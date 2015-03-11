@@ -1,0 +1,2 @@
+recursive-include lucterios/contacts *
+recursive-exclude lucterios/contacts/__pycache__ *
