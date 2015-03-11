@@ -1,0 +1,172 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-11 17:07+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: __init__.py:22
+msgid "Lucterios contacts"
+msgstr "Lucterios contacts"
+
+#: models.py:15 models.py:21
+msgid "postal code"
+msgstr "code postal"
+
+#: models.py:16
+msgid "city"
+msgstr "ville"
+
+#: models.py:17
+msgid "country"
+msgstr "pays"
+
+#: models.py:22
+msgid "postal codes"
+msgstr "Code postaux"
+
+#: views.py:19
+msgid "View my account."
+msgstr "Visualiser la fiche de mon compte."
+
+#: views.py:21
+msgid "My account"
+msgstr "Mon compte"
+
+#: views.py:24
+msgid "Our structure and its management"
+msgstr "Fiche de notre structure et de ses responsables"
+
+#: views.py:26
+msgid "Our details"
+msgstr "Nos coordonnées"
+
+#: views.py:29
+msgid "Contact"
+msgstr "Contact"
+
+#: views.py:31
+msgid "Management functions of individuals and categories of legal entities."
+msgstr ""
+"Gestion des fonctions des personnes physiques et des catégories de "
+"structures morales."
+
+#: views.py:33
+msgid "Contacts configuration"
+msgstr "Configuration des contacts"
+
+#: views.py:36
+msgid "Management of postal codes associated with their communes."
+msgstr "Gestion des codes postaux associés à leurs communes."
+
+#: views.py:38
+msgid "Postal code"
+msgstr "Code postal"
+
+#: views.py:52
+msgid "Filtrer by postal code"
+msgstr "Filtrer par code postal"
+
+#: views.py:66
+msgid "Add"
+msgstr "Ajouter"
+
+#: views.py:72
+#, python-format
+msgid "Total number of postal codes/city: %d"
+msgstr "Nombre total de code postaux/ville: %d"
+
+#: views.py:74
+msgid "close"
+msgstr "fermer"
+
+#: views.py:78
+msgid "Add postal code"
+msgstr "Ajouter un code postal"
+
+#: views.py:90
+msgid "Ok"
+msgstr "Ok"
+
+#: views.py:91
+msgid "Cancel"
+msgstr "Annuler"
+
+#: views.py:95
+msgid "Delete postal code"
+msgstr "Supprimer un code postal"
+
+#: views.py:101
+msgid "Configuring settings to send email"
+msgstr "Configuration des paramètres pour l'envoi de courriel"
+
+#: views.py:103
+msgid "Email configuration"
+msgstr "Configuration courriel"
+
+#: views_contacts.py:14
+msgid "Office"
+msgstr "Bureautique"
+
+#: views_contacts.py:14
+msgid "Office tools"
+msgstr "Outils bureautiques"
+
+#: views_contacts.py:16
+msgid "Addresses and contacts"
+msgstr "Adresses et Contacts"
+
+#: views_contacts.py:16
+msgid "Management of men or women and organizations saved."
+msgstr ""
+"Gestion d'hommes ou de femmes et d'organisations de personnes enregistrés"
+
+#: views_contacts.py:18
+msgid ""
+"Management of a structure or organization of people (company, association, "
+"administration, ...)"
+msgstr ""
+"Gestion d'une structure ou d'une organisation de personnes (entreprise, "
+"association, administration, ...)"
+
+#: views_contacts.py:20
+msgid "Legal entities"
+msgstr "Personnes _morales"
+
+#: views_contacts.py:23
+msgid "Management of men and women registered"
+msgstr "Gestion des hommes et des femmes enregistrés"
+
+#: views_contacts.py:25
+msgid "Individuals"
+msgstr "Personnes physiques"
+
+#: views_contacts.py:28
+msgid "To find an individual following a set of criteria."
+msgstr "Pour trouver une personne physique suivant un ensemble de critères."
+
+#: views_contacts.py:30
+msgid "Individual search"
+msgstr "Recherche de personne physique"
+
+#: views_contacts.py:33
+msgid "To find a legal entity following a set of criteria."
+msgstr ""
+"Pour trouver une personne morale{[newline]}suivant un ensemble de critères."
+
+#: views_contacts.py:35
+msgid "Legal entity search"
+msgstr "Recherche de personne morale"
