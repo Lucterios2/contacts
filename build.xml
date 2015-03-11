@@ -42,6 +42,7 @@
 
 	<target name="pylint">
 		<exec executable="pylint">
+			<env key="PYTHONPATH" value="${core.path}:${standard.path}:${env.PYTHONPATH}"/>
 			<arg line="--rcfile=./rcfile"/>
 			<arg line="--msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'"/>
 			<arg line="--reports=y"/>
