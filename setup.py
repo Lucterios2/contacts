@@ -24,7 +24,8 @@ setup(
     # Packages
     packages=["lucterios", "lucterios.contacts"],
     package_data={
+       "lucterios.contacts.migrations":['*'],
        "lucterios.contacts":['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["Lucterios>=2.0"],
+    install_requires=["Lucterios >=2.0b1"],
 )
