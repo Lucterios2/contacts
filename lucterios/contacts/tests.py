@@ -11,6 +11,7 @@ from lucterios.framework.test import LucteriosTest
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, \
     PostalCodeModify
+from django.utils import six
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -78,3 +79,9 @@ class PostalCodeTest(LucteriosTest):
         self.call('/CORE/postalCodeList', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'postalCodeList')
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 334", (0, 3, 3, 1))
+
+        self.factory.xfer = PostalCodeModify()
+        self.call('/CORE/postalCodeModify', {'postal_code':'96999', 'city':'Trifouilly', 'country':'LOIN'}, False)
+        self.assert_observer('Core.DialogBox', 'CORE', 'postalCodeModify')
+        self.assert_attrib_equal('TEXT', 'type', '3')
+        self.assert_xml_equal('TEXT', six.text_type('Cet enregistrement existe déjà!'))

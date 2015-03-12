@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-11 17:07+0000\n"
+"POT-Creation-Date: 2015-03-12 13:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,48 +69,50 @@ msgstr "Contacts configuration"
 msgid "Management of postal codes associated with their communes."
 msgstr "Management of postal codes associated with their communes."
 
-#: views.py:38
+#: views.py:38 views.py:42
 msgid "Postal code"
 msgstr "Postal code"
 
-#: views.py:52
+#: views.py:53
 msgid "Filtrer by postal code"
 msgstr "Filtrer by postal code"
 
-#: views.py:66
+#: views.py:67
 msgid "Add"
 msgstr "Add"
 
-#: views.py:72
+#: views.py:73
 #, python-format
 msgid "Total number of postal codes/city: %d"
 msgstr "Total number of postal codes/city: %d"
 
-#: views.py:74
-msgid "close"
+#: views.py:75
+#, fuzzy
+#| msgid "close"
+msgid "Close"
 msgstr "close"
 
-#: views.py:78
+#: views.py:79
 msgid "Add postal code"
 msgstr "Add postal code"
 
-#: views.py:90
+#: views.py:91
 msgid "Ok"
 msgstr "Ok"
 
-#: views.py:91
+#: views.py:92
 msgid "Cancel"
 msgstr "Cancel"
 
-#: views.py:95
+#: views.py:96
 msgid "Delete postal code"
 msgstr "Delete postal code"
 
-#: views.py:101
+#: views.py:102
 msgid "Configuring settings to send email"
 msgstr "Configuring settings to send email"
 
-#: views.py:103
+#: views.py:104
 msgid "Email configuration"
 msgstr "Email configuration"
 
