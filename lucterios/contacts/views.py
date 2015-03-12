@@ -33,12 +33,13 @@ class Configuration(XferContainerAcknowledge):
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
 
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
+@MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
 class PostalCodeList(XferContainerCustom):
     caption = _("Postal code")
     icon = "postalCode.png"
 
     def fillresponse(self, filter_postal_code=''):
+        self.caption = _("Postal code")
         img = XferCompImage('img')
         img.set_value('contacts/images/postalCode.png')
         img.set_location(0, 0, 1, 2)
@@ -54,7 +55,7 @@ class PostalCodeList(XferContainerCustom):
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
-        comp.set_action(self.request, self.get_changed("", ""), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
         if filter_postal_code == '':
@@ -71,9 +72,9 @@ class PostalCodeList(XferContainerCustom):
         lbl.set_location(0, 3, 3)
         lbl.set_value(_("Total number of postal codes/city: %d") % grid.nb_lines)
         self.add_component(lbl)
-        self.add_action(XferContainerAcknowledge().get_changed(_("close"), "images/close.png"), {})
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
 
-@MenuManage.describ('')
+@MenuManage.describ('contacts.add_postalcode')
 class PostalCodeAdd(XferContainerCustom):
     caption = _("Add postal code")
     icon = "postalCode.png"
@@ -90,7 +91,7 @@ class PostalCodeAdd(XferContainerCustom):
         self.add_action(PostalCodeModify().get_changed(_('Ok'), 'images/ok.png'), {})
         self.add_action(XferContainerAcknowledge().get_changed(_('Cancel'), 'images/cancel.png'), {})
 
-@MenuManage.describ('')
+@MenuManage.describ('contacts.add_postalcode')
 class PostalCodeModify(XferSave):
     caption = _("Delete postal code")
     icon = "postalCode.png"
@@ -98,7 +99,7 @@ class PostalCodeModify(XferSave):
     field_id = 'postalCode'
     raise_except_class = PostalCodeAdd
 
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
+@MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
 class ConfigMail(XferContainerAcknowledge):
     caption = _("Email configuration")
     icon = "emailconf.png"

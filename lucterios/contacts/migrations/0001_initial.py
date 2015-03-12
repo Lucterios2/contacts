@@ -8,13 +8,17 @@ from os import listdir
 from os.path import dirname, join
 from django.db.utils import IntegrityError
 from django.utils.log import getLogger
+import sys
 
 def initial_values(apps, schema_editor):
     # pylint: disable=unused-argument
+    pcfilename_prefix = 'postalcode_'
+    if (len(sys.argv) >= 2) and (sys.argv[1] == 'test'):
+        pcfilename_prefix = 'postalcode_frDOMTOM'
     postalcode = apps.get_model("contacts", "PostalCode")
     migrat_dir = dirname(__file__)
     for pcfile in listdir(migrat_dir):
-        if pcfile.endswith(".csv") and pcfile.startswith('postalcode_'):
+        if pcfile.endswith(".csv") and pcfile.startswith(pcfilename_prefix):
             with open(join(migrat_dir, pcfile)) as flpc:
                 for line in flpc.readlines():
                     try:
