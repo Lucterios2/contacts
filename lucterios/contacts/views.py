@@ -57,7 +57,7 @@ class Configuration(XferContainerCustom):
         self.add_component(lbl)
 
     def _fill_structuretype(self):
-        self.new_tab(_("Structure type for legal entities"))
+        self.new_tab(_("Structure type"))
         img = XferCompImage('imgType')
         img.set_value('contacts/images/category.png')
         img.set_location(0, 0)

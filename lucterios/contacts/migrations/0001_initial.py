@@ -64,7 +64,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
-                ('readonly', models.BooleanField(verbose_name='read-only', default=False)),
             ],
             options={
                 'default_permissions': [],
@@ -78,7 +77,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
                 ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
-                ('readonly', models.BooleanField(verbose_name='read-only', default=False)),
             ],
             options={
                 'verbose_name_plural': 'structure types',

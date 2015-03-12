@@ -26,7 +26,6 @@ class PostalCode(models.Model):
 
 class Function(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
-    readonly = models.BooleanField(_('read-only'), default=False)
 
     class Meta(object):
         # pylint: disable=no-init
@@ -36,7 +35,6 @@ class Function(models.Model):
 
 class StructureType(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
-    readonly = models.BooleanField(_('read-only'), default=False)
 
     class Meta(object):
         # pylint: disable=no-init

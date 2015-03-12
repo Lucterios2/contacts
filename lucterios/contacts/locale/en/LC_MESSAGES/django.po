@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-12 16:52+0000\n"
+"POT-Creation-Date: 2015-03-12 17:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,27 +37,23 @@ msgstr "country"
 msgid "postal codes"
 msgstr "postal codes"
 
-#: models.py:28 models.py:38
+#: models.py:28 models.py:37
 msgid "name"
 msgstr "name"
 
-#: models.py:29 models.py:39
-msgid "read-only"
-msgstr "read-only"
-
-#: models.py:33
+#: models.py:32
 msgid "individual function"
 msgstr "Individual function"
 
-#: models.py:34
+#: models.py:33
 msgid "individual functions"
 msgstr "Individual functions"
 
-#: models.py:43
+#: models.py:41
 msgid "structure type"
 msgstr "structure type"
 
-#: models.py:44
+#: models.py:42
 msgid "structure types"
 msgstr "structure types"
 
@@ -111,8 +107,8 @@ msgid "Number of function show: %d"
 msgstr "Number of function show: %d"
 
 #: views.py:60
-msgid "Structure type for legal entities"
-msgstr "Structure type for legal entities"
+msgid "Structure type"
+msgstr "Structure type"
 
 #: views.py:66
 msgid "Structure types list"
@@ -239,3 +235,6 @@ msgstr "To find a legal entity following a set of criteria."
 #: views_contacts.py:35
 msgid "Legal entity search"
 msgstr "Legal entity search"
+
+#~ msgid "read-only"
+#~ msgstr "read-only"
