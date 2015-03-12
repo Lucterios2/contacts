@@ -9,12 +9,12 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, \
-    FORMTYPE_REFRESH, CLOSE_NO
+    FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE
 from lucterios.framework.xfergraphic import XferContainerAcknowledge, \
-    XferContainerCustom, XferSave
+    XferContainerCustom, XferDelete, XferAddEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, \
     XferCompEdit, XferCompGrid
-from lucterios.contacts.models import PostalCode
+from lucterios.contacts.models import PostalCode, Function, StructureType
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerAcknowledge):
@@ -28,17 +28,110 @@ class CurrentStructure(XferContainerAcknowledge):
 
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
-class Configuration(XferContainerAcknowledge):
+@MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
+class Configuration(XferContainerCustom):
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
 
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
+    def _fill_functions(self):
+        self.new_tab(_("Functions and responsabilities"))
+        img = XferCompImage('imgFunction')
+        img.set_value('contacts/images/function.png')
+        img.set_location(0, 0)
+        self.add_component(img)
+        img = XferCompLabelForm('titleFunction')
+        img.set_value_as_title(_("Functions list"))
+        img.set_location(1, 0)
+        self.add_component(img)
+        dbfunction = Function.objects.all() # pylint: disable=no-member
+        grid = XferCompGrid("function")
+        grid.set_model(dbfunction, ["name"], self)
+        grid.add_action(self.request, FunctionAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'unique':SELECT_NONE})
+        grid.add_action(self.request, FunctionDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.set_location(0, 1, 2)
+        grid.set_size(200, 500)
+        self.add_component(grid)
+        lbl = XferCompLabelForm("nbFunction")
+        lbl.set_location(0, 2, 2)
+        lbl.set_value(_("Number of function show: %d") % grid.nb_lines)
+        self.add_component(lbl)
+
+    def _fill_structuretype(self):
+        self.new_tab(_("Structure type"))
+        img = XferCompImage('imgType')
+        img.set_value('contacts/images/category.png')
+        img.set_location(0, 0)
+        self.add_component(img)
+        img = XferCompLabelForm('titleType')
+        img.set_value_as_title(_('Structure types list'))
+        img.set_location(1, 0)
+        self.add_component(img)
+        dbcategorie = StructureType.objects.all() # pylint: disable=no-member
+        grid = XferCompGrid("structure_type")
+        grid.set_model(dbcategorie, ["name"], self)
+        grid.add_action(self.request, StructureTypeAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'select':SELECT_NONE})
+        grid.add_action(self.request, StructureTypeDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'select':SELECT_SINGLE})
+        grid.set_location(0, 1, 2)
+        grid.set_size(200, 500)
+        self.add_component(grid)
+        lbl = XferCompLabelForm("nbType")
+        lbl.set_location(0, 2, 2)
+        lbl.set_value(_("Number of structure type show: %d") % grid.nb_lines)
+        self.add_component(lbl)
+
+    def fillresponse(self):
+        self._fill_functions()
+        self._fill_structuretype()
+        self.new_tab(_("Customized fields"))
+        img = XferCompImage('imgfield')
+        img.set_value('contacts/images/fields.png')
+        img.set_location(0, 10)
+        self.add_component(img)
+        lab = XferCompLabelForm("titlefields")
+        lab.set_value_as_title(_("Addon fields to customize contacts"))
+        lab.set_location(1, 10, 5)
+        self.add_component(lab)
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
+
+@MenuManage.describ('CORE.add_parameter')
+class FunctionAddModify(XferAddEditor):
+    icon = "function.png"
+    model = Function
+    field_id = 'function'
+    caption_add = _("Add function")
+    caption_modify = _("Modify function")
+    fieldnames = ['name']
+
+@MenuManage.describ('CORE.add_parameter')
+class FunctionDel(XferDelete):
+    caption = _("Delete function")
+    icon = "function.png"
+    model = Function
+    field_id = 'function'
+
+@MenuManage.describ('CORE.add_parameter')
+class StructureTypeAddModify(XferAddEditor):
+    icon = "function.png"
+    model = StructureType
+    field_id = 'structure_type'
+    caption_add = _("Add structure type")
+    caption_modify = _("Modify structure type")
+    fieldnames = ['name']
+
+@MenuManage.describ('CORE.add_parameter')
+class StructureTypeDel(XferDelete):
+    caption = _("Delete structure type")
+    icon = "function.png"
+    model = StructureType
+    field_id = 'structure_type'
+
+@MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
 class PostalCodeList(XferContainerCustom):
     caption = _("Postal code")
     icon = "postalCode.png"
 
     def fillresponse(self, filter_postal_code=''):
+        self.caption = _("Postal code")
         img = XferCompImage('img')
         img.set_value('contacts/images/postalCode.png')
         img.set_location(0, 0, 1, 2)
@@ -49,12 +142,12 @@ class PostalCodeList(XferContainerCustom):
 #             local_struct.get(1)
 #             filtre_postal_code = local_struct.postal_code
         lbl = XferCompLabelForm('filtre')
-        lbl.set_value("{[bold]}%s{[/bold]}" % _('Filtrer by postal code'))
+        lbl.set_value_as_name(_('Filtrer by postal code'))
         lbl.set_location(1, 0)
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
-        comp.set_action(self.request, self.get_changed("", ""), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
         if filter_postal_code == '':
@@ -71,34 +164,18 @@ class PostalCodeList(XferContainerCustom):
         lbl.set_location(0, 3, 3)
         lbl.set_value(_("Total number of postal codes/city: %d") % grid.nb_lines)
         self.add_component(lbl)
-        self.add_action(XferContainerAcknowledge().get_changed(_("close"), "images/close.png"), {})
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
 
-@MenuManage.describ('')
-class PostalCodeAdd(XferContainerCustom):
-    caption = _("Add postal code")
+@MenuManage.describ('contacts.add_postalcode')
+class PostalCodeAdd(XferAddEditor):
+    caption_add = _("Add function")
+    caption_modify = _("Add postal code")
     icon = "postalCode.png"
     model = PostalCode
     field_id = 'postalCode'
+    fieldnames = ['postal_code', 'city', 'country']
 
-    def fillresponse(self):
-        img = XferCompImage('img')
-        img.set_value('contacts/images/postalCode.png')
-        img.set_location(0, 0, 1, 6)
-        self.add_component(img)
-        self.fill_from_model(1, 0, False, ['postal_code', 'city', 'country'])
-
-        self.add_action(PostalCodeModify().get_changed(_('Ok'), 'images/ok.png'), {})
-        self.add_action(XferContainerAcknowledge().get_changed(_('Cancel'), 'images/cancel.png'), {})
-
-@MenuManage.describ('')
-class PostalCodeModify(XferSave):
-    caption = _("Delete postal code")
-    icon = "postalCode.png"
-    model = PostalCode
-    field_id = 'postalCode'
-    raise_except_class = PostalCodeAdd
-
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
+@MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
 class ConfigMail(XferContainerAcknowledge):
     caption = _("Email configuration")
     icon = "emailconf.png"
