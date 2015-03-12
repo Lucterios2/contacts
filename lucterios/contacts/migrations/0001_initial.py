@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError
 from django.utils.log import getLogger
 import sys
 
-def initial_values(apps, schema_editor):
+def initial_postalcodes(apps, schema_editor):
     # pylint: disable=unused-argument
     pcfilename_prefix = 'postalcode_'
     if (len(sys.argv) >= 2) and (sys.argv[1] == 'test'):
@@ -59,5 +59,33 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
-        migrations.RunPython(initial_values),
+        migrations.CreateModel(
+            name='Function',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
+                ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
+                ('readonly', models.BooleanField(verbose_name='read-only', default=False)),
+            ],
+            options={
+                'default_permissions': [],
+                'verbose_name': 'individual function',
+                'verbose_name_plural': 'individual functions',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='StructureType',
+            fields=[
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
+                ('readonly', models.BooleanField(verbose_name='read-only', default=False)),
+            ],
+            options={
+                'verbose_name_plural': 'structure types',
+                'verbose_name': 'structure type',
+                'default_permissions': [],
+            },
+            bases=(models.Model,),
+        ),
+        migrations.RunPython(initial_postalcodes),
     ]

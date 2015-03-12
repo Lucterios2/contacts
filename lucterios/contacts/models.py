@@ -23,3 +23,23 @@ class PostalCode(models.Model):
         default_permissions = ['add', 'change']
         ordering = ['postal_code', 'city']
         unique_together = (('postal_code', 'city', 'country'),)
+
+class Function(models.Model):
+    name = models.CharField(_('name'), max_length=50, unique=True)
+    readonly = models.BooleanField(_('read-only'), default=False)
+
+    class Meta(object):
+        # pylint: disable=no-init
+        verbose_name = _('individual function')
+        verbose_name_plural = _('individual functions')
+        default_permissions = []
+
+class StructureType(models.Model):
+    name = models.CharField(_('name'), max_length=50, unique=True)
+    readonly = models.BooleanField(_('read-only'), default=False)
+
+    class Meta(object):
+        # pylint: disable=no-init
+        verbose_name = _('structure type')
+        verbose_name_plural = _('structure types')
+        default_permissions = []

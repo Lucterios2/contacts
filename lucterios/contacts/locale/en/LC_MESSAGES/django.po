@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-12 13:24+0000\n"
+"POT-Creation-Date: 2015-03-12 16:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,6 +36,30 @@ msgstr "country"
 #: models.py:22
 msgid "postal codes"
 msgstr "postal codes"
+
+#: models.py:28 models.py:38
+msgid "name"
+msgstr "name"
+
+#: models.py:29 models.py:39
+msgid "read-only"
+msgstr "read-only"
+
+#: models.py:33
+msgid "individual function"
+msgstr "Individual function"
+
+#: models.py:34
+msgid "individual functions"
+msgstr "Individual functions"
+
+#: models.py:43
+msgid "structure type"
+msgstr "structure type"
+
+#: models.py:44
+msgid "structure types"
+msgstr "structure types"
 
 #: views.py:19
 msgid "View my account."
@@ -65,54 +89,102 @@ msgstr "Management functions of individuals and categories of legal entities."
 msgid "Contacts configuration"
 msgstr "Contacts configuration"
 
-#: views.py:36
-msgid "Management of postal codes associated with their communes."
-msgstr "Management of postal codes associated with their communes."
+#: views.py:37
+msgid "Functions and responsabilities"
+msgstr "Functions and responsabilities"
 
-#: views.py:38 views.py:42
-msgid "Postal code"
-msgstr "Postal code"
+#: views.py:43
+msgid "Functions list"
+msgstr "Functions list"
 
-#: views.py:53
-msgid "Filtrer by postal code"
-msgstr "Filtrer by postal code"
-
-#: views.py:67
+#: views.py:49 views.py:72 views.py:159
 msgid "Add"
 msgstr "Add"
 
-#: views.py:73
+#: views.py:50 views.py:73
+msgid "Delete"
+msgstr "Delete"
+
+#: views.py:56
+#, python-format
+msgid "Number of function show: %d"
+msgstr "Number of function show: %d"
+
+#: views.py:60
+msgid "Structure type for legal entities"
+msgstr "Structure type for legal entities"
+
+#: views.py:66
+msgid "Structure types list"
+msgstr "Structure types list"
+
+#: views.py:79
+#, python-format
+msgid "Number of structure type show: %d"
+msgstr "Number of structure type show: %d"
+
+#: views.py:85
+msgid "Customized fields"
+msgstr "Customized fields"
+
+#: views.py:91
+msgid "Addon fields to customize contacts"
+msgstr "Addon fields to customize contacts"
+
+#: views.py:94 views.py:167
+msgid "Close"
+msgstr "Close"
+
+#: views.py:101 views.py:171
+msgid "Add function"
+msgstr "Add function"
+
+#: views.py:102
+msgid "Modify function"
+msgstr "Modify function"
+
+#: views.py:107
+msgid "Delete function"
+msgstr "Delete function"
+
+#: views.py:117
+msgid "Add structure type"
+msgstr "Add structure type"
+
+#: views.py:118
+msgid "Modify structure type"
+msgstr "Modify structure type"
+
+#: views.py:123
+msgid "Delete structure type"
+msgstr "Delete structure type"
+
+#: views.py:128
+msgid "Management of postal codes associated with their communes."
+msgstr "Management of postal codes associated with their communes."
+
+#: views.py:130 views.py:134
+msgid "Postal code"
+msgstr "Postal code"
+
+#: views.py:145
+msgid "Filtrer by postal code"
+msgstr "Filtrer by postal code"
+
+#: views.py:165
 #, python-format
 msgid "Total number of postal codes/city: %d"
 msgstr "Total number of postal codes/city: %d"
 
-#: views.py:75
-#, fuzzy
-#| msgid "close"
-msgid "Close"
-msgstr "close"
-
-#: views.py:79
+#: views.py:172
 msgid "Add postal code"
 msgstr "Add postal code"
 
-#: views.py:91
-msgid "Ok"
-msgstr "Ok"
-
-#: views.py:92
-msgid "Cancel"
-msgstr "Cancel"
-
-#: views.py:96
-msgid "Delete postal code"
-msgstr "Delete postal code"
-
-#: views.py:102
+#: views.py:178
 msgid "Configuring settings to send email"
 msgstr "Configuring settings to send email"
 
-#: views.py:104
+#: views.py:180
 msgid "Email configuration"
 msgstr "Email configuration"
 
