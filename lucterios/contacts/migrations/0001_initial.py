@@ -9,6 +9,14 @@ from os.path import dirname, join
 from django.db.utils import IntegrityError
 from django.utils.log import getLogger
 import sys
+from django.conf import settings
+
+def initial_values(apps, schema_editor):
+    # pylint: disable=unused-argument
+    legalentity = apps.get_model("contacts", "LegalEntity")
+    current_entity = legalentity.objects.create(id=1, name="---", address='---', \
+                            postal_code='00000', city='---')
+    current_entity.save()
 
 def initial_postalcodes(apps, schema_editor):
     # pylint: disable=unused-argument
@@ -67,8 +75,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'default_permissions': [],
-                'verbose_name': 'individual function',
-                'verbose_name_plural': 'individual functions',
+                'verbose_name': 'Individual function',
+                'verbose_name_plural': 'Individual functions'
             },
             bases=(models.Model,),
         ),
@@ -85,5 +93,53 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='AbstractContact',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('address', models.TextField(verbose_name='address')),
+                ('postal_code', models.CharField(max_length=10, verbose_name='postal code')),
+                ('city', models.CharField(max_length=100, verbose_name='city')),
+                ('country', models.CharField(max_length=100, verbose_name='country')),
+                ('tel1', models.CharField(max_length=15, verbose_name='tel1')),
+                ('tel2', models.CharField(max_length=15, verbose_name='tel1')),
+                ('email', models.EmailField(max_length=75, verbose_name='email')),
+                ('comment', models.TextField(verbose_name='comment')),
+            ],
+            options={
+                'default_permissions': [],
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Individual',
+            fields=[
+                ('abstractcontact_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='contacts.AbstractContact')),
+                ('genre', models.IntegerField(choices=[(1, 'Man'), (2, 'Woman')], default=1)),
+                ('lastname', models.CharField(max_length=50, verbose_name='lastname')),
+                ('firstname', models.CharField(max_length=50, verbose_name='firstname')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': 'individual',
+                'verbose_name_plural': 'individuals',
+            },
+            bases=('contacts.abstractcontact',),
+        ),
+        migrations.CreateModel(
+            name='LegalEntity',
+            fields=[
+                ('abstractcontact_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='contacts.AbstractContact')),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ('identify_number', models.CharField(max_length=100, verbose_name='identify number')),
+                ('structure_type', models.ForeignKey(to='contacts.StructureType', null=True)),
+            ],
+            options={
+                'verbose_name': 'legal entity',
+                'verbose_name_plural': 'legal entities',
+            },
+            bases=('contacts.abstractcontact',),
+        ),
         migrations.RunPython(initial_postalcodes),
+        migrations.RunPython(initial_values),
     ]
