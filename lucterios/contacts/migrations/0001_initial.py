@@ -12,6 +12,7 @@ import sys
 
 def initial_postalcodes(apps, schema_editor):
     # pylint: disable=unused-argument
+    import codecs
     pcfilename_prefix = 'postalcode_'
     if (len(sys.argv) >= 2) and (sys.argv[1] == 'test'):
         pcfilename_prefix = 'postalcode_frDOMTOM'
@@ -19,20 +20,23 @@ def initial_postalcodes(apps, schema_editor):
     migrat_dir = dirname(__file__)
     for pcfile in listdir(migrat_dir):
         if pcfile.endswith(".csv") and pcfile.startswith(pcfilename_prefix):
-            with open(join(migrat_dir, pcfile)) as flpc:
-                for line in flpc.readlines():
-                    try:
-                        postal_code, city, country = six.text_type(line).split(';')[:3]
-                        with transaction.atomic():
-                            newpc = postalcode.objects.create()
-                            newpc.postal_code = six.text_type(postal_code).strip()
-                            newpc.city = six.text_type(city).strip()
-                            newpc.country = six.text_type(country).strip()
-                            newpc.save()
-                    except ValueError:
-                        getLogger(__name__).warning(six.text_type(" --- ValueError"))
-                    except IntegrityError:
-                        getLogger(__name__).warning(six.text_type(" --- IntegrityError:") + six.text_type(line))
+            try:
+                with codecs.open(join(migrat_dir, pcfile), 'r', 'utf-8') as flpc:
+                    for line in flpc.readlines():
+                        try:
+                            postal_code, city, country = six.text_type(line).split(';')[:3]
+                            with transaction.atomic():
+                                newpc = postalcode.objects.create()
+                                newpc.postal_code = six.text_type(postal_code).strip()
+                                newpc.city = six.text_type(city).strip()
+                                newpc.country = six.text_type(country).strip()
+                                newpc.save()
+                        except ValueError:
+                            getLogger(__name__).warning(six.text_type(" --- ValueError"))
+                        except IntegrityError:
+                            getLogger(__name__).warning(six.text_type(" --- IntegrityError:") + six.text_type(line))
+            except UnicodeDecodeError:
+                getLogger(__name__).warning(six.text_type(" --- UnicodeDecodeError:") + pcfile)
 
 class Migration(migrations.Migration):
 
