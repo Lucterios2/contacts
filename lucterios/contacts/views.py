@@ -8,13 +8,13 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, \
-    FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE
-from lucterios.framework.xfergraphic import XferContainerAcknowledge, \
-    XferContainerCustom, XferDelete, XferAddEditor
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, \
-    XferCompEdit, XferCompGrid
-from lucterios.contacts.models import PostalCode, Function, StructureType
+from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
+from lucterios.framework.xferadvance import XferAddEditor, XferDelete
+from lucterios.contacts.models import PostalCode, Function, StructureType, \
+    LegalEntity
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, \
+    FORMTYPE_MODAL
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerAcknowledge):
@@ -22,9 +22,26 @@ class Account(XferContainerAcknowledge):
     icon = "account.png"
 
 @MenuManage.describ('', FORMTYPE_NOMODAL, 'core.general', _('Our structure and its management'))
-class CurrentStructure(XferContainerAcknowledge):
+class CurrentStructure(XferContainerCustom):
     caption = _("Our details")
     icon = "ourDetails.png"
+    model = LegalEntity
+    field_id = 1
+
+    def fillresponse(self):
+        img = XferCompImage('imgentity')
+        img.set_value('contacts/images/ourDetails.png')
+        img.set_location(0, 0)
+        self.add_component(img)
+        img = XferCompLabelForm('title_entity')
+        img.set_value_as_title(_("Our structure and its management"))
+        img.set_location(1, 0, 3)
+        self.add_component(img)
+
+        self.fill_from_model(0, 1, True)
+
+        self.add_action(XferContainerAcknowledge().get_changed(_("Modifier"), "images/edit.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
 
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
@@ -43,7 +60,7 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_("Functions list"))
         img.set_location(1, 0)
         self.add_component(img)
-        dbfunction = Function.objects.all() # pylint: disable=no-member
+        dbfunction = Function.objects.all()  # pylint: disable=no-member
         grid = XferCompGrid("function")
         grid.set_model(dbfunction, ["name"], self)
         grid.add_action(self.request, FunctionAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'unique':SELECT_NONE})
@@ -66,7 +83,7 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_('Structure types list'))
         img.set_location(1, 0)
         self.add_component(img)
-        dbcategorie = StructureType.objects.all() # pylint: disable=no-member
+        dbcategorie = StructureType.objects.all()  # pylint: disable=no-member
         grid = XferCompGrid("structure_type")
         grid.set_model(dbcategorie, ["name"], self)
         grid.add_action(self.request, StructureTypeAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'select':SELECT_NONE})

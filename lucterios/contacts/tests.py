@@ -14,6 +14,7 @@ from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, \
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
+#from lucterios.contacts.models import LegalEntity
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -109,6 +110,11 @@ class ConfigurationTest(LucteriosTest):
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="structure_type"]', (0, 1, 2, 1, 2))
         self.assert_count_equal('COMPONENTS/GRID[@name="structure_type"]/HEADER', 1)
         self.assert_xml_equal('COMPONENTS/GRID[@name="structure_type"]/HEADER[@name="name"]', "nom")
+
+#     def test_current(self):
+#         current = LegalEntity.objects.get(pk=1)
+#         self.assertEqual("---", current.name)
+#         current.get_fieldnames()
 
 def suite():
     # pylint: disable=redefined-outer-name
