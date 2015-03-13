@@ -7,12 +7,10 @@ Created on march 2015
 
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
-
 from django.db import models
 from lucterios.framework.models import LucteriosModel
 
 class PostalCode(LucteriosModel):
-
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
     country = models.CharField(_('country'), max_length=100, blank=False)

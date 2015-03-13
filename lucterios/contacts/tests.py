@@ -9,8 +9,7 @@ from __future__ import unicode_literals
 
 from lucterios.framework.test import LucteriosTest
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, \
-    Configuration, CurrentStructure
+from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
