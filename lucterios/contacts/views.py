@@ -17,7 +17,7 @@ from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm,
     XferCompEdit, XferCompGrid
 from lucterios.contacts.models import PostalCode, Function, StructureType, \
     LegalEntity
-import six
+from django.utils import six
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerAcknowledge):
