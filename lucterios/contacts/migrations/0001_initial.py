@@ -16,7 +16,7 @@ def initial_values(apps, schema_editor):
     # pylint: disable=unused-argument
     legalentity = apps.get_model("contacts", "LegalEntity")
     current_entity = legalentity.objects.create(id=1, name="---", address='---', \
-                            postal_code='00000', city='---')
+                            postal_code='00000', city='---', country='---')
     current_entity.save()
 
 def initial_postalcodes(apps, schema_editor):
@@ -102,14 +102,14 @@ class Migration(migrations.Migration):
             name='AbstractContact',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('address', models.TextField(verbose_name='address')),
-                ('postal_code', models.CharField(max_length=10, verbose_name='postal code')),
-                ('city', models.CharField(max_length=100, verbose_name='city')),
-                ('country', models.CharField(max_length=100, verbose_name='country')),
-                ('tel1', models.CharField(max_length=15, verbose_name='tel1')),
-                ('tel2', models.CharField(max_length=15, verbose_name='tel1')),
-                ('email', models.EmailField(max_length=75, verbose_name='email')),
-                ('comment', models.TextField(verbose_name='name')),
+                ('address', models.TextField(verbose_name='address', blank=False)),
+                ('postal_code', models.CharField(max_length=10, verbose_name='postal code', blank=False)),
+                ('city', models.CharField(max_length=100, verbose_name='city', blank=False)),
+                ('country', models.CharField(max_length=100, verbose_name='country', blank=False)),
+                ('tel1', models.CharField(max_length=15, blank=True, verbose_name='phone #1')),
+                ('tel2', models.CharField(max_length=15, blank=True, verbose_name='phone #2')),
+                ('email', models.EmailField(max_length=75, blank=True, verbose_name='email')),
+                ('comment', models.TextField(blank=True, verbose_name='comment')),
             ],
             options={
                 'default_permissions': [],
@@ -120,8 +120,8 @@ class Migration(migrations.Migration):
             name='LegalEntity',
             fields=[
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True, to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('identify_number', models.CharField(max_length=30, verbose_name='email')),
+                ('name', models.CharField(max_length=100, verbose_name='name', blank=False)),
+                ('identify_number', models.CharField(max_length=100, blank=True, verbose_name='legal number')),
                 ('structure_type', models.ForeignKey(null=True, to='contacts.StructureType')),
             ],
             options={
@@ -134,9 +134,9 @@ class Migration(migrations.Migration):
             name='Individual',
             fields=[
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True, to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
-                ('firstname', models.CharField(max_length=30, verbose_name='firstname')),
-                ('lastname', models.CharField(max_length=30, verbose_name='lastname')),
-                ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')])),
+                ('firstname', models.CharField(max_length=50, verbose_name='firstname')),
+                ('lastname', models.CharField(max_length=50, verbose_name='lastname')),
+                ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')], blank=False)),
                 ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL)),
             ],
             options={

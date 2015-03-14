@@ -9,7 +9,8 @@ from __future__ import unicode_literals
 
 from lucterios.framework.test import LucteriosTest
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure
+from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
+    CurrentStructureAddModify
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
@@ -21,7 +22,7 @@ class PostalCodeTest(LucteriosTest):
     def setUp(self):
         self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
-        ourdetails = LegalEntity.objects.get(id=1) # pylint: disable=no-member
+        ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
         ourdetails.postal_code = "97400"
         ourdetails.save()
 
@@ -107,13 +108,13 @@ class ConfigurationTest(LucteriosTest):
     def setUp(self):
         self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
-        ourdetails = LegalEntity.objects.get(id=1) # pylint: disable=no-member
+        ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
         ourdetails.name = "WoldCompany"
-        ourdetails.address = "wall street"
-        ourdetails.postal_code = "10005"
-        ourdetails.city = "New-York"
-        ourdetails.country = "USA - New York"
-        ourdetails.tel1 = "555-123-456"
+        ourdetails.address = "Place des cocotiers"
+        ourdetails.postal_code = "97200"
+        ourdetails.city = "FORT DE FRANCE"
+        ourdetails.country = "MARTINIQUE"
+        ourdetails.tel1 = "01-23-45-67-89"
         ourdetails.email = "mr-sylvestre@worldcompany.com"
         ourdetails.save()
 
@@ -134,7 +135,6 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/GRID[@name="structure_type"]/HEADER[@name="name"]', "nom")
 
     def test_ourdetails(self):
-
         self.factory.xfer = CurrentStructure()
         self.call('/CORE/currentStructure', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'currentStructure')
@@ -142,18 +142,57 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'contacts', 'currentStructureAddModify', 0, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 26)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany", (2, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="structure_type"]', "---", (1, 0, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="address"]', "wall street", (1, 1, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="postal_code"]', "10005", (1, 2, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="city"]', "New-York", (3, 2, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="country"]', "USA - New York", (1, 3, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel1"]', "555-123-456", (1, 4, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel2"]', None, (3, 4, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="email"]', "mr-sylvestre@worldcompany.com", (1, 5, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (1, 6, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="identify_number"]', None, (1, 7, 3, 1, 1))
+        self.assert_count_equal('COMPONENTS/*', 24)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany", (1, 0, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="address"]', "Place des cocotiers", (1, 2, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="postal_code"]', "97200", (1, 3, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="city"]', "FORT DE FRANCE", (3, 3, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="country"]', "MARTINIQUE", (1, 4, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel1"]', "01-23-45-67-89", (1, 5, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel2"]', None, (3, 5, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LINK[@name="email"]', "mr-sylvestre@worldcompany.com", (1, 6, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (1, 7, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="identify_number"]', None, (1, 8, 3, 1, 1))
+
+    def test_changedetails(self):
+        self.factory.xfer = CurrentStructureAddModify()
+        self.call('/CORE/currentAddModify', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'currentAddModify')
+        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
+        self.assert_count_equal('COMPONENTS/*', 21)
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', "WoldCompany", (2, 0, 3, 1))
+        self.assert_comp_equal('COMPONENTS/MEMO[@name="address"]', "Place des cocotiers", (2, 2, 3, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="postal_code"]', "97200", (2, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="city"]', "FORT DE FRANCE", (4, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="country"]', "MARTINIQUE", (2, 4, 3, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="tel1"]', "01-23-45-67-89", (2, 5, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="tel2"]', None, (4, 5, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="email"]', "mr-sylvestre@worldcompany.com", (2, 6, 3, 1))
+        self.assert_comp_equal('COMPONENTS/MEMO[@name="comment"]', None, (2, 7, 3, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="identify_number"]', None, (2, 8, 3, 1))
+
+        self.factory.xfer = CurrentStructureAddModify()
+        self.call('/CORE/currentAddModify', {"address":'Rue de la liberté{[newline]}BP 123', \
+                        "comment":'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....', "name":'WorldCompany', \
+                        "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-01-02-03-04', "SAVE":'YES', \
+                        "tel1":'09-87-65-43-21', "postal_code":'97250', "email":'jack@worldcompany.com', \
+                        "identify_number":'AZERTY123DDSQ'}, False)
+        self.assert_observer('Core.Acknowledge', 'CORE', 'currentAddModify')
+        self.assert_count_equal('CONTEXT/PARAM', 11)
+
+        self.factory.xfer = CurrentStructure()
+        self.call('/CORE/currentStructure', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'currentStructure')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WorldCompany")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="address"]', "Rue de la liberté{[newline]}BP 123")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="postal_code"]', "97250")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="city"]', "ST PIERRE")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="country"]', "MARTINIQUE")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="tel1"]', "09-87-65-43-21")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="tel2"]', '06-01-02-03-04')
+        self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="comment"]', 'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="identify_number"]', "AZERTY123DDSQ")
 
 def suite():
     # pylint: disable=redefined-outer-name
