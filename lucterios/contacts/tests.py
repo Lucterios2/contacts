@@ -15,6 +15,10 @@ from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
 from lucterios.contacts.models import LegalEntity
+from shutil import rmtree
+from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
+    get_user_path
+from os.path import join, dirname, exists
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -117,6 +121,7 @@ class ConfigurationTest(LucteriosTest):
         ourdetails.tel1 = "01-23-45-67-89"
         ourdetails.email = "mr-sylvestre@worldcompany.com"
         ourdetails.save()
+        rmtree(get_user_dir(), True)
 
     def test_list(self):
         self.factory.xfer = Configuration()
@@ -153,14 +158,14 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal('COMPONENTS/LINK[@name="email"]', "mr-sylvestre@worldcompany.com", (2, 6, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (2, 7, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="identify_number"]', None, (2, 8, 3, 1, 1))
-        self.assert_coordcomp_equal('COMPONENTS/IMAGE[@name="logoimg"]', (0, 2, 1, 6, 1))
+        self.assert_comp_equal('COMPONENTS/IMAGE[@name="logoimg"]', "contacts/images/NoImage.png", (0, 2, 1, 6, 1))
 
     def test_changedetails(self):
         self.factory.xfer = CurrentStructureAddModify()
         self.call('/CORE/currentAddModify', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'currentAddModify')
         self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
-        self.assert_count_equal('COMPONENTS/*', 22)
+        self.assert_count_equal('COMPONENTS/*', 23)
         self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', "WoldCompany", (2, 0, 3, 1))
         self.assert_comp_equal('COMPONENTS/MEMO[@name="address"]', "Place des cocotiers", (2, 2, 3, 1))
         self.assert_comp_equal('COMPONENTS/EDIT[@name="postal_code"]', "97200", (2, 3, 1, 1))
@@ -195,6 +200,21 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="comment"]', 'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="identify_number"]', "AZERTY123DDSQ")
+
+    def test_logo(self):
+        self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
+        logo_path = join(dirname(__file__), 'images', 'ourDetails.png')
+        logo_stream = "image.jpg;" + readimage_to_base64(logo_path, False).decode("utf-8")
+
+        self.factory.xfer = CurrentStructureAddModify()
+        self.call('/CORE/currentAddModify', {"SAVE":'YES', "uploadlogo":logo_stream}, False)
+        self.assert_observer('Core.Acknowledge', 'CORE', 'currentAddModify')
+        self.assertTrue(exists(get_user_path('contacts', 'Image_1.jpg')))
+
+        self.factory.xfer = CurrentStructure()
+        self.call('/CORE/currentStructure', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'currentStructure')
+        self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,/9j/4AAQSkZJRg", True)
 
 def suite():
     # pylint: disable=redefined-outer-name
