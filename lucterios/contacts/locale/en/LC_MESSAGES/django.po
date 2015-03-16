@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-16 09:39+0000\n"
+"POT-Creation-Date: 2015-03-16 15:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,7 @@ msgstr ""
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:165
+#: models.py:165 models.py:195
 msgid "001@Identity"
 msgstr "001@Identity"
 
@@ -125,134 +125,134 @@ msgstr "individual"
 msgid "individuals"
 msgstr "individuals"
 
-#: views.py:22
+#: views.py:25 views.py:36
 msgid "View my account."
 msgstr "View my account."
 
-#: views.py:24
+#: views.py:27 views.py:53 views.py:54
 msgid "My account"
 msgstr "My account"
 
-#: views.py:27 views.py:40
-msgid "Our structure and its management"
-msgstr "Our structure and its management"
-
-#: views.py:29 views.py:52 views.py:53
-msgid "Our details"
-msgstr "Our details"
-
-#: views.py:44
+#: views.py:41 views.py:44 views.py:74
 msgid "Edit"
 msgstr "Edit"
 
-#: views.py:45 views.py:120 views.py:189
+#: views.py:46 views.py:75 views.py:151 views.py:220
 msgid "Close"
 msgstr "Close"
 
-#: views.py:55
+#: views.py:57 views.py:70
+msgid "Our structure and its management"
+msgstr "Our structure and its management"
+
+#: views.py:59 views.py:82 views.py:83
+msgid "Our details"
+msgstr "Our details"
+
+#: views.py:86
 msgid "Contact"
 msgstr "Contact"
 
-#: views.py:57
+#: views.py:88
 msgid "Management functions of individuals and categories of legal entities."
 msgstr "Management functions of individuals and categories of legal entities."
 
-#: views.py:59
+#: views.py:90
 msgid "Contacts configuration"
 msgstr "Contacts configuration"
 
-#: views.py:63
+#: views.py:94
 msgid "Functions and responsabilities"
 msgstr "Functions and responsabilities"
 
-#: views.py:69
+#: views.py:100
 msgid "Functions list"
 msgstr "Functions list"
 
-#: views.py:75 views.py:98 views.py:181
+#: views.py:106 views.py:129 views.py:212
 msgid "Add"
 msgstr "Add"
 
-#: views.py:76 views.py:99
+#: views.py:107 views.py:130
 msgid "Delete"
 msgstr "Delete"
 
-#: views.py:82
+#: views.py:113
 #, python-format
 msgid "Number of function show: %d"
 msgstr "Number of function show: %d"
 
-#: views.py:86
+#: views.py:117
 msgid "Structure type"
 msgstr "Structure type"
 
-#: views.py:92
+#: views.py:123
 msgid "Structure types list"
 msgstr "Structure types list"
 
-#: views.py:105
+#: views.py:136
 #, python-format
 msgid "Number of structure type show: %d"
 msgstr "Number of structure type show: %d"
 
-#: views.py:111
+#: views.py:142
 msgid "Customized fields"
 msgstr "Customized fields"
 
-#: views.py:117
+#: views.py:148
 msgid "Addon fields to customize contacts"
 msgstr "Addon fields to customize contacts"
 
-#: views.py:127 views.py:193
+#: views.py:158 views.py:224
 msgid "Add function"
 msgstr "Add function"
 
-#: views.py:128
+#: views.py:159
 msgid "Modify function"
 msgstr "Modify function"
 
-#: views.py:132
+#: views.py:163
 msgid "Delete function"
 msgstr "Delete function"
 
-#: views.py:142
+#: views.py:173
 msgid "Add structure type"
 msgstr "Add structure type"
 
-#: views.py:143
+#: views.py:174
 msgid "Modify structure type"
 msgstr "Modify structure type"
 
-#: views.py:147
+#: views.py:178
 msgid "Delete structure type"
 msgstr "Delete structure type"
 
-#: views.py:152
+#: views.py:183
 msgid "Management of postal codes associated with their communes."
 msgstr "Management of postal codes associated with their communes."
 
-#: views.py:154 views.py:158
+#: views.py:185 views.py:189
 msgid "Postal code"
 msgstr "Postal code"
 
-#: views.py:167
+#: views.py:198
 msgid "Filtrer by postal code"
 msgstr "Filtrer by postal code"
 
-#: views.py:187
+#: views.py:218
 #, python-format
 msgid "Total number of postal codes/city: %d"
 msgstr "Total number of postal codes/city: %d"
 
-#: views.py:194
+#: views.py:225
 msgid "Add postal code"
 msgstr "Add postal code"
 
-#: views.py:199
+#: views.py:230
 msgid "Configuring settings to send email"
 msgstr "Configuring settings to send email"
 
-#: views.py:201
+#: views.py:232
 msgid "Email configuration"
 msgstr "Email configuration"
 
