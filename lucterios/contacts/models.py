@@ -193,7 +193,7 @@ class Individual(AbstractContact):
     # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
-    individual__editfields = ['genre', ('firstname', 'lastname'), None, 'user']
+    individual__editfields = ['genre', ('firstname', 'lastname'), None]
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)

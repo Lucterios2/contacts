@@ -43,7 +43,7 @@ class Account(XferContainerCustom):
             self.item = LucteriosUser.objects.get(id=self.request.user.id) # pylint: disable=no-member
             self.add_action(UsersEdit().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
-        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})  
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):

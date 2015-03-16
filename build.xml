@@ -120,7 +120,7 @@
 			<env key="PYTHONPATH" value="${core.path}:${standard.path}:${env.PYTHONPATH}"/>
 			<arg value="run"/>
 			<arg value="--branch"/>
-			<arg value="--source=lucterios"/>
+			<arg value="--source=lucterios,${core.path}/lucterios"/>
 			<arg value="--omit=${core.path}/lucterios/install/*"/>
 			<arg value="--include=${core.path}/lucterios/CORE/*.py,${core.path}/lucterios/framework/*.py"/>
 			<arg value="./manage_${test.instance}.py"/>
@@ -132,8 +132,9 @@
 		</exec>	
 		<exec executable="${testversion}">
 			<arg value="xml"/>
-		</exec>
+		</exec>		
 		<move file="coverage.xml" tofile="${testversion}.xml"/>
+		<replace file="${testversion}.xml" token='name=".home.ubuntu.workspace.lct-core.lucterios' value='name="lucterios' />
 	</target>
 
 	<target name="test_py2" if="python2.present">

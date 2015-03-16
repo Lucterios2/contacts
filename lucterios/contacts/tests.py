@@ -231,7 +231,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,/9j/4AAQSkZJRg", True)
 
     def test_account(self):
-        self.factory.user = LucteriosUser.objects.get(username='empty') # pylint: disable=no-member
+        self.factory.user = LucteriosUser.objects.get(username='empty')  # pylint: disable=no-member
         self.factory.xfer = Account()
         self.call('/CORE/account', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'account')
@@ -258,9 +258,14 @@ class ConfigurationTest(LucteriosTest):
         self.call('/CORE/accountAddModify', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'CORE', 'accountAddModify')
         self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+        self.assert_count_equal('COMPONENTS/*', 25)
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="genre"]', "1", (2, 0, 3, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="genre"]/CASE', 2)
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="genre"]/CASE[@id="1"]', 'Homme')
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="genre"]/CASE[@id="2"]', 'Femme')
 
     def test_noaccount(self):
-        self.factory.user = LucteriosUser.objects.get(username='admin') # pylint: disable=no-member
+        self.factory.user = LucteriosUser.objects.get(username='admin')  # pylint: disable=no-member
         self.factory.xfer = Account()
         self.call('/CORE/account', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'account')
