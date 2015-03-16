@@ -52,6 +52,7 @@ class AccountAddModify(XferAddEditor):
     field_id = 'individual'
     caption_add = _("My account")
     caption_modify = _("My account")
+    locked = True
 
 @MenuManage.describ('', FORMTYPE_NOMODAL, 'core.general', _('Our structure and its management'))
 class CurrentStructure(XferContainerCustom):
@@ -80,6 +81,7 @@ class CurrentStructureAddModify(XferAddEditor):
     field_id = 1
     caption_add = _("Our details")
     caption_modify = _("Our details")
+    locked = True
 
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 

@@ -134,7 +134,7 @@
 			<arg value="xml"/>
 		</exec>		
 		<move file="coverage.xml" tofile="${testversion}.xml"/>
-		<replace file="${testversion}.xml" token='name=".home.ubuntu.workspace.lct-core.lucterios' value='name="lucterios' />
+		<replaceregexp file="${testversion}.xml" match='name="\..*\.workspace\.lct-core\.lucterios' replace='name="lucterios' byline="true" />
 	</target>
 
 	<target name="test_py2" if="python2.present">
