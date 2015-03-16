@@ -132,7 +132,7 @@ class AbstractContact(LucteriosModel):
         xfer.tab = obj_addr.tab
         new_col = obj_addr.col
         xfer.move(obj_addr.tab, 1, 0)
-        img_path = get_user_path("contacts", "Image_%s.jpg" % self.abstractcontact_ptr_id) # pylint: disable=no-member
+        img_path = get_user_path("contacts", "Image_%s.jpg" % self.abstractcontact_ptr_id)  # pylint: disable=no-member
         img = XferCompImage('logoimg')
         if exists(img_path):
             img.type = 'jpg'
@@ -148,7 +148,7 @@ class AbstractContact(LucteriosModel):
             tmp_file = save_from_base64(uploadlogo)
             with open(tmp_file, "rb") as image_tmp:
                 image = open_image_resize(image_tmp, 100, 100)
-                img_path = get_user_path("contacts", "Image_%s.jpg" % self.abstractcontact_ptr_id) # pylint: disable=no-member
+                img_path = get_user_path("contacts", "Image_%s.jpg" % self.abstractcontact_ptr_id)  # pylint: disable=no-member
                 with open(img_path, "wb") as image_file:
                     image.save(image_file, 'JPEG', quality=90)
             unlink(tmp_file)
@@ -192,7 +192,7 @@ class Individual(AbstractContact):
     user = models.ForeignKey('auth.User', null=True)
     # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
-    individual__showfields = ['genre', ('firstname', 'lastname'), None, 'user']
+    individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
     individual__editfields = ['genre', ('firstname', 'lastname'), None, 'user']
 
     def __str__(self):

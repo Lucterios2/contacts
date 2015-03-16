@@ -7,18 +7,19 @@ Created on march 2015
 
 from __future__ import unicode_literals
 
-from lucterios.framework.test import LucteriosTest
+from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify
+    CurrentStructureAddModify, Account, AccountAddModify
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
-from lucterios.contacts.models import LegalEntity
+from lucterios.contacts.models import LegalEntity, Individual
 from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
 from os.path import join, dirname, exists
+from lucterios.CORE.models import LucteriosUser
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -121,9 +122,22 @@ class ConfigurationTest(LucteriosTest):
         ourdetails.tel1 = "01-23-45-67-89"
         ourdetails.email = "mr-sylvestre@worldcompany.com"
         ourdetails.save()
+        empty_user = add_empty_user()
+        empty_contact = Individual()
+        empty_contact.firstname = "jack"
+        empty_contact.lastname = "MISTER"
+        empty_contact.address = "rue de la liberté"
+        empty_contact.postal_code = "97250"
+        empty_contact.city = "LE PRECHEUR"
+        empty_contact.country = "MARTINIQUE"
+        empty_contact.tel2 = "02-78-45-12-95"
+        empty_contact.email = "jack@worldcompany.com"
+        empty_contact.user = empty_user
+
+        empty_contact.save()
         rmtree(get_user_dir(), True)
 
-    def test_list(self):
+    def test_config(self):
         self.factory.xfer = Configuration()
         self.call('/CORE/configuration', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'configuration')
@@ -215,6 +229,45 @@ class ConfigurationTest(LucteriosTest):
         self.call('/CORE/currentStructure', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'currentStructure')
         self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,/9j/4AAQSkZJRg", True)
+
+    def test_account(self):
+        self.factory.user = LucteriosUser.objects.get(username='empty') # pylint: disable=no-member
+        self.factory.xfer = Account()
+        self.call('/CORE/account', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'account')
+        self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'contacts', 'accountAddModify', 0, 1, 1, {'individual':'2'}))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
+        self.assert_count_equal('COMPONENTS/*', 28)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme", (2, 0, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack", (2, 1, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER", (4, 1, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="address"]', "rue de la liberté", (2, 2, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="postal_code"]', "97250", (2, 3, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="city"]', "LE PRECHEUR", (4, 3, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="country"]', "MARTINIQUE", (2, 4, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel1"]', None, (2, 5, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="tel2"]', '02-78-45-12-95', (4, 5, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com", (2, 6, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (2, 7, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/IMAGE[@name="logoimg"]', "contacts/images/NoImage.png", (0, 2, 1, 6, 1))
+
+    def test_accountmodify(self):
+        self.factory.xfer = AccountAddModify()
+        self.call('/CORE/accountAddModify', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'accountAddModify')
+        self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+
+    def test_noaccount(self):
+        self.factory.user = LucteriosUser.objects.get(username='admin') # pylint: disable=no-member
+        self.factory.xfer = Account()
+        self.call('/CORE/account', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'account')
+        self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif':'1'}))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
 
 def suite():
     # pylint: disable=redefined-outer-name

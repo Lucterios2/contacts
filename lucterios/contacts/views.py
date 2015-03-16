@@ -16,13 +16,42 @@ from lucterios.framework.xferadvance import XferDelete, XferAddEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, \
     XferCompEdit, XferCompGrid
 from lucterios.contacts.models import PostalCode, Function, StructureType, \
-    LegalEntity
+    LegalEntity, Individual
 from django.utils import six
+from django.core.exceptions import ObjectDoesNotExist
+from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.views_usergroup import UsersEdit
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
-class Account(XferContainerAcknowledge):
+class Account(XferContainerCustom):
     caption = _("My account")
     icon = "account.png"
+
+    def fillresponse(self):
+        img = XferCompImage('img')
+        img.set_value('contacts/images/account.png')
+        img.set_location(0, 0, 1, 2)
+        self.add_component(img)
+        lab = XferCompLabelForm("title")
+        lab.set_value_as_title(_('View my account.'))
+        lab.set_location(1, 0, 2)
+        self.add_component(lab)
+        try:
+            self.item = Individual.objects.get(user=self.request.user) # pylint: disable=no-member
+            self.add_action(AccountAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'individual':six.text_type(self.item.id)}})
+        except ObjectDoesNotExist:
+            self.item = LucteriosUser.objects.get(id=self.request.user.id) # pylint: disable=no-member
+            self.add_action(UsersEdit().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
+        self.fill_from_model(1, 1, True)
+        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})  
+
+@MenuManage.describ(None)
+class AccountAddModify(XferAddEditor):
+    icon = "account.png"
+    model = Individual
+    field_id = 'individual'
+    caption_add = _("My account")
+    caption_modify = _("My account")
 
 @MenuManage.describ('', FORMTYPE_NOMODAL, 'core.general', _('Our structure and its management'))
 class CurrentStructure(XferContainerCustom):
@@ -161,7 +190,7 @@ class PostalCodeList(XferContainerCustom):
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         if filter_postal_code is None:
-            local_struct = LegalEntity.objects.get(id=1) # pylint: disable=no-member
+            local_struct = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
             filter_postal_code = six.text_type(local_struct.postal_code)
         lbl = XferCompLabelForm('filtre')
         lbl.set_value_as_name(_('Filtrer by postal code'))

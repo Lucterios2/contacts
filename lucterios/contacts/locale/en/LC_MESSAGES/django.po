@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-13 21:06+0000\n"
+"POT-Creation-Date: 2015-03-16 09:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,103 +21,107 @@ msgstr ""
 msgid "Lucterios contacts"
 msgstr "Lucterios contacts"
 
-#: models.py:16 models.py:24 models.py:54
+#: models.py:16 models.py:27 models.py:63
 msgid "postal code"
 msgstr "postal code"
 
-#: models.py:17 models.py:55
+#: models.py:17 models.py:64
 msgid "city"
 msgstr "city"
 
-#: models.py:18 models.py:56
+#: models.py:18 models.py:65
 msgid "country"
 msgstr "country"
 
-#: models.py:25
+#: models.py:28
 msgid "postal codes"
 msgstr "postal codes"
 
-#: models.py:31 models.py:42 models.py:71
+#: models.py:34 models.py:48 models.py:162
 msgid "name"
 msgstr "name"
 
-#: models.py:37
+#: models.py:43
 msgid "individual function"
 msgstr "Individual function"
 
-#: models.py:38
+#: models.py:44
 msgid "individual functions"
 msgstr "Individual functions"
 
-#: models.py:48
+#: models.py:57
 msgid "structure type"
 msgstr "structure type"
 
-#: models.py:49
+#: models.py:58
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:53
+#: models.py:62
 msgid "address"
 msgstr "address"
 
-#: models.py:57
+#: models.py:66
 msgid "tel1"
 msgstr "phone #1"
 
-#: models.py:58
+#: models.py:67
 msgid "tel2"
 msgstr "phone #2"
 
-#: models.py:59
+#: models.py:68
 msgid "email"
 msgstr "email"
 
-#: models.py:60
+#: models.py:69
 msgid "comment"
 msgstr "comment"
 
-#: models.py:73
+#: models.py:114
+msgid "image"
+msgstr ""
+
+#: models.py:164
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:75
+#: models.py:165
 msgid "001@Identity"
 msgstr "001@Identity"
 
-#: models.py:75
+#: models.py:165
 msgid "002@Management"
 msgstr "002@Management"
 
-#: models.py:80
+#: models.py:185
 msgid "legal entity"
 msgstr "legal entity"
 
-#: models.py:81
+#: models.py:186
 msgid "legal entities"
 msgstr "legal entities"
 
-#: models.py:85
+#: models.py:189
 msgid "Man"
 msgstr "Man"
 
-#: models.py:85
+#: models.py:189
 msgid "Woman"
 msgstr "Woman"
 
-#: models.py:86
+#: models.py:190
 msgid "firstname"
 msgstr "firstname"
 
-#: models.py:87
+#: models.py:191
 msgid "lastname"
 msgstr "lastname"
 
-#: models.py:96
+#: models.py:203
 msgid "individual"
 msgstr "individual"
 
-#: models.py:97
+#: models.py:204
 msgid "individuals"
 msgstr "individuals"
 
