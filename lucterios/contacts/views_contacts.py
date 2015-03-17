@@ -8,10 +8,12 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, \
+    FORMTYPE_REFRESH, CLOSE_NO
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.contacts.models import LegalEntity, Individual
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor
+from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit
 
 MenuManage.add_sub("office", None, "contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
@@ -53,6 +55,12 @@ class LegalEntityList(XferListEditor):
     add_class = LegalEntityAddModify
     del_class = LegalEntityDel
 
+    def fillresponse_header(self):
+        self.fill_from_model(0, 2, False, ['structure_type'])
+        structure_type = self.getparam('structure_type')
+        if (structure_type is not None) and (structure_type != '0'):
+            self.filter = {'structure_type':int(structure_type)}
+
 @MenuManage.describ('contacts.add_individual')
 
 class IndividualAddModify(XferAddEditor):
@@ -88,6 +96,23 @@ class IndividualList(XferListEditor):
     show_class = IndividualShow
     add_class = IndividualAddModify
     del_class = IndividualDel
+
+    def fillresponse_header(self):
+        name_filter = self.getparam('filter')
+        if name_filter is None:
+            name_filter = ""
+        lbl = XferCompLabelForm('lbl_filtre')
+        lbl.set_value_as_name(_('Filtrer by name'))
+        lbl.set_location(0, 2)
+        self.add_component(lbl)
+        comp = XferCompEdit('filter')
+        comp.set_value(name_filter)
+        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_location(1, 2)
+        self.add_component(comp)
+        if name_filter != "":
+            from django.db.models import Q
+            self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
 
 @MenuManage.describ('contacts.change_individual', FORMTYPE_NOMODAL, 'contact.actions', _('To find an individual following a set of criteria.'))
 class IndividualSearch(XferContainerCustom):

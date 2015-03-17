@@ -14,16 +14,17 @@ from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuratio
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
-from lucterios.contacts.models import LegalEntity, Individual
+from lucterios.contacts.models import LegalEntity, Individual, StructureType
 from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
 from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
-from lucterios.contacts.views_contacts import IndividualList, LegalEntityList
+from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
+    LegalEntityAddModify, IndividualAddModify
 
 def change_ourdetail():
-    ourdetails = LegalEntity.objects.get(id=1) # pylint: disable=no-member
+    ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
     ourdetails.name = "WoldCompany"
     ourdetails.address = "Place des cocotiers"
     ourdetails.postal_code = "97200"
@@ -32,6 +33,20 @@ def change_ourdetail():
     ourdetails.tel1 = "01-23-45-67-89"
     ourdetails.email = "mr-sylvestre@worldcompany.com"
     ourdetails.save()
+
+def create_jack(empty_user=None):
+    empty_contact = Individual()
+    empty_contact.firstname = "jack"
+    empty_contact.lastname = "MISTER"
+    empty_contact.address = "rue de la liberté"
+    empty_contact.postal_code = "97250"
+    empty_contact.city = "LE PRECHEUR"
+    empty_contact.country = "MARTINIQUE"
+    empty_contact.tel2 = "02-78-45-12-95"
+    empty_contact.email = "jack@worldcompany.com"
+    empty_contact.user = empty_user
+    empty_contact.save()
+    return empty_contact
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -121,23 +136,12 @@ class PostalCodeTest(LucteriosTest):
 
 class ConfigurationTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
+
     def setUp(self):
         self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
         change_ourdetail()
-        empty_user = add_empty_user()
-        empty_contact = Individual()
-        empty_contact.firstname = "jack"
-        empty_contact.lastname = "MISTER"
-        empty_contact.address = "rue de la liberté"
-        empty_contact.postal_code = "97250"
-        empty_contact.city = "LE PRECHEUR"
-        empty_contact.country = "MARTINIQUE"
-        empty_contact.tel2 = "02-78-45-12-95"
-        empty_contact.email = "jack@worldcompany.com"
-        empty_contact.user = empty_user
-
-        empty_contact.save()
+        create_jack(add_empty_user())
         rmtree(get_user_dir(), True)
 
     def test_config(self):
@@ -277,7 +281,6 @@ class ConfigurationTest(LucteriosTest):
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif':'1'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
 
-
 class ContactsTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
 
@@ -286,10 +289,58 @@ class ContactsTest(LucteriosTest):
         LucteriosTest.setUp(self)
         change_ourdetail()
         rmtree(get_user_dir(), True)
+        StructureType.objects.create(name="Type A") # pylint: disable=no-member
+        StructureType.objects.create(name="Type B") # pylint: disable=no-member
+        StructureType.objects.create(name="Type C") # pylint: disable=no-member
+        create_jack()
 
     def test_individual(self):
         self.factory.xfer = IndividualList()
         self.call('/CORE/individualList', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="filter"]', None, (1, 2, 1, 1))
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="individual"]', (0, 3, 2, 1))
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = IndividualAddModify()
+        self.call('/CORE/individualAddModify', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualAddModify')
+        self.assert_count_equal('COMPONENTS/*', 25)
+
+        self.factory.xfer = IndividualAddModify()
+        self.call('/CORE/individualAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
+                        "comment":'no comment', "firstname":'Marie', "lastname":'DUPOND', \
+                        "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-54-87-19-34', "SAVE":'YES', \
+                        "tel1":'09-96-75-15-00', "postal_code":'97250', "email":'marie.dupond@worldcompany.com', \
+                        "genre":"2"}, False)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {'filter':'e'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {'filter':'marie'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {'filter':'dupon'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {'filter':'jack'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {'filter':'truc'}, False)
         self.assert_observer('Core.Custom', 'CORE', 'individualList')
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 
@@ -297,7 +348,36 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntityList()
         self.call('/CORE/legalEntityList', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'legalEntityList')
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="structure_type"]', '0', (1, 2, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="structure_type"]/CASE', 4)
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="legal_entity"]', (0, 3, 2, 1))
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+
+        self.factory.xfer = LegalEntityAddModify()
+        self.call('/CORE/legalEntityAddModify', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'legalEntityAddModify')
+        self.assert_count_equal('COMPONENTS/*', 25)
+
+        self.factory.xfer = LegalEntityAddModify()
+        self.call('/CORE/legalEntityAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
+                        "comment":'no comment', "name":'truc-muche', \
+                        "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-54-87-19-34', "SAVE":'YES', \
+                        "tel1":'09-96-75-15-00', "postal_code":'97250', "email":'contact@truc-muche.org', \
+                        "structure_type":2}, False)
+        self.assert_observer('Core.Acknowledge', 'CORE', 'legalEntityAddModify')
+
+        self.factory.xfer = LegalEntityList()
+        self.call('/CORE/legalEntityList', {}, False)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
+        self.factory.xfer = LegalEntityList()
+        self.call('/CORE/legalEntityList', {"structure_type":1}, False)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
+        self.factory.xfer = LegalEntityList()
+        self.call('/CORE/legalEntityList', {"structure_type":2}, False)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.factory.xfer = LegalEntityList()
+        self.call('/CORE/legalEntityList', {"structure_type":3}, False)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
 
 def suite():
     # pylint: disable=redefined-outer-name
@@ -305,4 +385,5 @@ def suite():
     loader = TestLoader()
     suite.addTest(loader.loadTestsFromTestCase(PostalCodeTest))
     suite.addTest(loader.loadTestsFromTestCase(ConfigurationTest))
+    suite.addTest(loader.loadTestsFromTestCase(ContactsTest))
     return suite
