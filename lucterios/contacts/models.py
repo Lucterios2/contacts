@@ -11,6 +11,7 @@ from django.db import models
 from lucterios.framework.models import LucteriosModel
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from posix import unlink
+import six
 
 class PostalCode(LucteriosModel):
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
@@ -160,7 +161,7 @@ class AbstractContact(LucteriosModel):
 
 class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
-    structure_type = models.ForeignKey('StructureType', null=True)
+    structure_type = models.ForeignKey('StructureType', null=True, on_delete=models.SET_NULL)
     identify_number = models.CharField(_('identify number'), max_length=100, blank=True)
     legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):[]}
     legalentity__editfields = ['name', 'structure_type', None, 'identify_number']
@@ -189,7 +190,7 @@ class Individual(AbstractContact):
     genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
     firstname = models.CharField(_('firstname'), max_length=50, blank=False)
     lastname = models.CharField(_('lastname'), max_length=50, blank=False)
-    user = models.ForeignKey('auth.User', null=True)
+    user = models.ForeignKey('auth.User', null=True, on_delete=models.SET_NULL)
     # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
@@ -197,6 +198,32 @@ class Individual(AbstractContact):
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
+
+    def show(self, xfer):
+        from lucterios.framework.xfercomponents import XferCompButton
+        from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO
+        from lucterios.contacts.views_contacts import IndividualUserAdd
+        from lucterios.CORE.views_usergroup import UsersEdit
+        AbstractContact.show(self, xfer)
+        obj_user = xfer.get_components('user')
+        obj_user.colspan = 2
+        btn = XferCompButton('userbtn')
+        btn.is_mini = True
+        btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
+        if self.user is None:
+            btn.set_action(xfer.request, IndividualUserAdd().get_changed("", 'images/add.png'), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
+        else:
+            btn.set_action(xfer.request, UsersEdit().get_changed("", 'images/edit.png'), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, \
+                                                        'params':{'user_actif':six.text_type(self.user.id), 'IDENT_READ':'YES'}}) # pylint: disable=no-member
+        xfer.add_component(btn)
+
+    def saving(self, xfer):
+        AbstractContact.saving(self, xfer)
+        if self.user is not None:
+            self.user.first_name = self.firstname
+            self.user.last_name = self.lastname
+            self.user.email = self.email
+            self.user.save() # pylint: disable=no-member
 
     class Meta(object):
         # pylint: disable=no-init

@@ -135,15 +135,6 @@ class Configuration(XferContainerCustom):
     def fillresponse(self):
         self._fill_functions()
         self._fill_structuretype()
-        self.new_tab(_("Customized fields"))
-        img = XferCompImage('imgfield')
-        img.set_value('contacts/images/fields.png')
-        img.set_location(0, 10)
-        self.add_component(img)
-        lab = XferCompLabelForm("titlefields")
-        lab.set_value_as_title(_("Addon fields to customize contacts"))
-        lab.set_location(1, 10, 5)
-        self.add_component(lab)
         self.add_action(SubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('CORE.add_parameter')
@@ -208,8 +199,3 @@ class PostalCodeList(XferListEditor):
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = {'postal_code__startswith':filter_postal_code}
-
-# @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
-# class ConfigMail(XferContainerAcknowledge):
-#     caption = _("Email configuration")
-#     icon = "emailconf.png"

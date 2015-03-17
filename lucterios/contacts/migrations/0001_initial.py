@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# pylint: disable=invalid-name
+# -*- coding: utf-8 -*- # pylint: disable=invalid-name,cyclic-import
 from __future__ import unicode_literals
 
 from django.db import models, migrations, transaction
@@ -117,7 +116,7 @@ class Migration(migrations.Migration):
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True, to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, verbose_name='name', blank=False)),
                 ('identify_number', models.CharField(max_length=100, blank=True, verbose_name='legal number')),
-                ('structure_type', models.ForeignKey(null=True, to='contacts.StructureType')),
+                ('structure_type', models.ForeignKey(on_delete=models.SET_NULL, null=True, to='contacts.StructureType')),
             ],
             options={
                 'verbose_name_plural': 'legal entities',
@@ -132,7 +131,7 @@ class Migration(migrations.Migration):
                 ('firstname', models.CharField(max_length=50, verbose_name='firstname')),
                 ('lastname', models.CharField(max_length=50, verbose_name='lastname')),
                 ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')], blank=False)),
-                ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
             ],
             options={
                 'verbose_name_plural': 'individuals',

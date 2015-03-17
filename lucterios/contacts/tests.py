@@ -21,7 +21,8 @@ from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
 from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
-    LegalEntityAddModify, IndividualAddModify
+    LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
+    IndividualUserValid
 
 def change_ourdetail():
     ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
@@ -152,7 +153,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('CONTEXT', 0)
         self.assert_count_equal('ACTIONS/ACTION', 1)
         self.assert_action_equal('ACTIONS/ACTION', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('COMPONENTS/*', 10)
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="function"]', (0, 1, 2, 1, 1))
         self.assert_count_equal('COMPONENTS/GRID[@name="function"]/HEADER', 1)
         self.assert_xml_equal('COMPONENTS/GRID[@name="function"]/HEADER[@name="name"]', "nom")
@@ -246,7 +247,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'contacts', 'accountAddModify', 0, 1, 1, {'individual':'2'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 28)
+        self.assert_count_equal('COMPONENTS/*', 29)
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme", (2, 0, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack", (2, 1, 1, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER", (4, 1, 1, 1, 1))
@@ -289,9 +290,9 @@ class ContactsTest(LucteriosTest):
         LucteriosTest.setUp(self)
         change_ourdetail()
         rmtree(get_user_dir(), True)
-        StructureType.objects.create(name="Type A") # pylint: disable=no-member
-        StructureType.objects.create(name="Type B") # pylint: disable=no-member
-        StructureType.objects.create(name="Type C") # pylint: disable=no-member
+        StructureType.objects.create(name="Type A")  # pylint: disable=no-member
+        StructureType.objects.create(name="Type B")  # pylint: disable=no-member
+        StructureType.objects.create(name="Type C")  # pylint: disable=no-member
         create_jack()
 
     def test_individual(self):
@@ -343,6 +344,42 @@ class ContactsTest(LucteriosTest):
         self.call('/CORE/individualList', {'filter':'truc'}, False)
         self.assert_observer('Core.Custom', 'CORE', 'individualList')
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+
+    def test_individual_user(self):
+        self.factory.xfer = IndividualShow()
+        self.call('/contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualShow')
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme", (2, 0, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack", (2, 1, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER", (4, 1, 1, 1, 1))
+
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "---", (2, 8, 2, 1, 1))
+        self.assert_coordcomp_equal('COMPONENTS/BUTTON[@name="userbtn"]', (4, 8, 1, 1, 1))
+        self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (None, 'images/add.png', 'contacts', 'individualUserAdd', 0, 1, 1))
+
+        self.factory.xfer = IndividualUserAdd()
+        self.call('/contacts/individualUserAdd', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualUserAdd')
+        self.assert_count_equal('COMPONENTS/*', 3)
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="username"]', None, (2, 0, 1, 1))
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'contacts', 'individualUserValid', 1, 1, 1))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
+
+        self.factory.xfer = IndividualUserValid()
+        self.call('/contacts/individualUserValid', {'individual':'2', 'username':'jacko'}, False)
+        self.assert_observer('Core.Acknowledge', 'contacts', 'individualUserValid')
+        self.assert_count_equal('CONTEXT/PARAM', 4)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="individual"]', "2")
+        self.assert_xml_equal('CONTEXT/PARAM[@name="username"]', "jacko")
+        self.assert_xml_equal('CONTEXT/PARAM[@name="user_actif"]', "2")
+        self.assert_xml_equal('CONTEXT/PARAM[@name="IDENT_READ"]', "YES")
+
+        self.factory.xfer = IndividualShow()
+        self.call('/contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualShow')
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "jacko", (2, 8, 2, 1, 1))
+        self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (None, 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
 
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
