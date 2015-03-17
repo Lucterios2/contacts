@@ -8,15 +8,11 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, \
-    FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE
-from lucterios.framework.xfergraphic import XferContainerAcknowledge, \
-    XferContainerCustom
-from lucterios.framework.xferadvance import XferDelete, XferAddEditor
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, \
-    XferCompEdit, XferCompGrid
-from lucterios.contacts.models import PostalCode, Function, StructureType, \
-    LegalEntity, Individual
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, SubAction
+from lucterios.framework.xfergraphic import XferContainerCustom
+from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
+from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from lucterios.CORE.models import LucteriosUser
@@ -37,13 +33,13 @@ class Account(XferContainerCustom):
         lab.set_location(1, 0, 2)
         self.add_component(lab)
         try:
-            self.item = Individual.objects.get(user=self.request.user) # pylint: disable=no-member
+            self.item = Individual.objects.get(user=self.request.user)  # pylint: disable=no-member
             self.add_action(AccountAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'individual':six.text_type(self.item.id)}})
         except ObjectDoesNotExist:
-            self.item = LucteriosUser.objects.get(id=self.request.user.id) # pylint: disable=no-member
+            self.item = LucteriosUser.objects.get(id=self.request.user.id)  # pylint: disable=no-member
             self.add_action(UsersEdit().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
-        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
+        self.add_action(SubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):
@@ -72,7 +68,7 @@ class CurrentStructure(XferContainerCustom):
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
-        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
+        self.add_action(SubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
@@ -126,8 +122,8 @@ class Configuration(XferContainerCustom):
         dbcategorie = StructureType.objects.all()  # pylint: disable=no-member
         grid = XferCompGrid("structure_type")
         grid.set_model(dbcategorie, ["name"], self)
-        grid.add_action(self.request, StructureTypeAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'select':SELECT_NONE})
-        grid.add_action(self.request, StructureTypeDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'select':SELECT_SINGLE})
+        grid.add_action(self.request, StructureTypeAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'unique':SELECT_NONE})
+        grid.add_action(self.request, StructureTypeDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'unique':SELECT_SINGLE})
         grid.set_location(0, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -148,7 +144,7 @@ class Configuration(XferContainerCustom):
         lab.set_value_as_title(_("Addon fields to customize contacts"))
         lab.set_location(1, 10, 5)
         self.add_component(lab)
-        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
+        self.add_action(SubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):
@@ -180,17 +176,25 @@ class StructureTypeDel(XferDelete):
     model = StructureType
     field_id = 'structure_type'
 
+@MenuManage.describ('contacts.add_postalcode')
+class PostalCodeAdd(XferAddEditor):
+    caption_add = _("Add function")
+    caption_modify = _("Add postal code")
+    icon = "postalCode.png"
+    model = PostalCode
+    field_id = 'postalCode'
+
 @MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
-class PostalCodeList(XferContainerCustom):
+class PostalCodeList(XferListEditor):
     caption = _("Postal code")
     icon = "postalCode.png"
+    model = PostalCode
+    field_id = 'postalCode'
+    field_names = ['postal_code', 'city', 'country']
+    add_class = PostalCodeAdd
 
-    def fillresponse(self, filter_postal_code):
-        self.caption = _("Postal code")
-        img = XferCompImage('img')
-        img.set_value('contacts/images/postalCode.png')
-        img.set_location(0, 0, 1, 2)
-        self.add_component(img)
+    def fillresponse_header(self):
+        filter_postal_code = self.getparam('filter_postal_code')
         if filter_postal_code is None:
             local_struct = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
             filter_postal_code = six.text_type(local_struct.postal_code)
@@ -203,31 +207,9 @@ class PostalCodeList(XferContainerCustom):
         comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
-        if filter_postal_code == '':
-            postcode = PostalCode.objects.all()  # pylint: disable=no-member
-        else:
-            postcode = PostalCode.objects.filter(postal_code__startswith=filter_postal_code)  # pylint: disable=no-member
-        grid = XferCompGrid("postalCode")
-        grid.set_model(postcode, ['postal_code', 'city', 'country'], self)
-        grid.add_action(self.request, PostalCodeAdd().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO})
-        grid.set_location(0, 2, 3)
-        grid.set_size(300, 750)
-        self.add_component(grid)
-        lbl = XferCompLabelForm("nb")
-        lbl.set_location(0, 3, 3)
-        lbl.set_value(_("Total number of postal codes/city: %d") % grid.nb_lines)
-        self.add_component(lbl)
-        self.add_action(XferContainerAcknowledge().get_changed(_("Close"), "images/close.png"), {})
+        self.filter = {'postal_code__startswith':filter_postal_code}
 
-@MenuManage.describ('contacts.add_postalcode')
-class PostalCodeAdd(XferAddEditor):
-    caption_add = _("Add function")
-    caption_modify = _("Add postal code")
-    icon = "postalCode.png"
-    model = PostalCode
-    field_id = 'postalCode'
-
-@MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
-class ConfigMail(XferContainerAcknowledge):
-    caption = _("Email configuration")
-    icon = "emailconf.png"
+# @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Configuring settings to send email'))
+# class ConfigMail(XferContainerAcknowledge):
+#     caption = _("Email configuration")
+#     icon = "emailconf.png"

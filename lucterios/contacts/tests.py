@@ -20,6 +20,18 @@ from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
 from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
+from lucterios.contacts.views_contacts import IndividualList, LegalEntityList
+
+def change_ourdetail():
+    ourdetails = LegalEntity.objects.get(id=1) # pylint: disable=no-member
+    ourdetails.name = "WoldCompany"
+    ourdetails.address = "Place des cocotiers"
+    ourdetails.postal_code = "97200"
+    ourdetails.city = "FORT DE FRANCE"
+    ourdetails.country = "MARTINIQUE"
+    ourdetails.tel1 = "01-23-45-67-89"
+    ourdetails.email = "mr-sylvestre@worldcompany.com"
+    ourdetails.save()
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -40,11 +52,11 @@ class PostalCodeTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 1)
         self.assert_action_equal('ACTIONS/ACTION', ('Fermer', 'images/close.png'))
         self.assert_count_equal('COMPONENTS/*', 5)
-        self.assert_comp_equal('COMPONENTS/IMAGE[@name="img"]', 'contacts/images/postalCode.png', (0, 0, 1, 2))
+        self.assert_comp_equal('COMPONENTS/IMAGE[@name="img"]', 'contacts/images/postalCode.png', (0, 0, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="filtre"]', '{[b]}Filtrer par code postal{[/b]}', (1, 0, 1, 1))
         self.assert_comp_equal('COMPONENTS/EDIT[@name="filter_postal_code"]', None, (1, 1, 1, 1))
-        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="postalCode"]', (0, 2, 3, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 333", (0, 3, 3, 1))
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="postalCode"]', (0, 2, 2, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 333", (0, 3, 2, 1))
 
         self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', '13')
         self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageNum', '0')
@@ -61,7 +73,7 @@ class PostalCodeTest(LucteriosTest):
         self.call('/CORE/postalCodeList', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'postalCodeList')
         self.assert_comp_equal('COMPONENTS/EDIT[@name="filter_postal_code"]', '97400', (1, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 6", (0, 3, 3, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 6", (0, 3, 2, 1))
 
         self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', None)
         self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageNum', None)
@@ -71,7 +83,7 @@ class PostalCodeTest(LucteriosTest):
         self.factory.xfer = PostalCodeList()
         self.call('/CORE/postalCodeList', {'filter_postal_code':'973'}, False)
         self.assert_observer('Core.Custom', 'CORE', 'postalCodeList')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 27", (0, 3, 3, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 27", (0, 3, 2, 1))
         self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97300')
         self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[25]/VALUE[@name="postal_code"]', '97370')
 
@@ -79,7 +91,7 @@ class PostalCodeTest(LucteriosTest):
         self.factory.xfer = PostalCodeList()
         self.call('/CORE/postalCodeList', {'GRID_PAGE%postalCode':'5', 'filter_postal_code':''}, False)
         self.assert_observer('Core.Custom', 'CORE', 'postalCodeList')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 333", (0, 3, 3, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 333", (0, 3, 2, 1))
         self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97417')
 
     def test_add(self):
@@ -99,7 +111,7 @@ class PostalCodeTest(LucteriosTest):
         self.factory.xfer = PostalCodeList()
         self.call('/CORE/postalCodeList', {'filter_postal_code':''}, False)
         self.assert_observer('Core.Custom', 'CORE', 'postalCodeList')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux/ville: 334", (0, 3, 3, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 334", (0, 3, 2, 1))
 
         self.factory.xfer = PostalCodeAdd()
         self.call('/CORE/postalCodeAdd', {'SAVE':'YES', 'postal_code':'96999', 'city':'Trifouilly', 'country':'LOIN'}, False)
@@ -109,19 +121,10 @@ class PostalCodeTest(LucteriosTest):
 
 class ConfigurationTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
-
     def setUp(self):
         self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
-        ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
-        ourdetails.name = "WoldCompany"
-        ourdetails.address = "Place des cocotiers"
-        ourdetails.postal_code = "97200"
-        ourdetails.city = "FORT DE FRANCE"
-        ourdetails.country = "MARTINIQUE"
-        ourdetails.tel1 = "01-23-45-67-89"
-        ourdetails.email = "mr-sylvestre@worldcompany.com"
-        ourdetails.save()
+        change_ourdetail()
         empty_user = add_empty_user()
         empty_contact = Individual()
         empty_contact.firstname = "jack"
@@ -273,6 +276,28 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif':'1'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
+
+
+class ContactsTest(LucteriosTest):
+    # pylint: disable=too-many-public-methods,too-many-statements
+
+    def setUp(self):
+        self.xfer_class = XferContainerAcknowledge
+        LucteriosTest.setUp(self)
+        change_ourdetail()
+        rmtree(get_user_dir(), True)
+
+    def test_individual(self):
+        self.factory.xfer = IndividualList()
+        self.call('/CORE/individualList', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'individualList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+
+    def test_legalentity(self):
+        self.factory.xfer = LegalEntityList()
+        self.call('/CORE/legalEntityList', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'legalEntityList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
 def suite():
     # pylint: disable=redefined-outer-name
