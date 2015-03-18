@@ -8,7 +8,7 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, SubAction
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, StubAction
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
@@ -39,7 +39,7 @@ class Account(XferContainerCustom):
             self.item = LucteriosUser.objects.get(id=self.request.user.id)  # pylint: disable=no-member
             self.add_action(UsersEdit().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
-        self.add_action(SubAction(_("Close"), "images/close.png"), {})
+        self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):
@@ -68,7 +68,7 @@ class CurrentStructure(XferContainerCustom):
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
-        self.add_action(SubAction(_("Close"), "images/close.png"), {})
+        self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
@@ -135,7 +135,7 @@ class Configuration(XferContainerCustom):
     def fillresponse(self):
         self._fill_functions()
         self._fill_structuretype()
-        self.add_action(SubAction(_("Close"), "images/close.png"), {})
+        self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):

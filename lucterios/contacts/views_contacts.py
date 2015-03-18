@@ -8,7 +8,7 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, icon_path, SubAction
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, icon_path, StubAction
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.contacts.models import LegalEntity, Individual
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
@@ -129,7 +129,7 @@ class IndividualUserAdd(XferContainerCustom):
         self.add_component(img)
         self.fill_from_model(1, 0, False, ['username'])
         self.add_action(IndividualUserValid().get_changed(_('Ok'), 'images/ok.png'), {})
-        self.add_action(SubAction(_('Cancel'), 'images/cancel.png'), {})
+        self.add_action(StubAction(_('Cancel'), 'images/cancel.png'), {})
 
 @MenuManage.describ('auth.add_user')
 class IndividualUserValid(XferSave):
@@ -144,7 +144,7 @@ class IndividualUserValid(XferSave):
             obj_indiv = Individual.objects.get(pk=individual) # pylint: disable=no-member
             obj_indiv.user = self.item
             obj_indiv.save()
-            self.item.saving(self)
+            obj_indiv.saving(self)
             self.params['user_actif'] = six.text_type(self.item.id)
             self.params['IDENT_READ'] = 'YES'
             self.redirect_action(UsersEdit())

@@ -12,6 +12,7 @@ from lucterios.framework.models import LucteriosModel
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from posix import unlink
 from django.utils import six
+from lucterios.framework.tools import StubAction
 
 class PostalCode(LucteriosModel):
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
@@ -181,6 +182,13 @@ class LegalEntity(AbstractContact):
             xfer.remove_component('structure_type')
         return AbstractContact.show(self, xfer)
 
+    def can_delete(self):
+        msg = AbstractContact.can_delete(self)
+        if msg == '':
+            if self.id == 1:  # pylint: disable=no-member
+                msg = _("You cannot delete this legal entity!")
+        return msg
+
     class Meta(object):
         # pylint: disable=no-init
         verbose_name = _('legal entity')
@@ -202,7 +210,6 @@ class Individual(AbstractContact):
     def show(self, xfer):
         from lucterios.framework.xfercomponents import XferCompButton
         from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO
-        from lucterios.contacts.views_contacts import IndividualUserAdd
         from lucterios.CORE.views_usergroup import UsersEdit
         AbstractContact.show(self, xfer)
         obj_user = xfer.get_components('user')
@@ -211,10 +218,11 @@ class Individual(AbstractContact):
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.user is None:
-            btn.set_action(xfer.request, IndividualUserAdd().get_changed("", 'images/add.png'), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
+            act = StubAction("", 'images/add.png', extension='contacts', action='individualUserAdd', is_view_right='auth.add_user')
+            btn.set_action(xfer.request, act, {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
         else:
             btn.set_action(xfer.request, UsersEdit().get_changed("", 'images/edit.png'), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, \
-                                                        'params':{'user_actif':six.text_type(self.user.id), 'IDENT_READ':'YES'}}) # pylint: disable=no-member
+                                                        'params':{'user_actif':six.text_type(self.user.id), 'IDENT_READ':'YES'}})  # pylint: disable=no-member
         xfer.add_component(btn)
 
     def saving(self, xfer):
@@ -223,7 +231,7 @@ class Individual(AbstractContact):
             self.user.first_name = self.firstname
             self.user.last_name = self.lastname
             self.user.email = self.email
-            self.user.save() # pylint: disable=no-member
+            self.user.save()  # pylint: disable=no-member
 
     class Meta(object):
         # pylint: disable=no-init

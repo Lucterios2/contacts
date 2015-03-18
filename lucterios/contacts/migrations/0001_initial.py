@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*- # pylint: disable=invalid-name,cyclic-import
+# -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
 from __future__ import unicode_literals
 
 from django.db import models, migrations, transaction

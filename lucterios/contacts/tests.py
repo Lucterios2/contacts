@@ -22,7 +22,8 @@ from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
-    IndividualUserValid
+    IndividualUserValid, LegalEntityDel
+from lucterios.CORE.views_usergroup import UsersEdit
 
 def change_ourdetail():
     ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
@@ -349,9 +350,10 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualShow()
         self.call('/contacts/individualShow', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'contacts', 'individualShow')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme", (2, 0, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack", (2, 1, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER", (4, 1, 1, 1, 1))
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER")
+        self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
 
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "---", (2, 8, 2, 1, 1))
         self.assert_coordcomp_equal('COMPONENTS/BUTTON[@name="userbtn"]', (4, 8, 1, 1, 1))
@@ -374,6 +376,16 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('CONTEXT/PARAM[@name="username"]', "jacko")
         self.assert_xml_equal('CONTEXT/PARAM[@name="user_actif"]', "2")
         self.assert_xml_equal('CONTEXT/PARAM[@name="IDENT_READ"]', "YES")
+        self.assert_count_equal('ACTION', 1)
+        self.assert_action_equal('ACTION', (None, "images/user.png", "CORE", "usersEdit", 1, 1, 1))
+
+        self.factory.xfer = UsersEdit()
+        self.call('/CORE/usersEdit', {'individual':'2', 'username':'jacko', 'user_actif':'2', 'IDENT_READ':'YES'}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="username"]', "jacko")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="first_name"]', "jack")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="last_name"]', "MISTER")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="email"]', "jack@worldcompany.com")
 
         self.factory.xfer = IndividualShow()
         self.call('/contacts/individualShow', {'individual':'2'}, False)
@@ -383,38 +395,45 @@ class ContactsTest(LucteriosTest):
 
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
-        self.call('/CORE/legalEntityList', {}, False)
-        self.assert_observer('Core.Custom', 'CORE', 'legalEntityList')
+        self.call('/contacts/legalEntityList', {}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityList')
         self.assert_comp_equal('COMPONENTS/SELECT[@name="structure_type"]', '0', (1, 2, 1, 1))
         self.assert_count_equal('COMPONENTS/SELECT[@name="structure_type"]/CASE', 4)
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="legal_entity"]', (0, 3, 2, 1))
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/CORE/legalEntityAddModify', {}, False)
-        self.assert_observer('Core.Custom', 'CORE', 'legalEntityAddModify')
+        self.call('/contacts/legalEntityAddModify', {}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityAddModify')
         self.assert_count_equal('COMPONENTS/*', 25)
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/CORE/legalEntityAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
+        self.call('/contacts/legalEntityAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
                         "comment":'no comment', "name":'truc-muche', \
                         "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-54-87-19-34', "SAVE":'YES', \
                         "tel1":'09-96-75-15-00', "postal_code":'97250', "email":'contact@truc-muche.org', \
                         "structure_type":2}, False)
-        self.assert_observer('Core.Acknowledge', 'CORE', 'legalEntityAddModify')
+        self.assert_observer('Core.Acknowledge', 'contacts', 'legalEntityAddModify')
 
         self.factory.xfer = LegalEntityList()
-        self.call('/CORE/legalEntityList', {}, False)
+        self.call('/contacts/legalEntityList', {}, False)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
         self.factory.xfer = LegalEntityList()
-        self.call('/CORE/legalEntityList', {"structure_type":1}, False)
+        self.call('/contacts/legalEntityList', {"structure_type":1}, False)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
         self.factory.xfer = LegalEntityList()
-        self.call('/CORE/legalEntityList', {"structure_type":2}, False)
+        self.call('/contacts/legalEntityList', {"structure_type":2}, False)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
         self.factory.xfer = LegalEntityList()
-        self.call('/CORE/legalEntityList', {"structure_type":3}, False)
+        self.call('/contacts/legalEntityList', {"structure_type":3}, False)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
+
+    def test_legalentity_delete(self):
+
+        self.factory.xfer = LegalEntityDel()
+        self.call('/contacts/legalEntityDel', {'legal_entity':'1'}, False)
+        self.assert_observer('CORE.Exception', 'contacts', 'legalEntityDel')
+        self.assert_xml_equal("EXCEPTION/MESSAGE", "Vous ne pouvez supprimer cette structure morale!")
 
 def suite():
     # pylint: disable=redefined-outer-name
