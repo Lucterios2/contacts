@@ -8,7 +8,7 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, StubAction
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, StubAction, ActionsManage
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
@@ -96,11 +96,11 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_("Functions list"))
         img.set_location(1, 0)
         self.add_component(img)
+        self.model = Function
         dbfunction = Function.objects.all()  # pylint: disable=no-member
         grid = XferCompGrid("function")
-        grid.set_model(dbfunction, ["name"], self)
-        grid.add_action(self.request, FunctionAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'unique':SELECT_NONE})
-        grid.add_action(self.request, FunctionDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.set_model(dbfunction, None, self)
+        grid.add_actions(self)
         grid.set_location(0, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -119,11 +119,11 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_('Structure types list'))
         img.set_location(1, 0)
         self.add_component(img)
+        self.model = StructureType
         dbcategorie = StructureType.objects.all()  # pylint: disable=no-member
         grid = XferCompGrid("structure_type")
-        grid.set_model(dbcategorie, ["name"], self)
-        grid.add_action(self.request, StructureTypeAddModify().get_changed(_("Add"), "images/add.png"), {'close':CLOSE_NO, 'unique':SELECT_NONE})
-        grid.add_action(self.request, StructureTypeDel().get_changed(_("Delete"), "images/suppr.png"), {'close':CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.set_model(dbcategorie, None, self)
+        grid.add_actions(self)
         grid.set_location(0, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -137,6 +137,7 @@ class Configuration(XferContainerCustom):
         self._fill_structuretype()
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
+@ActionsManage.affect('Function', 'add')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):
     icon = "function.png"
@@ -145,6 +146,7 @@ class FunctionAddModify(XferAddEditor):
     caption_add = _("Add function")
     caption_modify = _("Modify function")
 
+@ActionsManage.affect('Function', 'del')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionDel(XferDelete):
     caption = _("Delete function")
@@ -152,6 +154,7 @@ class FunctionDel(XferDelete):
     model = Function
     field_id = 'function'
 
+@ActionsManage.affect('StructureType', 'add')
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeAddModify(XferAddEditor):
     icon = "function.png"
@@ -160,6 +163,7 @@ class StructureTypeAddModify(XferAddEditor):
     caption_add = _("Add structure type")
     caption_modify = _("Modify structure type")
 
+@ActionsManage.affect('StructureType', 'del')
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeDel(XferDelete):
     caption = _("Delete structure type")
@@ -167,6 +171,7 @@ class StructureTypeDel(XferDelete):
     model = StructureType
     field_id = 'structure_type'
 
+@ActionsManage.affect('PostalCode', 'add')
 @MenuManage.describ('contacts.add_postalcode')
 class PostalCodeAdd(XferAddEditor):
     caption_add = _("Add function")
@@ -181,8 +186,6 @@ class PostalCodeList(XferListEditor):
     icon = "postalCode.png"
     model = PostalCode
     field_id = 'postalCode'
-    field_names = ['postal_code', 'city', 'country']
-    add_class = PostalCodeAdd
 
     def fillresponse_header(self):
         filter_postal_code = self.getparam('filter_postal_code')

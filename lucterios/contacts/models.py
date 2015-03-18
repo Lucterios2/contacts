@@ -12,7 +12,7 @@ from lucterios.framework.models import LucteriosModel
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from posix import unlink
 from django.utils import six
-from lucterios.framework.tools import StubAction
+from lucterios.framework.tools import ActionsManage
 
 class PostalCode(LucteriosModel):
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
@@ -20,6 +20,8 @@ class PostalCode(LucteriosModel):
     country = models.CharField(_('country'), max_length=100, blank=False)
 
     postalcode__editfields = ['postal_code', 'city', 'country']
+
+    default_fields = ['postal_code', 'city', 'country']
 
     def __str__(self):
         return '[%s] %s %s' % (self.country, self.postal_code, self.city)
@@ -40,6 +42,8 @@ class Function(LucteriosModel):
 
     function__editfields = ['name']
 
+    default_fields = ["name"]
+
     class Meta(object):
         # pylint: disable=no-init
         verbose_name = _('individual function')
@@ -50,6 +54,8 @@ class StructureType(LucteriosModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
 
     structuretype__editfields = ['name']
+
+    default_fields = ["name"]
 
     def __str__(self):
         return self.name
@@ -164,8 +170,10 @@ class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
     structure_type = models.ForeignKey('StructureType', null=True, on_delete=models.SET_NULL)
     identify_number = models.CharField(_('identify number'), max_length=100, blank=True)
-    legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):[]}
+
+    legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):['responsability_set']}
     legalentity__editfields = ['name', 'structure_type', None, 'identify_number']
+    default_fields = ["name", 'tel1', 'tel2', 'email']
 
     def __str__(self):
         return self.name
@@ -203,6 +211,7 @@ class Individual(AbstractContact):
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
     individual__editfields = ['genre', ('firstname', 'lastname'), None]
+    default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
@@ -210,7 +219,6 @@ class Individual(AbstractContact):
     def show(self, xfer):
         from lucterios.framework.xfercomponents import XferCompButton
         from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO
-        from lucterios.CORE.views_usergroup import UsersEdit
         AbstractContact.show(self, xfer)
         obj_user = xfer.get_components('user')
         obj_user.colspan = 2
@@ -218,11 +226,11 @@ class Individual(AbstractContact):
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.user is None:
-            act = StubAction("", 'images/add.png', extension='contacts', action='individualUserAdd', is_view_right='auth.add_user')
-            btn.set_action(xfer.request, act, {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
+            btn.set_action(xfer.request, ActionsManage.get_act_changed('Individual', 'useradd', "", 'images/add.png'), \
+                    {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
         else:
-            btn.set_action(xfer.request, UsersEdit().get_changed("", 'images/edit.png'), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, \
-                                                        'params':{'user_actif':six.text_type(self.user.id), 'IDENT_READ':'YES'}})  # pylint: disable=no-member
+            btn.set_action(xfer.request, ActionsManage.get_act_changed('LucteriosUser', 'edit', '', 'images/edit.png'), \
+                    {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.user.id), 'IDENT_READ':'YES'}})  # pylint: disable=no-member
         xfer.add_component(btn)
 
     def saving(self, xfer):
@@ -237,3 +245,18 @@ class Individual(AbstractContact):
         # pylint: disable=no-init
         verbose_name = _('individual')
         verbose_name_plural = _('individuals')
+
+class Responsability(LucteriosModel):
+    individual = models.ForeignKey(Individual, null=False)
+    legal_entity = models.ForeignKey(LegalEntity, null=False)
+    functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
+    functions__titles = [_("Available functions"), _("Chosen functions")]
+
+    individual__showfields = ["legal_entity", "individual", "functions"]
+    individual__editfields = ["legal_entity", "individual", "functions"]
+    default_fields = ["individual", "functions"]
+
+    class Meta(object):
+        # pylint: disable=no-init
+        verbose_name = _('responsability')
+        verbose_name_plural = _('responsabilities')

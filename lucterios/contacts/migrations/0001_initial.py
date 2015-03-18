@@ -140,6 +140,20 @@ class Migration(migrations.Migration):
             },
             bases=('contacts.abstractcontact',),
         ),
+        migrations.CreateModel(
+            name='Responsability',
+            fields=[
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('functions', models.ManyToManyField(blank=True, verbose_name='functions', to='contacts.Function')),
+                ('individual', models.ForeignKey(to='contacts.Individual')),
+                ('legal_entity', models.ForeignKey(to='contacts.LegalEntity')),
+            ],
+            options={
+                'verbose_name_plural': 'responsabilities',
+                'verbose_name': 'responsability',
+            },
+            bases=(models.Model,),
+        ),
         migrations.RunPython(initial_postalcodes),
         migrations.RunPython(initial_values),
     ]

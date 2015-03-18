@@ -14,7 +14,8 @@ from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuratio
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
-from lucterios.contacts.models import LegalEntity, Individual, StructureType
+from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
+    Function
 from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
@@ -22,7 +23,7 @@ from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
-    IndividualUserValid, LegalEntityDel
+    IndividualUserValid, LegalEntityDel, LegalEntityShow
 from lucterios.CORE.views_usergroup import UsersEdit
 
 def change_ourdetail():
@@ -170,7 +171,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'contacts', 'currentStructureAddModify', 0, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 25)
+        self.assert_count_equal('COMPONENTS/*', 27)
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany", (2, 0, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="address"]', "Place des cocotiers", (2, 2, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="postal_code"]', "97200", (2, 3, 1, 1, 1))
@@ -182,6 +183,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (2, 7, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="identify_number"]', None, (2, 8, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/IMAGE[@name="logoimg"]', "contacts/images/NoImage.png", (0, 2, 1, 6, 1))
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="responsability_set"]', (1, 0, 1, 1, 2))
 
     def test_changedetails(self):
         self.factory.xfer = CurrentStructureAddModify()
@@ -294,6 +296,10 @@ class ContactsTest(LucteriosTest):
         StructureType.objects.create(name="Type A")  # pylint: disable=no-member
         StructureType.objects.create(name="Type B")  # pylint: disable=no-member
         StructureType.objects.create(name="Type C")  # pylint: disable=no-member
+        Function.objects.create(name="President") # pylint: disable=no-member
+        Function.objects.create(name="Secretaire") # pylint: disable=no-member
+        Function.objects.create(name="Tresorier") # pylint: disable=no-member
+        Function.objects.create(name="Troufion") # pylint: disable=no-member
         create_jack()
 
     def test_individual(self):
@@ -377,7 +383,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('CONTEXT/PARAM[@name="user_actif"]', "2")
         self.assert_xml_equal('CONTEXT/PARAM[@name="IDENT_READ"]', "YES")
         self.assert_count_equal('ACTION', 1)
-        self.assert_action_equal('ACTION', (None, "images/user.png", "CORE", "usersEdit", 1, 1, 1))
+        self.assert_action_equal('ACTION', (None, None, "CORE", "usersEdit", 1, 1, 1))
 
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {'individual':'2', 'username':'jacko', 'user_actif':'2', 'IDENT_READ':'YES'}, False)
@@ -429,11 +435,19 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
 
     def test_legalentity_delete(self):
-
         self.factory.xfer = LegalEntityDel()
         self.call('/contacts/legalEntityDel', {'legal_entity':'1'}, False)
         self.assert_observer('CORE.Exception', 'contacts', 'legalEntityDel')
         self.assert_xml_equal("EXCEPTION/MESSAGE", "Vous ne pouvez supprimer cette structure morale!")
+
+    def test_legalentity_responsability(self):
+        self.factory.xfer = LegalEntityShow()
+        self.call('/contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityShow')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/HEADER', 2)
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD', 0)
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/ACTIONS/ACTION', 3)
 
 def suite():
     # pylint: disable=redefined-outer-name
