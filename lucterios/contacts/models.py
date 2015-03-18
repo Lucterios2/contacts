@@ -11,7 +11,7 @@ from django.db import models
 from lucterios.framework.models import LucteriosModel
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from posix import unlink
-import six
+from django.utils import six
 
 class PostalCode(LucteriosModel):
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
