@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-19 09:22+0000\n"
+"POT-Creation-Date: 2015-03-19 10:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -141,11 +141,11 @@ msgstr "Available functions"
 msgid "Chosen functions"
 msgstr "Chosen functions"
 
-#: models.py:264
+#: models.py:265
 msgid "responsability"
 msgstr "responsability"
 
-#: models.py:265
+#: models.py:266
 msgid "responsabilities"
 msgstr "responsabilities"
 
@@ -157,97 +157,97 @@ msgstr "View my account."
 msgid "My account"
 msgstr "My account"
 
-#: views.py:37 views.py:40 views.py:70
+#: views.py:37 views.py:40 views.py:71
 msgid "Edit"
 msgstr "Edit"
 
-#: views.py:42 views.py:71 views.py:138
+#: views.py:42 views.py:72 views.py:139
 msgid "Close"
 msgstr "Close"
 
-#: views.py:53 views.py:66
+#: views.py:53 views.py:67
 msgid "Our structure and its management"
 msgstr "Our structure and its management"
 
-#: views.py:55 views.py:78 views.py:79
+#: views.py:55 views.py:79 views.py:80
 msgid "Our details"
 msgstr "Our details"
 
-#: views.py:82
+#: views.py:83
 msgid "Contact"
 msgstr "Contact"
 
-#: views.py:84
+#: views.py:85
 msgid "Management functions of individuals and categories of legal entities."
 msgstr "Management functions of individuals and categories of legal entities."
 
-#: views.py:86
+#: views.py:87
 msgid "Contacts configuration"
 msgstr "Contacts configuration"
 
-#: views.py:90
+#: views.py:91
 msgid "Functions and responsabilities"
 msgstr "Functions and responsabilities"
 
-#: views.py:96
+#: views.py:97
 msgid "Functions list"
 msgstr "Functions list"
 
-#: views.py:109
+#: views.py:110
 #, python-format
 msgid "Number of function show: %d"
 msgstr "Number of function show: %d"
 
-#: views.py:113
+#: views.py:114
 msgid "Structure type"
 msgstr "Structure type"
 
-#: views.py:119
+#: views.py:120
 msgid "Structure types list"
 msgstr "Structure types list"
 
-#: views.py:132
+#: views.py:133
 #, python-format
 msgid "Number of structure type show: %d"
 msgstr "Number of structure type show: %d"
 
-#: views.py:146 views.py:177
+#: views.py:147 views.py:178
 msgid "Add function"
 msgstr "Add function"
 
-#: views.py:147
+#: views.py:148
 msgid "Modify function"
 msgstr "Modify function"
 
-#: views.py:152
+#: views.py:153
 msgid "Delete function"
 msgstr "Delete function"
 
-#: views.py:163
+#: views.py:164
 msgid "Add structure type"
 msgstr "Add structure type"
 
-#: views.py:164
+#: views.py:165
 msgid "Modify structure type"
 msgstr "Modify structure type"
 
-#: views.py:169
+#: views.py:170
 msgid "Delete structure type"
 msgstr "Delete structure type"
 
-#: views.py:178
+#: views.py:179
 msgid "Add postal code"
 msgstr "Add postal code"
 
-#: views.py:183
+#: views.py:184
 msgid "Management of postal codes associated with their communes."
 msgstr "Management of postal codes associated with their communes."
 
-#: views.py:185
+#: views.py:186
 msgid "Postal code"
 msgstr "Postal code"
 
-#: views.py:196
+#: views.py:197
 msgid "Filtrer by postal code"
 msgstr "Filtrer by postal code"
 

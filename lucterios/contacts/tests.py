@@ -353,6 +353,26 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('Core.Custom', 'CORE', 'individualList')
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 
+    def test_individual_image(self):
+        self.assertFalse(exists(get_user_path('contacts', 'Image_2.jpg')))
+        logo_path = join(dirname(__file__), 'help', 'EditIndividual.jpg')
+        logo_stream = "image.jpg;" + readimage_to_base64(logo_path, False).decode("utf-8")
+
+        self.factory.xfer = IndividualShow()
+        self.call('/contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualShow')
+        self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "contacts/images/NoImage.png")
+
+        self.factory.xfer = IndividualAddModify()
+        self.call('/contacts/individualAddModify', {"SAVE":'YES', 'individual':'2', "uploadlogo":logo_stream}, False)
+        self.assert_observer('Core.Acknowledge', 'contacts', 'individualAddModify')
+        self.assertTrue(exists(get_user_path('contacts', 'Image_2.jpg')))
+
+        self.factory.xfer = IndividualShow()
+        self.call('/contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualShow')
+        self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,", True)
+
     def test_individual_user(self):
         self.factory.xfer = IndividualShow()
         self.call('/contacts/individualShow', {'individual':'2'}, False)
