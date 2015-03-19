@@ -58,6 +58,7 @@ class CurrentStructure(XferContainerCustom):
     field_id = 1
 
     def fillresponse(self):
+        self.params['legal_entity'] = '1'
         img = XferCompImage('img')
         img.set_value('contacts/images/fields.png')
         img.set_location(0, 0, 1, 2)

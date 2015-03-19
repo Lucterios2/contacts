@@ -23,7 +23,8 @@ from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
-    IndividualUserValid, LegalEntityDel, LegalEntityShow
+    IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
+    ResponsabilityModify
 from lucterios.CORE.views_usergroup import UsersEdit
 
 def change_ourdetail():
@@ -296,10 +297,10 @@ class ContactsTest(LucteriosTest):
         StructureType.objects.create(name="Type A")  # pylint: disable=no-member
         StructureType.objects.create(name="Type B")  # pylint: disable=no-member
         StructureType.objects.create(name="Type C")  # pylint: disable=no-member
-        Function.objects.create(name="President") # pylint: disable=no-member
-        Function.objects.create(name="Secretaire") # pylint: disable=no-member
-        Function.objects.create(name="Tresorier") # pylint: disable=no-member
-        Function.objects.create(name="Troufion") # pylint: disable=no-member
+        Function.objects.create(name="President")  # pylint: disable=no-member
+        Function.objects.create(name="Secretaire")  # pylint: disable=no-member
+        Function.objects.create(name="Tresorier")  # pylint: disable=no-member
+        Function.objects.create(name="Troufion")  # pylint: disable=no-member
         create_jack()
 
     def test_individual(self):
@@ -448,6 +449,58 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/HEADER', 2)
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD', 0)
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/ACTIONS/ACTION', 3)
+
+        self.factory.xfer = ResponsabilityAdd()
+        self.call('/contacts/responsabilityAdd', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'responsabilityAdd')
+        self.assert_count_equal('COMPONENTS/*', 7)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/HEADER', 5)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/ACTIONS/ACTION', 3)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
+
+        self.factory.xfer = ResponsabilityModify()
+        self.call('/contacts/responsabilityModify', {'legal_entity':'1', 'individual':'2', "SAVE":"YES"}, False)
+        self.assert_observer('Core.Acknowledge', 'contacts', 'responsabilityModify')
+
+        self.factory.xfer = LegalEntityShow()
+        self.call('/contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityShow')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD', 1)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]', 'id', '1')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="functions"]', None)
+
+        self.factory.xfer = ResponsabilityModify()
+        self.call('/contacts/responsabilityModify', {'responsability_set':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'responsabilityModify')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lbl_functions"]', "{[b]}fonctions{[/b]}")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="hd_functions_available"]', "{[center]}{[i]}Fonctions disponibles{[/i]}{[/center]}")
+        self.assert_xml_equal('COMPONENTS/CHECKLIST[@name="functions_available"]', None)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="hd_functions_chosen"]', "{[center]}{[i]}Fonctions choisies{[/i]}{[/center]}")
+        self.assert_xml_equal('COMPONENTS/CHECKLIST[@name="functions_chosen"]', None)
+
+        self.factory.xfer = LegalEntityShow()
+        self.call('/contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityShow')
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD', 1)
+
+        self.factory.xfer = ResponsabilityModify()
+        self.call('/contacts/responsabilityModify', {'responsability_set':'1', 'functions':'2;4', "SAVE":"YES"}, False)
+        self.assert_observer('Core.Acknowledge', 'contacts', 'responsabilityModify')
+
+        self.factory.xfer = LegalEntityShow()
+        self.call('/contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntityShow')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
+        self.assert_count_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD', 1)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]', 'id', '1')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="functions"]', "Secretaire{[br/]}Troufion")
 
 def suite():
     # pylint: disable=redefined-outer-name

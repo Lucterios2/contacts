@@ -165,7 +165,7 @@ class ResponsabilityAdd(XferContainerCustom):
     caption = _("Add responsability")
     icon = "function.png"
     model = Responsability
-    field_id = 'responsability'
+    field_id = 'responsability_set'
 
     def fillresponse(self, legal_entity=0, name_filter=''):
         self.item.legal_entity = LegalEntity.objects.get(id=legal_entity) # pylint: disable=no-member
@@ -194,9 +194,9 @@ class ResponsabilityAdd(XferContainerCustom):
         items = Individual.objects.filter(*identfilter) # pylint: disable=no-member
         grid = XferCompGrid('individual')
         grid.set_model(items, None, self)
-
         grid.set_location(2, 3)
         grid.add_action(self.request, ResponsabilityModify().get_changed(_("Select"), "images/ok.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{"SAVE":"YES"}})
+        grid.add_action(self.request, IndividualShow().get_changed(_("Show"), "images/edit.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, 'unique':SELECT_SINGLE})
         grid.add_action(self.request, ActionsManage.get_act_changed("Individual", "add", _("Add"), "images/add.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
         self.add_component(grid)
 
@@ -207,7 +207,7 @@ class ResponsabilityModify(XferAddEditor):
     caption = _("Modify responsability")
     icon = "function.png"
     model = Responsability
-    field_id = 'responsability'
+    field_id = 'responsability_set'
 
 @ActionsManage.affect('Responsability', 'del')
 @MenuManage.describ('contacts.delete_responsability')
@@ -216,4 +216,4 @@ class ResponsabilityDel(XferDelete):
     caption = _("Delete responsability")
     icon = "function.png"
     model = Responsability
-    field_id = 'responsability'
+    field_id = 'responsability_set'

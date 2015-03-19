@@ -252,9 +252,13 @@ class Responsability(LucteriosModel):
     functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
-    individual__showfields = ["legal_entity", "individual", "functions"]
-    individual__editfields = ["legal_entity", "individual", "functions"]
+    responsability__editfields = ["legal_entity", "individual", "functions"]
     default_fields = ["individual", "functions"]
+
+    def edit(self, xfer):
+        xfer.change_to_readonly('legal_entity')
+
+        xfer.change_to_readonly('individual')
 
     class Meta(object):
         # pylint: disable=no-init
