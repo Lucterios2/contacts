@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-19 10:57+0000\n"
+"POT-Creation-Date: 2015-03-20 15:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,131 +21,149 @@ msgstr ""
 msgid "Lucterios contacts"
 msgstr "Lucterios contacts"
 
-#: models.py:18 models.py:31 models.py:71
+#: help/01_individual.html:2
+#, fuzzy
+#| msgid "individual"
+msgid "01_individual.html"
+msgstr "individual"
+
+#: help/02_legal_entity.html:2
+#, fuzzy
+#| msgid "legal entity"
+msgid "02_legal_entity.html"
+msgstr "legal entity"
+
+#: help/03_configuration.html:2
+#, fuzzy
+#| msgid "Contacts configuration"
+msgid "03_configuration.html"
+msgstr "Contacts configuration"
+
+#: models.py:18 models.py:32 models.py:74
 msgid "postal code"
 msgstr "postal code"
 
-#: models.py:19 models.py:72
+#: models.py:19 models.py:75
 msgid "city"
 msgstr "city"
 
-#: models.py:20 models.py:73
+#: models.py:20 models.py:76
 msgid "country"
 msgstr "country"
 
-#: models.py:32
+#: models.py:33
 msgid "postal codes"
 msgstr "postal codes"
 
-#: models.py:38 models.py:54 models.py:170
+#: models.py:39 models.py:56 models.py:174
 msgid "name"
 msgstr "name"
 
-#: models.py:49
+#: models.py:51
 msgid "individual function"
 msgstr "Individual function"
 
-#: models.py:50
+#: models.py:52
 msgid "individual functions"
 msgstr "Individual functions"
 
-#: models.py:65
+#: models.py:68
 msgid "structure type"
 msgstr "structure type"
 
-#: models.py:66
+#: models.py:69
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:70
+#: models.py:73
 msgid "address"
 msgstr "address"
 
-#: models.py:74
+#: models.py:77
 msgid "tel1"
 msgstr "phone #1"
 
-#: models.py:75
+#: models.py:78
 msgid "tel2"
 msgstr "phone #2"
 
-#: models.py:76
+#: models.py:79
 msgid "email"
 msgstr "email"
 
-#: models.py:77
+#: models.py:80
 msgid "comment"
 msgstr "comment"
 
-#: models.py:122
+#: models.py:126
 msgid "image"
 msgstr "image"
 
-#: models.py:172
+#: models.py:176
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:174 models.py:212
+#: models.py:178 models.py:217
 msgid "001@Identity"
 msgstr "001@Identity"
 
-#: models.py:174
+#: models.py:178
 msgid "002@Management"
 msgstr "002@Management"
 
-#: models.py:197
+#: models.py:202
 msgid "You cannot delete this legal entity!"
 msgstr "You cannot delete this legal entity!"
 
-#: models.py:202
+#: models.py:207
 msgid "legal entity"
 msgstr "legal entity"
 
-#: models.py:203
+#: models.py:208
 msgid "legal entities"
 msgstr "legal entities"
 
-#: models.py:206
+#: models.py:211
 msgid "Man"
 msgstr "Man"
 
-#: models.py:206
+#: models.py:211
 msgid "Woman"
 msgstr "Woman"
 
-#: models.py:207
+#: models.py:212
 msgid "firstname"
 msgstr "firstname"
 
-#: models.py:208
+#: models.py:213
 msgid "lastname"
 msgstr "lastname"
 
-#: models.py:246 views_contacts.py:191
+#: models.py:252 views_contacts.py:181
 msgid "individual"
 msgstr "individual"
 
-#: models.py:247
+#: models.py:253
 msgid "individuals"
 msgstr "individuals"
 
-#: models.py:252
+#: models.py:258
 msgid "functions"
 msgstr "functions"
 
-#: models.py:253
+#: models.py:259
 msgid "Available functions"
 msgstr "Available functions"
 
-#: models.py:253
+#: models.py:259
 msgid "Chosen functions"
 msgstr "Chosen functions"
 
-#: models.py:265
+#: models.py:272
 msgid "responsability"
 msgstr "responsability"
 
-#: models.py:266
+#: models.py:273
 msgid "responsabilities"
 msgstr "responsabilities"
 
@@ -319,7 +337,7 @@ msgstr "Management of men and women registered"
 msgid "Individuals"
 msgstr "Individuals"
 
-#: views_contacts.py:104 views_contacts.py:178
+#: views_contacts.py:104 views_contacts.py:168
 msgid "Filtrer by name"
 msgstr "Filtrer by name"
 
@@ -335,42 +353,42 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: views_contacts.py:151
-msgid "To find an individual following a set of criteria."
-msgstr "To find an individual following a set of criteria."
-
-#: views_contacts.py:153
-msgid "Individual search"
-msgstr "Individual search"
-
-#: views_contacts.py:156
-msgid "To find a legal entity following a set of criteria."
-msgstr "To find a legal entity following a set of criteria."
-
-#: views_contacts.py:158
-msgid "Legal entity search"
-msgstr "Legal entity search"
-
-#: views_contacts.py:165
+#: views_contacts.py:155
 msgid "Add responsability"
 msgstr "Add responsability"
 
-#: views_contacts.py:198
+#: views_contacts.py:188
 msgid "Select"
 msgstr "Select"
 
-#: views_contacts.py:199
+#: views_contacts.py:189
 msgid "Show"
 msgstr "Show"
 
-#: views_contacts.py:200
+#: views_contacts.py:190
 msgid "Add"
 msgstr "Add"
 
-#: views_contacts.py:207
+#: views_contacts.py:197
 msgid "Modify responsability"
 msgstr "Modify responsability"
 
-#: views_contacts.py:216
+#: views_contacts.py:206
 msgid "Delete responsability"
 msgstr "Delete responsability"
+
+#: views_contacts.py:211
+msgid "To find an individual following a set of criteria."
+msgstr "To find an individual following a set of criteria."
+
+#: views_contacts.py:213
+msgid "Individual search"
+msgstr "Individual search"
+
+#: views_contacts.py:218
+msgid "To find a legal entity following a set of criteria."
+msgstr "To find a legal entity following a set of criteria."
+
+#: views_contacts.py:220
+msgid "Legal entity search"
+msgstr "Legal entity search"

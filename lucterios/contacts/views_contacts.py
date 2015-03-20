@@ -7,16 +7,16 @@ Created on march 2015
 
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
-
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, icon_path, StubAction, ActionsManage, \
-    FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
-from lucterios.framework.xfergraphic import XferContainerCustom
-from lucterios.contacts.models import LegalEntity, Individual, Responsability
-from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
-from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, \
-    XferCompGrid
-from lucterios.CORE.models import LucteriosUser
 from django.utils import six
+
+from lucterios.framework.tools import MenuManage, icon_path, StubAction, ActionsManage
+from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
+from lucterios.framework.xfergraphic import XferContainerCustom
+from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
+from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
+from lucterios.framework.xfersearch import XferSearchEditor
+from lucterios.CORE.models import LucteriosUser
+from lucterios.contacts.models import LegalEntity, Individual, Responsability
 
 MenuManage.add_sub("office", None, "contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
@@ -148,16 +148,6 @@ class IndividualUserValid(XferSave):
             self.params['IDENT_READ'] = 'YES'
             self.redirect_action(ActionsManage.get_act_changed('LucteriosUser', 'edit', '', ''))
 
-@MenuManage.describ('contacts.change_individual', FORMTYPE_NOMODAL, 'contact.actions', _('To find an individual following a set of criteria.'))
-class IndividualSearch(XferContainerCustom):
-    caption = _("Individual search")
-    icon = "individualFind.png"
-
-@MenuManage.describ('contacts.change_individual', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
-class LegalEntitySearch(XferContainerCustom):
-    caption = _("Legal entity search")
-    icon = "legalEntityFind.png"
-
 @ActionsManage.affect('Responsability', 'add')
 @MenuManage.describ('contacts.change_responsability')
 class ResponsabilityAdd(XferContainerCustom):
@@ -168,7 +158,7 @@ class ResponsabilityAdd(XferContainerCustom):
     field_id = 'responsability_set'
 
     def fillresponse(self, legal_entity=0, name_filter=''):
-        self.item.legal_entity = LegalEntity.objects.get(id=legal_entity) # pylint: disable=no-member
+        self.item.legal_entity = LegalEntity.objects.get(id=legal_entity)  # pylint: disable=no-member
         img = XferCompImage('img')
         img.set_value(icon_path(self))
         img.set_location(0, 0, 1, 3)
@@ -191,7 +181,7 @@ class ResponsabilityAdd(XferContainerCustom):
         lbl.set_value_as_name(_('individual'))
         lbl.set_location(1, 3)
         self.add_component(lbl)
-        items = Individual.objects.filter(*identfilter) # pylint: disable=no-member
+        items = Individual.objects.filter(*identfilter)  # pylint: disable=no-member
         grid = XferCompGrid('individual')
         grid.set_model(items, None, self)
         grid.set_location(2, 3)
@@ -217,3 +207,17 @@ class ResponsabilityDel(XferDelete):
     icon = "function.png"
     model = Responsability
     field_id = 'responsability_set'
+
+@MenuManage.describ('contacts.change_individual', FORMTYPE_NOMODAL, 'contact.actions', _('To find an individual following a set of criteria.'))
+class IndividualSearch(XferSearchEditor):
+    caption = _("Individual search")
+    icon = "individualFind.png"
+    model = Individual
+    field_id = 'individual'
+
+@MenuManage.describ('contacts.change_individual', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
+class LegalEntitySearch(XferSearchEditor):
+    caption = _("Legal entity search")
+    icon = "legalEntityFind.png"
+    model = LegalEntity
+    field_id = 'legal_entity'

@@ -20,6 +20,7 @@ class PostalCode(LucteriosModel):
     country = models.CharField(_('country'), max_length=100, blank=False)
 
     postalcode__editfields = ['postal_code', 'city', 'country']
+    postalcode__searchfields = ['postal_code', 'city', 'country']
 
     default_fields = ['postal_code', 'city', 'country']
 
@@ -41,6 +42,7 @@ class Function(LucteriosModel):
         return self.name
 
     function__editfields = ['name']
+    function__searchfields = ['name']
 
     default_fields = ["name"]
 
@@ -54,6 +56,7 @@ class StructureType(LucteriosModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
 
     structuretype__editfields = ['name']
+    structuretype__searchfields = ['name']
 
     default_fields = ["name"]
 
@@ -78,6 +81,7 @@ class AbstractContact(LucteriosModel):
 
     abstractcontact__showfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
     abstractcontact__editfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
+    abstractcontact__searchfields = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
 
     def _change_city_select(self, xfer, list_postalcode, obj_city):
         # pylint: disable=no-self-use
@@ -173,6 +177,7 @@ class LegalEntity(AbstractContact):
 
     legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):['responsability_set']}
     legalentity__editfields = ['name', 'structure_type', None, 'identify_number']
+    legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', 'responsability_set.individual', 'responsability_set.functions']
     default_fields = ["name", 'tel1', 'tel2', 'email']
 
     def __str__(self):
@@ -211,6 +216,7 @@ class Individual(AbstractContact):
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
     individual__editfields = ['genre', ('firstname', 'lastname'), None]
+    individual__searchfields = ['genre', 'firstname', 'lastname', None]
     default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
 
     def __str__(self):
@@ -253,6 +259,7 @@ class Responsability(LucteriosModel):
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
     responsability__editfields = ["legal_entity", "individual", "functions"]
+    responsability__searchfields = ["legal_entity", "individual", "functions"]
     default_fields = ["individual", "functions"]
 
     def edit(self, xfer):
