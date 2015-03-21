@@ -177,7 +177,8 @@ class LegalEntity(AbstractContact):
 
     legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):['responsability_set']}
     legalentity__editfields = ['name', 'structure_type', None, 'identify_number']
-    legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', 'responsability_set.individual', 'responsability_set.functions']
+    legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', \
+            'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions']
     default_fields = ["name", 'tel1', 'tel2', 'email']
 
     def __str__(self):
@@ -216,7 +217,8 @@ class Individual(AbstractContact):
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
     individual__editfields = ['genre', ('firstname', 'lastname'), None]
-    individual__searchfields = ['genre', 'firstname', 'lastname', None]
+    individual__searchfields = ['genre', 'firstname', 'lastname', None, 'user.username', \
+                                'responsability_set.legal_entity.name', 'responsability_set.functions']
     default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
 
     def __str__(self):

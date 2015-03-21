@@ -24,7 +24,7 @@ from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
-    ResponsabilityModify
+    ResponsabilityModify, LegalEntitySearch, IndividualSearch
 from lucterios.CORE.views_usergroup import UsersEdit
 
 def change_ourdetail():
@@ -420,6 +420,46 @@ class ContactsTest(LucteriosTest):
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "jacko", (2, 8, 2, 1, 1))
         self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (None, 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
 
+    def test_individual_search(self):
+        self.factory.xfer = IndividualAddModify()
+        self.call('/CORE/individualAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
+                        "comment":'no comment', "firstname":'Marie', "lastname":'DUPOND', \
+                        "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-54-87-19-34', "SAVE":'YES', \
+                        "tel1":'09-96-75-15-00', "postal_code":'97250', "email":'marie.dupond@worldcompany.com', \
+                        "genre":"2"}, False)
+
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
+        self.assert_count_equal('COMPONENTS/*', 16)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {'CRITERIA':'genre||8||1;2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1;2')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {'CRITERIA':'genre||8||1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {'CRITERIA':'genre||8||2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||2')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
         self.call('/contacts/legalEntityList', {}, False)
@@ -521,6 +561,55 @@ class ContactsTest(LucteriosTest):
         self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]', 'id', '1')
         self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="individual"]', "jack MISTER")
         self.assert_xml_equal('COMPONENTS/GRID[@name="responsability_set"]/RECORD[1]/VALUE[@name="functions"]', "Secretaire{[br/]}Troufion")
+
+    def test_legalentity_search(self):
+        self.factory.xfer = LegalEntityAddModify()
+        self.call('/contacts/legalEntityAddModify', {"address":'Avenue de la Paix{[newline]}BP 987', \
+                        "comment":'no comment', "name":'truc-muche', \
+                        "city":'ST PIERRE', "country":'MARTINIQUE', "tel2":'06-54-87-19-34', "SAVE":'YES', \
+                        "tel1":'09-96-75-15-00', "postal_code":'97250', "email":'contact@truc-muche.org', \
+                        "structure_type":2}, False)
+        self.assert_observer('Core.Acknowledge', 'contacts', 'legalEntityAddModify')
+
+        self.factory.xfer = LegalEntitySearch()
+        self.call('/contacts/legalEntitySearch', {}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
+        self.assert_count_equal('COMPONENTS/*', 16)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
+
+        self.factory.xfer = LegalEntitySearch()
+        self.call('/contacts/legalEntitySearch', {'searchSelector':'name', 'searchOperator':'5', 'searchValueStr':'truc', 'ACT':'ADD'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+
+        self.factory.xfer = LegalEntitySearch()
+        self.call('/contacts/legalEntitySearch', {'searchSelector':'structure_type', 'searchOperator':'9', 'searchValueList':'2', 'ACT':'ADD'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||9||2')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+
+        self.factory.xfer = LegalEntitySearch()
+        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||9||2'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc//structure_type||9||2')
+        self.assert_count_equal('COMPONENTS/*', 20)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+
+        self.factory.xfer = LegalEntitySearch()
+        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||9||2', 'ACT':'0'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||9||2')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
 def suite():
     # pylint: disable=redefined-outer-name
