@@ -17,6 +17,7 @@ from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
+from lucterios.framework.xferprinting import XferContainerPrint, ReportGenerator
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
@@ -69,7 +70,21 @@ class CurrentStructure(XferContainerCustom):
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
+        self.add_action(CurrentStructurePrint().get_changed(_("Print"), "images/print.png"), {'close':CLOSE_NO})
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
+
+@MenuManage.describ('')
+class CurrentStructurePrint(XferContainerPrint):
+    icon = "ourDetails.png"
+    model = LegalEntity
+    field_id = 1
+    caption = _("Our details")
+    with_text_export = True
+    
+    def fillresponse(self):
+        if self.show_selector():
+            rep = ReportGenerator(self.caption)
+            self.print_data(rep)
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
