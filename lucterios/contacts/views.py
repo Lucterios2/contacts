@@ -80,7 +80,7 @@ class CurrentStructurePrint(XferContainerPrint):
     field_id = 1
     caption = _("Our details")
     with_text_export = True
-    
+
     def fillresponse(self):
         if self.show_selector():
             rep = ReportGenerator(self.caption)

@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, Account, AccountAddModify
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
@@ -26,6 +26,7 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch
 from lucterios.CORE.views_usergroup import UsersEdit
+from base64 import b64decode
 
 def change_ourdetail():
     ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
@@ -171,7 +172,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
         self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'contacts', 'currentStructureAddModify', 0, 1, 1))
-        #self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Imprimer', 'images/print.png', 'contacts', 'currentStructurePrint', 0, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
         self.assert_count_equal('COMPONENTS/*', 27)
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany", (2, 0, 3, 1, 1))
@@ -227,6 +228,34 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="comment"]', 'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="identify_number"]', "AZERTY123DDSQ")
+
+    def test_printdetails(self):
+        self.factory.xfer = CurrentStructurePrint()
+        self.call('/CORE/currentStructurePrint', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'currentStructurePrint')
+        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
+        self.assert_count_equal('COMPONENTS/*', 2)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        self.factory.xfer = CurrentStructurePrint()
+        self.call('/CORE/currentStructurePrint', {'PRINT_MODE':'3'}, False)
+        self.assert_observer('Core.Print', 'CORE', 'currentStructurePrint')
+        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
+        self.assert_attrib_equal('PRINT', 'mode', '3')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+        self.factory.xfer = CurrentStructurePrint()
+        self.call('/CORE/currentStructurePrint', {'PRINT_MODE':'4'}, False)
+        self.assert_observer('Core.Print', 'CORE', 'currentStructurePrint')
+        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
+        self.assert_attrib_equal('PRINT', 'mode', '4')
+        self.assert_xml_equal('PRINT', None)
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
@@ -461,6 +490,22 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
 
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {'CRITERIA':'responsability_set.functions||9||1'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'responsability_set.functions||9||1')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+
+        self.factory.xfer = IndividualSearch()
+        self.call('/contacts/individualSearch', {'CRITERIA':'user.username||5||empt'}, False)
+        self.assert_observer('Core.Custom', 'contacts', 'individualSearch')
+        self.assert_count_equal('CONTEXT/PARAM', 1)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'user.username||5||empt')
+        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
         self.call('/contacts/legalEntityList', {}, False)
@@ -589,28 +634,29 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/contacts/legalEntitySearch', {'searchSelector':'structure_type', 'searchOperator':'9', 'searchValueList':'2', 'ACT':'ADD'}, False)
+        self.call('/contacts/legalEntitySearch', {'searchSelector':'structure_type', 'searchOperator':'8', 'searchValueList':'2', 'ACT':'ADD'}, False)
         self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||9||2')
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||9||2'}, False)
+        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||8||2'}, False)
         self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc//structure_type||9||2')
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc//structure_type||8||2')
         self.assert_count_equal('COMPONENTS/*', 20)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||9||2', 'ACT':'0'}, False)
+        self.call('/contacts/legalEntitySearch', {'CRITERIA':'name||5||truc//structure_type||8||2', 'ACT':'0'}, False)
         self.assert_observer('Core.Custom', 'contacts', 'legalEntitySearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||9||2')
+        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+
 
 def suite():
     # pylint: disable=redefined-outer-name
