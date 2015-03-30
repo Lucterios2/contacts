@@ -17,7 +17,8 @@ from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
-from lucterios.framework.xferprinting import XferContainerPrint, ReportGenerator
+from lucterios.framework.xferprinting import XferContainerPrint
+from lucterios.framework.printgenerators import ActionGenerator
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
@@ -26,7 +27,7 @@ class Account(XferContainerCustom):
 
     def fillresponse(self):
         img = XferCompImage('img')
-        img.set_value('contacts/images/account.png')
+        img.set_value('lucterios.contacts/images/account.png')
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -61,7 +62,7 @@ class CurrentStructure(XferContainerCustom):
     def fillresponse(self):
         self.params['legal_entity'] = '1'
         img = XferCompImage('img')
-        img.set_value('contacts/images/fields.png')
+        img.set_value('lucterios.contacts/images/fields.png')
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -83,7 +84,7 @@ class CurrentStructurePrint(XferContainerPrint):
 
     def fillresponse(self):
         if self.show_selector():
-            rep = ReportGenerator(self.caption)
+            rep = ActionGenerator(self.caption, CurrentStructure(), self.request)
             self.print_data(rep)
 
 @MenuManage.describ('CORE.add_parameter')
@@ -105,7 +106,7 @@ class Configuration(XferContainerCustom):
     def _fill_functions(self):
         self.new_tab(_("Functions and responsabilities"))
         img = XferCompImage('imgFunction')
-        img.set_value('contacts/images/function.png')
+        img.set_value('lucterios.contacts/images/function.png')
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleFunction')
@@ -128,7 +129,7 @@ class Configuration(XferContainerCustom):
     def _fill_structuretype(self):
         self.new_tab(_("Structure type"))
         img = XferCompImage('imgType')
-        img.set_value('contacts/images/category.png')
+        img.set_value('lucterios.contacts/images/category.png')
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleType')

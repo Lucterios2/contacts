@@ -150,7 +150,7 @@ class AbstractContact(LucteriosModel):
             img.type = 'jpg'
             img.set_value(readimage_to_base64(img_path))
         else:
-            img.set_value("contacts/images/NoImage.png")
+            img.set_value("lucterios.contacts/images/NoImage.png")
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
 

@@ -18,9 +18,9 @@ from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.models import LegalEntity, Individual, Responsability
 
-MenuManage.add_sub("office", None, "contacts/images/office.png", _("Office"), _("Office tools"), 70)
+MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
-MenuManage.add_sub("contact.actions", "office", "contacts/images/contacts.png", _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
+MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/contacts.png", _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
 
 @ActionsManage.affect('LegalEntity', 'add')
 @MenuManage.describ('contacts.add_legalentity')
