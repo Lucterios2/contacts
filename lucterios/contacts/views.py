@@ -82,10 +82,8 @@ class CurrentStructurePrint(XferContainerPrint):
     caption = _("Our details")
     with_text_export = True
 
-    def fillresponse(self):
-        if self.show_selector():
-            rep = ActionGenerator(self.caption, CurrentStructure(), self.request)
-            self.print_data(rep)
+    def get_report_generator(self):
+        return ActionGenerator(CurrentStructure())
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):

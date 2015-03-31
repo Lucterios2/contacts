@@ -27,6 +27,8 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch
 from lucterios.CORE.views_usergroup import UsersEdit
 from base64 import b64decode
+import csv
+from _io import StringIO
 
 def change_ourdetail():
     ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
@@ -256,7 +258,12 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
         csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
-        self.assertEqual(len(csv_value), 583)
+        with StringIO(csv_value) as fcsv:
+            content_csv = list(csv.reader(fcsv))
+            self.assertEqual(len(content_csv), 33, str(content_csv))
+            self.assertEqual(content_csv[1][0].strip(), '"Nos coordonnées"')
+            self.assertEqual(content_csv[5][0].strip(), '"Identité"')
+            self.assertEqual(content_csv[27][0].strip(), '"Responsables"')
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))

@@ -14,15 +14,18 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
-from lucterios.framework.xfersearch import XferSearchEditor
+from lucterios.framework.xfersearch import XferSearchEditor, get_search_query
 from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.models import LegalEntity, Individual, Responsability
+from lucterios.framework.xferprinting import XferContainerPrint
+from lucterios.framework.printgenerators import ActionGenerator, \
+    ListingGenerator
 
 MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
 MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/contacts.png", _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
 
-@ActionsManage.affect('LegalEntity', 'add')
+@ActionsManage.affect('LegalEntity', 'add', 'modify')
 @MenuManage.describ('contacts.add_legalentity')
 class LegalEntityAddModify(XferAddEditor):
     icon = "legalEntity.png"
@@ -32,13 +35,23 @@ class LegalEntityAddModify(XferAddEditor):
     caption_modify = _("Modify legal entity")
 
 @ActionsManage.affect('LegalEntity', 'show')
-@MenuManage.describ('contacts.add_legalentity')
+@MenuManage.describ('contacts.change_legalentity')
 class LegalEntityShow(XferShowEditor):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
     model = LegalEntity
     field_id = 'legal_entity'
-    modify_class = LegalEntityAddModify
+
+@ActionsManage.affect('LegalEntity', 'print')
+@MenuManage.describ('contacts.change_legalentity')
+class LegalEntityPrint(XferContainerPrint):
+    caption = _("Show legal entity")
+    icon = "legalEntity.png"
+    model = LegalEntity
+    field_id = 'legal_entity'
+
+    def get_report_generator(self):
+        return ActionGenerator(LegalEntityShow())
 
 @ActionsManage.affect('LegalEntity', 'del')
 @MenuManage.describ('contacts.delete_legalentity')
@@ -63,6 +76,26 @@ class LegalEntityList(XferListEditor):
         if (structure_type is not None) and (structure_type != '0'):
             self.filter = {'structure_type':int(structure_type)}
 
+@ActionsManage.affect('LegalEntity', 'listing')
+@MenuManage.describ('contacts.change_legalentity')
+class LegalEntityListing(XferContainerPrint):
+    caption = _("Legal entities")
+    icon = "legalEntity.png"
+    model = LegalEntity
+    field_id = 'legal_entity'
+    with_text_export = True
+
+    def get_report_generator(self):
+        structure_type = self.getparam('structure_type')
+        criteria = self.getparam('CRITERIA')
+        lst_gen = ListingGenerator(self.model)
+        if (structure_type is not None) and (structure_type != '0'):
+            lst_gen.filter = {'structure_type':int(structure_type)}
+        elif criteria is not None:
+            lst_gen.filter = get_search_query(criteria, self.item)
+        lst_gen.columns = [(12, _("name"), "#name"), (18, _("address"), "#address"), (5, _("city"), "#city"), (10, _("tel"), "#tel1<br/>#tel2"), (20, _("email"), "#email")]
+        return lst_gen
+
 @ActionsManage.affect('Individual', 'add')
 @MenuManage.describ('contacts.add_individual')
 class IndividualAddModify(XferAddEditor):
@@ -79,7 +112,17 @@ class IndividualShow(XferShowEditor):
     icon = "individual.png"
     model = Individual
     field_id = 'individual'
-    modify_class = IndividualAddModify
+
+@ActionsManage.affect('Individual', 'print')
+@MenuManage.describ('contacts.change_individual')
+class IndividualPrint(XferContainerPrint):
+    caption = _("Show individual")
+    icon = "individual.png"
+    model = Individual
+    field_id = 'individual'
+
+    def get_report_generator(self):
+        return ActionGenerator(IndividualShow())
 
 @ActionsManage.affect('Individual', 'del')
 @MenuManage.describ('contacts.delete_individual')
@@ -112,6 +155,28 @@ class IndividualList(XferListEditor):
         if name_filter != "":
             from django.db.models import Q
             self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+
+@ActionsManage.affect('Individual', 'listing')
+@MenuManage.describ('contacts.change_individual')
+class IndividualListing(XferContainerPrint):
+    caption = _("Individuals")
+    icon = "individual.png"
+    model = Individual
+    field_id = 'individual'
+    with_text_export = True
+
+    def get_report_generator(self):
+        name_filter = self.getparam('filter')
+        criteria = self.getparam('CRITERIA')
+        lst_gen = ListingGenerator(self.model)
+        if (name_filter is not None) and (name_filter != ""):
+            from django.db.models import Q
+            lst_gen.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+        elif criteria is not None:
+            lst_gen.filter = get_search_query(criteria, self.item)
+        lst_gen.columns = [(6, _("firstname"), "#firstname"), (6, _("lastname"), "#lastname"), (18, _("address"), "#address"), (5, _("city"), "#city"), \
+                           (10, _("tel"), "#tel1<br/>#tel2"), (20, _("email"), "#email")]
+        return lst_gen
 
 @ActionsManage.affect('Individual', 'useradd')
 @MenuManage.describ('auth.add_user')
