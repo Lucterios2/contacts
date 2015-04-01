@@ -256,7 +256,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
         csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
-        content_csv = csv_value.split('\n') 
+        content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 33, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Nos coordonnées"')
         self.assertEqual(content_csv[5].strip(), '"Identité"')
