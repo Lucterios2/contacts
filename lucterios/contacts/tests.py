@@ -24,7 +24,8 @@ from lucterios.CORE.models import LucteriosUser
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
-    ResponsabilityModify, LegalEntitySearch, IndividualSearch
+    ResponsabilityModify, LegalEntitySearch, IndividualSearch, \
+    LegalEntityListing
 from lucterios.CORE.views_usergroup import UsersEdit
 from base64 import b64decode
 
@@ -232,35 +233,12 @@ class ConfigurationTest(LucteriosTest):
     def test_printdetails(self):
         self.factory.xfer = CurrentStructurePrint()
         self.call('/lucterios.contacts/currentStructurePrint', {}, False)
-        self.assert_observer('Core.Custom', 'lucterios.contacts', 'currentStructurePrint')
-        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
-        self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
-
-        self.factory.xfer = CurrentStructurePrint()
-        self.call('/lucterios.contacts/currentStructurePrint', {'PRINT_MODE':'3'}, False)
         self.assert_observer('Core.Print', 'lucterios.contacts', 'currentStructurePrint')
         self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
         pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
-
-        self.factory.xfer = CurrentStructurePrint()
-        self.call('/lucterios.contacts/currentStructurePrint', {'PRINT_MODE':'4'}, False)
-        self.assert_observer('Core.Print', 'lucterios.contacts', 'currentStructurePrint')
-        self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
-        self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
-        content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 33, str(content_csv))
-        self.assertEqual(content_csv[1].strip(), '"Nos coordonnées"')
-        self.assertEqual(content_csv[5].strip(), '"Identité"')
-        self.assertEqual(content_csv[27].strip(), '"Responsables"')
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
@@ -276,6 +254,12 @@ class ConfigurationTest(LucteriosTest):
         self.call('/lucterios.contacts/currentStructure', {}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'currentStructure')
         self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,/9j/4AAQSkZJRg", True)
+
+        self.factory.xfer = CurrentStructurePrint()
+        self.call('/lucterios.contacts/currentStructurePrint', {}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'currentStructurePrint')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_account(self):
         self.factory.user = LucteriosUser.objects.get(username='empty')  # pylint: disable=no-member
@@ -662,6 +646,28 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
+    def test_legalentity_listing(self):
+        self.factory.xfer = LegalEntityListing()
+        self.call('/lucterios.contacts/legalEntityListing', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_count_equal('COMPONENTS/*', 2)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        self.factory.xfer = LegalEntityListing()
+        self.call('/lucterios.contacts/legalEntityListing', {'PRINT_MODE':'4'}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'legalEntityListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
+        self.assert_attrib_equal('PRINT', 'mode', '4')
+        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        content_csv = csv_value.split('\n')
+        self.assertEqual(len(content_csv), 7, str(content_csv))
+        self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
+        self.assertEqual(content_csv[3].strip(), '"nom";"adresse";"ville";"tel";"courriel";')
 
 def suite():
     # pylint: disable=redefined-outer-name

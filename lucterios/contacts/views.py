@@ -80,7 +80,6 @@ class CurrentStructurePrint(XferContainerPrint):
     model = LegalEntity
     field_id = 1
     caption = _("Our details")
-    with_text_export = True
 
     def get_report_generator(self):
         return ActionGenerator(CurrentStructure())
