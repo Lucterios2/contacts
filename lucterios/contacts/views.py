@@ -7,18 +7,17 @@ Created on march 2015
 
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
+from django.core.exceptions import ObjectDoesNotExist
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, StubAction, ActionsManage
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
-from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual
-from django.utils import six
-from django.core.exceptions import ObjectDoesNotExist
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
-from lucterios.framework.xferprinting import XferContainerPrint
-from lucterios.framework.printgenerators import ActionGenerator
+from lucterios.CORE.xferprint import XferPrintAction
+from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual
 
 @MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
@@ -75,14 +74,12 @@ class CurrentStructure(XferContainerCustom):
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('')
-class CurrentStructurePrint(XferContainerPrint):
+class CurrentStructurePrint(XferPrintAction):
     icon = "ourDetails.png"
     model = LegalEntity
     field_id = 1
     caption = _("Our details")
-
-    def get_report_generator(self):
-        return ActionGenerator(CurrentStructure())
+    action_class = CurrentStructure
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):

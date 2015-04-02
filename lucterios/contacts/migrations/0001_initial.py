@@ -6,7 +6,8 @@ from django.db import models, migrations, transaction
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.utils.log import getLogger
-from django.utils import six
+from django.utils import six, translation
+from django.utils.translation import ugettext_lazy as _
 
 from os import listdir
 from os.path import dirname, join
@@ -14,10 +15,32 @@ import sys
 
 def initial_values(apps, schema_editor):
     # pylint: disable=unused-argument
+    translation.activate(settings.LANGUAGE_CODE)
     legalentity = apps.get_model("contacts", "LegalEntity")
     current_entity = legalentity.objects.create(id=1, name="---", address='---', \
                             postal_code='00000', city='---', country='---')
     current_entity.save()
+
+    printmodel = apps.get_model("CORE", "PrintModel")
+    prtmdl = printmodel.objects.create(name=_("listing"), kind=0, modelname='LegalEntity')
+    prtmdl.value = "210\n297\n"
+    for column in [(12, _("name"), "#name"), (18, _("address"), "#address"), (5, _("city"), "#city"), \
+                   (10, _("tel"), "#tel1{[newline]}#tel2"), (20, _("email"), "#email")]:
+        prtmdl.value += "%d//%s//%s\n" % column
+    prtmdl.save()
+    prtmdl = printmodel.objects.create(name=_("label"), kind=1, modelname='LegalEntity')
+    prtmdl.value = "#name{[newline]}#address{[newline]}#postal_code #city"
+    prtmdl.save()
+
+    prtmdl = printmodel.objects.create(name=_("listing"), kind=0, modelname='Individual')
+    prtmdl.value = "210\n297\n"
+    for column in [(6, _("firstname"), "#firstname"), (6, _("lastname"), "#lastname"), (18, _("address"), "#address"), (5, _("city"), "#city"), \
+                           (10, _("tel"), "#tel1{[newline]}#tel2"), (20, _("email"), "#email")]:
+        prtmdl.value += "%d//%s//%s\n" % column
+    prtmdl.save()
+    prtmdl = printmodel.objects.create(name=_("label"), kind=1, modelname='Individual')
+    prtmdl.value = "#firstname #lastname{[newline]}#address{[newline]}#postal_code #city"
+    prtmdl.save()
 
 def initial_postalcodes(apps, schema_editor):
     # pylint: disable=unused-argument

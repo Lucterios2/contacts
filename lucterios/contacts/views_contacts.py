@@ -14,12 +14,11 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
-from lucterios.framework.xfersearch import XferSearchEditor, get_search_query
+from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing,\
+    XferPrintLabel
 from lucterios.contacts.models import LegalEntity, Individual, Responsability
-from lucterios.framework.xferprinting import XferContainerPrint
-from lucterios.framework.printgenerators import ActionGenerator, \
-    ListingGenerator
 
 MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
@@ -44,14 +43,12 @@ class LegalEntityShow(XferShowEditor):
 
 @ActionsManage.affect('LegalEntity', 'print')
 @MenuManage.describ('contacts.change_legalentity')
-class LegalEntityPrint(XferContainerPrint):
+class LegalEntityPrint(XferPrintAction):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
     model = LegalEntity
     field_id = 'legal_entity'
-
-    def get_report_generator(self):
-        return ActionGenerator(LegalEntityShow())
+    action_class = LegalEntityShow
 
 @ActionsManage.affect('LegalEntity', 'del')
 @MenuManage.describ('contacts.delete_legalentity')
@@ -78,23 +75,33 @@ class LegalEntityList(XferListEditor):
 
 @ActionsManage.affect('LegalEntity', 'listing')
 @MenuManage.describ('contacts.change_legalentity')
-class LegalEntityListing(XferContainerPrint):
+class LegalEntityListing(XferPrintListing):
     caption = _("Legal entities")
     icon = "legalEntity.png"
     model = LegalEntity
     field_id = 'legal_entity'
-    with_text_export = True
 
-    def get_report_generator(self):
+    def get_filter(self):
         structure_type = self.getparam('structure_type')
-        criteria = self.getparam('CRITERIA')
-        lst_gen = ListingGenerator(self.model)
         if (structure_type is not None) and (structure_type != '0'):
-            lst_gen.filter = {'structure_type':int(structure_type)}
-        elif criteria is not None:
-            lst_gen.filter = get_search_query(criteria, self.item)
-        lst_gen.columns = [(12, _("name"), "#name"), (18, _("address"), "#address"), (5, _("city"), "#city"), (10, _("tel"), "#tel1<br/>#tel2"), (20, _("email"), "#email")]
-        return lst_gen
+            return {'structure_type':int(structure_type)}
+        else:
+            return XferPrintListing.get_filter(self)
+
+@ActionsManage.affect('LegalEntity', 'label')
+@MenuManage.describ('contacts.change_legalentity')
+class LegalEntityLabel(XferPrintLabel):
+    caption = _("Legal entities")
+    icon = "legalEntity.png"
+    model = LegalEntity
+    field_id = 'legal_entity'
+
+    def get_filter(self):
+        structure_type = self.getparam('structure_type')
+        if (structure_type is not None) and (structure_type != '0'):
+            return {'structure_type':int(structure_type)}
+        else:
+            return XferPrintListing.get_filter(self)
 
 @ActionsManage.affect('Individual', 'add')
 @MenuManage.describ('contacts.add_individual')
@@ -115,14 +122,12 @@ class IndividualShow(XferShowEditor):
 
 @ActionsManage.affect('Individual', 'print')
 @MenuManage.describ('contacts.change_individual')
-class IndividualPrint(XferContainerPrint):
+class IndividualPrint(XferPrintAction):
     caption = _("Show individual")
     icon = "individual.png"
     model = Individual
     field_id = 'individual'
-
-    def get_report_generator(self):
-        return ActionGenerator(IndividualShow())
+    action_class = IndividualShow
 
 @ActionsManage.affect('Individual', 'del')
 @MenuManage.describ('contacts.delete_individual')
@@ -156,27 +161,38 @@ class IndividualList(XferListEditor):
             from django.db.models import Q
             self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
 
+@ActionsManage.affect('Individual', 'label')
+@MenuManage.describ('contacts.change_individual')
+class IndividualLabel(XferPrintLabel):
+    caption = _("Individuals")
+    icon = "individual.png"
+    model = Individual
+    field_id = 'individual'
+
+    def get_filter(self):
+        name_filter = self.getparam('filter')
+        if (name_filter is not None) and (name_filter != ""):
+            from django.db.models import Q
+            return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+        else:
+            return XferPrintListing.get_filter(self)
+
 @ActionsManage.affect('Individual', 'listing')
 @MenuManage.describ('contacts.change_individual')
-class IndividualListing(XferContainerPrint):
+class IndividualListing(XferPrintListing):
     caption = _("Individuals")
     icon = "individual.png"
     model = Individual
     field_id = 'individual'
     with_text_export = True
 
-    def get_report_generator(self):
+    def get_filter(self):
         name_filter = self.getparam('filter')
-        criteria = self.getparam('CRITERIA')
-        lst_gen = ListingGenerator(self.model)
         if (name_filter is not None) and (name_filter != ""):
             from django.db.models import Q
-            lst_gen.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
-        elif criteria is not None:
-            lst_gen.filter = get_search_query(criteria, self.item)
-        lst_gen.columns = [(6, _("firstname"), "#firstname"), (6, _("lastname"), "#lastname"), (18, _("address"), "#address"), (5, _("city"), "#city"), \
-                           (10, _("tel"), "#tel1<br/>#tel2"), (20, _("email"), "#email")]
-        return lst_gen
+            return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+        else:
+            return XferPrintListing.get_filter(self)
 
 @ActionsManage.affect('Individual', 'useradd')
 @MenuManage.describ('auth.add_user')
