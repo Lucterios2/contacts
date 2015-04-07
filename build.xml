@@ -1,5 +1,6 @@
 <project name="Lucterios2" default="all" basedir=".">
 	<property name="test.instance" value="test"/>
+	<property environment="env"/>
 	<property name="standard.path" value="${basedir}/../lct-standard"/>
 	<property name="core.path" value="${basedir}/../lct-core"/>
 	
@@ -85,7 +86,7 @@
 
 	<target name="add_instance">
 		<exec executable="python3">
-			<env key="PYTHONPATH" value="${core.path}:${standard.path}:${env.PYTHONPATH}"/>
+			<env key="PYTHONPATH" value="${basedir}:${core.path}:${standard.path}:${env.PYTHONPATH}"/>
 			<arg value="${core.path}/lucterios/install/lucterios-admin.py"/>
 			<arg value="add"/>
 			<arg value="--name=${test.instance}"/>
@@ -95,7 +96,7 @@
 
 	<target name="del_instance">
 		<exec executable="python3">
-			<env key="PYTHONPATH" value="${core.path}:${standard.path}:${env.PYTHONPATH}"/>
+			<env key="PYTHONPATH" value="${basedir}:${core.path}:${standard.path}:${env.PYTHONPATH}"/>
 			<arg value="${core.path}/lucterios/install/lucterios-admin.py"/>
 			<arg value="del"/>
 			<arg value="--name=${test.instance}"/>
