@@ -91,12 +91,6 @@
 			<arg value="--name=${test.instance}"/>
 			<arg value="--module=lucterios.contacts"/>			
 		</exec>	
-		<exec executable="python3">
-			<env key="PYTHONPATH" value="${core.path}:${standard.path}:${env.PYTHONPATH}"/>
-			<arg value="./manage_${test.instance}.py"/>
-			<arg value="migrate"/>
-			<arg value="--noinput"/>			
-		</exec>	
 	</target>	
 
 	<target name="del_instance">
