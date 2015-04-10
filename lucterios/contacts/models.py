@@ -172,7 +172,7 @@ class AbstractContact(LucteriosModel):
 
 class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
-    structure_type = models.ForeignKey('StructureType', null=True, on_delete=models.SET_NULL)
+    structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
     identify_number = models.CharField(_('identify number'), max_length=100, blank=True)
 
     legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):['responsability_set']}
@@ -212,7 +212,7 @@ class Individual(AbstractContact):
     genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
     firstname = models.CharField(_('firstname'), max_length=50, blank=False)
     lastname = models.CharField(_('lastname'), max_length=50, blank=False)
-    user = models.ForeignKey('auth.User', null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey('auth.User', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
     # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
@@ -255,8 +255,8 @@ class Individual(AbstractContact):
         verbose_name_plural = _('individuals')
 
 class Responsability(LucteriosModel):
-    individual = models.ForeignKey(Individual, null=False)
-    legal_entity = models.ForeignKey(LegalEntity, null=False)
+    individual = models.ForeignKey(Individual, verbose_name=_('individual'), null=False)
+    legal_entity = models.ForeignKey(LegalEntity, verbose_name=_('legal entity'), null=False)
     functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]
 

@@ -101,7 +101,7 @@ class LegalEntityLabel(XferPrintLabel):
         if (structure_type is not None) and (structure_type != '0'):
             return {'structure_type':int(structure_type)}
         else:
-            return XferPrintListing.get_filter(self)
+            return XferPrintLabel.get_filter(self)
 
 @ActionsManage.affect('Individual', 'add')
 @MenuManage.describ('contacts.add_individual')
@@ -175,7 +175,7 @@ class IndividualLabel(XferPrintLabel):
             from django.db.models import Q
             return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
         else:
-            return XferPrintListing.get_filter(self)
+            return XferPrintLabel.get_filter(self)
 
 @ActionsManage.affect('Individual', 'listing')
 @MenuManage.describ('contacts.change_individual')

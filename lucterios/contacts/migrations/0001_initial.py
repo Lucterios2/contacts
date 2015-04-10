@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True, to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, verbose_name='name', blank=False)),
                 ('identify_number', models.CharField(max_length=100, blank=True, verbose_name='legal number')),
-                ('structure_type', models.ForeignKey(on_delete=models.SET_NULL, null=True, to='contacts.StructureType')),
+                ('structure_type', models.ForeignKey(on_delete=models.deletion.SET_NULL, to='contacts.StructureType', verbose_name='structure type', null=True)),
             ],
             options={
                 'verbose_name_plural': 'legal entities',
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
                 ('firstname', models.CharField(max_length=50, verbose_name='firstname')),
                 ('lastname', models.CharField(max_length=50, verbose_name='lastname')),
                 ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')], blank=False)),
-                ('user', models.ForeignKey(on_delete=models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
+                ('user', models.ForeignKey(on_delete=models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='user', null=True)),
             ],
             options={
                 'verbose_name_plural': 'individuals',
@@ -172,8 +172,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('functions', models.ManyToManyField(blank=True, verbose_name='functions', to='contacts.Function')),
-                ('individual', models.ForeignKey(to='contacts.Individual')),
-                ('legal_entity', models.ForeignKey(to='contacts.LegalEntity')),
+                ('individual', models.ForeignKey(verbose_name='individual', to='contacts.Individual')),
+                ('legal_entity', models.ForeignKey(verbose_name='legal entity', to='contacts.LegalEntity')),
             ],
             options={
                 'verbose_name_plural': 'responsabilities',

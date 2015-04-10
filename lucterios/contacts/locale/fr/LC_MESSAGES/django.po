@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-09 12:43+0000\n"
+"POT-Creation-Date: 2015-04-10 15:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,7 @@ msgstr "fonction de personne physique"
 msgid "individual functions"
 msgstr "fonctions de personne physique"
 
-#: models.py:68
+#: models.py:68 models.py:175
 msgid "structure type"
 msgstr "type de structure"
 
@@ -131,7 +131,7 @@ msgstr "002@Responsables"
 msgid "You cannot delete this legal entity!"
 msgstr "Vous ne pouvez supprimer cette structure morale!"
 
-#: models.py:208
+#: models.py:208 models.py:259
 msgid "legal entity"
 msgstr "personne morale"
 
@@ -147,7 +147,11 @@ msgstr "Homme"
 msgid "Woman"
 msgstr "Femme"
 
-#: models.py:254 views_contacts.py:262
+#: models.py:215
+msgid "user"
+msgstr ""
+
+#: models.py:254 models.py:258 views_contacts.py:262
 msgid "individual"
 msgstr "personne physique"
 
