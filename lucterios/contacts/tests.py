@@ -25,7 +25,7 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch, \
-    LegalEntityListing
+    LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel
 from lucterios.CORE.views_usergroup import UsersEdit
 from base64 import b64decode
 
@@ -495,6 +495,81 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 
+    def test_individual_listing(self):
+        self.factory.xfer = IndividualListing()
+        self.call('/lucterios.contacts/individualListing', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "3", (1, 1, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        self.factory.xfer = IndividualListing()
+        self.call('/lucterios.contacts/individualListing', {'PRINT_MODE':'4', 'MODEL':3}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'individualListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
+        self.assert_attrib_equal('PRINT', 'mode', '4')
+        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        content_csv = csv_value.split('\n')
+        self.assertEqual(len(content_csv), 7, str(content_csv))
+        self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
+        self.assertEqual(content_csv[3].strip(), '"prénom";"nom";"adresse";"ville";"tel";"courriel";')
+
+        self.factory.xfer = IndividualListing()
+        self.call('/lucterios.contacts/individualListing', {'PRINT_MODE':'4', 'MODEL':3, 'filter':'marie'}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'individualListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
+        self.assert_attrib_equal('PRINT', 'mode', '4')
+        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        content_csv = csv_value.split('\n')
+        self.assertEqual(len(content_csv), 6, str(content_csv))
+        self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
+        self.assertEqual(content_csv[3].strip(), '"prénom";"nom";"adresse";"ville";"tel";"courriel";')
+
+    def test_individual_label(self):
+        self.factory.xfer = IndividualLabel()
+        self.call('/lucterios.contacts/individualLabel', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_count_equal('COMPONENTS/*', 8)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 1)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblLABEL"]', "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="LABEL"]', "1", (1, 1, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="LABEL"]/CASE', 6)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblFIRSTLABEL"]', "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="FIRSTLABEL"]', "1", (1, 2, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "4", (1, 3, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        self.factory.xfer = IndividualLabel()
+        self.call('/lucterios.contacts/individualLabel', {'PRINT_MODE':'3', 'LABEL': 3, 'FIRSTLABEL':5, 'MODEL':4, 'name_filter':'marie'}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'individualLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
+        self.assert_attrib_equal('PRINT', 'mode', '3')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+        self.factory.xfer = IndividualLabel()
+        self.call('/lucterios.contacts/individualLabel', {'PRINT_MODE':'3', 'LABEL': 2, 'FIRSTLABEL':4, 'MODEL':4}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'individualLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
+        self.assert_attrib_equal('PRINT', 'mode', '3')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
         self.call('/lucterios.contacts/legalEntityList', {}, False)
@@ -547,6 +622,16 @@ class ContactsTest(LucteriosTest):
 
         self.factory.xfer = ResponsabilityAdd()
         self.call('/lucterios.contacts/responsabilityAdd', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'responsabilityAdd')
+        self.assert_count_equal('COMPONENTS/*', 7)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/HEADER', 5)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/ACTIONS/ACTION', 3)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
+
+        self.factory.xfer = ResponsabilityAdd()
+        self.call('/lucterios.contacts/responsabilityAdd', {'legal_entity':'1', 'name_filter':'jack'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'responsabilityAdd')
         self.assert_count_equal('COMPONENTS/*', 7)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
@@ -671,6 +756,55 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
         self.assertEqual(content_csv[3].strip(), '"nom";"adresse";"ville";"tel";"courriel";')
+
+        self.factory.xfer = LegalEntityListing()
+        self.call('/lucterios.contacts/legalEntityListing', {'PRINT_MODE':'4', 'MODEL':1, 'structure_type':2}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'legalEntityListing')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
+        self.assert_attrib_equal('PRINT', 'mode', '4')
+        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        content_csv = csv_value.split('\n')
+        self.assertEqual(len(content_csv), 6, str(content_csv))
+        self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
+        self.assertEqual(content_csv[3].strip(), '"nom";"adresse";"ville";"tel";"courriel";')
+
+    def test_legalentity_label(self):
+        self.factory.xfer = LegalEntityLabel()
+        self.call('/lucterios.contacts/legalEntityLabel', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_count_equal('COMPONENTS/*', 8)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 1)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblLABEL"]', "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="LABEL"]', "1", (1, 1, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="LABEL"]/CASE', 6)
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblFIRSTLABEL"]', "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="FIRSTLABEL"]', "1", (1, 2, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "2", (1, 3, 1, 1))
+        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        self.factory.xfer = LegalEntityLabel()
+        self.call('/lucterios.contacts/legalEntityLabel', {'PRINT_MODE':'3', 'LABEL': 1, 'FIRSTLABEL':3, 'MODEL':2, 'structure_type':2}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'legalEntityLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
+        self.assert_attrib_equal('PRINT', 'mode', '3')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+        self.factory.xfer = LegalEntityLabel()
+        self.call('/lucterios.contacts/legalEntityLabel', {'PRINT_MODE':'3', 'LABEL': 5, 'FIRSTLABEL':2, 'MODEL':2}, False)
+        self.assert_observer('Core.Print', 'lucterios.contacts', 'legalEntityLabel')
+        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
+        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
+        self.assert_attrib_equal('PRINT', 'mode', '3')
+        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
 def suite():
     # pylint: disable=redefined-outer-name
