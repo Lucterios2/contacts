@@ -9,7 +9,7 @@ from setuptools import setup
 from lucterios.contacts import __version__
 
 setup(
-    name="Lucterios_contacts",
+    name="lucterios-contacts",
     version=__version__,
     author="Lucterios",
     author_email="support@lucterios.org",
@@ -27,5 +27,5 @@ setup(
        "lucterios.contacts.migrations":['*'],
        "lucterios.contacts":['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["Lucterios ==2.0", "Pillow ==2.8"],
+    install_requires=["Lucterios =>2.0", "Pillow ==2.8"],
 )
