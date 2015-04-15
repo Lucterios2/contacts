@@ -27,5 +27,5 @@ setup(
        "lucterios.contacts.migrations":['*'],
        "lucterios.contacts":['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["lucterios >=2.0", "Pillow ==2.8"],
+    install_requires=["lucterios >=2.0b0,<2.0b9999", "Pillow ==2.8"],
 )
