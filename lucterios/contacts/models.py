@@ -180,6 +180,8 @@ class LegalEntity(AbstractContact):
     legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', \
             'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions']
     default_fields = ["name", 'tel1', 'tel2', 'email']
+    print_fields = ["name", 'structure_type','address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+                    'email', 'comment', 'identify_number']
 
     def __str__(self):
         return self.name
@@ -212,7 +214,7 @@ class Individual(AbstractContact):
     genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
     firstname = models.CharField(_('firstname'), max_length=50, blank=False)
     lastname = models.CharField(_('lastname'), max_length=50, blank=False)
-    user = models.ForeignKey('auth.User', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
     # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
     individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
@@ -220,6 +222,8 @@ class Individual(AbstractContact):
     individual__searchfields = ['genre', 'firstname', 'lastname', None, 'user.username', \
                                 'responsability_set.legal_entity.name', 'responsability_set.functions']
     default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
+    print_fields = ["firstname", "lastname",'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+                    'email', 'comment', 'user', 'responsability_set']
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
@@ -263,6 +267,7 @@ class Responsability(LucteriosModel):
     responsability__editfields = ["legal_entity", "individual", "functions"]
     responsability__searchfields = ["legal_entity", "individual", "functions"]
     default_fields = ["individual", "functions"]
+    print_fields = ["legal_entity", "functions"]
 
     def edit(self, xfer):
         xfer.change_to_readonly('legal_entity')
