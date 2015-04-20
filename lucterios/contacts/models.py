@@ -180,7 +180,7 @@ class LegalEntity(AbstractContact):
     legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', \
             'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions']
     default_fields = ["name", 'tel1', 'tel2', 'email']
-    print_fields = ["name", 'structure_type','address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+    print_fields = ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
                     'email', 'comment', 'identify_number']
 
     def __str__(self):
@@ -222,7 +222,7 @@ class Individual(AbstractContact):
     individual__searchfields = ['genre', 'firstname', 'lastname', None, 'user.username', \
                                 'responsability_set.legal_entity.name', 'responsability_set.functions']
     default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
-    print_fields = ["firstname", "lastname",'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+    print_fields = ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
                     'email', 'comment', 'user', 'responsability_set']
 
     def __str__(self):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-17 09:14+0000\n"
+"POT-Creation-Date: 2015-04-20 13:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,11 +62,11 @@ msgstr "email"
 msgid "label"
 msgstr "label"
 
-#: migrations/0001_initial.py:38 models.py:213
+#: migrations/0001_initial.py:38 models.py:215
 msgid "firstname"
 msgstr "firstname"
 
-#: migrations/0001_initial.py:39 models.py:214
+#: migrations/0001_initial.py:39 models.py:216
 msgid "lastname"
 msgstr "lastname"
 
@@ -118,7 +118,7 @@ msgstr "image"
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:178 models.py:218
+#: models.py:178 models.py:220
 msgid "001@Identity"
 msgstr "001@Identity"
 
@@ -126,55 +126,55 @@ msgstr "001@Identity"
 msgid "002@Management"
 msgstr "002@Management"
 
-#: models.py:203
+#: models.py:205
 msgid "You cannot delete this legal entity!"
 msgstr "You cannot delete this legal entity!"
 
-#: models.py:208 models.py:259
+#: models.py:210 models.py:263
 msgid "legal entity"
 msgstr "legal entity"
 
-#: models.py:209
+#: models.py:211
 msgid "legal entities"
 msgstr "legal entities"
 
-#: models.py:212
+#: models.py:214
 msgid "Man"
 msgstr "Man"
 
-#: models.py:212
+#: models.py:214
 msgid "Woman"
 msgstr "Woman"
 
-#: models.py:215
+#: models.py:217
 msgid "user"
 msgstr ""
 
-#: models.py:254 models.py:258 views_contacts.py:262
+#: models.py:258 models.py:262 views_contacts.py:262
 msgid "individual"
 msgstr "individual"
 
-#: models.py:255
+#: models.py:259
 msgid "individuals"
 msgstr "individuals"
 
-#: models.py:260
+#: models.py:264
 msgid "functions"
 msgstr "functions"
 
-#: models.py:261
+#: models.py:265
 msgid "Available functions"
 msgstr "Available functions"
 
-#: models.py:261
+#: models.py:265
 msgid "Chosen functions"
 msgstr "Chosen functions"
 
-#: models.py:274
+#: models.py:279
 msgid "responsability"
 msgstr "responsability"
 
-#: models.py:275
+#: models.py:280
 msgid "responsabilities"
 msgstr "responsabilities"
 

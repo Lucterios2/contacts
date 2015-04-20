@@ -10,7 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, StubAction, ActionsManage
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, StubAction, ActionsManage,\
+    FORMTYPE_MODAL
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
@@ -19,7 +20,7 @@ from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
 from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual
 
-@MenuManage.describ(None, FORMTYPE_NOMODAL, 'core.general', _('View my account.'))
+@MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
     caption = _("My account")
     icon = "account.png"
@@ -51,7 +52,7 @@ class AccountAddModify(XferAddEditor):
     caption_modify = _("My account")
     locked = True
 
-@MenuManage.describ('', FORMTYPE_NOMODAL, 'core.general', _('Our structure and its management'))
+@MenuManage.describ('', FORMTYPE_MODAL, 'core.general', _('Our structure and its management'))
 class CurrentStructure(XferContainerCustom):
     caption = _("Our details")
     icon = "ourDetails.png"
