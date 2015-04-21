@@ -8,7 +8,7 @@ Created on march 2015
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
-from lucterios.framework.models import LucteriosModel
+from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from posix import unlink
 from django.utils import six
@@ -181,7 +181,7 @@ class LegalEntity(AbstractContact):
             'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions']
     default_fields = ["name", 'tel1', 'tel2', 'email']
     print_fields = ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
-                    'email', 'comment', 'identify_number']
+                    'email', 'comment', 'identify_number', 'OUR_DETAIL']
 
     def __str__(self):
         return self.name
@@ -223,7 +223,7 @@ class Individual(AbstractContact):
                                 'responsability_set.legal_entity.name', 'responsability_set.functions']
     default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
     print_fields = ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
-                    'email', 'comment', 'user', 'responsability_set']
+                    'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
@@ -278,3 +278,21 @@ class Responsability(LucteriosModel):
         # pylint: disable=no-init
         verbose_name = _('responsability')
         verbose_name_plural = _('responsabilities')
+
+class OurDetailPrintPlugin(PrintFieldsPlugIn):
+
+    name = "OUR_DETAIL"
+    title = _('our detail')
+
+    def get_print_fields(self):
+        fields = []
+        for title, name in LegalEntity.get_print_fields(False):
+            if (name[:14] != 'structure_type') and (name[:len(self.name)] != self.name):
+                fields.append(("%s > %s" % (self.title, title), "%s.%s" % (self.name, name)))
+        return fields
+
+    def evaluate(self, text_to_evaluate):
+        our_details = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
+        return our_details.evaluate(text_to_evaluate)
+
+PrintFieldsPlugIn.add_plugin(OurDetailPrintPlugin)

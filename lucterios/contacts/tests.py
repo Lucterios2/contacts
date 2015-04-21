@@ -15,7 +15,7 @@ from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
 from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
-    Function
+    Function, Responsability
 from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
@@ -569,6 +569,28 @@ class ContactsTest(LucteriosTest):
         self.assert_attrib_equal('PRINT', 'mode', '3')
         pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+    def test_individual_fieldsprint(self):
+        # pylint: disable=line-too-long
+        ourdetails = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
+        indiv_jack = Individual.objects.get(id=2)  # pylint: disable=no-member
+        resp = Responsability.objects.create(individual=indiv_jack, legal_entity=ourdetails)  # pylint: disable=no-member
+        resp.functions = Function.objects.filter(id__in=[1, 2])  # pylint: disable=no-member
+        resp.save()
+
+        print_text = ""
+        for print_fields in Individual.get_print_fields():
+            print_text += "#%s " % print_fields[1]
+        self.assertEqual("#firstname #lastname #address #postal_code #city #country #tel1 #tel2 #email #comment ", print_text[:86])
+        self.assertEqual("#user.username #responsability_set.legal_entity.name #responsability_set.legal_entity.structure_type.name ", print_text[86:192])
+        self.assertEqual("#responsability_set.legal_entity.address #responsability_set.legal_entity.postal_code #responsability_set.legal_entity.city #responsability_set.legal_entity.country ", print_text[192:357])
+        self.assertEqual("#responsability_set.legal_entity.tel1 #responsability_set.legal_entity.tel2 #responsability_set.legal_entity.email ", print_text[357:472])
+        self.assertEqual("#responsability_set.legal_entity.comment #responsability_set.legal_entity.identify_number #responsability_set.functions.name ", print_text[472:597])
+        self.assertEqual("#OUR_DETAIL.name #OUR_DETAIL.address #OUR_DETAIL.postal_code #OUR_DETAIL.city #OUR_DETAIL.country ", print_text[597:695])
+        self.assertEqual("#OUR_DETAIL.tel1 #OUR_DETAIL.tel2 #OUR_DETAIL.email ", print_text[695:747])
+        self.assertEqual("#OUR_DETAIL.comment #OUR_DETAIL.identify_number ", print_text[747:])
+        self.assertEqual("jack MISTER rue de la liberté 97250 LE PRECHEUR MARTINIQUE  02-78-45-12-95 jack@worldcompany.com   WoldCompany  Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   President{[br/]}Secretaire ", indiv_jack.evaluate(print_text[:597]))
+        self.assertEqual("WoldCompany Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   ", indiv_jack.evaluate(print_text[597:]))
 
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
