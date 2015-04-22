@@ -24,23 +24,23 @@ def initial_values(apps, schema_editor):
     current_entity.save()
 
     prtmdl = PrintModel.objects.create(name=_("listing"), kind=0, modelname=LegalEntity.get_long_name())
-    prtmdl.change_listing(210, 297, [(12, _("name"), "#name"), \
+    prtmdl.change_listing(297, 210, [(12, _("name"), "#name"), \
                                      (18, _("address"), "#address"), \
-                                     (5, _("city"), "#city"), \
+                                     (13, _("city"), "#city"), \
                                      (10, _("tel"), "#tel1{[newline]}#tel2"), \
-                                     (20, _("email"), "#email")])
+                                     (13, _("email"), "#email")])
     prtmdl.save()
     prtmdl = PrintModel.objects.create(name=_("label"), kind=1, modelname=LegalEntity.get_long_name())
     prtmdl.value = "#name{[newline]}#address{[newline]}#postal_code #city"
     prtmdl.save()
 
     prtmdl = PrintModel.objects.create(name=_("listing"), kind=0, modelname=Individual.get_long_name())
-    prtmdl.change_listing(210, 297, [(6, _("firstname"), "#firstname"), \
-                                   (6, _("lastname"), "#lastname"), \
+    prtmdl.change_listing(297, 210, [(8, _("firstname"), "#firstname"), \
+                                   (8, _("lastname"), "#lastname"), \
                                    (18, _("address"), "#address"), \
-                                   (5, _("city"), "#city"), \
+                                   (13, _("city"), "#city"), \
                                    (10, _("tel"), "#tel1{[newline]}#tel2"), \
-                                   (20, _("email"), "#email")])
+                                   (13, _("email"), "#email")])
     prtmdl.save()
     prtmdl = PrintModel.objects.create(name=_("label"), kind=1, modelname=Individual.get_long_name())
     prtmdl.value = "#firstname #lastname{[newline]}#address{[newline]}#postal_code #city"

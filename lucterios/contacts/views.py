@@ -67,7 +67,7 @@ class CurrentStructure(XferContainerCustom):
         self.add_component(img)
         lab = XferCompLabelForm("title")
         lab.set_value_as_title(_('Our structure and its management'))
-        lab.set_location(1, 0, 2)
+        lab.set_location(1, 0, 4)
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
