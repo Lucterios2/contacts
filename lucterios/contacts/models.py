@@ -69,6 +69,120 @@ class StructureType(LucteriosModel):
         verbose_name_plural = _('structure types')
         default_permissions = []
 
+class CustomField(LucteriosModel):
+    modelname = models.CharField(_('model'), max_length=100)
+    name = models.CharField(_('name'), max_length=100, unique=False)
+    kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
+    args = models.CharField(_('arguments'), max_length=200, default="{}")
+
+    customfield__showfields = ['name', 'modelname', 'kind']
+    customfield__editfields = ['name', 'modelname', 'kind']
+    default_fields = ['name', (_('model'), 'model_title'), 'kind']
+
+    def model_associated(self):
+        from django.apps import apps
+        return apps.get_model(self.modelname)
+
+    @property
+    def model_title(self):
+        return self.model_associated()._meta.verbose_name.title()  # pylint: disable=protected-access
+
+    def edit(self, xfer):
+        args = self.get_args()
+        from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm, XferCompFloat, XferCompEdit
+        obj_model = xfer.get_components('modelname')
+        obj_kind = xfer.get_components('kind')
+        xfer.remove_component('modelname')
+        model_current = obj_model.value
+        xfer.tab = obj_model.tab
+        model_list = []
+        model_list.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
+        for sub_class in AbstractContact.__subclasses__(): # pylint: disable=no-member
+            model_list.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
+        model_select = XferCompSelect('modelname')
+        model_select.set_value(model_current)
+        model_select.set_select(model_list)
+        model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
+        model_select.set_size(obj_model.vmin, obj_model.hmin)
+        xfer.add_component(model_select)
+        lbl = XferCompLabelForm('lbl_args_min')
+        lbl.set_value_as_name(_('min'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 1, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_min', -10000, -10000, 0)
+        arg.set_value(args['min'])
+        arg.set_location(obj_kind.col, obj_kind.row + 1, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+
+        lbl = XferCompLabelForm('lbl_args_max')
+        lbl.set_value_as_name(_('max'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 2, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_max', -10000, -10000, 0)
+        arg.set_value(args['max'])
+        arg.set_location(obj_kind.col, obj_kind.row + 2, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+
+        lbl = XferCompLabelForm('lbl_args_prec')
+        lbl.set_value_as_name(_('precision'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 3, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_prec', 0, 10, 0)
+        arg.set_value(args['prec'])
+        arg.set_location(obj_kind.col, obj_kind.row + 3, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+
+        lbl = XferCompLabelForm('lbl_args_list')
+        lbl.set_value_as_name(_('list'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 4, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompEdit('args_list')
+        arg.set_value(args['list'])
+        arg.set_location(obj_kind.col, obj_kind.row + 4, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+
+        obj_kind.java_script = """
+var type=current.getValue();
+parent.get('lbl_args_min').setVisible(type==1 || type==2);
+parent.get('lbl_args_max').setVisible(type==1 || type==2);
+parent.get('lbl_args_prec').setVisible(type==2);
+parent.get('lbl_args_list').setVisible(type==4);
+parent.get('args_min').setVisible(type==1 || type==2);
+parent.get('args_max').setVisible(type==1 || type==2);
+parent.get('args_prec').setVisible(type==2);
+parent.get('args_list').setVisible(type==4);
+"""
+
+    def saving(self, xfer):
+        args = {}
+        for arg_name in ['min', 'max', 'prec', 'list']:
+            args_val = xfer.getparam('args_' + arg_name)
+            if args_val is not None:
+                if arg_name != 'list':
+                    args[arg_name] = float(args_val)
+                else:
+                    args[arg_name] = args_val
+        self.args = six.text_type(args)
+        LucteriosModel.saving(self, xfer)
+        self.save()
+
+    def get_args(self):
+        default_args = {'min':0, 'max':0, 'prec':0, 'list':''}
+        try:
+            args = eval(self.args)  # pylint: disable=eval-used
+        except:  # pylint: disable=bare-except
+            args = {}
+        for name, val in default_args.items():
+            if not name in args.keys():
+                args[name] = val
+        return args
+
+    class Meta(object):
+        # pylint: disable=no-init
+        verbose_name = _('custom field')
+        verbose_name_plural = _('custom fields')
+        default_permissions = []
+
 class AbstractContact(LucteriosModel):
     address = models.TextField(_('address'), blank=False)
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
@@ -168,6 +282,8 @@ class AbstractContact(LucteriosModel):
 
     class Meta(object):
         # pylint: disable=no-init
+        verbose_name = _('generic contact')
+        verbose_name_plural = _('generic contacts')
         default_permissions = []
 
 class LegalEntity(AbstractContact):

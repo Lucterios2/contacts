@@ -18,7 +18,8 @@ from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm,
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
-from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual
+from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual,\
+    CustomField
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
@@ -144,9 +145,33 @@ class Configuration(XferContainerCustom):
         lbl.set_value(_("Number of structure type show: %d") % grid.nb_lines)
         self.add_component(lbl)
 
+    def _fill_customfield(self):
+        self.new_tab(_("Custom field"))
+        img = XferCompImage('imgField')
+        img.set_value('lucterios.contacts/images/fields.png')
+        img.set_location(0, 0)
+        self.add_component(img)
+        img = XferCompLabelForm('titleField')
+        img.set_value_as_title(_('custom field list'))
+        img.set_location(1, 0)
+        self.add_component(img)
+        self.model = CustomField
+        dbcustom = CustomField.objects.all()  # pylint: disable=no-member
+        grid = XferCompGrid("custom_field")
+        grid.set_model(dbcustom, None, self)
+        grid.add_actions(self)
+        grid.set_location(0, 1, 2)
+        grid.set_size(200, 500)
+        self.add_component(grid)
+        lbl = XferCompLabelForm("nbField")
+        lbl.set_location(0, 2, 2)
+        lbl.set_value(_("Number of custom field show: %d") % grid.nb_lines)
+        self.add_component(lbl)
+
     def fillresponse(self):
         self._fill_functions()
         self._fill_structuretype()
+        self._fill_customfield()
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @ActionsManage.affect('Function', 'add')
@@ -165,6 +190,23 @@ class FunctionDel(XferDelete):
     icon = "function.png"
     model = Function
     field_id = 'function'
+
+@ActionsManage.affect('CustomField', 'add', 'edit')
+@MenuManage.describ('CORE.add_parameter')
+class CustomFieldAddModify(XferAddEditor):
+    icon = "fields.png"
+    model = CustomField
+    field_id = 'custom_field'
+    caption_add = _("Add custom field")
+    caption_modify = _("Modify custom field")
+
+@ActionsManage.affect('CustomField', 'del')
+@MenuManage.describ('CORE.add_parameter')
+class CustomFieldDel(XferDelete):
+    caption = _("Delete custom field")
+    icon = "fields.png"
+    model = CustomField
+    field_id = 'custom_field'
 
 @ActionsManage.affect('StructureType', 'add')
 @MenuManage.describ('CORE.add_parameter')

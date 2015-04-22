@@ -121,6 +121,22 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='CustomField',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('modelname', models.CharField(max_length=100, verbose_name='model')),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ('kind', models.IntegerField(choices=[(0, 'String'), (1, 'Integer'), (2, 'Real'), (3, 'Boolean'), (4, 'Select')])),
+                ('args', models.CharField(default='{}', max_length=200, verbose_name='arguments')),
+            ],
+            options={
+                'default_permissions': [],
+                'verbose_name_plural': 'custom fields',
+                'verbose_name': 'custom field',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='AbstractContact',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
@@ -159,7 +175,7 @@ class Migration(migrations.Migration):
                 ('firstname', models.CharField(max_length=50, verbose_name='firstname')),
                 ('lastname', models.CharField(max_length=50, verbose_name='lastname')),
                 ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')], blank=False)),
-                ('user', models.ForeignKey(on_delete=models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='user', null=True)),
+                ('user', models.ForeignKey(to='CORE.LucteriosUser', null=True, on_delete=models.deletion.SET_NULL, verbose_name='user')),
             ],
             options={
                 'verbose_name_plural': 'individuals',
