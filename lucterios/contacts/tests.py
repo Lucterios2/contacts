@@ -210,7 +210,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal('COMPONENTS/EDIT[@name="email"]', "mr-sylvestre@worldcompany.com", (2, 6, 3, 1))
         self.assert_comp_equal('COMPONENTS/MEMO[@name="comment"]', None, (2, 7, 3, 1))
         self.assert_comp_equal('COMPONENTS/EDIT[@name="identify_number"]', None, (2, 8, 3, 1))
-        self.assert_coordcomp_equal('COMPONENTS/UPLOAD[@name="uploadlogo"]', (2, 17, 3, 1))
+        self.assert_coordcomp_equal('COMPONENTS/UPLOAD[@name="uploadlogo"]', (2, 18, 3, 1))
 
         self.factory.xfer = CurrentStructureAddModify()
         self.call('/lucterios.contacts/currentAddModify', {"address":'Rue de la liberté{[newline]}BP 123', \

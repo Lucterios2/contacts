@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
                 ('modelname', models.CharField(max_length=100, verbose_name='model')),
                 ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('kind', models.IntegerField(choices=[(0, 'String'), (1, 'Integer'), (2, 'Real'), (3, 'Boolean'), (4, 'Select')])),
+                ('kind', models.IntegerField(choices=[(0, 'String'), (1, 'Integer'), (2, 'Real'), (3, 'Boolean'), (4, 'Select')], verbose_name='kind')),
                 ('args', models.CharField(default='{}', max_length=200, verbose_name='arguments')),
             ],
             options={
@@ -151,6 +151,23 @@ class Migration(migrations.Migration):
             ],
             options={
                 'default_permissions': [],
+                'verbose_name_plural': 'generic contacts',
+
+                'verbose_name': 'generic contact'},
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ContactCustomField',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
+                ('value', models.TextField(verbose_name='value')),
+                ('contact', models.ForeignKey(to='contacts.AbstractContact', verbose_name='contact')),
+                ('field', models.ForeignKey(to='contacts.CustomField', verbose_name='field')),
+            ],
+            options={
+                'default_permissions': [],
+                'verbose_name_plural': 'custom field values',
+                'verbose_name': 'custom field value',
             },
             bases=(models.Model,),
         ),

@@ -16,7 +16,7 @@ from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowE
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
 from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.CORE.models import LucteriosUser
-from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing,\
+from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, \
     XferPrintLabel
 from lucterios.contacts.models import LegalEntity, Individual, Responsability
 
@@ -103,7 +103,7 @@ class LegalEntityLabel(XferPrintLabel):
         else:
             return XferPrintLabel.get_filter(self)
 
-@ActionsManage.affect('Individual', 'add')
+@ActionsManage.affect('Individual', 'add', 'modify')
 @MenuManage.describ('contacts.add_individual')
 class IndividualAddModify(XferAddEditor):
     icon = "individual.png"

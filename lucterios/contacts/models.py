@@ -97,7 +97,7 @@ class CustomField(LucteriosModel):
         xfer.tab = obj_model.tab
         model_list = []
         model_list.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
-        for sub_class in AbstractContact.__subclasses__(): # pylint: disable=no-member
+        for sub_class in AbstractContact.__subclasses__():  # pylint: disable=no-member
             model_list.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
         model_select = XferCompSelect('modelname')
         model_select.set_value(model_current)
@@ -183,6 +183,17 @@ parent.get('args_list').setVisible(type==4);
         verbose_name_plural = _('custom fields')
         default_permissions = []
 
+class ContactCustomField(LucteriosModel):
+    contact = models.ForeignKey('AbstractContact', verbose_name=_('contact'), null=False, on_delete=models.CASCADE)
+    field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
+    value = models.TextField(_('value'), default="")
+
+    class Meta(object):
+        # pylint: disable=no-init
+        verbose_name = _('custom field value')
+        verbose_name_plural = _('custom field values')
+        default_permissions = []
+
 class AbstractContact(LucteriosModel):
     address = models.TextField(_('address'), blank=False)
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
@@ -196,6 +207,44 @@ class AbstractContact(LucteriosModel):
     abstractcontact__showfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
     abstractcontact__editfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
     abstractcontact__searchfields = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
+
+    def get_custom_fields(self):
+        import inspect
+        fields = []
+        model_list = []
+        for sub_class in inspect.getmro(self.__class__):
+            if hasattr(sub_class, "get_long_name"):
+                model_list.append(sub_class.get_long_name())
+        for cf_model in CustomField.objects.filter(modelname__in=model_list): # pylint: disable=no-member
+            fields.append(("custom_%d" % cf_model.id, cf_model))
+        return fields
+
+    def __getattr__(self, name):
+
+        if name[:7] == "custom_":
+            cf_id = int(name[7:])
+            cf_model = CustomField.objects.get(id=cf_id) # pylint: disable=no-member
+            if self.id is None:
+                ccf_value = ""
+            else:
+                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model) # pylint: disable=no-member
+                ccf_value = ccf_model[0].value
+            if cf_model.kind == 0:
+                return six.text_type(ccf_value)
+            if cf_model.kind == 1:
+                return int('0' + ccf_value)
+            if cf_model.kind == 2:
+                return float('0' + ccf_value)
+            if cf_model.kind == 3:
+                return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
+            if cf_model.kind == 4:
+                num = int('0' + ccf_value)
+                args_list = cf_model.get_args()['list'].split(',')
+                if num < len(args_list):
+                    return args_list[num]
+                else:
+                    return "---"
+        raise AttributeError(name)
 
     def _change_city_select(self, xfer, list_postalcode, obj_city):
         # pylint: disable=no-self-use
@@ -222,6 +271,45 @@ class AbstractContact(LucteriosModel):
         city_select.set_action(xfer.request, xfer, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         xfer.add_component(city_select)
 
+    def _edit_custom_field(self, xfer, init_col):
+        # pylint: disable=too-many-locals
+        from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect
+        col = init_col
+        col_offset = 0
+        row = xfer.get_max_row() + 5
+        for cf_name, cf_model in self.get_custom_fields():
+            lbl = XferCompLabelForm('lbl_' + cf_name)
+            lbl.set_location(col + col_offset, row, 1, 1)
+            lbl.set_value_as_name(cf_model.name)
+            xfer.add_component(lbl)
+            args = cf_model.get_args()
+            if cf_model.kind == 0:
+                val = XferCompEdit(cf_name)
+                val.set_value(getattr(self, cf_name))
+            elif (cf_model.kind == 1) or (cf_model.kind == 2):
+                val = XferCompFloat(cf_name, args['min'], args['max'], args['prec'])
+                val.set_value(getattr(self, cf_name))
+            elif cf_model.kind == 3:
+                val = XferCompCheck(cf_name)
+                val.set_value(getattr(self, cf_name))
+            elif cf_model.kind == 4:
+                val_selected = getattr(self, cf_name)
+                select_id = 0
+                select_list = []
+                for sel_item in args['list'].split(','):
+                    if sel_item == val_selected:
+                        select_id = len(select_list)
+                    select_list.append((len(select_list), sel_item))
+                val = XferCompSelect(cf_name)
+                val.set_select(select_list)
+                val.set_value(select_id)
+            val.set_location(col + col_offset + 1, row, 1, 1)
+            xfer.add_component(val)
+            col_offset += 2
+            if col_offset == 4:
+                col_offset = 0
+                row += 1
+
     def edit(self, xfer):
         from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompUpLoad
         from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO
@@ -233,12 +321,14 @@ class AbstractContact(LucteriosModel):
         list_postalcode = PostalCode.objects.filter(postal_code=postalcode_current)  # pylint: disable=no-member
         if len(list_postalcode) > 0:
             self._change_city_select(xfer, list_postalcode, obj_city)
-
         obj_cmt = xfer.get_components('comment')
         xfer.tab = obj_cmt.tab
+
+        self._edit_custom_field(xfer, obj_cmt.col - 1)
+        row = xfer.get_max_row()
         lbl = XferCompLabelForm('lbl_uploadlogo')
         lbl.set_value_as_name(_('image'))
-        lbl.set_location(obj_cmt.col - 1, obj_cmt.row + 10, 1, 1)
+        lbl.set_location(obj_cmt.col - 1, row + 10, 1, 1)
         xfer.add_component(lbl)
         upload = XferCompUpLoad('uploadlogo')
         upload.set_value('')
@@ -246,9 +336,28 @@ class AbstractContact(LucteriosModel):
         upload.add_filter('.gif')
         upload.add_filter('.png')
         upload.add_filter('.bmp')
-        upload.set_location(obj_cmt.col, obj_cmt.row + 10, obj_cmt.colspan, 1)
+        upload.set_location(obj_cmt.col, row + 10, obj_cmt.colspan, 1)
         xfer.add_component(upload)
         return
+
+    def _show_custom_field(self, xfer, init_col):
+        from lucterios.framework.xfercomponents import XferCompLabelForm
+        col = init_col
+        col_offset = 0
+        row = xfer.get_max_row() + 5
+        for cf_name, cf_model in self.get_custom_fields():
+            lbl = XferCompLabelForm('lbl_' + cf_name)
+            lbl.set_location(col + col_offset, row, 1, 1)
+            lbl.set_value_as_name(cf_model.name)
+            xfer.add_component(lbl)
+            val = XferCompLabelForm(cf_name)
+            val.set_location(col + col_offset + 1, row, 1, 1)
+            val.set_value(getattr(self, cf_name))
+            xfer.add_component(val)
+            col_offset += 2
+            if col_offset == 4:
+                col_offset = 0
+                row += 1
 
     def show(self, xfer):
         from lucterios.framework.xfercomponents import XferCompImage
@@ -267,6 +376,7 @@ class AbstractContact(LucteriosModel):
             img.set_value("lucterios.contacts/images/NoImage.png")
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
+        self._show_custom_field(xfer, obj_addr.col)
 
     def saving(self, xfer):
         uploadlogo = xfer.getparam('uploadlogo')
@@ -279,6 +389,14 @@ class AbstractContact(LucteriosModel):
                     image.save(image_file, 'JPEG', quality=90)
             unlink(tmp_file)
         LucteriosModel.saving(self, xfer)
+        for cf_name, cf_model in self.get_custom_fields():
+            cf_value = xfer.getparam(cf_name)
+            if cf_value is not None:
+                cf_id = int(cf_name[7:])
+                cf_model = CustomField.objects.get(id=cf_id) # pylint: disable=no-member
+                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model) # pylint: disable=no-member
+                ccf_model[0].value = six.text_type(cf_value)
+                ccf_model[0].save()
 
     class Meta(object):
         # pylint: disable=no-init
