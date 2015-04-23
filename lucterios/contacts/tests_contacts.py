@@ -739,7 +739,7 @@ class ContactsTest(LucteriosTest):
 
         filter_result, desc_result = get_search_query_from_criteria("custom_1||5||beau", Individual)
         self.assertEqual({'0':'{[b]}aaa{[/b]} contiens {[i]}"beau"{[/i]}'}, desc_result)
-        q_res = Q(contactcustomfield__field__id=1) & Q(contactcustomfield__value__contains='beau')
+        q_res = Q(contactcustomfield__field__id=1) & Q(**{'contactcustomfield__value__contains':'beau'})
         self.assertEqual(six.text_type(q_res), six.text_type(filter_result))
 
         find_indiv = list(Individual.objects.filter(q_res)) # pylint: disable=no-member
