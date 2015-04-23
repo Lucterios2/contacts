@@ -585,9 +585,12 @@ class ContactsTest(LucteriosTest):
         resp.functions = Function.objects.filter(id__in=[1, 2])  # pylint: disable=no-member
         resp.save()
 
+        print_field_list = Individual.get_print_fields()
+        self.assertEqual(33, len(print_field_list))
         print_text = ""
-        for print_fields in Individual.get_print_fields():
-            print_text += "#%s " % print_fields[1]
+
+        for print_field_item in print_field_list:
+            print_text += "#%s " % print_field_item[1]
         self.assertEqual("#firstname #lastname #address #postal_code #city #country #tel1 #tel2 #email #comment ", print_text[:86])
         self.assertEqual("#user.username #responsability_set.legal_entity.name #responsability_set.legal_entity.structure_type.name ", print_text[86:192])
         self.assertEqual("#responsability_set.legal_entity.address #responsability_set.legal_entity.postal_code #responsability_set.legal_entity.city #responsability_set.legal_entity.country ", print_text[192:357])
@@ -595,7 +598,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual("#responsability_set.legal_entity.comment #responsability_set.legal_entity.identify_number #responsability_set.functions.name ", print_text[472:597])
         self.assertEqual("#OUR_DETAIL.name #OUR_DETAIL.address #OUR_DETAIL.postal_code #OUR_DETAIL.city #OUR_DETAIL.country ", print_text[597:695])
         self.assertEqual("#OUR_DETAIL.tel1 #OUR_DETAIL.tel2 #OUR_DETAIL.email ", print_text[695:747])
-        self.assertEqual("#OUR_DETAIL.comment #OUR_DETAIL.identify_number ", print_text[747:])
+        self.assertEqual("#OUR_DETAIL.comment #OUR_DETAIL.identify_number ", print_text[747:795])
         self.assertEqual("jack MISTER rue de la liberté 97250 LE PRECHEUR MARTINIQUE  02-78-45-12-95 jack@worldcompany.com   WoldCompany  Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   President{[br/]}Secretaire ", indiv_jack.evaluate(print_text[:597]))
         self.assertEqual("WoldCompany Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   ", indiv_jack.evaluate(print_text[597:]))
 
@@ -940,6 +943,22 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "15")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "-5.4")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "Y")
+
+        print_field_list = Individual.get_print_fields()
+        self.assertEqual(45, len(print_field_list))
+        print_text = ""
+
+        for print_field_item in print_field_list:
+            if 'custom_' in print_field_item[1]:
+                print_text += "#%s " % print_field_item[1]
+        self.assertEqual("#responsability_set.legal_entity.custom_1 #responsability_set.legal_entity.custom_2 ", print_text[:84])
+        self.assertEqual("#responsability_set.legal_entity.custom_3 #responsability_set.legal_entity.custom_4 ", print_text[84:168])
+        self.assertEqual("#OUR_DETAIL.custom_1 #OUR_DETAIL.custom_2 #OUR_DETAIL.custom_3 #OUR_DETAIL.custom_4 ", print_text[168:252])
+        self.assertEqual("#custom_1 #custom_2 #custom_3 #custom_5 ", print_text[252:])
+
+        indiv_jack = Individual.objects.get(id=2)  # pylint: disable=no-member
+        self.assertEqual(" 0 0.0 Non ", indiv_jack.evaluate(print_text[168:252]))
+        self.assertEqual("blabla 15 -5.4 Y ", indiv_jack.evaluate(print_text[252:]))
 
 def suite():
     # pylint: disable=redefined-outer-name

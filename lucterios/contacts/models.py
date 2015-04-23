@@ -219,8 +219,15 @@ class AbstractContact(LucteriosModel):
             fields.append(("custom_%d" % cf_model.id, cf_model))
         return fields
 
-    def __getattr__(self, name):
+    @classmethod
+    def get_print_fields(cls, with_plugin=True):
+        fields = super(AbstractContact, cls).get_print_fields(with_plugin)
+        item = cls()
+        for cf_name, cf_model in item.get_custom_fields():
+            fields.append((cf_model.name, cf_name))
+        return fields
 
+    def __getattr__(self, name):
         if name[:7] == "custom_":
             cf_id = int(name[7:])
             cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
