@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-22 14:37+0000\n"
+"POT-Creation-Date: 2015-04-23 12:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,16 +38,16 @@ msgid "listing"
 msgstr "listing"
 
 #: migrations/0001_initial.py:27 models.py:39 models.py:56 models.py:74
-#: models.py:290
+#: models.py:408
 msgid "name"
 msgstr "name"
 
-#: migrations/0001_initial.py:28 migrations/0001_initial.py:40 models.py:187
+#: migrations/0001_initial.py:28 migrations/0001_initial.py:40 models.py:198
 msgid "address"
 msgstr "address"
 
 #: migrations/0001_initial.py:29 migrations/0001_initial.py:41 models.py:19
-#: models.py:189
+#: models.py:200
 msgid "city"
 msgstr "city"
 
@@ -55,7 +55,7 @@ msgstr "city"
 msgid "tel"
 msgstr "phone"
 
-#: migrations/0001_initial.py:31 migrations/0001_initial.py:43 models.py:193
+#: migrations/0001_initial.py:31 migrations/0001_initial.py:43 models.py:204
 msgid "email"
 msgstr "email"
 
@@ -63,19 +63,19 @@ msgstr "email"
 msgid "label"
 msgstr "label"
 
-#: migrations/0001_initial.py:38 models.py:331
+#: migrations/0001_initial.py:38 models.py:449
 msgid "firstname"
 msgstr "firstname"
 
-#: migrations/0001_initial.py:39 models.py:332
+#: migrations/0001_initial.py:39 models.py:450
 msgid "lastname"
 msgstr "lastname"
 
-#: models.py:18 models.py:32 models.py:188
+#: models.py:18 models.py:32 models.py:199
 msgid "postal code"
 msgstr "postal code"
 
-#: models.py:20 models.py:190
+#: models.py:20 models.py:201
 msgid "country"
 msgstr "country"
 
@@ -91,7 +91,7 @@ msgstr "Individual function"
 msgid "individual functions"
 msgstr "Individual functions"
 
-#: models.py:68 models.py:291
+#: models.py:68 models.py:409
 msgid "structure type"
 msgstr "structure type"
 
@@ -155,95 +155,121 @@ msgstr "custom field"
 msgid "custom fields"
 msgstr "custom fields"
 
-#: models.py:191
+#: models.py:187
+#, fuzzy
+#| msgid "Contact"
+msgid "contact"
+msgstr "Contact"
+
+#: models.py:188
+msgid "field"
+msgstr ""
+
+#: models.py:189
+msgid "value"
+msgstr ""
+
+#: models.py:193
+#, fuzzy
+#| msgid "custom field list"
+msgid "custom field value"
+msgstr "custom field list"
+
+#: models.py:194
+#, fuzzy
+#| msgid "custom field list"
+msgid "custom field values"
+msgstr "custom field list"
+
+#: models.py:202
 msgid "tel1"
 msgstr "phone #1"
 
-#: models.py:192
+#: models.py:203
 msgid "tel2"
 msgstr "phone #2"
 
-#: models.py:194
+#: models.py:205
 msgid "comment"
 msgstr "comment"
 
-#: models.py:240
+#: models.py:330
 msgid "image"
 msgstr "image"
 
-#: models.py:285
+#: models.py:403
 msgid "generic contact"
 msgstr "generic contact"
 
-#: models.py:286
+#: models.py:404
 msgid "generic contacts"
 msgstr "generic contacts"
 
-#: models.py:292
+#: models.py:410
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:294 models.py:336
+#: models.py:412 models.py:454
 msgid "001@Identity"
 msgstr "001@Identity"
 
-#: models.py:294
+#: models.py:412
 msgid "002@Management"
 msgstr "002@Management"
 
-#: models.py:321
+#: models.py:439
 msgid "You cannot delete this legal entity!"
 msgstr "You cannot delete this legal entity!"
 
-#: models.py:326 models.py:379
+#: models.py:444 models.py:497
 msgid "legal entity"
 msgstr "legal entity"
 
-#: models.py:327
+#: models.py:445
 msgid "legal entities"
 msgstr "legal entities"
 
-#: models.py:330
+#: models.py:448
 msgid "Man"
 msgstr "Man"
 
-#: models.py:330
+#: models.py:448
 msgid "Woman"
 msgstr "Woman"
 
-#: models.py:333
+#: models.py:451
 msgid "user"
 msgstr "user"
 
-#: models.py:374 models.py:378 views_contacts.py:262
+#: models.py:492 models.py:496 views_contacts.py:262
 msgid "individual"
 msgstr "individual"
 
-#: models.py:375
+#: models.py:493
 msgid "individuals"
 msgstr "individuals"
 
-#: models.py:380
+#: models.py:498
 msgid "functions"
 msgstr "functions"
 
-#: models.py:381
+#: models.py:499
 msgid "Available functions"
 msgstr "Available functions"
 
-#: models.py:381
+#: models.py:499
 msgid "Chosen functions"
 msgstr "Chosen functions"
 
-#: models.py:395
+#: models.py:513
 msgid "responsability"
 msgstr "responsability"
 
-#: models.py:396
+#: models.py:514
 msgid "responsabilities"
 msgstr "responsabilities"
 
-#: models.py:401
+#: models.py:519
 msgid "our detail"
 msgstr "our detail"
 

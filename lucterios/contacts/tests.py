@@ -10,7 +10,8 @@ from __future__ import unicode_literals
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint, \
+    CustomFieldAddModify
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
@@ -401,6 +402,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualShow()
         self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualShow')
+        self.assert_count_equal('COMPONENTS/*', 29)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER")
@@ -832,6 +834,112 @@ class ContactsTest(LucteriosTest):
         self.assert_attrib_equal('PRINT', 'mode', '3')
         pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+    def test_custom_fields(self):
+        self.factory.xfer = Configuration()
+        self.call('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('COMPONENTS/*', 15)
+        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER', 3)
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="name"]', "nom")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="model_title"]', "modèle")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind"]', "type")
+        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 0)
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'customFieldAddModify')
+        self.assert_xml_equal('TITLE', 'Ajouter un champ personnalisé')
+        self.assert_count_equal('CONTEXT', 0)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE":"YES"}))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
+        self.assert_count_equal('COMPONENTS/*', 15)
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (2, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', None, (2, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="kind"]', '0', (2, 2, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (2, 3, 1, 1))
+
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_max"]', '0', (2, 4, 1, 1))
+
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_prec"]', '0', (2, 5, 1, 1))
+
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="args_list"]', None, (2, 6, 1, 1))
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'aaa', 'modelname':'contacts.AbstractContact', \
+                                                               'kind':'0', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
+        self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'bbb', 'modelname':'contacts.AbstractContact', \
+                                                               'kind':'1', 'args_min':'0', 'args_max':'100', 'args_prec':'0', 'args_list':''}, False)
+        self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'ccc', 'modelname':'contacts.AbstractContact', \
+                                                               'kind':'2', 'args_min':'-10.0', 'args_max':'10.0', 'args_prec':'1', 'args_list':''}, False)
+        self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'ddd', 'modelname':'contacts.LegalEntity', \
+                                                               'kind':'3', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
+        self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'eee', 'modelname':'contacts.Individual', \
+                                                               'kind':'4', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':'U,V,W,X,Y,Z'}, False)
+        self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = Configuration()
+        self.call('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 5)
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="name"]', 'aaa')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="model_title"]', 'contact générique')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="kind"]', 'Chaîne')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="name"]', 'bbb')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="model_title"]', 'contact générique')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="kind"]', 'Entier')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="name"]', 'ccc')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="model_title"]', 'contact générique')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="kind"]', 'Réel')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="name"]', 'ddd')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="model_title"]', 'personne morale')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="kind"]', 'Booléen')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="name"]', 'eee')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="model_title"]', 'personne physique')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="kind"]', 'Sélection')
+
+        self.factory.xfer = IndividualShow()
+        self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualShow')
+        self.assert_count_equal('COMPONENTS/*', 37)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', None)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "0")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "0.0")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "U")
+
+        self.factory.xfer = IndividualAddModify()
+        self.call('/lucterios.contacts/individualAddModify', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualAddModify')
+        self.assert_count_equal('COMPONENTS/*', 33)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="custom_1"]', None)
+        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_2"]', "0")
+        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_3"]', "0.0")
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="custom_5"]', "0")
+
+        self.factory.xfer = IndividualAddModify()
+        self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'blabla', "custom_2":"15", "custom_3":"-5.4", "custom_5":"4"}, False)
+
+        self.factory.xfer = IndividualShow()
+        self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualShow')
+        self.assert_count_equal('COMPONENTS/*', 37)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', 'blabla')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "15")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "-5.4")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "Y")
 
 def suite():
     # pylint: disable=redefined-outer-name

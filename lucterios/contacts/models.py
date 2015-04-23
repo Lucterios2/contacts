@@ -85,7 +85,7 @@ class CustomField(LucteriosModel):
 
     @property
     def model_title(self):
-        return self.model_associated()._meta.verbose_name.title()  # pylint: disable=protected-access
+        return six.text_type(self.model_associated()._meta.verbose_name)  # pylint: disable=protected-access
 
     def edit(self, xfer):
         args = self.get_args()
@@ -215,7 +215,7 @@ class AbstractContact(LucteriosModel):
         for sub_class in inspect.getmro(self.__class__):
             if hasattr(sub_class, "get_long_name"):
                 model_list.append(sub_class.get_long_name())
-        for cf_model in CustomField.objects.filter(modelname__in=model_list): # pylint: disable=no-member
+        for cf_model in CustomField.objects.filter(modelname__in=model_list):  # pylint: disable=no-member
             fields.append(("custom_%d" % cf_model.id, cf_model))
         return fields
 
@@ -223,22 +223,24 @@ class AbstractContact(LucteriosModel):
 
         if name[:7] == "custom_":
             cf_id = int(name[7:])
-            cf_model = CustomField.objects.get(id=cf_id) # pylint: disable=no-member
+            cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
             if self.id is None:
                 ccf_value = ""
             else:
-                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model) # pylint: disable=no-member
+                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model)  # pylint: disable=no-member
                 ccf_value = ccf_model[0].value
             if cf_model.kind == 0:
                 return six.text_type(ccf_value)
+            if ccf_value == '':
+                ccf_value = '0'
             if cf_model.kind == 1:
-                return int('0' + ccf_value)
+                return int(ccf_value)
             if cf_model.kind == 2:
-                return float('0' + ccf_value)
+                return float(ccf_value)
             if cf_model.kind == 3:
                 return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
             if cf_model.kind == 4:
-                num = int('0' + ccf_value)
+                num = int(ccf_value)
                 args_list = cf_model.get_args()['list'].split(',')
                 if num < len(args_list):
                     return args_list[num]
@@ -393,8 +395,8 @@ class AbstractContact(LucteriosModel):
             cf_value = xfer.getparam(cf_name)
             if cf_value is not None:
                 cf_id = int(cf_name[7:])
-                cf_model = CustomField.objects.get(id=cf_id) # pylint: disable=no-member
-                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model) # pylint: disable=no-member
+                cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
+                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model)  # pylint: disable=no-member
                 ccf_model[0].value = six.text_type(cf_value)
                 ccf_model[0].save()
 
