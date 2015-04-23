@@ -227,6 +227,33 @@ class AbstractContact(LucteriosModel):
             fields.append((cf_model.name, cf_name))
         return fields
 
+    @classmethod
+    def get_fieldnames_for_search(cls, is_topleve=True):
+        # pylint: disable=too-many-locals
+        fieldnames = super(AbstractContact, cls).get_fieldnames_for_search()
+        if is_topleve:
+            from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField
+            from django.core.validators import MaxValueValidator, MinValueValidator
+            from django.db.models import Q
+            for cf_name, cf_model in cls().get_custom_fields():
+                dbfield = None
+                args = cf_model.get_args()
+                if cf_model.kind == 0:
+                    dbfield = TextField(cf_model.name)
+                if cf_model.kind == 1:
+                    dbfield = IntegerField(cf_model.name, validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+                if cf_model.kind == 2:
+                    dbfield = DecimalField(cf_model.name, decimal_places=int(args['prec']), validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+                if cf_model.kind == 3:
+                    dbfield = BooleanField(cf_model.name)
+                if cf_model.kind == 4:
+                    choices = []
+                    for item in args['list'].split(','):
+                        choices.append((len(choices), item))
+                    dbfield = IntegerField(cf_model.name, choices=tuple(choices))
+                fieldnames.append((cf_name, dbfield, 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
+        return fieldnames
+
     def __getattr__(self, name):
         if name[:7] == "custom_":
             cf_id = int(name[7:])
@@ -514,7 +541,6 @@ class Responsability(LucteriosModel):
 
     def edit(self, xfer):
         xfer.change_to_readonly('legal_entity')
-
         xfer.change_to_readonly('individual')
 
     class Meta(object):
