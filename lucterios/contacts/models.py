@@ -83,13 +83,59 @@ class CustomField(LucteriosModel):
         from django.apps import apps
         return apps.get_model(self.modelname)
 
+    def get_fieldname(self):
+        return "custom_%d" % self.id # pylint: disable=no-member
+
     @property
     def model_title(self):
         return six.text_type(self.model_associated()._meta.verbose_name)  # pylint: disable=protected-access
 
-    def edit(self, xfer):
+    def _edit_add_args(self, xfer, obj_kind):
         args = self.get_args()
-        from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm, XferCompFloat, XferCompEdit
+        from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompFloat, XferCompEdit, XferCompCheck
+        lbl = XferCompLabelForm('lbl_args_multi')
+        lbl.set_value_as_name(_('multi-line'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 1, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompCheck('args_multi')
+        arg.set_value(args['multi'])
+        arg.set_location(obj_kind.col, obj_kind.row + 1, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+        lbl = XferCompLabelForm('lbl_args_min')
+        lbl.set_value_as_name(_('min'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 2, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_min', -10000, -10000, 0)
+        arg.set_value(args['min'])
+        arg.set_location(obj_kind.col, obj_kind.row + 2, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+        lbl = XferCompLabelForm('lbl_args_max')
+        lbl.set_value_as_name(_('max'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 3, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_max', -10000, -10000, 0)
+        arg.set_value(args['max'])
+        arg.set_location(obj_kind.col, obj_kind.row + 3, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+        lbl = XferCompLabelForm('lbl_args_prec')
+        lbl.set_value_as_name(_('precision'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 4, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompFloat('args_prec', 0, 10, 0)
+        arg.set_value(args['prec'])
+        arg.set_location(obj_kind.col, obj_kind.row + 4, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+        lbl = XferCompLabelForm('lbl_args_list')
+        lbl.set_value_as_name(_('list'))
+        lbl.set_location(obj_kind.col - 1, obj_kind.row + 5, 1, 1)
+        xfer.add_component(lbl)
+        arg = XferCompEdit('args_list')
+        arg.set_value(args['list'])
+        arg.set_location(obj_kind.col, obj_kind.row + 5, obj_kind.colspan, 1)
+        xfer.add_component(arg)
+
+    def edit(self, xfer):
+        from lucterios.framework.xfercomponents import XferCompSelect
         obj_model = xfer.get_components('modelname')
         obj_kind = xfer.get_components('kind')
         xfer.remove_component('modelname')
@@ -105,48 +151,16 @@ class CustomField(LucteriosModel):
         model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
         model_select.set_size(obj_model.vmin, obj_model.hmin)
         xfer.add_component(model_select)
-        lbl = XferCompLabelForm('lbl_args_min')
-        lbl.set_value_as_name(_('min'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 1, 1, 1)
-        xfer.add_component(lbl)
-        arg = XferCompFloat('args_min', -10000, -10000, 0)
-        arg.set_value(args['min'])
-        arg.set_location(obj_kind.col, obj_kind.row + 1, obj_kind.colspan, 1)
-        xfer.add_component(arg)
-
-        lbl = XferCompLabelForm('lbl_args_max')
-        lbl.set_value_as_name(_('max'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 2, 1, 1)
-        xfer.add_component(lbl)
-        arg = XferCompFloat('args_max', -10000, -10000, 0)
-        arg.set_value(args['max'])
-        arg.set_location(obj_kind.col, obj_kind.row + 2, obj_kind.colspan, 1)
-        xfer.add_component(arg)
-
-        lbl = XferCompLabelForm('lbl_args_prec')
-        lbl.set_value_as_name(_('precision'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 3, 1, 1)
-        xfer.add_component(lbl)
-        arg = XferCompFloat('args_prec', 0, 10, 0)
-        arg.set_value(args['prec'])
-        arg.set_location(obj_kind.col, obj_kind.row + 3, obj_kind.colspan, 1)
-        xfer.add_component(arg)
-
-        lbl = XferCompLabelForm('lbl_args_list')
-        lbl.set_value_as_name(_('list'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 4, 1, 1)
-        xfer.add_component(lbl)
-        arg = XferCompEdit('args_list')
-        arg.set_value(args['list'])
-        arg.set_location(obj_kind.col, obj_kind.row + 4, obj_kind.colspan, 1)
-        xfer.add_component(arg)
+        self._edit_add_args(xfer, obj_kind)
 
         obj_kind.java_script = """
 var type=current.getValue();
+parent.get('lbl_args_multi').setVisible(type==0);
 parent.get('lbl_args_min').setVisible(type==1 || type==2);
 parent.get('lbl_args_max').setVisible(type==1 || type==2);
 parent.get('lbl_args_prec').setVisible(type==2);
 parent.get('lbl_args_list').setVisible(type==4);
+parent.get('args_multi').setVisible(type==0);
 parent.get('args_min').setVisible(type==1 || type==2);
 parent.get('args_max').setVisible(type==1 || type==2);
 parent.get('args_prec').setVisible(type==2);
@@ -155,7 +169,7 @@ parent.get('args_list').setVisible(type==4);
 
     def saving(self, xfer):
         args = {}
-        for arg_name in ['min', 'max', 'prec', 'list']:
+        for arg_name in ['min', 'max', 'prec', 'list', 'multi']:
             args_val = xfer.getparam('args_' + arg_name)
             if args_val is not None:
                 if arg_name != 'list':
@@ -167,7 +181,7 @@ parent.get('args_list').setVisible(type==4);
         self.save()
 
     def get_args(self):
-        default_args = {'min':0, 'max':0, 'prec':0, 'list':''}
+        default_args = {'min':0, 'max':0, 'prec':0, 'list':'', 'multi':False}
         try:
             args = eval(self.args)  # pylint: disable=eval-used
         except:  # pylint: disable=bare-except
@@ -176,6 +190,55 @@ parent.get('args_list').setVisible(type==4);
             if not name in args.keys():
                 args[name] = val
         return args
+
+    def get_field(self):
+        from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField
+        from django.core.validators import MaxValueValidator, MinValueValidator
+        args = self.get_args()
+        if self.kind == 0:
+            dbfield = TextField(self.name)
+        if self.kind == 1:
+            dbfield = IntegerField(self.name, validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+        if self.kind == 2:
+            dbfield = DecimalField(self.name, decimal_places=int(args['prec']), validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+        if self.kind == 3:
+            dbfield = BooleanField(self.name)
+        if self.kind == 4:
+            choices = []
+            for item in args['list'].split(','):
+                choices.append((len(choices), item))
+            dbfield = IntegerField(self.name, choices=tuple(choices))
+        return dbfield
+
+    def get_comp(self, value):
+
+        from lucterios.framework.xfercomponents import XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, XferCompMemo
+        comp = None
+        args = self.get_args()
+        if self.kind == 0:
+            if args['multi']:
+                comp = XferCompMemo(self.get_fieldname())
+            else:
+                comp = XferCompEdit(self.get_fieldname())
+            comp.set_value(value)
+        elif (self.kind == 1) or (self.kind == 2):
+            comp = XferCompFloat(self.get_fieldname(), args['min'], args['max'], args['prec'])
+            comp.set_value(value)
+        elif self.kind == 3:
+            comp = XferCompCheck(self.get_fieldname())
+            comp.set_value(value)
+        elif self.kind == 4:
+            val_selected = value
+            select_id = 0
+            select_list = []
+            for sel_item in args['list'].split(','):
+                if sel_item == val_selected:
+                    select_id = len(select_list)
+                select_list.append((len(select_list), sel_item))
+            comp = XferCompSelect(self.get_fieldname())
+            comp.set_select(select_list)
+            comp.set_value(select_id)
+        return comp
 
     class Meta(object):
         # pylint: disable=no-init
@@ -216,7 +279,7 @@ class AbstractContact(LucteriosModel):
             if hasattr(sub_class, "get_long_name"):
                 model_list.append(sub_class.get_long_name())
         for cf_model in CustomField.objects.filter(modelname__in=model_list):  # pylint: disable=no-member
-            fields.append(("custom_%d" % cf_model.id, cf_model))
+            fields.append((cf_model.get_fieldname(), cf_model))
         return fields
 
     @classmethod
@@ -229,29 +292,11 @@ class AbstractContact(LucteriosModel):
 
     @classmethod
     def get_fieldnames_for_search(cls, is_topleve=True):
-        # pylint: disable=too-many-locals
         fieldnames = super(AbstractContact, cls).get_fieldnames_for_search()
         if is_topleve:
-            from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField
-            from django.core.validators import MaxValueValidator, MinValueValidator
             from django.db.models import Q
             for cf_name, cf_model in cls().get_custom_fields():
-                dbfield = None
-                args = cf_model.get_args()
-                if cf_model.kind == 0:
-                    dbfield = TextField(cf_model.name)
-                if cf_model.kind == 1:
-                    dbfield = IntegerField(cf_model.name, validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
-                if cf_model.kind == 2:
-                    dbfield = DecimalField(cf_model.name, decimal_places=int(args['prec']), validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
-                if cf_model.kind == 3:
-                    dbfield = BooleanField(cf_model.name)
-                if cf_model.kind == 4:
-                    choices = []
-                    for item in args['list'].split(','):
-                        choices.append((len(choices), item))
-                    dbfield = IntegerField(cf_model.name, choices=tuple(choices))
-                fieldnames.append((cf_name, dbfield, 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
+                fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
         return fieldnames
 
     def __getattr__(self, name):
@@ -309,7 +354,7 @@ class AbstractContact(LucteriosModel):
 
     def _edit_custom_field(self, xfer, init_col):
         # pylint: disable=too-many-locals
-        from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect
+        from lucterios.framework.xfercomponents import XferCompLabelForm
         col = init_col
         col_offset = 0
         row = xfer.get_max_row() + 5
@@ -318,29 +363,9 @@ class AbstractContact(LucteriosModel):
             lbl.set_location(col + col_offset, row, 1, 1)
             lbl.set_value_as_name(cf_model.name)
             xfer.add_component(lbl)
-            args = cf_model.get_args()
-            if cf_model.kind == 0:
-                val = XferCompEdit(cf_name)
-                val.set_value(getattr(self, cf_name))
-            elif (cf_model.kind == 1) or (cf_model.kind == 2):
-                val = XferCompFloat(cf_name, args['min'], args['max'], args['prec'])
-                val.set_value(getattr(self, cf_name))
-            elif cf_model.kind == 3:
-                val = XferCompCheck(cf_name)
-                val.set_value(getattr(self, cf_name))
-            elif cf_model.kind == 4:
-                val_selected = getattr(self, cf_name)
-                select_id = 0
-                select_list = []
-                for sel_item in args['list'].split(','):
-                    if sel_item == val_selected:
-                        select_id = len(select_list)
-                    select_list.append((len(select_list), sel_item))
-                val = XferCompSelect(cf_name)
-                val.set_select(select_list)
-                val.set_value(select_id)
-            val.set_location(col + col_offset + 1, row, 1, 1)
-            xfer.add_component(val)
+            comp = cf_model.get_comp(getattr(self, cf_name))
+            comp.set_location(col + col_offset + 1, row, 1, 1)
+            xfer.add_component(comp)
             col_offset += 2
             if col_offset == 4:
                 col_offset = 0

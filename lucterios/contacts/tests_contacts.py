@@ -600,39 +600,40 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE":"YES"}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
-        self.assert_count_equal('COMPONENTS/*', 15)
+        self.assert_count_equal('COMPONENTS/*', 17)
         self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (2, 0, 1, 1))
         self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', None, (2, 1, 1, 1))
         self.assert_comp_equal('COMPONENTS/SELECT[@name="kind"]', '0', (2, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (2, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_max"]', '0', (2, 4, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_prec"]', '0', (2, 5, 1, 1))
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="args_list"]', None, (2, 6, 1, 1))
+        self.assert_comp_equal('COMPONENTS/CHECK[@name="args_multi"]', '0', (2, 3, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (2, 4, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_max"]', '0', (2, 5, 1, 1))
+        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_prec"]', '0', (2, 6, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="args_list"]', None, (2, 7, 1, 1))
 
     def test_custom_fields_added(self):
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'aaa', 'modelname':'contacts.AbstractContact', \
-                                                               'kind':'0', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
+                                                               'kind':'0', 'args_multi':'0', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
         self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'bbb', 'modelname':'contacts.AbstractContact', \
-                                                               'kind':'1', 'args_min':'0', 'args_max':'100', 'args_prec':'0', 'args_list':''}, False)
+                                                               'kind':'1', 'args_multi':'0', 'args_min':'0', 'args_max':'100', 'args_prec':'0', 'args_list':''}, False)
         self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'ccc', 'modelname':'contacts.AbstractContact', \
-                                                               'kind':'2', 'args_min':'-10.0', 'args_max':'10.0', 'args_prec':'1', 'args_list':''}, False)
+                                                               'kind':'2', 'args_multi':'0', 'args_min':'-10.0', 'args_max':'10.0', 'args_prec':'1', 'args_list':''}, False)
         self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'ddd', 'modelname':'contacts.LegalEntity', \
-                                                               'kind':'3', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
+                                                               'kind':'3', 'args_multi':'0', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':''}, False)
         self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE":"YES", 'name':'eee', 'modelname':'contacts.Individual', \
-                                                               'kind':'4', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':'U,V,W,X,Y,Z'}, False)
+                                                               'kind':'4', 'args_multi':'0', 'args_min':'0', 'args_max':'0', 'args_prec':'0', 'args_list':'U,V,W,X,Y,Z'}, False)
         self.assert_observer('Core.Acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = Configuration()
@@ -657,13 +658,14 @@ class ContactsTest(LucteriosTest):
 
     def _initial_custom_values(self):
         # pylint: disable=no-self-use
-        initial_values = [{'name':'aaa', 'modelname':'contacts.AbstractContact', 'kind':'0', 'args':"{'min':0, 'max':0, 'prec':0, 'list':''}"},
-                          {'name':'bbb', 'modelname':'contacts.AbstractContact', 'kind':'1', 'args':"{'min':0, 'max':100, 'prec':0, 'list':''}"},
-                          {'name':'ccc', 'modelname':'contacts.AbstractContact', 'kind':'2', 'args':"{'min':-10.0, 'max':10.0, 'prec':1, 'list':''}"},
-                          {'name':'ddd', 'modelname':'contacts.LegalEntity', 'kind':'3', 'args':"{'min':0, 'max':0, 'prec':0, 'list':''}"},
-                          {'name':'eee', 'modelname':'contacts.Individual', 'kind':'4', 'args':"{'min':0, 'max':0, 'prec':0, 'list':'U,V,W,X,Y,Z'}"}]
+        initial_values = [{'name':'aaa', 'modelname':'contacts.AbstractContact', 'kind':'0', 'args':"{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':''}"},
+                          {'name':'bbb', 'modelname':'contacts.AbstractContact', 'kind':'1', 'args':"{'multi':False,'min':0, 'max':100, 'prec':0, 'list':''}"},
+                          {'name':'ccc', 'modelname':'contacts.AbstractContact', 'kind':'2', 'args':"{'multi':False,'min':-10.0, 'max':10.0, 'prec':1, 'list':''}"},
+                          {'name':'ddd', 'modelname':'contacts.LegalEntity', 'kind':'3', 'args':"{'multi':False,'min':0, 'max':0, 'prec':0, 'list':''}"},
+                          {'name':'eee', 'modelname':'contacts.Individual', 'kind':'4', 'args':"{'multi':False,'min':0, 'max':0, 'prec':0, 'list':'U,V,W,X,Y,Z'}"},
+                          {'name':'fff', 'modelname':'contacts.Individual', 'kind':'0', 'args':"{'multi':True,'min':0, 'max':0, 'prec':0, 'list':''}"}]
         for initial_value in initial_values:
-            CustomField.objects.create(**initial_value) # pylint: disable=no-member
+            CustomField.objects.create(**initial_value)  # pylint: disable=no-member
 
     def test_custom_fields_individual(self):
         self._initial_custom_values()
@@ -671,41 +673,45 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualShow()
         self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualShow')
-        self.assert_count_equal('COMPONENTS/*', 37)
+        self.assert_count_equal('COMPONENTS/*', 39)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', None)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "0")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "0.0")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "U")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_6"]', None)
 
         self.factory.xfer = IndividualAddModify()
         self.call('/lucterios.contacts/individualAddModify', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualAddModify')
-        self.assert_count_equal('COMPONENTS/*', 33)
+        self.assert_count_equal('COMPONENTS/*', 35)
         self.assert_xml_equal('COMPONENTS/EDIT[@name="custom_1"]', None)
         self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_2"]', "0")
         self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_3"]', "0.0")
         self.assert_xml_equal('COMPONENTS/SELECT[@name="custom_5"]', "0")
+        self.assert_xml_equal('COMPONENTS/MEMO[@name="custom_6"]', None)
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'blabla', "custom_2":"15", "custom_3":"-5.4", "custom_5":"4"}, False)
+        self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'blabla', "custom_2":"15", \
+                                                              "custom_3":"-5.4", "custom_5":"4", "custom_6":"azerty{[br/]}qwerty"}, False)
 
         self.factory.xfer = IndividualShow()
         self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'individualShow')
-        self.assert_count_equal('COMPONENTS/*', 37)
+        self.assert_count_equal('COMPONENTS/*', 39)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', 'blabla')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "15")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "-5.4")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "Y")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_6"]', "azerty{[br/]}qwerty")
 
     def test_custom_fields_printing(self):
         self._initial_custom_values()
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'boum!', "custom_2":"-67", "custom_3":"9.9", "custom_5":"2"}, False)
+        self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'boum!', "custom_2":"-67", "custom_3":"9.9", "custom_5":"2", "custom_6":"a{[br/]}z"}, False)
 
         print_field_list = Individual.get_print_fields()
-        self.assertEqual(45, len(print_field_list))
+        self.assertEqual(46, len(print_field_list))
         print_text = ""
         for print_field_item in print_field_list:
             if 'custom_' in print_field_item[1]:
@@ -713,25 +719,26 @@ class ContactsTest(LucteriosTest):
         self.assertEqual("#responsability_set.legal_entity.custom_1 #responsability_set.legal_entity.custom_2 ", print_text[:84])
         self.assertEqual("#responsability_set.legal_entity.custom_3 #responsability_set.legal_entity.custom_4 ", print_text[84:168])
         self.assertEqual("#OUR_DETAIL.custom_1 #OUR_DETAIL.custom_2 #OUR_DETAIL.custom_3 #OUR_DETAIL.custom_4 ", print_text[168:252])
-        self.assertEqual("#custom_1 #custom_2 #custom_3 #custom_5 ", print_text[252:])
+        self.assertEqual("#custom_1 #custom_2 #custom_3 #custom_5 #custom_6 ", print_text[252:])
 
         indiv_jack = Individual.objects.get(id=2)  # pylint: disable=no-member
         self.assertEqual(" 0 0.0 Non ", indiv_jack.evaluate(print_text[168:252]))
-        self.assertEqual("boum! -67 9.9 W ", indiv_jack.evaluate(print_text[252:]))
+        self.assertEqual("boum! -67 9.9 W a{[br/]}z ", indiv_jack.evaluate(print_text[252:]))
 
     def test_custom_fields_search(self):
         from django.db.models import Q
         self._initial_custom_values()
-        custom_1 = ContactCustomField.objects.get_or_create(contact_id=2, field_id=1) # pylint: disable=no-member
+        custom_1 = ContactCustomField.objects.get_or_create(contact_id=2, field_id=1)  # pylint: disable=no-member
         custom_1[0].value = "pas beau!!!"
         custom_1[0].save()
 
         fieldnames = Individual.get_fieldnames_for_search()
-        self.assertEqual(18, len(fieldnames))
-        self.assertEqual('custom_1', fieldnames[-4][0])
-        self.assertEqual('custom_2', fieldnames[-3][0])
-        self.assertEqual('custom_3', fieldnames[-2][0])
-        self.assertEqual('custom_5', fieldnames[-1][0])
+        self.assertEqual(19, len(fieldnames))
+        self.assertEqual('custom_1', fieldnames[-5][0])
+        self.assertEqual('custom_2', fieldnames[-4][0])
+        self.assertEqual('custom_3', fieldnames[-3][0])
+        self.assertEqual('custom_5', fieldnames[-2][0])
+        self.assertEqual('custom_6', fieldnames[-1][0])
 
         filter_result, desc_result = get_search_query_from_criteria("", Individual)
         self.assertEqual({}, desc_result)
@@ -742,5 +749,5 @@ class ContactsTest(LucteriosTest):
         q_res = Q(contactcustomfield__field__id=1) & Q(**{'contactcustomfield__value__contains':'beau'})
         self.assertEqual(six.text_type(q_res), six.text_type(filter_result))
 
-        find_indiv = list(Individual.objects.filter(q_res)) # pylint: disable=no-member
+        find_indiv = list(Individual.objects.filter(q_res))  # pylint: disable=no-member
         self.assertEqual(1, len(find_indiv), find_indiv)
