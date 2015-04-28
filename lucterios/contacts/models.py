@@ -84,7 +84,7 @@ class CustomField(LucteriosModel):
         return apps.get_model(self.modelname)
 
     def get_fieldname(self):
-        return "custom_%d" % self.id # pylint: disable=no-member
+        return "custom_%d" % self.id  # pylint: disable=no-member
 
     @property
     def model_title(self):
@@ -130,7 +130,7 @@ class CustomField(LucteriosModel):
         lbl.set_location(obj_kind.col - 1, obj_kind.row + 5, 1, 1)
         xfer.add_component(lbl)
         arg = XferCompEdit('args_list')
-        arg.set_value(args['list'])
+        arg.set_value(','.join(args['list']))
         arg.set_location(obj_kind.col, obj_kind.row + 5, obj_kind.colspan, 1)
         xfer.add_component(arg)
 
@@ -181,7 +181,7 @@ parent.get('args_list').setVisible(type==4);
         self.save()
 
     def get_args(self):
-        default_args = {'min':0, 'max':0, 'prec':0, 'list':'', 'multi':False}
+        default_args = {'min':0, 'max':0, 'prec':0, 'list':[], 'multi':False}
         try:
             args = eval(self.args)  # pylint: disable=eval-used
         except:  # pylint: disable=bare-except
@@ -189,6 +189,7 @@ parent.get('args_list').setVisible(type==4);
         for name, val in default_args.items():
             if not name in args.keys():
                 args[name] = val
+        args['list'] = list(args['list'])
         return args
 
     def get_field(self):
@@ -205,7 +206,7 @@ parent.get('args_list').setVisible(type==4);
             dbfield = BooleanField(self.name)
         if self.kind == 4:
             choices = []
-            for item in args['list'].split(','):
+            for item in args['list']:
                 choices.append((len(choices), item))
             dbfield = IntegerField(self.name, choices=tuple(choices))
         return dbfield
@@ -231,7 +232,7 @@ parent.get('args_list').setVisible(type==4);
             val_selected = value
             select_id = 0
             select_list = []
-            for sel_item in args['list'].split(','):
+            for sel_item in args['list']:
                 if sel_item == val_selected:
                     select_id = len(select_list)
                 select_list.append((len(select_list), sel_item))
@@ -320,7 +321,7 @@ class AbstractContact(LucteriosModel):
                 return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
             if cf_model.kind == 4:
                 num = int(ccf_value)
-                args_list = cf_model.get_args()['list'].split(',')
+                args_list = cf_model.get_args()['list']
                 if num < len(args_list):
                     return args_list[num]
                 else:
