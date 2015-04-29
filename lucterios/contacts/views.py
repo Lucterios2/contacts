@@ -91,6 +91,7 @@ class CurrentStructureAddModify(XferAddEditor):
     caption_add = _("Our details")
     caption_modify = _("Our details")
     locked = True
+    redirect_to_show = False
 
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 

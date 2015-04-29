@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-23 12:29+0000\n"
+"POT-Creation-Date: 2015-04-29 09:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,16 +39,16 @@ msgid "listing"
 msgstr "liste"
 
 #: migrations/0001_initial.py:27 models.py:39 models.py:56 models.py:74
-#: models.py:408
+#: models.py:470
 msgid "name"
 msgstr "nom"
 
-#: migrations/0001_initial.py:28 migrations/0001_initial.py:40 models.py:198
+#: migrations/0001_initial.py:28 migrations/0001_initial.py:40 models.py:262
 msgid "address"
 msgstr "adresse"
 
 #: migrations/0001_initial.py:29 migrations/0001_initial.py:41 models.py:19
-#: models.py:200
+#: models.py:264
 msgid "city"
 msgstr "ville"
 
@@ -56,7 +56,7 @@ msgstr "ville"
 msgid "tel"
 msgstr "tel"
 
-#: migrations/0001_initial.py:31 migrations/0001_initial.py:43 models.py:204
+#: migrations/0001_initial.py:31 migrations/0001_initial.py:43 models.py:268
 msgid "email"
 msgstr "courriel"
 
@@ -64,19 +64,19 @@ msgstr "courriel"
 msgid "label"
 msgstr "étiquette"
 
-#: migrations/0001_initial.py:38 models.py:449
+#: migrations/0001_initial.py:38 models.py:511
 msgid "firstname"
 msgstr "prénom"
 
-#: migrations/0001_initial.py:39 models.py:450
+#: migrations/0001_initial.py:39 models.py:512
 msgid "lastname"
 msgstr "nom"
 
-#: models.py:18 models.py:32 models.py:199
+#: models.py:18 models.py:32 models.py:263
 msgid "postal code"
 msgstr "code postal"
 
-#: models.py:20 models.py:201
+#: models.py:20 models.py:265
 msgid "country"
 msgstr "pays"
 
@@ -92,7 +92,7 @@ msgstr "fonction de personne physique"
 msgid "individual functions"
 msgstr "fonctions de personne physique"
 
-#: models.py:68 models.py:409
+#: models.py:68 models.py:471
 msgid "structure type"
 msgstr "type de structure"
 
@@ -132,145 +132,149 @@ msgstr "Selection"
 msgid "arguments"
 msgstr "arguments"
 
-#: models.py:109
+#: models.py:97
+msgid "multi-line"
+msgstr ""
+
+#: models.py:105
 msgid "min"
 msgstr "min"
 
-#: models.py:118
+#: models.py:113
 msgid "max"
 msgstr "max"
 
-#: models.py:127
+#: models.py:121
 msgid "precision"
 msgstr "précision"
 
-#: models.py:136
+#: models.py:129
 msgid "list"
 msgstr "liste"
 
-#: models.py:182
+#: models.py:246
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: models.py:183
+#: models.py:247
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: models.py:187
+#: models.py:251
 #, fuzzy
 #| msgid "Contact"
 msgid "contact"
 msgstr "Contact"
 
-#: models.py:188
+#: models.py:252
 msgid "field"
 msgstr ""
 
-#: models.py:189
+#: models.py:253
 msgid "value"
 msgstr ""
 
-#: models.py:193
+#: models.py:257
 #, fuzzy
 #| msgid "custom field list"
 msgid "custom field value"
 msgstr "liste de champs personnalisés"
 
-#: models.py:194
+#: models.py:258
 #, fuzzy
 #| msgid "custom field list"
 msgid "custom field values"
 msgstr "liste de champs personnalisés"
 
-#: models.py:202
+#: models.py:266
 msgid "tel1"
 msgstr "tel1"
 
-#: models.py:203
+#: models.py:267
 msgid "tel2"
 msgstr "tel2"
 
-#: models.py:205
+#: models.py:269
 msgid "comment"
 msgstr "commentaire"
 
-#: models.py:330
+#: models.py:392
 msgid "image"
 msgstr "image"
 
-#: models.py:403
+#: models.py:465
 msgid "generic contact"
 msgstr "contact générique"
 
-#: models.py:404
+#: models.py:466
 msgid "generic contacts"
 msgstr "contacts génériques"
 
-#: models.py:410
+#: models.py:472
 msgid "identify number"
 msgstr "N° SIRET/SIREN"
 
-#: models.py:412 models.py:454
+#: models.py:474 models.py:516
 msgid "001@Identity"
 msgstr "001@Identité"
 
-#: models.py:412
+#: models.py:474
 msgid "002@Management"
 msgstr "002@Responsables"
 
-#: models.py:439
+#: models.py:501
 msgid "You cannot delete this legal entity!"
 msgstr "Vous ne pouvez supprimer cette structure morale!"
 
-#: models.py:444 models.py:497
+#: models.py:506 models.py:559
 msgid "legal entity"
 msgstr "personne morale"
 
-#: models.py:445
+#: models.py:507
 msgid "legal entities"
 msgstr "personnes morales"
 
-#: models.py:448
+#: models.py:510
 msgid "Man"
 msgstr "Homme"
 
-#: models.py:448
+#: models.py:510
 msgid "Woman"
 msgstr "Femme"
 
-#: models.py:451
+#: models.py:513
 msgid "user"
 msgstr "utilisateur"
 
-#: models.py:492 models.py:496 views_contacts.py:262
+#: models.py:554 models.py:558 views_contacts.py:262
 msgid "individual"
 msgstr "personne physique"
 
-#: models.py:493
+#: models.py:555
 msgid "individuals"
 msgstr "personnes physiques"
 
-#: models.py:498
+#: models.py:560
 msgid "functions"
 msgstr "fonctions"
 
-#: models.py:499
+#: models.py:561
 msgid "Available functions"
 msgstr "Fonctions disponibles"
 
-#: models.py:499
+#: models.py:561
 msgid "Chosen functions"
 msgstr "Fonctions choisies"
 
-#: models.py:513
+#: models.py:574
 msgid "responsability"
 msgstr "responsabilité"
 
-#: models.py:514
+#: models.py:575
 msgid "responsabilities"
 msgstr "responsabilités"
 
-#: models.py:519
+#: models.py:580
 msgid "our detail"
 msgstr "Nos coordonnées"
 
@@ -286,7 +290,7 @@ msgstr "Mon compte"
 msgid "Edit"
 msgstr "Editer"
 
-#: views.py:45 views.py:76 views.py:175
+#: views.py:45 views.py:76 views.py:176
 msgid "Close"
 msgstr "Fermer"
 
@@ -302,108 +306,108 @@ msgstr "Nos coordonnées"
 msgid "Print"
 msgstr "Imprimer"
 
-#: views.py:95
+#: views.py:96
 msgid "Contact"
 msgstr "Contact"
 
-#: views.py:97
+#: views.py:98
 msgid "Management functions of individuals and categories of legal entities."
 msgstr ""
 "Gestion des fonctions des personnes physiques et des catégories de "
 "structures morales."
 
-#: views.py:99
+#: views.py:100
 msgid "Contacts configuration"
 msgstr "Configuration des contacts"
 
-#: views.py:103
+#: views.py:104
 msgid "Functions and responsabilities"
 msgstr "Fonctions et responsabilités"
 
-#: views.py:109
+#: views.py:110
 msgid "Functions list"
 msgstr "Liste de fonctions"
 
-#: views.py:122
+#: views.py:123
 #, python-format
 msgid "Number of function show: %d"
 msgstr "Nombre de fonctions affichées: %d"
 
-#: views.py:126
+#: views.py:127
 msgid "Structure type"
 msgstr "Type de structure"
 
-#: views.py:132
+#: views.py:133
 msgid "Structure types list"
 msgstr "Liste des types de structure"
 
-#: views.py:145
+#: views.py:146
 #, python-format
 msgid "Number of structure type show: %d"
 msgstr "Nombre de types de structure affichés: %d"
 
-#: views.py:149
+#: views.py:150
 msgid "Custom field"
 msgstr "Champ personnalisé"
 
-#: views.py:155
+#: views.py:156
 msgid "custom field list"
 msgstr "liste de champs personnalisés"
 
-#: views.py:168
+#: views.py:169
 #, python-format
 msgid "Number of custom field show: %d"
 msgstr "Nombre de champs personnalisés affichés: %d"
 
-#: views.py:183 views.py:231
+#: views.py:184 views.py:232
 msgid "Add function"
 msgstr "Ajout d'un fonction"
 
-#: views.py:184
+#: views.py:185
 msgid "Modify function"
 msgstr "Modifier une fonction"
 
-#: views.py:189
+#: views.py:190
 msgid "Delete function"
 msgstr "Supprimer une fonction"
 
-#: views.py:200
+#: views.py:201
 msgid "Add custom field"
 msgstr "Ajouter un champ personnalisé"
 
-#: views.py:201
+#: views.py:202
 msgid "Modify custom field"
 msgstr "Modifier un champ personnalisé"
 
-#: views.py:206
+#: views.py:207
 msgid "Delete custom field"
 msgstr "Supprimer un champ personnalisé"
 
-#: views.py:217
+#: views.py:218
 msgid "Add structure type"
 msgstr "Ajouter un type de structure"
 
-#: views.py:218
+#: views.py:219
 msgid "Modify structure type"
 msgstr "Modifier un type de structure"
 
-#: views.py:223
+#: views.py:224
 msgid "Delete structure type"
 msgstr "Supprimer un type de structure"
 
-#: views.py:232
+#: views.py:233
 msgid "Add postal code"
 msgstr "Ajouter un code postal"
 
-#: views.py:237
+#: views.py:238
 msgid "Management of postal codes associated with their communes."
 msgstr "Gestion des codes postaux associés à leurs communes."
 
-#: views.py:239
+#: views.py:240
 msgid "Postal code"
 msgstr "Code postal"
 
-#: views.py:250
+#: views.py:251
 msgid "Filtrer by postal code"
 msgstr "Filtrer par code postal"
 
