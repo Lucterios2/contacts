@@ -137,8 +137,8 @@ class ContactsTest(LucteriosTest):
 
     def test_individual_image(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_2.jpg')))
-        logo_path = join(dirname(__file__), 'help', 'EditIndividual.jpg')
-        logo_stream = "image.jpg;" + readimage_to_base64(logo_path, False).decode("utf-8")
+        logo_path = join(dirname(__file__), 'help', 'EditIndividual.png')
+        logo_stream = "image.png;" + readimage_to_base64(logo_path, False).decode("utf-8")
 
         self.factory.xfer = IndividualShow()
         self.call('/lucterios.contacts/individualShow', {'individual':'2'}, False)
