@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-20 15:54+0000\n"
+"POT-Creation-Date: 2015-05-21 13:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,147 +24,181 @@ msgstr "Lucterios contacts"
 
 #: help/01_individual.html:2
 msgid "01_individual.html"
-msgstr "Personne physique"
+msgstr "Les contact physiques"
 
 #: help/01_individual.html:4
-#, fuzzy
-#| msgid "individual function"
 msgid "help-individual_intro"
-msgstr "fonction de personne physique"
+msgstr ""
+"<p>Un contact physique est une personne, homme ou femme, à mémoriser. </p>"
 
 #: help/01_individual.html:6
-#, fuzzy
-#| msgid "individuals"
 msgid "help-individual_list"
-msgstr "personnes physiques"
+msgstr "Liste de vos contacts physiques"
 
 #: help/01_individual.html:8
 msgid "help-individual_list-detail"
 msgstr ""
+"<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes Physiques</i> vous "
+"permet de consulter la liste des personnes que vous avez déjà enregistrées. "
+"Étant donné que la liste peut devenir importante, il est possible de filtrer "
+"les personnes par leur nom.</p><p>Depuis cet écran, vous avez aussi la "
+"possibilité d'imprimer la liste des personnes. </p>"
 
 #: help/01_individual.html:11
-#, fuzzy
-#| msgid "individual"
 msgid "help-individual_edit"
-msgstr "personne physique"
+msgstr "Edition d'un contact physique"
 
 #: help/01_individual.html:12
 msgid "help-individual_edit-detail"
 msgstr ""
+"<p>Depuis la liste précédente, vous avez la possibilité d'ajouter une "
+"nouvelle personne. Vous pouvez ré-éditer cette fiche depuis sa visualisation."
+"</p>"
 
 #: help/01_individual.html:15
-#, fuzzy
-#| msgid "individuals"
 msgid "help-individual_show"
-msgstr "personnes physiques"
+msgstr "Visualisation d'un contact physique"
 
 #: help/01_individual.html:16
 msgid "help-individual_show-detail"
 msgstr ""
+"<p>Depuis la liste des personnes physiques, vous avez la possibilité de "
+"visualiser une personne.</p> <p>Cela vous permettra de consulter la fiche "
+"d'une personne précédemment enregistrée dans votre base. Vous pouvez "
+"modifier cette fiche ou l'imprimer. Vous pouvez également lui donner un "
+"alias de connexion à l'application associé à un droit d'accès (voir Les "
+"utilisateurs). Si cette personne n'est pas référencée dans d'autres "
+"enregistrements de l'application, vous avez la possibilité de la supprimer. "
+"</p>"
 
 #: help/01_individual.html:19
-#, fuzzy
-#| msgid "individual function"
 msgid "help-individual_find"
-msgstr "fonction de personne physique"
+msgstr "Recherche d'un contact physique"
 
 #: help/01_individual.html:20
-#, fuzzy
-#| msgid "individual function"
 msgid "help-individual_find-detail"
-msgstr "fonction de personne physique"
+msgstr ""
+"<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne "
+"physique</i> de personne physique vous permet de définir un critère de "
+"recherche sur une personne physique.</p><p>Une fois validé, l'outil va "
+"rechercher dans la base toutes les personnes correspondantes à ces critères. "
+"Vous pourrez alors imprimer cette liste ou en visualiser/modifier une fiche."
+"</p>"
 
 #: help/02_legal_entity.html:2
 msgid "02_legal_entity.html"
-msgstr "Personne morale"
+msgstr "Les contacts moraux"
 
 #: help/02_legal_entity.html:4
-#, fuzzy
-#| msgid "legal entity"
 msgid "help-legal_entity_intro"
-msgstr "personne morale"
+msgstr ""
+"<p>Un contact moral est une structure ou d'une organisation de personne "
+"(entreprise, association, administration, ...), à mémoriser. </p>"
 
 #: help/02_legal_entity.html:6
-#, fuzzy
-#| msgid "legal entities"
 msgid "help-legal_entity_list"
-msgstr "personnes morales"
+msgstr "Liste de vos contacts moraux"
 
 #: help/02_legal_entity.html:8
 msgid "help-legal_entity_list-detail"
 msgstr ""
+"<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes</i> morales vous "
+"permet de consulter la liste des structures que vous avez déjà enregistrées. "
+"Chaque contact moral est associé à une catégorie. Dans cette liste, vous "
+"consultez vos structures filtrées par ces catégories.</p><p>Depuis cet "
+"écran, vous avez aussi la possibilité d'imprimer la liste des structures. </"
+"p>"
 
 #: help/02_legal_entity.html:11
-#, fuzzy
-#| msgid "legal entity"
 msgid "help-legal_entity_edit"
-msgstr "personne morale"
+msgstr "Edition d'un contact moral"
 
 #: help/02_legal_entity.html:12
 msgid "help-legal_entity_edit-detail"
 msgstr ""
+"<p> Depuis la liste précédente, vous avez la possibilité de créer une "
+"nouvelle structure. Vous pouvez ré-éditer cette fiche depuis sa "
+"visualisation.</p>"
 
 #: help/02_legal_entity.html:15
-#, fuzzy
-#| msgid "legal entity"
 msgid "help-legal_entity_show"
-msgstr "personne morale"
+msgstr "Visualisation d'un contact moral"
 
 #: help/02_legal_entity.html:16
-#, fuzzy
-#| msgid "02_legal_entity.html"
 msgid "help-legal_entity_show-detail"
-msgstr "Personne morale"
+msgstr ""
+"<p> Depuis la liste des personnes morales, vous avez la possibilité de "
+"visualiser une structure.</p><p>Cela vous permettra de consulter la fiche "
+"d'une structure précédemment entrée dans votre base. Vous pouvez modifier "
+"cette fiche ou l'imprimer. Si cette personne n'est pas référencée dans "
+"d'autre enregistrement de l'application, vous avez la possibilité de la "
+"supprimer. </p>"
 
 #: help/02_legal_entity.html:19
-#, fuzzy
-#| msgid "Delete responsability"
 msgid "help-legal_entity_responsability"
-msgstr "Supprimer une responsabilité"
+msgstr "Responsables d'un contact moral"
 
 #: help/02_legal_entity.html:20
-#, fuzzy
-#| msgid "Delete responsability"
 msgid "help-legal_entity_responsability-detail"
-msgstr "Supprimer une responsabilité"
+msgstr ""
+"<p>Vous avez la possibilité d'associer une personne physique à votre "
+"structure.</p><p>Choisissez le nouveau responsable: si la personne n'existe "
+"pas dans votre base, vous aurez la possibilité de la créer. Vous pourrez "
+"également ajouter une fonction à un responsable défini.</p>"
 
 #: help/02_legal_entity.html:23
-#, fuzzy
-#| msgid "legal entity"
 msgid "help-legal_entity_find"
-msgstr "personne morale"
+msgstr "Recherche d'un contact moral"
 
 #: help/02_legal_entity.html:24
 msgid "help-legal_entity_find-detail"
 msgstr ""
+"<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne morale</"
+"i> de personne morale vous permet de définir un critère de recherche sur une "
+"structure morale.</p>"
 
 #: help/03_configuration.html:2
 msgid "03_configuration.html"
-msgstr "Configuration des contacts"
+msgstr "Configuration et paramétrage"
 
 #: help/03_configuration.html:4
-#, fuzzy
-#| msgid "03_configuration.html"
 msgid "help-configuration_intro"
-msgstr "Configuration des contacts"
+msgstr ""
+"<p>Dans le menu <i>Administration/Modules (conf.)</i> vous avez à votre "
+"disposition des outils pour configurer la gestion des contacts. </p>"
 
 #: help/03_configuration.html:6
 msgid "help-configuration_contact"
-msgstr ""
+msgstr "Configuration des contacts"
 
 #: help/03_configuration.html:8
 msgid "help-configuration_contact-detail"
 msgstr ""
+"<p>Dans cet écran, vous avez la possibilité de créer ou de modifier une "
+"définition de fonction, ou responsabilité, pour associer une personne "
+"physique à une structure morale. Vous pouvez créer ou modifier une catégorie "
+"de structure morale pour vous aider dans la classification de vos contacts "
+"moraux.</p> <p>Il se peut que vous ayez besoin de préciser des informations "
+"supplémentaires pour vos différents contacts. Vous avez ici la possibilité "
+"d'ajouter des champs personnels pour chaque type de contacts. Pour ajouter "
+"un champ, vous devez simplement donner son titre ainsi que définir son type "
+"et éventuellement les compléments nécessaires.<br/>5 types are possibles:"
+"<ul><li>chaîne de texte</li><li>nombre entier</li><li>nombre à virgule "
+"(réel)</li><li>valeur Oui/Non (booléen)</li><li>choix dans une liste "
+"(énumération)</li></ul> Dans le cas de l'énumération, vous devez définir la "
+"liste des valeurs possibles (mots) séparées par un point-virgule.</p>"
 
 #: help/03_configuration.html:10
-#, fuzzy
-#| msgid "03_configuration.html"
 msgid "help-configuration_postalCode"
-msgstr "Configuration des contacts"
+msgstr "Codes postaux/villes"
 
 #: help/03_configuration.html:12
 msgid "help-configuration_postalCode-detail"
 msgstr ""
+"<p> To help you in your contact entry, the tool will automatically search "
+"the city associated with the postal code that you entered.In this screen, "
+"you can add missing zip codes.By default, the French and Swiss postal codes "
+"are inserted. </p>"
 
 #: migrations/0001_initial.py:49 migrations/0001_initial.py:60
 msgid "listing"
