@@ -100,7 +100,7 @@ class PostalCodeTest(LucteriosTest):
         self.call('/lucterios.contacts/postalCodeList', {'GRID_PAGE%postalCode':'5', 'filter_postal_code':''}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'postalCodeList')
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 333", (0, 3, 2, 1))
-        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97417')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97416')
 
     def test_add(self):
         self.factory.xfer = PostalCodeAdd()
