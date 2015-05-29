@@ -242,9 +242,7 @@ class IndividualUserValid(XferSave):
             obj_indiv.user = self.item
             obj_indiv.save()
             obj_indiv.saving(self)
-            self.params['user_actif'] = six.text_type(self.item.id)
-            self.params['IDENT_READ'] = 'YES'
-            self.redirect_action(ActionsManage.get_act_changed('LucteriosUser', 'edit', '', ''))
+            self.redirect_action(ActionsManage.get_act_changed('LucteriosUser', 'edit', '', ''), {'params':{'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'}})
 
 @ActionsManage.affect('Responsability', 'add')
 @MenuManage.describ('contacts.change_responsability')
