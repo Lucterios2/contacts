@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-28 08:19+0000\n"
+"POT-Creation-Date: 2015-06-03 13:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -275,7 +275,7 @@ msgstr "Real"
 msgid "Boolean"
 msgstr "Boolean"
 
-#: models.py:92 views_contacts.py:286
+#: models.py:92 views_contacts.py:284
 msgid "Select"
 msgstr "Select"
 
@@ -394,7 +394,7 @@ msgstr "Woman"
 msgid "user"
 msgstr "user"
 
-#: models.py:571 models.py:575 views_contacts.py:279
+#: models.py:571 models.py:575 views_contacts.py:277
 msgid "individual"
 msgstr "individual"
 
@@ -625,7 +625,7 @@ msgstr "Management of men and women registered"
 msgid "Individuals"
 msgstr "Individuals"
 
-#: views_contacts.py:169 views_contacts.py:266
+#: views_contacts.py:169 views_contacts.py:264
 msgid "Filtrer by name"
 msgstr "Filtrer by name"
 
@@ -641,38 +641,38 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: views_contacts.py:253
+#: views_contacts.py:251
 msgid "Add responsability"
 msgstr "Add responsability"
 
-#: views_contacts.py:287
+#: views_contacts.py:285
 msgid "Show"
 msgstr "Show"
 
-#: views_contacts.py:288
+#: views_contacts.py:286
 msgid "Add"
 msgstr "Add"
 
-#: views_contacts.py:295
+#: views_contacts.py:293
 msgid "Modify responsability"
 msgstr "Modify responsability"
 
-#: views_contacts.py:304
+#: views_contacts.py:302
 msgid "Delete responsability"
 msgstr "Delete responsability"
 
-#: views_contacts.py:309
+#: views_contacts.py:307
 msgid "To find an individual following a set of criteria."
 msgstr "To find an individual following a set of criteria."
 
-#: views_contacts.py:311
+#: views_contacts.py:309
 msgid "Individual search"
 msgstr "Individual search"
 
-#: views_contacts.py:316
+#: views_contacts.py:314
 msgid "To find a legal entity following a set of criteria."
 msgstr "To find a legal entity following a set of criteria."
 
-#: views_contacts.py:318
+#: views_contacts.py:316
 msgid "Legal entity search"
 msgstr "Legal entity search"

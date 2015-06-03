@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-28 08:19+0000\n"
+"POT-Creation-Date: 2015-06-03 13:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -290,7 +290,7 @@ msgstr "Réel"
 msgid "Boolean"
 msgstr "Booléen"
 
-#: models.py:92 views_contacts.py:286
+#: models.py:92 views_contacts.py:284
 msgid "Select"
 msgstr "Selection"
 
@@ -406,7 +406,7 @@ msgstr "Femme"
 msgid "user"
 msgstr "utilisateur"
 
-#: models.py:571 models.py:575 views_contacts.py:279
+#: models.py:571 models.py:575 views_contacts.py:277
 msgid "individual"
 msgstr "personne physique"
 
@@ -640,7 +640,7 @@ msgstr "Gestion des hommes et des femmes enregistrés"
 msgid "Individuals"
 msgstr "Personnes physiques"
 
-#: views_contacts.py:169 views_contacts.py:266
+#: views_contacts.py:169 views_contacts.py:264
 msgid "Filtrer by name"
 msgstr "Filtrer par nom"
 
@@ -656,39 +656,39 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: views_contacts.py:253
+#: views_contacts.py:251
 msgid "Add responsability"
 msgstr "Ajouter une responsabilité"
 
-#: views_contacts.py:287
+#: views_contacts.py:285
 msgid "Show"
 msgstr "Voir"
 
-#: views_contacts.py:288
+#: views_contacts.py:286
 msgid "Add"
 msgstr "Ajouter"
 
-#: views_contacts.py:295
+#: views_contacts.py:293
 msgid "Modify responsability"
 msgstr "Modifier une responsabilité"
 
-#: views_contacts.py:304
+#: views_contacts.py:302
 msgid "Delete responsability"
 msgstr "Supprimer une responsabilité"
 
-#: views_contacts.py:309
+#: views_contacts.py:307
 msgid "To find an individual following a set of criteria."
 msgstr "Pour trouver une personne physique suivant un ensemble de critères."
 
-#: views_contacts.py:311
+#: views_contacts.py:309
 msgid "Individual search"
 msgstr "Recherche de personne physique"
 
-#: views_contacts.py:316
+#: views_contacts.py:314
 msgid "To find a legal entity following a set of criteria."
 msgstr ""
 "Pour trouver une personne morale{[newline]}suivant un ensemble de critères."
 
-#: views_contacts.py:318
+#: views_contacts.py:316
 msgid "Legal entity search"
 msgstr "Recherche de personne morale"
