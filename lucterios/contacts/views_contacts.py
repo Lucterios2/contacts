@@ -85,7 +85,7 @@ class LegalEntityList(XferListEditor):
     def fillresponse_header(self):
         self.fill_from_model(0, 2, False, ['structure_type'])
         obj_strtype = self.get_components('structure_type')
-        obj_strtype.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        obj_strtype.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
             self.filter = {'structure_type':int(structure_type)}
@@ -171,7 +171,7 @@ class IndividualList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 2)
         self.add_component(comp)
         if name_filter != "":
@@ -225,7 +225,7 @@ class IndividualUserAdd(XferContainerCustom):
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, False, ['username'])
-        self.add_action(IndividualUserValid().get_changed(_('Ok'), 'images/ok.png'), {})
+        self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'), {})
         self.add_action(StubAction(_('Cancel'), 'images/cancel.png'), {})
 
 @MenuManage.describ('auth.add_user')
@@ -266,7 +266,7 @@ class ResponsabilityAdd(XferContainerCustom):
         self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(2, 2)
         self.add_component(comp)
         identfilter = []
@@ -281,8 +281,8 @@ class ResponsabilityAdd(XferContainerCustom):
         grid = XferCompGrid('individual')
         grid.set_model(items, None, self)
         grid.set_location(2, 3)
-        grid.add_action(self.request, ResponsabilityModify().get_changed(_("Select"), "images/ok.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{"SAVE":"YES"}})
-        grid.add_action(self.request, IndividualShow().get_changed(_("Show"), "images/edit.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{"SAVE":"YES"}})
+        grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, 'unique':SELECT_SINGLE})
         grid.add_action(self.request, ActionsManage.get_act_changed("Individual", "add", _("Add"), "images/add.png"), {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
         self.add_component(grid)
 

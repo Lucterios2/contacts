@@ -54,10 +54,10 @@ class Account(XferContainerCustom):
         self.add_component(lab)
         try:
             self.item = Individual.objects.get(user=self.request.user)  # pylint: disable=no-member
-            self.add_action(AccountAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'individual':six.text_type(self.item.id)}})
+            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'individual':six.text_type(self.item.id)}})
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(id=self.request.user.id)  # pylint: disable=no-member
-            self.add_action(UsersEdit().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
+            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
@@ -88,8 +88,8 @@ class CurrentStructure(XferContainerCustom):
         lab.set_location(1, 0, 4)
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
-        self.add_action(CurrentStructureAddModify().get_changed(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
-        self.add_action(CurrentStructurePrint().get_changed(_("Print"), "images/print.png"), {'close':CLOSE_NO})
+        self.add_action(CurrentStructureAddModify.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
+        self.add_action(CurrentStructurePrint.get_action(_("Print"), "images/print.png"), {'close':CLOSE_NO})
         self.add_action(StubAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('')
@@ -270,7 +270,7 @@ class PostalCodeList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
-        comp.set_action(self.request, self, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = {'postal_code__startswith':filter_postal_code}

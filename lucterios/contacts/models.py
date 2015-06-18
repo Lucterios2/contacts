@@ -367,7 +367,7 @@ class AbstractContact(LucteriosModel):
         city_select.set_select(city_list)
         city_select.set_location(obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
         city_select.set_size(obj_city.vmin, obj_city.hmin)
-        city_select.set_action(xfer.request, xfer, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        city_select.set_action(xfer.request, xfer.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         xfer.add_component(city_select)
 
     def _edit_custom_field(self, xfer, init_col):
@@ -394,7 +394,7 @@ class AbstractContact(LucteriosModel):
         from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO
 
         obj_pstcd = xfer.get_components('postal_code')
-        obj_pstcd.set_action(xfer.request, xfer, {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        obj_pstcd.set_action(xfer.request, xfer.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         obj_city = xfer.get_components('city')
         postalcode_current = obj_pstcd.value
         list_postalcode = PostalCode.objects.filter(postal_code=postalcode_current)  # pylint: disable=no-member
