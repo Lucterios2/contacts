@@ -201,7 +201,7 @@ class ContactsTest(LucteriosTest):
         self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (None, 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
 
     def test_individual_search(self):
-        fieldnames = Individual.get_fieldnames_for_search()
+        fieldnames = Individual.get_search_fields()
         self.assertEqual(14, len(fieldnames))
 
         self.factory.xfer = IndividualAddModify()
@@ -342,7 +342,7 @@ class ContactsTest(LucteriosTest):
         resp.functions = Function.objects.filter(id__in=[1, 2])  # pylint: disable=no-member
         resp.save()
 
-        print_field_list = Individual.get_print_fields()
+        print_field_list = Individual.get_all_print_fields()
         self.assertEqual(33, len(print_field_list))
         print_text = ""
 
@@ -724,7 +724,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualAddModify()
         self.call('/lucterios.contacts/individualAddModify', {'individual':'2', "SAVE":"YES", "custom_1":'boum!', "custom_2":"-67", "custom_3":"9.9", "custom_5":"2", "custom_6":"a{[br/]}z"}, False)
 
-        print_field_list = Individual.get_print_fields()
+        print_field_list = Individual.get_all_print_fields()
         self.assertEqual(46, len(print_field_list))
         print_text = ""
         for print_field_item in print_field_list:
@@ -746,13 +746,13 @@ class ContactsTest(LucteriosTest):
         custom_1[0].value = "pas beau!!!"
         custom_1[0].save()
 
-        fieldnames = Individual.get_fieldnames_for_search()
+        fieldnames = Individual.get_search_fields()
         self.assertEqual(19, len(fieldnames))
-        self.assertEqual('custom_1', fieldnames[-5][0])
-        self.assertEqual('custom_2', fieldnames[-4][0])
-        self.assertEqual('custom_3', fieldnames[-3][0])
-        self.assertEqual('custom_5', fieldnames[-2][0])
-        self.assertEqual('custom_6', fieldnames[-1][0])
+        self.assertEqual('custom_1', fieldnames[-8][0])
+        self.assertEqual('custom_2', fieldnames[-7][0])
+        self.assertEqual('custom_3', fieldnames[-6][0])
+        self.assertEqual('custom_5', fieldnames[-5][0])
+        self.assertEqual('custom_6', fieldnames[-4][0])
 
         filter_result, desc_result = get_search_query_from_criteria("", Individual)
         self.assertEqual({}, desc_result)

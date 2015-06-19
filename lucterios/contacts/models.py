@@ -39,7 +39,9 @@ class PostalCode(LucteriosModel):
     postalcode__editfields = ['postal_code', 'city', 'country']
     postalcode__searchfields = ['postal_code', 'city', 'country']
 
-    default_fields = ['postal_code', 'city', 'country']
+    @classmethod
+    def get_default_fields(cls):
+        return ['postal_code', 'city', 'country']
 
     def __str__(self):
         return '[%s] %s %s' % (self.country, self.postal_code, self.city)
@@ -58,10 +60,9 @@ class Function(LucteriosModel):
     def __str__(self):
         return self.name
 
-    function__editfields = ['name']
-    function__searchfields = ['name']
-
-    default_fields = ["name"]
+    @classmethod
+    def get_default_fields(cls):
+        return ["name"]
 
     class Meta(object):
         # pylint: disable=no-init
@@ -72,10 +73,9 @@ class Function(LucteriosModel):
 class StructureType(LucteriosModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
 
-    structuretype__editfields = ['name']
-    structuretype__searchfields = ['name']
-
-    default_fields = ["name"]
+    @classmethod
+    def get_default_fields(cls):
+        return ["name"]
 
     def __str__(self):
         return self.name
@@ -92,9 +92,17 @@ class CustomField(LucteriosModel):
     kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
 
-    customfield__showfields = ['name', 'modelname', 'kind']
-    customfield__editfields = ['name', 'modelname', 'kind']
-    default_fields = ['name', (_('model'), 'model_title'), 'kind']
+    @classmethod
+    def get_show_fields(cls):
+        return ['name', 'modelname', 'kind']
+
+    @classmethod
+    def get_edit_fields(cls):
+        return ['name', 'modelname', 'kind']
+
+    @classmethod
+    def get_default_fields(cls):
+        return ['name', (_('model'), 'model_title'), 'kind']
 
     def model_associated(self):
         from django.apps import apps
@@ -285,9 +293,21 @@ class AbstractContact(LucteriosModel):
     email = models.EmailField(_('email'), blank=True)
     comment = models.TextField(_('comment'), blank=True)
 
-    abstractcontact__showfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
-    abstractcontact__editfields = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
-    abstractcontact__searchfields = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
+    @classmethod
+    def get_show_fields(cls):
+        return ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
+
+    @classmethod
+    def get_edit_fields(cls):
+        return ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
+
+    @classmethod
+    def get_search_fields(cls):
+        fieldnames = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
+        from django.db.models import Q
+        for cf_name, cf_model in cls().get_custom_fields():
+            fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
+        return fieldnames
 
     def get_custom_fields(self):
         import inspect
@@ -301,21 +321,12 @@ class AbstractContact(LucteriosModel):
         return fields
 
     @classmethod
-    def get_print_fields(cls, with_plugin=True):
-        fields = super(AbstractContact, cls).get_print_fields(with_plugin)
+    def get_all_print_fields(cls, with_plugin=True):
+        fields = super(AbstractContact, cls).get_all_print_fields(with_plugin)
         item = cls()
         for cf_name, cf_model in item.get_custom_fields():
             fields.append((cf_model.name, cf_name))
         return fields
-
-    @classmethod
-    def get_fieldnames_for_search(cls, is_topleve=True):
-        fieldnames = super(AbstractContact, cls).get_fieldnames_for_search()
-        if is_topleve:
-            from django.db.models import Q
-            for cf_name, cf_model in cls().get_custom_fields():
-                fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
-        return fieldnames
 
     def __getattr__(self, name):
         if name[:7] == "custom_":
@@ -488,12 +499,35 @@ class LegalEntity(AbstractContact):
     structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
     identify_number = models.CharField(_('identify number'), max_length=100, blank=True)
 
-    legalentity__showfields = {_('001@Identity'):['name', 'structure_type', None, 'identify_number'], _('002@Management'):['responsability_set']}
-    legalentity__editfields = ['name', 'structure_type', None, 'identify_number']
-    legalentity__searchfields = ['name', 'structure_type', None, 'identify_number', \
-            'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions']
-    default_fields = ["name", 'tel1', 'tel2', 'email']
-    print_fields = ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+    @classmethod
+    def get_show_fields(cls):
+        ident_field = ['name', 'structure_type']
+        ident_field.extend(super(LegalEntity, cls).get_show_fields())
+        ident_field.append('identify_number')
+        res_fields = {_('001@Identity'):ident_field, _('002@Management'):['responsability_set']}
+        return res_fields
+
+    @classmethod
+    def get_edit_fields(cls):
+        res_fields = ['name', 'structure_type']
+        res_fields.extend(super(LegalEntity, cls).get_edit_fields())
+        res_fields.append('identify_number')
+        return res_fields
+
+    @classmethod
+    def get_search_fields(cls):
+        res_fields = ['name', 'structure_type']
+        res_fields.extend(super(LegalEntity, cls).get_search_fields())
+        res_fields.extend(['identify_number', 'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions'])
+        return res_fields
+
+    @classmethod
+    def get_default_fields(cls):
+        return ["name", 'tel1', 'tel2', 'email']
+
+    @classmethod
+    def get_print_fields(cls):
+        return ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
                     'email', 'comment', 'identify_number', 'OUR_DETAIL']
 
     def __str__(self):
@@ -528,14 +562,35 @@ class Individual(AbstractContact):
     firstname = models.CharField(_('firstname'), max_length=50, blank=False)
     lastname = models.CharField(_('lastname'), max_length=50, blank=False)
     user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
-    # 'functions'=>array('description'=>'Fonctions', 'type'=>11, 'notnull'=>false, 'params'=>array('Function'=>'org_lucterios_contacts_FCT_personnePhysique_APAS_getFunctions', 'NbField'=>2)));
 
-    individual__showfields = {_('001@Identity'):['genre', ('firstname', 'lastname'), None, 'user']}
-    individual__editfields = ['genre', ('firstname', 'lastname'), None]
-    individual__searchfields = ['genre', 'firstname', 'lastname', None, 'user.username', \
-                                'responsability_set.legal_entity.name', 'responsability_set.functions']
-    default_fields = ["firstname", "lastname", 'tel1', 'tel2', 'email']
-    print_fields = ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
+    @classmethod
+    def get_show_fields(cls):
+        ident_field = ['genre', ('firstname', 'lastname')]
+        ident_field.extend(super(Individual, cls).get_show_fields())
+        ident_field.append('user')
+        res_fields = {_('001@Identity'):ident_field}
+        return res_fields
+
+    @classmethod
+    def get_edit_fields(cls):
+        ident_field = ['genre', ('firstname', 'lastname')]
+        ident_field.extend(super(Individual, cls).get_edit_fields())
+        return ident_field
+
+    @classmethod
+    def get_search_fields(cls):
+        ident_field = ['genre', 'firstname', 'lastname']
+        ident_field.extend(super(Individual, cls).get_search_fields())
+        ident_field.extend(['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
+        return ident_field
+
+    @classmethod
+    def get_default_fields(cls):
+        return ["firstname", "lastname", 'tel1', 'tel2', 'email']
+
+    @classmethod
+    def get_print_fields(cls):
+        return ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
                     'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
 
     def __str__(self):
@@ -577,10 +632,21 @@ class Responsability(LucteriosModel):
     functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
-    responsability__editfields = ["legal_entity", "individual", "functions"]
-    responsability__searchfields = ["legal_entity", "individual", "functions"]
-    default_fields = ["individual", "functions"]
-    print_fields = ["legal_entity", "functions"]
+    @classmethod
+    def get_edit_fields(cls):
+        return ["legal_entity", "individual", "functions"]
+
+    @classmethod
+    def get_search_fields(cls):
+        return ["legal_entity", "individual", "functions"]
+
+    @classmethod
+    def get_default_fields(cls):
+        return ["individual", "functions"]
+
+    @classmethod
+    def get_print_fields(cls):
+        return ["legal_entity", "functions"]
 
     def edit(self, xfer):
         xfer.change_to_readonly('legal_entity')
@@ -596,9 +662,9 @@ class OurDetailPrintPlugin(PrintFieldsPlugIn):
     name = "OUR_DETAIL"
     title = _('our detail')
 
-    def get_print_fields(self):
+    def get_all_print_fields(self):
         fields = []
-        for title, name in LegalEntity.get_print_fields(False):
+        for title, name in LegalEntity.get_all_print_fields(False):
             if (name[:14] != 'structure_type') and (name[:len(self.name)] != self.name):
                 fields.append(("%s > %s" % (self.title, title), "%s.%s" % (self.name, name)))
         return fields
