@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, StubAction, ActionsManage,\
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage,\
     FORMTYPE_MODAL
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
@@ -59,7 +59,7 @@ class Account(XferContainerCustom):
             self.item = LucteriosUser.objects.get(id=self.request.user.id)  # pylint: disable=no-member
             self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
-        self.add_action(StubAction(_("Close"), "images/close.png"), {})
+        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):
@@ -90,7 +90,7 @@ class CurrentStructure(XferContainerCustom):
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
         self.add_action(CurrentStructurePrint.get_action(_("Print"), "images/print.png"), {'close':CLOSE_NO})
-        self.add_action(StubAction(_("Close"), "images/close.png"), {})
+        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 @MenuManage.describ('')
 class CurrentStructurePrint(XferPrintAction):
@@ -190,7 +190,7 @@ class Configuration(XferContainerCustom):
         self._fill_functions()
         self._fill_structuretype()
         self._fill_customfield()
-        self.add_action(StubAction(_("Close"), "images/close.png"), {})
+        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 @ActionsManage.affect('Function', 'add')
 @MenuManage.describ('CORE.add_parameter')

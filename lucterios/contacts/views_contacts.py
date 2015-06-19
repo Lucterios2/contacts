@@ -26,7 +26,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
-from lucterios.framework.tools import MenuManage, icon_path, StubAction, ActionsManage
+from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
@@ -221,12 +221,12 @@ class IndividualUserAdd(XferContainerCustom):
 
     def fillresponse(self):
         img = XferCompImage('img')
-        img.set_value(icon_path(self))
+        img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, False, ['username'])
         self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'), {})
-        self.add_action(StubAction(_('Cancel'), 'images/cancel.png'), {})
+        self.add_action(WrapAction(_('Cancel'), 'images/cancel.png'), {})
 
 @MenuManage.describ('auth.add_user')
 class IndividualUserValid(XferSave):
@@ -256,7 +256,7 @@ class ResponsabilityAdd(XferContainerCustom):
     def fillresponse(self, legal_entity=0, name_filter=''):
         self.item.legal_entity = LegalEntity.objects.get(id=legal_entity)  # pylint: disable=no-member
         img = XferCompImage('img')
-        img.set_value(icon_path(self))
+        img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, True, ['legal_entity'])
