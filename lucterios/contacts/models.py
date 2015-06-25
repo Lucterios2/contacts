@@ -294,6 +294,10 @@ class AbstractContact(LucteriosModel):
     comment = models.TextField(_('comment'), blank=True)
 
     @classmethod
+    def get_default_fields(cls):
+        return [(_('contact'), 'str'), 'tel1', 'tel2', 'email']
+
+    @classmethod
     def get_show_fields(cls):
         return ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
 
@@ -329,7 +333,10 @@ class AbstractContact(LucteriosModel):
         return fields
 
     def __getattr__(self, name):
-        if name[:7] == "custom_":
+        # pylint: disable=too-many-return-statements
+        if name == "str":
+            return six.text_type(self)
+        elif name[:7] == "custom_":
             cf_id = int(name[7:])
             cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
             if self.id is None:
@@ -492,7 +499,6 @@ class AbstractContact(LucteriosModel):
         # pylint: disable=no-init
         verbose_name = _('generic contact')
         verbose_name_plural = _('generic contacts')
-        default_permissions = []
 
 class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
@@ -556,6 +562,7 @@ class LegalEntity(AbstractContact):
         # pylint: disable=no-init
         verbose_name = _('legal entity')
         verbose_name_plural = _('legal entities')
+        default_permissions = []
 
 class Individual(AbstractContact):
     genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
@@ -625,6 +632,7 @@ class Individual(AbstractContact):
         # pylint: disable=no-init
         verbose_name = _('individual')
         verbose_name_plural = _('individuals')
+        default_permissions = []
 
 class Responsability(LucteriosModel):
     individual = models.ForeignKey(Individual, verbose_name=_('individual'), null=False)

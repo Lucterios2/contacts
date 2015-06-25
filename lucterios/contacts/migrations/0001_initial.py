@@ -172,18 +172,14 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=75, blank=True, verbose_name='email')),
                 ('comment', models.TextField(blank=True, verbose_name='comment')),
             ],
-            options={
-                'default_permissions': [],
-                'verbose_name_plural': 'generic contacts',
-
-                'verbose_name': 'generic contact'},
+            options={'verbose_name': 'generic contact', 'verbose_name_plural': 'generic contacts'},
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='ContactCustomField',
             fields=[
                 ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('value', models.TextField(verbose_name='value')),
+                ('value', models.TextField(verbose_name='value', default='')),
                 ('contact', models.ForeignKey(to='contacts.AbstractContact', verbose_name='contact')),
                 ('field', models.ForeignKey(to='contacts.CustomField', verbose_name='field')),
             ],
@@ -202,10 +198,7 @@ class Migration(migrations.Migration):
                 ('identify_number', models.CharField(max_length=100, blank=True, verbose_name='legal number')),
                 ('structure_type', models.ForeignKey(on_delete=models.deletion.SET_NULL, to='contacts.StructureType', verbose_name='structure type', null=True)),
             ],
-            options={
-                'verbose_name_plural': 'legal entities',
-                'verbose_name': 'legal entity',
-            },
+            options={'verbose_name': 'legal entity', 'default_permissions': [], 'verbose_name_plural': 'legal entities'},
             bases=('contacts.abstractcontact',),
         ),
         migrations.CreateModel(
@@ -217,10 +210,7 @@ class Migration(migrations.Migration):
                 ('genre', models.IntegerField(default=1, choices=[(1, 'Man'), (2, 'Woman')], blank=False)),
                 ('user', models.ForeignKey(to='CORE.LucteriosUser', null=True, on_delete=models.deletion.SET_NULL, verbose_name='user')),
             ],
-            options={
-                'verbose_name_plural': 'individuals',
-                'verbose_name': 'individual',
-            },
+            options={'verbose_name': 'individual', 'default_permissions': [], 'verbose_name_plural': 'individuals'},
             bases=('contacts.abstractcontact',),
         ),
         migrations.CreateModel(
