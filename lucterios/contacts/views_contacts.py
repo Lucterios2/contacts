@@ -35,8 +35,9 @@ from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, \
     XferPrintLabel
-from lucterios.contacts.models import LegalEntity, Individual, Responsability,\
+from lucterios.contacts.models import LegalEntity, Individual, Responsability, \
     AbstractContact
+from lucterios.framework import signal_and_lock
 
 MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
@@ -334,3 +335,25 @@ class AbstractContactDel(XferDelete):
     model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Delete contact")
+
+@signal_and_lock.Signal.decorate('summary')
+def summary_contacts(xfer):
+    row = xfer.get_max_row() + 1
+    lab = XferCompLabelForm('contactstitle')
+    lab.set_value_as_infocenter(_("Addresses and contacts"))
+    lab.set_location(0, row, 4)
+    xfer.add_component(lab)
+    nb_legal_entities = len(LegalEntity.objects.all())  # pylint: disable=no-member
+    lbl_doc = XferCompLabelForm('lbl_nblegalentities')
+    lbl_doc.set_location(0, row + 1, 4)
+    lbl_doc.set_value_center(_("Total number of legal entities: %d") % nb_legal_entities)
+    xfer.add_component(lbl_doc)
+    nb_individual = len(Individual.objects.all())  # pylint: disable=no-member
+    lbl_doc = XferCompLabelForm('lbl_nbindividuals')
+    lbl_doc.set_location(0, row + 2, 4)
+    lbl_doc.set_value_center(_("Total number of individuals: %d") % nb_individual)
+    xfer.add_component(lbl_doc)
+    lab = XferCompLabelForm('contactsend')
+    lab.set_value_center('{[hr/]}')
+    lab.set_location(0, row + 3, 4)
+    xfer.add_component(lab)

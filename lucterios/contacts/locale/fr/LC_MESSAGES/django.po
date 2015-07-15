@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-25 16:53+0000\n"
+"POT-Creation-Date: 2015-07-15 16:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -290,7 +290,7 @@ msgstr "Réel"
 msgid "Boolean"
 msgstr "Booléen"
 
-#: models.py:92 tools.py:67 views_contacts.py:285
+#: models.py:92 tools.py:67 views_contacts.py:286
 msgid "Select"
 msgstr "Selection"
 
@@ -406,7 +406,7 @@ msgstr "Femme"
 msgid "user"
 msgstr "utilisateur"
 
-#: models.py:633 models.py:638 views_contacts.py:278
+#: models.py:633 models.py:638 views_contacts.py:279
 msgid "individual"
 msgstr "personne physique"
 
@@ -439,10 +439,8 @@ msgid "our detail"
 msgstr "Nos coordonnées"
 
 #: tools.py:38
-#, fuzzy
-#| msgid "generic contact"
 msgid "Select contact"
-msgstr "contact générique"
+msgstr "Selection un contact"
 
 #: views.py:41 views.py:52
 msgid "View my account."
@@ -577,40 +575,40 @@ msgstr "Code postal"
 msgid "Filtrer by postal code"
 msgstr "Filtrer par code postal"
 
-#: views_contacts.py:41
+#: views_contacts.py:42
 msgid "Office"
 msgstr "Bureautique"
 
-#: views_contacts.py:41
+#: views_contacts.py:42
 msgid "Office tools"
 msgstr "Outils bureautiques"
 
-#: views_contacts.py:43
+#: views_contacts.py:44 views_contacts.py:343
 msgid "Addresses and contacts"
 msgstr "Adresses et Contacts"
 
-#: views_contacts.py:43
+#: views_contacts.py:44
 msgid "Management of men or women and organizations saved."
 msgstr ""
 "Gestion d'hommes ou de femmes et d'organisations de personnes enregistrés"
 
-#: views_contacts.py:51
+#: views_contacts.py:52
 msgid "Add legal entity"
 msgstr "Ajout d'une personne morale"
 
-#: views_contacts.py:52
+#: views_contacts.py:53
 msgid "Modify legal entity"
 msgstr "Modifier une personne morale"
 
-#: views_contacts.py:57 views_contacts.py:65
+#: views_contacts.py:58 views_contacts.py:66
 msgid "Show legal entity"
 msgstr "Voir une personne morale"
 
-#: views_contacts.py:74
+#: views_contacts.py:75
 msgid "Delete legal entity"
 msgstr "Supprimer une personne morale"
 
-#: views_contacts.py:79
+#: views_contacts.py:80
 msgid ""
 "Management of a structure or organization of people (company, association, "
 "administration, ...)"
@@ -618,95 +616,101 @@ msgstr ""
 "Gestion d'une structure ou d'une organisation de personnes (entreprise, "
 "association, administration, ...)"
 
-#: views_contacts.py:81 views_contacts.py:97 views_contacts.py:112
+#: views_contacts.py:82 views_contacts.py:98 views_contacts.py:113
 msgid "Legal entities"
 msgstr "Personnes morales"
 
-#: views_contacts.py:130
+#: views_contacts.py:131
 msgid "Add individual"
 msgstr "Ajouter une personne physique"
 
-#: views_contacts.py:131
+#: views_contacts.py:132
 msgid "Modify individual"
 msgstr "Modifier une personne physique"
 
-#: views_contacts.py:136 views_contacts.py:144
+#: views_contacts.py:137 views_contacts.py:145
 msgid "Show individual"
 msgstr "Voir une personne physique"
 
-#: views_contacts.py:153
+#: views_contacts.py:154
 msgid "Delete individual"
 msgstr "Supprimer une personne physique"
 
-#: views_contacts.py:158
+#: views_contacts.py:159
 msgid "Management of men and women registered"
 msgstr "Gestion des hommes et des femmes enregistrés"
 
-#: views_contacts.py:160 views_contacts.py:185 views_contacts.py:201
+#: views_contacts.py:161 views_contacts.py:186 views_contacts.py:202
 msgid "Individuals"
 msgstr "Personnes physiques"
 
-#: views_contacts.py:170 views_contacts.py:265
+#: views_contacts.py:171 views_contacts.py:266
 msgid "Filtrer by name"
 msgstr "Filtrer par nom"
 
-#: views_contacts.py:219 views_contacts.py:235
+#: views_contacts.py:220 views_contacts.py:236
 msgid "Add as an users"
 msgstr "Ajouter comme utilisateur"
 
-#: views_contacts.py:229
+#: views_contacts.py:230
 msgid "Ok"
 msgstr "Ok"
 
-#: views_contacts.py:230
+#: views_contacts.py:231
 msgid "Cancel"
 msgstr "Annuler"
 
-#: views_contacts.py:252
+#: views_contacts.py:253
 msgid "Add responsability"
 msgstr "Ajouter une responsabilité"
 
-#: views_contacts.py:286
+#: views_contacts.py:287
 msgid "Show"
 msgstr "Voir"
 
-#: views_contacts.py:287
+#: views_contacts.py:288
 msgid "Add"
 msgstr "Ajouter"
 
-#: views_contacts.py:294
+#: views_contacts.py:295
 msgid "Modify responsability"
 msgstr "Modifier une responsabilité"
 
-#: views_contacts.py:303
+#: views_contacts.py:304
 msgid "Delete responsability"
 msgstr "Supprimer une responsabilité"
 
-#: views_contacts.py:308
+#: views_contacts.py:309
 msgid "To find an individual following a set of criteria."
 msgstr "Pour trouver une personne physique suivant un ensemble de critères."
 
-#: views_contacts.py:310
+#: views_contacts.py:311
 msgid "Individual search"
 msgstr "Recherche de personne physique"
 
-#: views_contacts.py:315
+#: views_contacts.py:316
 msgid "To find a legal entity following a set of criteria."
 msgstr ""
 "Pour trouver une personne morale{[newline]}suivant un ensemble de critères."
 
-#: views_contacts.py:317
+#: views_contacts.py:318
 msgid "Legal entity search"
 msgstr "Recherche de personne morale"
 
-#: views_contacts.py:328
-#, fuzzy
-#| msgid "contact"
+#: views_contacts.py:329
 msgid "Show contact"
-msgstr "contact"
+msgstr "Voir un contact"
 
-#: views_contacts.py:336
-#, fuzzy
-#| msgid "generic contact"
+#: views_contacts.py:337
 msgid "Delete contact"
-msgstr "contact générique"
+msgstr "Supprime un contact"
+
+#: views_contacts.py:349
+#, python-format
+msgid "Total number of legal entities: %d"
+msgstr "Nombre total de structures morales: %d"
+
+#: views_contacts.py:354
+#, python-format
+msgid "Total number of individuals: %d"
+msgstr "Nombre total de contacts physiques: %d"
