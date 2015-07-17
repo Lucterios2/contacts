@@ -39,7 +39,7 @@ from lucterios.contacts.models import PostalCode, Function, StructureType, Legal
     CustomField
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
-class AccountThird(XferContainerCustom):
+class Account(XferContainerCustom):
     caption = _("My account")
     icon = "account.png"
 

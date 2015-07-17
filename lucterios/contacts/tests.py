@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, AccountThird, AccountAddModify, CurrentStructurePrint
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
 from django.utils import six
 from unittest.loader import TestLoader
 from unittest.suite import TestSuite
@@ -255,7 +255,7 @@ class ConfigurationTest(LucteriosTest):
 
     def test_account(self):
         self.factory.user = LucteriosUser.objects.get(username='empty')  # pylint: disable=no-member
-        self.factory.xfer = AccountThird()
+        self.factory.xfer = Account()
         self.call('/lucterios.contacts/account', {}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'account')
         self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
@@ -289,7 +289,7 @@ class ConfigurationTest(LucteriosTest):
 
     def test_noaccount(self):
         self.factory.user = LucteriosUser.objects.get(username='admin')  # pylint: disable=no-member
-        self.factory.xfer = AccountThird()
+        self.factory.xfer = Account()
         self.call('/lucterios.contacts/account', {}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'account')
         self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
