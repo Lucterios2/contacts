@@ -39,7 +39,7 @@ from lucterios.contacts.models import PostalCode, Function, StructureType, Legal
     CustomField
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
-class Account(XferContainerCustom):
+class AccountThird(XferContainerCustom):
     caption = _("My account")
     icon = "account.png"
 
@@ -201,7 +201,7 @@ class FunctionAddModify(XferAddEditor):
     caption_add = _("Add function")
     caption_modify = _("Modify function")
 
-@ActionsManage.affect('Function', 'del')
+@ActionsManage.affect('Function', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionDel(XferDelete):
     caption = _("Delete function")
@@ -218,7 +218,7 @@ class CustomFieldAddModify(XferAddEditor):
     caption_add = _("Add custom field")
     caption_modify = _("Modify custom field")
 
-@ActionsManage.affect('CustomField', 'del')
+@ActionsManage.affect('CustomField', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldDel(XferDelete):
     caption = _("Delete custom field")
@@ -235,7 +235,7 @@ class StructureTypeAddModify(XferAddEditor):
     caption_add = _("Add structure type")
     caption_modify = _("Modify structure type")
 
-@ActionsManage.affect('StructureType', 'del')
+@ActionsManage.affect('StructureType', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeDel(XferDelete):
     caption = _("Delete structure type")

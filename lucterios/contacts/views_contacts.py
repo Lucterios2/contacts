@@ -69,7 +69,7 @@ class LegalEntityPrint(XferPrintAction):
     field_id = 'legal_entity'
     action_class = LegalEntityShow
 
-@ActionsManage.affect('LegalEntity', 'del')
+@ActionsManage.affect('LegalEntity', 'delete')
 @MenuManage.describ('contacts.delete_abstractcontact')
 class LegalEntityDel(XferDelete):
     caption = _("Delete legal entity")
@@ -148,7 +148,7 @@ class IndividualPrint(XferPrintAction):
     field_id = 'individual'
     action_class = IndividualShow
 
-@ActionsManage.affect('Individual', 'del')
+@ActionsManage.affect('Individual', 'delete')
 @MenuManage.describ('contacts.delete_abstractcontact')
 class IndividualDel(XferDelete):
     caption = _("Delete individual")
@@ -297,7 +297,7 @@ class ResponsabilityModify(XferAddEditor):
     model = Responsability
     field_id = 'responsability_set'
 
-@ActionsManage.affect('Responsability', 'del')
+@ActionsManage.affect('Responsability', 'delete')
 @MenuManage.describ('contacts.delete_responsability')
 class ResponsabilityDel(XferDelete):
     # pylint: disable=too-many-public-methods
@@ -328,7 +328,7 @@ class AbstractContactShow(XferShowEditor):
     field_id = 'abstractcontact'
     caption = _("Show contact")
 
-@ActionsManage.affect('AbstractContact', 'del')
+@ActionsManage.affect('AbstractContact', 'delete')
 @MenuManage.describ('contacts.delete_abstractcontact')
 class AbstractContactDel(XferDelete):
     icon = "contacts.png"
