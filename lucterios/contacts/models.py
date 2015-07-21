@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
-from posix import unlink
+from os import unlink
 from django.utils import six
 from lucterios.framework.tools import ActionsManage
 
