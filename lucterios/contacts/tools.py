@@ -64,4 +64,4 @@ class ContactSelection(XferSearchEditor):
         self.add_component(selected_model)
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
-            grid.add_action(self, self.select_class.get_action(_("Select"), "images/ok.png"), {'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{'pkname':self.field_id}}, 0)
+            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"), {'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{'pkname':self.field_id}}, 0)
