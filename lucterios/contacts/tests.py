@@ -66,7 +66,7 @@ class PostalCodeTest(LucteriosTest):
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="postalCode"]', (0, 2, 2, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb"]', "Nombre total de code postaux: 333", (0, 3, 2, 1))
 
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', '13')
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', '14')
         self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageNum', '0')
         self.assert_count_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER', 3)
         self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="postal_code"]', "code postal")

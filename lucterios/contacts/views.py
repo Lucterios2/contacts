@@ -26,6 +26,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage,\
     FORMTYPE_MODAL
@@ -273,4 +274,4 @@ class PostalCodeList(XferListEditor):
         comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
-        self.filter = {'postal_code__startswith':filter_postal_code}
+        self.filter = [Q(postal_code__startswith=filter_postal_code)]

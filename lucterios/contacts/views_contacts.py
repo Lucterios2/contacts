@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
+from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
@@ -90,7 +91,7 @@ class LegalEntityList(XferListEditor):
         obj_strtype.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
-            self.filter = {'structure_type':int(structure_type)}
+            self.filter = [Q(structure_type=int(structure_type))]
 
 @ActionsManage.affect('LegalEntity', 'listing')
 @MenuManage.describ('contacts.change_abstractcontact')
