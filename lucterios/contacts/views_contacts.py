@@ -178,7 +178,6 @@ class IndividualList(XferListEditor):
         comp.set_location(1, 2)
         self.add_component(comp)
         if name_filter != "":
-            from django.db.models import Q
             self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
 
 @ActionsManage.affect('Individual', 'label')
@@ -192,7 +191,6 @@ class IndividualLabel(XferPrintLabel):
     def get_filter(self):
         name_filter = self.getparam('filter')
         if (name_filter is not None) and (name_filter != ""):
-            from django.db.models import Q
             return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
         else:
             return XferPrintLabel.get_filter(self)
@@ -209,7 +207,6 @@ class IndividualListing(XferPrintListing):
     def get_filter(self):
         name_filter = self.getparam('filter')
         if (name_filter is not None) and (name_filter != ""):
-            from django.db.models import Q
             return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
         else:
             return XferPrintListing.get_filter(self)
@@ -274,7 +271,6 @@ class ResponsabilityAdd(XferContainerCustom):
         self.add_component(comp)
         identfilter = []
         if name_filter != "":
-            from django.db.models import Q
             identfilter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
         lbl = XferCompLabelForm('lbl_individual')
         lbl.set_value_as_name(_('individual'))
