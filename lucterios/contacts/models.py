@@ -601,7 +601,7 @@ class Individual(AbstractContact):
                     'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
 
     def __str__(self):
-        return '%s %s' % (self.firstname, self.lastname)
+        return '%s %s' % (self.lastname, self.firstname)
 
     def show(self, xfer):
         from lucterios.framework.xfercomponents import XferCompButton

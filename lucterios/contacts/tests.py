@@ -179,7 +179,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="comment"]', None, (2, 7, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/LABELFORM[@name="identify_number"]', None, (2, 8, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/IMAGE[@name="logoimg"]', "lucterios.contacts/images/NoImage.png", (0, 2, 1, 6, 1))
-        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="responsability_set"]', (1, 0, 1, 1, 2))
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="responsability"]', (1, 0, 1, 1, 2))
 
     def test_changedetails(self):
         self.factory.xfer = CurrentStructureAddModify()

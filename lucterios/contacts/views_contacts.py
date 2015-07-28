@@ -292,7 +292,7 @@ class ResponsabilityModify(XferAddEditor):
     caption = _("Modify responsability")
     icon = "function.png"
     model = Responsability
-    field_id = 'responsability_set'
+    field_id = 'responsability'
 
 @ActionsManage.affect('Responsability', 'delete')
 @MenuManage.describ('contacts.delete_responsability')
@@ -301,7 +301,7 @@ class ResponsabilityDel(XferDelete):
     caption = _("Delete responsability")
     icon = "function.png"
     model = Responsability
-    field_id = 'responsability_set'
+    field_id = 'responsability'
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find an individual following a set of criteria.'))
 class IndividualSearch(XferSearchEditor):
