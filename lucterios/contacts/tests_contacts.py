@@ -439,14 +439,14 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 1)
         self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]', 'id', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "MISTER jack")
         self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="functions"]', None)
 
         self.factory.xfer = ResponsabilityModify()
         self.call('/lucterios.contacts/responsabilityModify', {'responsability':'1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'responsabilityModify')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="individual"]', "MISTER jack")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lbl_functions"]', "{[b]}fonctions{[/b]}")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="hd_functions_available"]', "{[center]}{[i]}Fonctions disponibles{[/i]}{[/center]}")
         self.assert_xml_equal('COMPONENTS/CHECKLIST[@name="functions_available"]', None)
@@ -468,7 +468,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 1)
         self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]', 'id', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "jack MISTER")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "MISTER jack")
         self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="functions"]', "Secretaire{[br/]}Troufion")
 
     def test_legalentity_search(self):
