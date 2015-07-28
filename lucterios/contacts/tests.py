@@ -229,7 +229,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Nos coordonnées'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Nos coordonnées'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_logo(self):
@@ -250,7 +250,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructurePrint()
         self.call('/lucterios.contacts/currentStructurePrint', {}, False)
         self.assert_observer('Core.Print', 'lucterios.contacts', 'currentStructurePrint')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_account(self):

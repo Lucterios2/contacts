@@ -279,7 +279,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
@@ -291,7 +291,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 6, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
@@ -322,7 +322,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
         self.factory.xfer = IndividualLabel()
@@ -331,7 +331,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_individual_fieldsprint(self):
@@ -540,7 +540,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
@@ -552,7 +552,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
         self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text)).decode("utf-8")
+        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 6, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
@@ -583,7 +583,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
         self.factory.xfer = LegalEntityLabel()
@@ -592,7 +592,7 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
         self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
         self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self._get_first_xpath('PRINT').text))
+        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_custom_fields(self):
