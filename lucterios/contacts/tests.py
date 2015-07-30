@@ -29,8 +29,6 @@ from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
     CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
 from django.utils import six
-from unittest.loader import TestLoader
-from unittest.suite import TestSuite
 from lucterios.contacts.models import LegalEntity
 from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
@@ -38,8 +36,7 @@ from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
 from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
 from base64 import b64decode
-from lucterios.contacts.tests_contacts import ContactsTest, change_ourdetail,\
-    create_jack
+from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 
 class PostalCodeTest(LucteriosTest):
     # pylint: disable=too-many-public-methods,too-many-statements
@@ -296,12 +293,3 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif':'1'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
-
-def suite():
-    # pylint: disable=redefined-outer-name
-    suite = TestSuite()
-    loader = TestLoader()
-    suite.addTest(loader.loadTestsFromTestCase(PostalCodeTest))
-    suite.addTest(loader.loadTestsFromTestCase(ConfigurationTest))
-    suite.addTest(loader.loadTestsFromTestCase(ContactsTest))
-    return suite
