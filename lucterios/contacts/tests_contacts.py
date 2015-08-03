@@ -616,7 +616,7 @@ class ContactsTest(LucteriosTest):
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
         self.assert_count_equal('COMPONENTS/*', 17)
         self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (2, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', None, (2, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', 'contacts.AbstractContact', (2, 1, 1, 1))
         self.assert_comp_equal('COMPONENTS/SELECT[@name="kind"]', '0', (2, 2, 1, 1))
         self.assert_comp_equal('COMPONENTS/CHECK[@name="args_multi"]', '0', (2, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (2, 4, 1, 1))
