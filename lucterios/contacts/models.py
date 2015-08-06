@@ -335,7 +335,7 @@ class AbstractContact(LucteriosModel):
     def __getattr__(self, name):
         # pylint: disable=too-many-return-statements
         if name == "str":
-            return six.text_type(self)
+            return six.text_type(self.get_final_child())
         elif name[:7] == "custom_":
             cf_id = int(name[7:])
             cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member

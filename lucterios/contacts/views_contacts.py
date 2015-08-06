@@ -104,7 +104,7 @@ class LegalEntityListing(XferPrintListing):
     def get_filter(self):
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
-            return {'structure_type':int(structure_type)}
+            return [Q(structure_type=int(structure_type))]
         else:
             return XferPrintListing.get_filter(self)
 
@@ -119,7 +119,7 @@ class LegalEntityLabel(XferPrintLabel):
     def get_filter(self):
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
-            return {'structure_type':int(structure_type)}
+            return [Q(structure_type=int(structure_type))]
         else:
             return XferPrintLabel.get_filter(self)
 
