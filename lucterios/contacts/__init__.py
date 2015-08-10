@@ -37,3 +37,6 @@ __version__ = "2.0b" + get_build()
 def __title__():
     from django.utils.translation import ugettext_lazy as _
     return _("Lucterios contacts")
+
+def link():
+    return []
