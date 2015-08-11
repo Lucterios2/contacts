@@ -276,7 +276,7 @@ class PostalCodeList(XferListEditor):
         comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
-        self.filter = [Q(postal_code__startswith=filter_postal_code)]
+        self.filter = Q(postal_code__startswith=filter_postal_code)
 
 @signal_and_lock.Signal.decorate('config')
 def config_contacts(xfer):

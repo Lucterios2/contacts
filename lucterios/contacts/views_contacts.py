@@ -91,7 +91,7 @@ class LegalEntityList(XferListEditor):
         obj_strtype.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
-            self.filter = [Q(structure_type=int(structure_type))]
+            self.filter = Q(structure_type=int(structure_type))
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
@@ -108,7 +108,7 @@ class LegalEntityListing(XferPrintListing):
     def get_filter(self):
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
-            return [Q(structure_type=int(structure_type))]
+            return Q(structure_type=int(structure_type))
         else:
             return XferPrintListing.get_filter(self)
 
@@ -182,7 +182,7 @@ class IndividualList(XferListEditor):
         comp.set_location(1, 2)
         self.add_component(comp)
         if name_filter != "":
-            self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+            self.filter = Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
@@ -215,7 +215,7 @@ class IndividualListing(XferPrintListing):
     def get_filter(self):
         name_filter = self.getparam('filter')
         if (name_filter is not None) and (name_filter != ""):
-            return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+            return Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)
         else:
             return XferPrintListing.get_filter(self)
 
