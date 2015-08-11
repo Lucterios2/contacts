@@ -92,6 +92,10 @@ class LegalEntityList(XferListEditor):
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
             self.filter = [Q(structure_type=int(structure_type))]
+            
+    def fillresponse(self):
+        XferListEditor.fillresponse(self)
+        self.item.editor.add_email_selector(self , 0, self.get_max_row() + 1, 2)
 
 @ActionsManage.affect('LegalEntity', 'listing')
 @MenuManage.describ('contacts.change_abstractcontact')
@@ -179,6 +183,10 @@ class IndividualList(XferListEditor):
         self.add_component(comp)
         if name_filter != "":
             self.filter = [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+
+    def fillresponse(self):
+        XferListEditor.fillresponse(self)
+        self.item.editor.add_email_selector(self , 0, self.get_max_row() + 1, 2)
 
 @ActionsManage.affect('Individual', 'label')
 @MenuManage.describ('contacts.change_abstractcontact')
@@ -310,12 +318,20 @@ class IndividualSearch(XferSearchEditor):
     model = Individual
     field_id = 'individual'
 
+    def fillresponse(self):
+        XferSearchEditor.fillresponse(self)
+        self.item.editor.add_email_selector(self , 0, self.get_max_row() + 1, 5)
+
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
 class LegalEntitySearch(XferSearchEditor):
     caption = _("Legal entity search")
     icon = "legalEntityFind.png"
     model = LegalEntity
     field_id = 'legal_entity'
+
+    def fillresponse(self):
+        XferSearchEditor.fillresponse(self)
+        self.item.editor.add_email_selector(self , 0, self.get_max_row() + 1, 5)
 
 @ActionsManage.affect('AbstractContact', 'show')
 @MenuManage.describ('contacts.change_abstractcontact')

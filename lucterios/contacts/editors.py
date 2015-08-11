@@ -31,13 +31,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
-                    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton
+                    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
+    XferCompLinkLabel
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
 from lucterios.contacts.models import AbstractContact, PostalCode, ContactCustomField, \
     CustomField
+from lucterios.CORE.parameters import Params
 
 class CustomFieldEditor(LucteriosEditor):
 
@@ -279,6 +281,24 @@ class AbstractContactEditor(LucteriosEditor):
                 ccf_model = ContactCustomField.objects.get_or_create(contact=self.item, field=cf_model)  # pylint: disable=no-member
                 ccf_model[0].value = six.text_type(cf_value)
                 ccf_model[0].save()
+
+    def add_email_selector(self, xfer, col, row, colspan):
+        mailto_type = Params.getvalue("contacts-mailtoconfig")
+        email_list = [];
+        for item in xfer.items.exclude(email__isnull=True).exclude(email__exact=''):
+            email_list.append(six.text_type(item.email))
+        if len(email_list) > 0:
+            link = XferCompLinkLabel('emailAll')
+            link.set_value_center(_('Write to all'))
+            if mailto_type == 1:  # CC
+                mailto_prefix = 'mailto:?cc='
+            elif mailto_type == 2:  # BCC
+                mailto_prefix = 'mailto:?bcc='
+            else:  # TO
+                mailto_prefix = 'mailto:'
+            link.set_link(mailto_prefix + ','.join(email_list))
+            link.set_location(col, row, colspan)
+            xfer.add_component(link)
 
 class LegalEntityEditor(AbstractContactEditor):
 

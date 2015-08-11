@@ -185,8 +185,23 @@ class ContactsMigrate(MigrateAbstract):
                 cust_field = self.customfield_list[contactcustomfield_val[1]]
                 contactcustomfield_mdl.objects.create(contact=abs_contact, field=cust_field, value=contactcustomfield_val[2])
 
+    def _params(self):
+        from lucterios.CORE.models import Parameter
+        cur_p = self.old_db.open()
+        cur_p.execute("SELECT paramName,value FROM CORE_extension_params WHERE extensionId LIKE 'org_lucterios_contacts' and paramName in ('MailToConfig')")
+        for param_name, param_value in cur_p.fetchall():
+            pname = ''
+            if param_name == 'MailToConfig':
+                pname = 'contacts-mailtoconfig'
+                if param_value == '':
+                    param_value = '0'
+            if pname != '':
+                self.print_log("=> parameter of account %s - %s", (pname, param_value))
+                Parameter.change_value(pname, param_value)
+
     def run(self):
         try:
+            self._params()
             self._config()
             self._structure()
             self._relations()

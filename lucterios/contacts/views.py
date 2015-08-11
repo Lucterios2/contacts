@@ -28,7 +28,7 @@ from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage,\
+from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
     FORMTYPE_MODAL
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
@@ -36,8 +36,10 @@ from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm,
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
-from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual,\
+from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual, \
     CustomField
+from lucterios.framework import signal_and_lock
+from lucterios.CORE.parameters import Params
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
@@ -275,3 +277,8 @@ class PostalCodeList(XferListEditor):
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = [Q(postal_code__startswith=filter_postal_code)]
+
+@signal_and_lock.Signal.decorate('config')
+def config_contacts(xfer):
+    Params.fill(xfer, ['contacts-mailtoconfig'], 1, 10)
+    xfer.params['params'].append('contacts-mailtoconfig')
