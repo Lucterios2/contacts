@@ -74,7 +74,7 @@ def initial_values(apps, schema_editor):
     param.param_titles = (_("contacts-mailtoconfig.0"), _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2"))
     param.args = "{'Enum':3}"
     param.value = '0'
-    param.save()    
+    param.save()
 
 def initial_postalcodes(apps, schema_editor):
     # pylint: disable=unused-argument

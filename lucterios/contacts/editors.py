@@ -283,8 +283,9 @@ class AbstractContactEditor(LucteriosEditor):
                 ccf_model[0].save()
 
     def add_email_selector(self, xfer, col, row, colspan):
+        # pylint: disable=no-self-use
         mailto_type = Params.getvalue("contacts-mailtoconfig")
-        email_list = [];
+        email_list = []
         for item in xfer.items.exclude(email__isnull=True).exclude(email__exact=''):
             email_list.append(six.text_type(item.email))
         if len(email_list) > 0:
