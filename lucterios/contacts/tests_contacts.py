@@ -404,6 +404,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntityShow()
         self.call('/lucterios.contacts/legalEntityShow', {'legal_entity':'1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_count_equal('COMPONENTS/*', 27)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/HEADER', 2)
         self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 0)
@@ -717,6 +718,44 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "-5.4")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "Y")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_6"]', "azerty{[br/]}qwerty")
+
+    def test_custom_fields_legalentity(self):
+        self._initial_custom_values()
+
+        self.factory.xfer = LegalEntityShow()
+        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_count_equal('COMPONENTS/*', 35)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', None)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "0")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "0.0")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_4"]', "Non")
+        self.assert_count_equal('COMPONENTS/LABELFORM[@name="custom_5"]', 0)
+        self.assert_count_equal('COMPONENTS/LABELFORM[@name="custom_6"]', 0)
+
+        self.factory.xfer = LegalEntityAddModify()
+        self.call('/lucterios.contacts/legalEntityAddModify', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityAddModify')
+        self.assert_count_equal('COMPONENTS/*', 31)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="custom_1"]', None)
+        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_2"]', "0")
+        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_3"]', "0.0")
+        self.assert_xml_equal('COMPONENTS/CHECK[@name="custom_4"]', "0")
+
+        self.factory.xfer = LegalEntityAddModify()
+        self.call('/lucterios.contacts/legalEntityAddModify', {'legal_entity':'1', "SAVE":"YES", "custom_1":"n'import quoi", "custom_2":"37", \
+                                                              "custom_3":"9.1", "custom_4":"1"}, False)
+
+        self.factory.xfer = LegalEntityShow()
+        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity':'1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_count_equal('COMPONENTS/*', 35)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', "n'import quoi")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "37")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "9.1")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_4"]', "Oui")
 
     def test_custom_fields_printing(self):
         self._initial_custom_values()

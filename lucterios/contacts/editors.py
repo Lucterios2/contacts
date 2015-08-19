@@ -40,6 +40,7 @@ from lucterios.framework.editors import LucteriosEditor
 from lucterios.contacts.models import AbstractContact, PostalCode, ContactCustomField, \
     CustomField
 from lucterios.CORE.parameters import Params
+from lucterios.framework.models import get_value_converted
 
 class CustomFieldEditor(LucteriosEditor):
 
@@ -238,7 +239,7 @@ class AbstractContactEditor(LucteriosEditor):
             xfer.add_component(lbl)
             val = XferCompLabelForm(cf_name)
             val.set_location(col + col_offset + 1, row, 1, 1)
-            val.set_value(getattr(self.item, cf_name))
+            val.set_value(get_value_converted(getattr(self.item, cf_name), True))
             xfer.add_component(val)
             col_offset += 2
             if col_offset == 4:
