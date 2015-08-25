@@ -31,6 +31,7 @@ from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm
 from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO, CLOSE_YES, SELECT_SINGLE
 
+
 class ContactSelection(XferSearchEditor):
     icon = "contacts.png"
     model = AbstractContact
@@ -53,15 +54,19 @@ class ContactSelection(XferSearchEditor):
         lbl.set_location(1, 0)
         self.add_component(lbl)
         list_of_modal = []
-        list_of_modal.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
-        for sub_class in AbstractContact.__subclasses__():  # pylint: disable=no-member
-            list_of_modal.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
+        list_of_modal.append((AbstractContact.get_long_name(
+        ), AbstractContact._meta.verbose_name.title()))
+        for sub_class in AbstractContact.__subclasses__():
+            list_of_modal.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title(
+            )))
         selected_model = XferCompSelect('modelname')
         selected_model.set_value(model_current)
         selected_model.set_select(list_of_modal)
         selected_model.set_location(2, 0, 3)
-        selected_model.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        selected_model.set_action(
+            self.request, self.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
         self.add_component(selected_model)
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
-            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"), {'close':CLOSE_YES, 'unique':SELECT_SINGLE, 'params':{'pkname':self.field_id}}, 0)
+            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"), {
+                            'close': CLOSE_YES, 'unique': SELECT_SINGLE, 'params': {'pkname': self.field_id}}, 0)

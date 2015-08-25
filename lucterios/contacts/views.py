@@ -41,6 +41,7 @@ from lucterios.contacts.models import PostalCode, Function, StructureType, Legal
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.parameters import Params
 
+
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
     caption = _("My account")
@@ -56,13 +57,18 @@ class Account(XferContainerCustom):
         lab.set_location(1, 0, 2)
         self.add_component(lab)
         try:
-            self.item = Individual.objects.get(user=self.request.user)  # pylint: disable=no-member
-            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'individual':six.text_type(self.item.id)}})
+            self.item = Individual.objects.get(
+                user=self.request.user)
+            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"),
+                            {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.id)}})
         except ObjectDoesNotExist:
-            self.item = LucteriosUser.objects.get(id=self.request.user.id)  # pylint: disable=no-member
-            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.request.user.id)}})
+            self.item = LucteriosUser.objects.get(
+                id=self.request.user.id)
+            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {
+                            'close': CLOSE_NO, 'params': {'user_actif': six.text_type(self.request.user.id)}})
         self.fill_from_model(1, 1, True)
         self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):
@@ -72,6 +78,7 @@ class AccountAddModify(XferAddEditor):
     caption_add = _("My account")
     caption_modify = _("My account")
     locked = True
+
 
 @MenuManage.describ('', FORMTYPE_MODAL, 'core.general', _('Our structure and its management'))
 class CurrentStructure(XferContainerCustom):
@@ -91,9 +98,12 @@ class CurrentStructure(XferContainerCustom):
         lab.set_location(1, 0, 4)
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
-        self.add_action(CurrentStructureAddModify.get_action(_("Edit"), "images/edit.png"), {'close':CLOSE_NO})
-        self.add_action(CurrentStructurePrint.get_action(_("Print"), "images/print.png"), {'close':CLOSE_NO})
+        self.add_action(CurrentStructureAddModify.get_action(
+            _("Edit"), "images/edit.png"), {'close': CLOSE_NO})
+        self.add_action(CurrentStructurePrint.get_action(
+            _("Print"), "images/print.png"), {'close': CLOSE_NO})
         self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+
 
 @MenuManage.describ('')
 class CurrentStructurePrint(XferPrintAction):
@@ -102,6 +112,7 @@ class CurrentStructurePrint(XferPrintAction):
     field_id = 1
     caption = _("Our details")
     action_class = CurrentStructure
+
 
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
@@ -114,6 +125,7 @@ class CurrentStructureAddModify(XferAddEditor):
     redirect_to_show = False
 
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
+
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
 class Configuration(XferContainerCustom):
@@ -131,7 +143,7 @@ class Configuration(XferContainerCustom):
         img.set_location(1, 0)
         self.add_component(img)
         self.model = Function
-        dbfunction = Function.objects.all()  # pylint: disable=no-member
+        dbfunction = Function.objects.all()
         grid = XferCompGrid("function")
         grid.set_model(dbfunction, None, self)
         grid.add_actions(self)
@@ -154,7 +166,7 @@ class Configuration(XferContainerCustom):
         img.set_location(1, 0)
         self.add_component(img)
         self.model = StructureType
-        dbcategorie = StructureType.objects.all()  # pylint: disable=no-member
+        dbcategorie = StructureType.objects.all()
         grid = XferCompGrid("structure_type")
         grid.set_model(dbcategorie, None, self)
         grid.add_actions(self)
@@ -177,7 +189,7 @@ class Configuration(XferContainerCustom):
         img.set_location(1, 0)
         self.add_component(img)
         self.model = CustomField
-        dbcustom = CustomField.objects.all()  # pylint: disable=no-member
+        dbcustom = CustomField.objects.all()
         grid = XferCompGrid("custom_field")
         grid.set_model(dbcustom, None, self)
         grid.add_actions(self)
@@ -195,6 +207,7 @@ class Configuration(XferContainerCustom):
         self._fill_customfield()
         self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
+
 @ActionsManage.affect('Function', 'add')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):
@@ -204,6 +217,7 @@ class FunctionAddModify(XferAddEditor):
     caption_add = _("Add function")
     caption_modify = _("Modify function")
 
+
 @ActionsManage.affect('Function', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionDel(XferDelete):
@@ -211,6 +225,7 @@ class FunctionDel(XferDelete):
     icon = "function.png"
     model = Function
     field_id = 'function'
+
 
 @ActionsManage.affect('CustomField', 'add', 'edit')
 @MenuManage.describ('CORE.add_parameter')
@@ -221,6 +236,7 @@ class CustomFieldAddModify(XferAddEditor):
     caption_add = _("Add custom field")
     caption_modify = _("Modify custom field")
 
+
 @ActionsManage.affect('CustomField', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldDel(XferDelete):
@@ -228,6 +244,7 @@ class CustomFieldDel(XferDelete):
     icon = "fields.png"
     model = CustomField
     field_id = 'custom_field'
+
 
 @ActionsManage.affect('StructureType', 'add')
 @MenuManage.describ('CORE.add_parameter')
@@ -238,6 +255,7 @@ class StructureTypeAddModify(XferAddEditor):
     caption_add = _("Add structure type")
     caption_modify = _("Modify structure type")
 
+
 @ActionsManage.affect('StructureType', 'delete')
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeDel(XferDelete):
@@ -245,6 +263,7 @@ class StructureTypeDel(XferDelete):
     icon = "function.png"
     model = StructureType
     field_id = 'structure_type'
+
 
 @ActionsManage.affect('PostalCode', 'add')
 @MenuManage.describ('contacts.add_postalcode')
@@ -254,6 +273,7 @@ class PostalCodeAdd(XferAddEditor):
     icon = "postalCode.png"
     model = PostalCode
     field_id = 'postalCode'
+
 
 @MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
 class PostalCodeList(XferListEditor):
@@ -265,7 +285,8 @@ class PostalCodeList(XferListEditor):
     def fillresponse_header(self):
         filter_postal_code = self.getparam('filter_postal_code')
         if filter_postal_code is None:
-            local_struct = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
+            local_struct = LegalEntity.objects.get(
+                id=1)
             filter_postal_code = six.text_type(local_struct.postal_code)
         lbl = XferCompLabelForm('filtre')
         lbl.set_value_as_name(_('Filtrer by postal code'))
@@ -273,10 +294,12 @@ class PostalCodeList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
-        comp.set_action(self.request, self.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        comp.set_action(self.request, self.get_action(),
+                        {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = Q(postal_code__startswith=filter_postal_code)
+
 
 @signal_and_lock.Signal.decorate('config')
 def config_contacts(xfer):

@@ -54,8 +54,9 @@ setup(
     ],
     packages=["lucterios", "lucterios.contacts"],
     package_data={
-       "lucterios.contacts.migrations":['*'],
-       "lucterios.contacts":['build', 'images/*', 'locale/*/*/*', 'help/*'],
+        "lucterios.contacts.migrations": ['*'],
+        "lucterios.contacts": ['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["lucterios >=2.0b0,<2.0b999999999999999", "Pillow ==2.8"],
+    install_requires=[
+        "lucterios >=2.0b0,<2.0b999999999999999", "Pillow ==2.8"],
 )

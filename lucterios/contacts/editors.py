@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
-                    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
+    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
     XferCompLinkLabel
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO
 from lucterios.framework.tools import ActionsManage
@@ -41,6 +41,7 @@ from lucterios.contacts.models import AbstractContact, PostalCode, ContactCustom
     CustomField
 from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
+
 
 class CustomFieldEditor(LucteriosEditor):
 
@@ -94,13 +95,16 @@ class CustomFieldEditor(LucteriosEditor):
         model_current = obj_model.value
         xfer.tab = obj_model.tab
         model_list = []
-        model_list.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
-        for sub_class in AbstractContact.__subclasses__():  # pylint: disable=no-member
-            model_list.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title()))  # pylint: disable=protected-access,no-member
+        model_list.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title(
+        )))
+        for sub_class in AbstractContact.__subclasses__():
+            model_list.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title(
+            )))
         model_select = XferCompSelect('modelname')
         model_select.set_value(model_current)
         model_select.set_select(model_list)
-        model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
+        model_select.set_location(
+            obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
         model_select.set_size(obj_model.vmin, obj_model.hmin)
         xfer.add_component(model_select)
         self._edit_add_args(xfer, obj_kind)
@@ -141,7 +145,8 @@ parent.get('args_list').setVisible(type==4);
                 comp = XferCompEdit(self.item.get_fieldname())
             comp.set_value(value)
         elif (self.item.kind == 1) or (self.item.kind == 2):
-            comp = XferCompFloat(self.item.get_fieldname(), args['min'], args['max'], args['prec'])
+            comp = XferCompFloat(
+                self.item.get_fieldname(), args['min'], args['max'], args['prec'])
             comp.set_value(value)
         elif self.item.kind == 3:
             comp = XferCompCheck(self.item.get_fieldname())
@@ -159,10 +164,11 @@ parent.get('args_list').setVisible(type==4);
             comp.set_value(select_id)
         return comp
 
+
 class AbstractContactEditor(LucteriosEditor):
 
     def _change_city_select(self, xfer, list_postalcode, obj_city):
-        # pylint: disable=no-self-use
+
         obj_country = xfer.get_components('country')
         city_current = obj_city.value
         city_list = {}
@@ -179,13 +185,15 @@ class AbstractContactEditor(LucteriosEditor):
         city_select = XferCompSelect('city')
         city_select.set_value(city_current)
         city_select.set_select(city_list)
-        city_select.set_location(obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
+        city_select.set_location(
+            obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
         city_select.set_size(obj_city.vmin, obj_city.hmin)
-        city_select.set_action(xfer.request, xfer.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        city_select.set_action(
+            xfer.request, xfer.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
         xfer.add_component(city_select)
 
     def _edit_custom_field(self, xfer, init_col):
-        # pylint: disable=too-many-locals
+
         col = init_col
         col_offset = 0
         row = xfer.get_max_row() + 5
@@ -204,10 +212,12 @@ class AbstractContactEditor(LucteriosEditor):
 
     def edit(self, xfer):
         obj_pstcd = xfer.get_components('postal_code')
-        obj_pstcd.set_action(xfer.request, xfer.get_action(), {'modal':FORMTYPE_REFRESH, 'close':CLOSE_NO})
+        obj_pstcd.set_action(
+            xfer.request, xfer.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
         obj_city = xfer.get_components('city')
         postalcode_current = obj_pstcd.value
-        list_postalcode = PostalCode.objects.filter(postal_code=postalcode_current)  # pylint: disable=no-member
+        list_postalcode = PostalCode.objects.filter(
+            postal_code=postalcode_current)
         if len(list_postalcode) > 0:
             self._change_city_select(xfer, list_postalcode, obj_city)
         obj_cmt = xfer.get_components('comment')
@@ -239,7 +249,8 @@ class AbstractContactEditor(LucteriosEditor):
             xfer.add_component(lbl)
             val = XferCompLabelForm(cf_name)
             val.set_location(col + col_offset + 1, row, 1, 1)
-            val.set_value(get_value_converted(getattr(self.item, cf_name), True))
+            val.set_value(
+                get_value_converted(getattr(self.item, cf_name), True))
             xfer.add_component(val)
             col_offset += 2
             if col_offset == 4:
@@ -252,7 +263,8 @@ class AbstractContactEditor(LucteriosEditor):
         xfer.tab = obj_addr.tab
         new_col = obj_addr.col
         xfer.move(obj_addr.tab, 1, 0)
-        img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)  # pylint: disable=no-member
+        img_path = get_user_path(
+            "contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
         img = XferCompImage('logoimg')
         if exists(img_path):
             img.type = 'jpg'
@@ -269,7 +281,8 @@ class AbstractContactEditor(LucteriosEditor):
             tmp_file = save_from_base64(uploadlogo)
             with open(tmp_file, "rb") as image_tmp:
                 image = open_image_resize(image_tmp, 100, 100)
-                img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)  # pylint: disable=no-member
+                img_path = get_user_path(
+                    "contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
                 with open(img_path, "wb") as image_file:
                     image.save(image_file, 'JPEG', quality=90)
             unlink(tmp_file)
@@ -278,13 +291,15 @@ class AbstractContactEditor(LucteriosEditor):
             cf_value = xfer.getparam(cf_name)
             if cf_value is not None:
                 cf_id = int(cf_name[7:])
-                cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
-                ccf_model = ContactCustomField.objects.get_or_create(contact=self.item, field=cf_model)  # pylint: disable=no-member
+                cf_model = CustomField.objects.get(
+                    id=cf_id)
+                ccf_model = ContactCustomField.objects.get_or_create(
+                    contact=self.item, field=cf_model)
                 ccf_model[0].value = six.text_type(cf_value)
                 ccf_model[0].save()
 
     def add_email_selector(self, xfer, col, row, colspan):
-        # pylint: disable=no-self-use
+
         mailto_type = Params.getvalue("contacts-mailtoconfig")
         email_list = []
         for item in xfer.items.exclude(email__isnull=True).exclude(email__exact=''):
@@ -302,19 +317,21 @@ class AbstractContactEditor(LucteriosEditor):
             link.set_location(col, row, colspan)
             xfer.add_component(link)
 
+
 class LegalEntityEditor(AbstractContactEditor):
 
     def edit(self, xfer):
-        if self.item.id == 1:  # pylint: disable=no-member
+        if self.item.id == 1:
             xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
         return AbstractContactEditor.edit(self, xfer)
 
     def show(self, xfer):
-        if self.item.id == 1:  # pylint: disable=no-member
+        if self.item.id == 1:
             xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
         return AbstractContactEditor.show(self, xfer)
+
 
 class IndividualEditor(AbstractContactEditor):
 
@@ -326,11 +343,11 @@ class IndividualEditor(AbstractContactEditor):
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.item.user is None:
-            btn.set_action(xfer.request, ActionsManage.get_act_changed('Individual', 'useradd', "", 'images/add.png'), \
-                    {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO})
+            btn.set_action(xfer.request, ActionsManage.get_act_changed('Individual', 'useradd', "", 'images/add.png'),
+                           {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
         else:
-            btn.set_action(xfer.request, ActionsManage.get_act_changed('LucteriosUser', 'edit', '', 'images/edit.png'), \
-                    {'modal':FORMTYPE_MODAL, 'close':CLOSE_NO, 'params':{'user_actif':six.text_type(self.item.user.id), 'IDENT_READ':'YES'}})  # pylint: disable=no-member
+            btn.set_action(xfer.request, ActionsManage.get_act_changed('LucteriosUser', 'edit', '', 'images/edit.png'),
+                           {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'params': {'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'}})
         xfer.add_component(btn)
 
     def saving(self, xfer):
@@ -339,7 +356,8 @@ class IndividualEditor(AbstractContactEditor):
             self.item.user.first_name = self.item.firstname
             self.item.user.last_name = self.item.lastname
             self.item.user.email = self.item.email
-            self.item.user.save()  # pylint: disable=no-member
+            self.item.user.save()
+
 
 class ResponsabilityEditor(LucteriosEditor):
 

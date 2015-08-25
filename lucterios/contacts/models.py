@@ -30,8 +30,10 @@ from django.db import models
 
 from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
 
+
 class PostalCode(LucteriosModel):
-    postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
+    postal_code = models.CharField(
+        _('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
     country = models.CharField(_('country'), max_length=100, blank=False)
 
@@ -46,12 +48,13 @@ class PostalCode(LucteriosModel):
         return '[%s] %s %s' % (self.country, self.postal_code, self.city)
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('postal code')
         verbose_name_plural = _('postal codes')
         default_permissions = ['add', 'change']
         ordering = ['postal_code', 'city']
         unique_together = (('postal_code', 'city', 'country'),)
+
 
 class Function(LucteriosModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -64,10 +67,11 @@ class Function(LucteriosModel):
         return ["name"]
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('individual function')
         verbose_name_plural = _('individual functions')
         default_permissions = []
+
 
 class StructureType(LucteriosModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -80,15 +84,17 @@ class StructureType(LucteriosModel):
         return self.name
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('structure type')
         verbose_name_plural = _('structure types')
         default_permissions = []
 
+
 class CustomField(LucteriosModel):
     modelname = models.CharField(_('model'), max_length=100)
     name = models.CharField(_('name'), max_length=100, unique=False)
-    kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
+    kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _(
+        'Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
 
     @classmethod
@@ -108,20 +114,21 @@ class CustomField(LucteriosModel):
         return apps.get_model(self.modelname)
 
     def get_fieldname(self):
-        return "custom_%d" % self.id  # pylint: disable=no-member
+        return "custom_%d" % self.id
 
     @property
     def model_title(self):
-        return six.text_type(self.model_associated()._meta.verbose_name)  # pylint: disable=protected-access
+        return six.text_type(self.model_associated()._meta.verbose_name)
 
     def get_args(self):
-        default_args = {'min':0, 'max':0, 'prec':0, 'list':[], 'multi':False}
+        default_args = {
+            'min': 0, 'max': 0, 'prec': 0, 'list': [], 'multi': False}
         try:
-            args = eval(self.args)  # pylint: disable=eval-used
-        except:  # pylint: disable=bare-except
+            args = eval(self.args)
+        except:
             args = {}
         for name, val in default_args.items():
-            if not name in args.keys():
+            if name not in args.keys():
                 args[name] = val
         args['list'] = list(args['list'])
         return args
@@ -133,9 +140,11 @@ class CustomField(LucteriosModel):
         if self.kind == 0:
             dbfield = TextField(self.name)
         if self.kind == 1:
-            dbfield = IntegerField(self.name, validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+            dbfield = IntegerField(self.name, validators=[MinValueValidator(
+                float(args['min'])), MaxValueValidator(float(args['max']))])
         if self.kind == 2:
-            dbfield = DecimalField(self.name, decimal_places=int(args['prec']), validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
+            dbfield = DecimalField(self.name, decimal_places=int(args['prec']), validators=[
+                                   MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
         if self.kind == 3:
             dbfield = BooleanField(self.name)
         if self.kind == 4:
@@ -146,25 +155,30 @@ class CustomField(LucteriosModel):
         return dbfield
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('custom field')
         verbose_name_plural = _('custom fields')
         default_permissions = []
 
+
 class ContactCustomField(LucteriosModel):
-    contact = models.ForeignKey('AbstractContact', verbose_name=_('contact'), null=False, on_delete=models.CASCADE)
-    field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
+    contact = models.ForeignKey('AbstractContact', verbose_name=_(
+        'contact'), null=False, on_delete=models.CASCADE)
+    field = models.ForeignKey(
+        'CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
     value = models.TextField(_('value'), default="")
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('custom field value')
         verbose_name_plural = _('custom field values')
         default_permissions = []
 
+
 class AbstractContact(LucteriosModel):
     address = models.TextField(_('address'), blank=False)
-    postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
+    postal_code = models.CharField(
+        _('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
     country = models.CharField(_('country'), max_length=100, blank=False)
     tel1 = models.CharField(_('tel1'), max_length=15, blank=True)
@@ -186,10 +200,12 @@ class AbstractContact(LucteriosModel):
 
     @classmethod
     def get_search_fields(cls):
-        fieldnames = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
+        fieldnames = ['address', 'postal_code', 'city',
+                      'country', 'tel1', 'tel2', 'email', 'comment']
         from django.db.models import Q
         for cf_name, cf_model in cls().get_custom_fields():
-            fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
+            fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(
+                contactcustomfield__field__id=cf_model.id)))
         return fieldnames
 
     def get_custom_fields(self):
@@ -199,7 +215,7 @@ class AbstractContact(LucteriosModel):
         for sub_class in inspect.getmro(self.__class__):
             if hasattr(sub_class, "get_long_name"):
                 model_list.append(sub_class.get_long_name())
-        for cf_model in CustomField.objects.filter(modelname__in=model_list):  # pylint: disable=no-member
+        for cf_model in CustomField.objects.filter(modelname__in=model_list):
             fields.append((cf_model.get_fieldname(), cf_model))
         return fields
 
@@ -212,16 +228,18 @@ class AbstractContact(LucteriosModel):
         return fields
 
     def __getattr__(self, name):
-        # pylint: disable=too-many-return-statements
+
         if name == "str":
             return six.text_type(self.get_final_child())
         elif name[:7] == "custom_":
             cf_id = int(name[7:])
-            cf_model = CustomField.objects.get(id=cf_id)  # pylint: disable=no-member
+            cf_model = CustomField.objects.get(
+                id=cf_id)
             if self.id is None:
                 ccf_value = ""
             else:
-                ccf_model = ContactCustomField.objects.get_or_create(contact=self, field=cf_model)  # pylint: disable=no-member
+                ccf_model = ContactCustomField.objects.get_or_create(
+                    contact=self, field=cf_model)
                 ccf_value = ccf_model[0].value
             if cf_model.kind == 0:
                 return six.text_type(ccf_value)
@@ -243,21 +261,25 @@ class AbstractContact(LucteriosModel):
         raise AttributeError(name)
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('generic contact')
         verbose_name_plural = _('generic contacts')
 
+
 class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
-    structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
-    identify_number = models.CharField(_('identify number'), max_length=100, blank=True)
+    structure_type = models.ForeignKey('StructureType', verbose_name=_(
+        'structure type'), null=True, on_delete=models.SET_NULL)
+    identify_number = models.CharField(
+        _('identify number'), max_length=100, blank=True)
 
     @classmethod
     def get_show_fields(cls):
         ident_field = ['name', 'structure_type']
         ident_field.extend(super(LegalEntity, cls).get_show_fields())
         ident_field.append('identify_number')
-        res_fields = {_('001@Identity'):ident_field, _('002@Management'):['responsability_set']}
+        res_fields = {_('001@Identity'): ident_field, _(
+            '002@Management'): ['responsability_set']}
         return res_fields
 
     @classmethod
@@ -271,7 +293,8 @@ class LegalEntity(AbstractContact):
     def get_search_fields(cls):
         res_fields = ['name', 'structure_type']
         res_fields.extend(super(LegalEntity, cls).get_search_fields())
-        res_fields.extend(['identify_number', 'responsability_set.individual.firstname', 'responsability_set.individual.lastname', 'responsability_set.functions'])
+        res_fields.extend(['identify_number', 'responsability_set.individual.firstname',
+                           'responsability_set.individual.lastname', 'responsability_set.functions'])
         return res_fields
 
     @classmethod
@@ -280,8 +303,8 @@ class LegalEntity(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
-                    'email', 'comment', 'identify_number', 'OUR_DETAIL']
+        return ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
+                'email', 'comment', 'identify_number', 'OUR_DETAIL']
 
     def __str__(self):
         return self.name
@@ -289,28 +312,31 @@ class LegalEntity(AbstractContact):
     def can_delete(self):
         msg = AbstractContact.can_delete(self)
         if msg == '':
-            if self.id == 1:  # pylint: disable=no-member
+            if self.id == 1:
                 msg = _("You cannot delete this legal entity!")
         return msg
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('legal entity')
         verbose_name_plural = _('legal entities')
         default_permissions = []
 
+
 class Individual(AbstractContact):
-    genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
+    genre = models.IntegerField(
+        choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
     firstname = models.CharField(_('firstname'), max_length=50, blank=False)
     lastname = models.CharField(_('lastname'), max_length=50, blank=False)
-    user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_(
+        'user'), null=True, on_delete=models.SET_NULL)
 
     @classmethod
     def get_show_fields(cls):
         ident_field = ['genre', ('firstname', 'lastname')]
         ident_field.extend(super(Individual, cls).get_show_fields())
         ident_field.append('user')
-        res_fields = {_('001@Identity'):ident_field}
+        res_fields = {_('001@Identity'): ident_field}
         return res_fields
 
     @classmethod
@@ -323,7 +349,8 @@ class Individual(AbstractContact):
     def get_search_fields(cls):
         ident_field = ['genre', 'firstname', 'lastname']
         ident_field.extend(super(Individual, cls).get_search_fields())
-        ident_field.extend(['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
+        ident_field.extend(
+            ['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
         return ident_field
 
     @classmethod
@@ -332,22 +359,26 @@ class Individual(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', \
-                    'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
+        return ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
+                'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
 
     def __str__(self):
         return '%s %s' % (self.lastname, self.firstname)
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('individual')
         verbose_name_plural = _('individuals')
         default_permissions = []
 
+
 class Responsability(LucteriosModel):
-    individual = models.ForeignKey(Individual, verbose_name=_('individual'), null=False)
-    legal_entity = models.ForeignKey(LegalEntity, verbose_name=_('legal entity'), null=False)
-    functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
+    individual = models.ForeignKey(
+        Individual, verbose_name=_('individual'), null=False)
+    legal_entity = models.ForeignKey(
+        LegalEntity, verbose_name=_('legal entity'), null=False)
+    functions = models.ManyToManyField(
+        Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
     @classmethod
@@ -367,9 +398,10 @@ class Responsability(LucteriosModel):
         return ["legal_entity", "functions"]
 
     class Meta(object):
-        # pylint: disable=no-init
+
         verbose_name = _('responsability')
         verbose_name_plural = _('responsabilities')
+
 
 class OurDetailPrintPlugin(PrintFieldsPlugIn):
 
@@ -380,11 +412,13 @@ class OurDetailPrintPlugin(PrintFieldsPlugIn):
         fields = []
         for title, name in LegalEntity.get_all_print_fields(False):
             if (name[:14] != 'structure_type') and (name[:len(self.name)] != self.name):
-                fields.append(("%s > %s" % (self.title, title), "%s.%s" % (self.name, name)))
+                fields.append(
+                    ("%s > %s" % (self.title, title), "%s.%s" % (self.name, name)))
         return fields
 
     def evaluate(self, text_to_evaluate):
-        our_details = LegalEntity.objects.get(id=1)  # pylint: disable=no-member
+        our_details = LegalEntity.objects.get(
+            id=1)
         return our_details.evaluate(text_to_evaluate)
 
 PrintFieldsPlugIn.add_plugin(OurDetailPrintPlugin)
