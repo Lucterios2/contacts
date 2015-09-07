@@ -277,7 +277,7 @@ class ContactsTest(LucteriosTest):
             'Core.Custom', 'lucterios.contacts', 'individualSearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
-        self.assert_count_equal('COMPONENTS/*', 17)
+        self.assert_count_equal('COMPONENTS/*', 19)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 2)
 
@@ -289,7 +289,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1;2')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 2)
 
@@ -300,7 +300,7 @@ class ContactsTest(LucteriosTest):
             'Core.Custom', 'lucterios.contacts', 'individualSearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 1)
 
@@ -311,7 +311,7 @@ class ContactsTest(LucteriosTest):
             'Core.Custom', 'lucterios.contacts', 'individualSearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||2')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 1)
 
@@ -323,7 +323,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'responsability_set.functions||9||1')
-        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/*', 21)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 
@@ -335,7 +335,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'user.username||5||empt')
-        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/*', 21)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 
@@ -681,7 +681,7 @@ class ContactsTest(LucteriosTest):
             'Core.Custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
-        self.assert_count_equal('COMPONENTS/*', 17)
+        self.assert_count_equal('COMPONENTS/*', 19)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
 
@@ -693,7 +693,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
@@ -705,7 +705,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
@@ -717,7 +717,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc//structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 21)
+        self.assert_count_equal('COMPONENTS/*', 24)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 
@@ -729,7 +729,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_xml_equal(
             'CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 19)
+        self.assert_count_equal('COMPONENTS/*', 22)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
 

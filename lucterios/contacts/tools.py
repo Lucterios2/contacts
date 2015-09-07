@@ -30,9 +30,10 @@ from lucterios.contacts.models import AbstractContact
 from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm
 from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO, CLOSE_YES, SELECT_SINGLE
+from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 
 
-class ContactSelection(XferSearchEditor):
+class ContactSelection(XferSavedCriteriaSearchEditor):
     icon = "contacts.png"
     model = AbstractContact
     field_id = 'abstractcontact'

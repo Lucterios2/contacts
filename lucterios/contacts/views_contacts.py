@@ -39,6 +39,7 @@ from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, \
 from lucterios.contacts.models import LegalEntity, Individual, Responsability, \
     AbstractContact
 from lucterios.framework import signal_and_lock
+from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 
 MenuManage.add_sub(
     "office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
@@ -347,7 +348,7 @@ class ResponsabilityDel(XferDelete):
 
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find an individual following a set of criteria.'))
-class IndividualSearch(XferSearchEditor):
+class IndividualSearch(XferSavedCriteriaSearchEditor):
     caption = _("Individual search")
     icon = "individualFind.png"
     model = Individual
@@ -359,7 +360,7 @@ class IndividualSearch(XferSearchEditor):
 
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
-class LegalEntitySearch(XferSearchEditor):
+class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     caption = _("Legal entity search")
     icon = "legalEntityFind.png"
     model = LegalEntity
