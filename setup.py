@@ -52,10 +52,12 @@ setup(
         'Programming Language :: Python',
         'Topic :: Database :: Front-Ends',
     ],
-    packages=["lucterios", "lucterios.contacts"],
+    packages=["lucterios", "lucterios.contacts", "lucterios.mailing"],
     package_data={
         "lucterios.contacts.migrations": ['*'],
         "lucterios.contacts": ['build', 'images/*', 'locale/*/*/*', 'help/*'],
+        "lucterios.mailing.migrations": ['*'],
+        "lucterios.mailing": ['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
     install_requires=[
         "lucterios >=2.0b0,<2.0b999999999999999", "Pillow ==2.8"],

@@ -1,2 +1,4 @@
 recursive-include lucterios/contacts *
+recursive-include lucterios/mailing *
 recursive-exclude lucterios/contacts/__pycache__ *
+recursive-exclude lucterios/mailing/__pycache__ *

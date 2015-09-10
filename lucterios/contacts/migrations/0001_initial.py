@@ -149,9 +149,9 @@ class Migration(migrations.Migration):
                     unique=True, max_length=50, verbose_name='name')),
             ],
             options={
-                'default_permissions': [],
-                'verbose_name': 'Individual function',
-                'verbose_name_plural': 'Individual functions'
+                'verbose_name_plural': 'individual functions',
+                'verbose_name': 'individual function',
+                'default_permissions': []
             },
             bases=(models.Model,),
         ),
@@ -205,11 +205,11 @@ class Migration(migrations.Migration):
                 ('country', models.CharField(
                     max_length=100, verbose_name='country', blank=False)),
                 ('tel1', models.CharField(
-                    max_length=15, blank=True, verbose_name='phone #1')),
+                    max_length=15, blank=True, verbose_name='tel1')),
                 ('tel2', models.CharField(
-                    max_length=15, blank=True, verbose_name='phone #2')),
+                    max_length=15, blank=True, verbose_name='tel2')),
                 ('email', models.EmailField(
-                    max_length=75, blank=True, verbose_name='email')),
+                    max_length=254, blank=True, verbose_name='email')),
                 ('comment', models.TextField(
                     blank=True, verbose_name='comment')),
             ],
@@ -243,7 +243,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(
                     max_length=100, verbose_name='name', blank=False)),
                 ('identify_number', models.CharField(
-                    max_length=100, blank=True, verbose_name='legal number')),
+                    max_length=100, blank=True, verbose_name='identify number')),
                 ('structure_type', models.ForeignKey(on_delete=models.deletion.SET_NULL,
                                                      to='contacts.StructureType', verbose_name='structure type', null=True)),
             ],
