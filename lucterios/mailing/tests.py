@@ -48,6 +48,7 @@ from _io import BytesIO
 from os.path import join, dirname
 from lucterios.framework.tools import get_binay
 from io import SEEK_END
+from lucterios.CORE.views_usergroup import UsersEdit
 
 
 def decode_b64(data):
@@ -161,7 +162,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_observer(
             'Core.Custom', 'lucterios.mailing', 'configuration')
         self.assert_count_equal('CONTEXT', 0)
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_xml_equal(
             'COMPONENTS/LABELFORM[@name="mailing-smtpserver"]', None)
         self.assert_xml_equal(
@@ -172,6 +173,8 @@ class ConfigurationTest(LucteriosTest):
             'COMPONENTS/LABELFORM[@name="mailing-smtpuser"]', None)
         self.assert_xml_equal(
             'COMPONENTS/LABELFORM[@name="mailing-smtppass"]', None)
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="mailing-msg-connection"]', 'Confirmation de connexion à votre application:\nAlias:%(username)s\nMot de passe:%(password)s\n')
 
     def test_tryemail_noconfig(self):
         self.config('', 25)
@@ -335,3 +338,33 @@ class ConfigurationTest(LucteriosTest):
         finally:
             file1.close()
             file2.close()
+
+    def test_user_withoutconfig(self):
+        self.config('', 25)
+        self.factory.xfer = UsersEdit()
+        self.call('/CORE/usersEdit', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
+        self.assert_count_equal('COMPONENTS/*', 39)
+
+    def test_user_withconfig(self):
+        self.config('localhost', 1025)
+        self.factory.xfer = UsersEdit()
+        self.call('/CORE/usersEdit', {}, False)
+        self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
+        self.assert_count_equal('COMPONENTS/*', 41)
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="lbl_password_generate"]', "{[b]}Générer un nouveau mot de passe?{[/b]}")
+
+    def test_user_change_password(self):
+        self.config('localhost', 1025)
+        self.assertEqual(0, self.server.count())
+        self.factory.xfer = UsersEdit()
+        self.call('/CORE/usersEdit', {'SAVE': 'YES', 'user_actif': '1',
+                                      "password_generate": 'o', "email": 'admin@super.com'}, False)
+        self.assert_observer('Core.Acknowledge', 'CORE', 'usersEdit')
+        self.assertEqual(1, self.server.count())
+        msg, = self.check_first_message('Mot de passe de connexion', 1)
+        self.assertEqual('text/plain', msg.get_content_type())
+        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        self.assertEqual(
+            'Confirmation de connexion à votre application:\nAlias:admin\nMot de passe:', decode_b64(msg.get_payload())[:72])

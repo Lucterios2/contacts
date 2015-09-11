@@ -413,3 +413,4 @@ def summary_contacts(xfer):
     lab.set_value_center('{[hr/]}')
     lab.set_location(0, row + 3, 4)
     xfer.add_component(lab)
+    return True

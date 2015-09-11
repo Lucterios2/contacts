@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-10 16:27+0000\n"
+"POT-Creation-Date: 2015-09-11 15:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,9 +21,13 @@ msgstr ""
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
-#: functions.py:48
+#: functions.py:52
 msgid "Email not configure!"
 msgstr "Email not configure!"
+
+#: functions.py:99
+msgid "Connection password"
+msgstr "Connection password"
 
 #: migrations/0001_initial.py:41
 msgid "mailing-smtpserver"
@@ -57,38 +61,57 @@ msgstr "SMTP user"
 msgid "mailing-smtppass"
 msgstr "SMTP pass"
 
-#: views.py:40
+#: migrations/0001_initial.py:74
+msgid "mailing-msg-connection"
+msgstr "Connection confirmation message"
+
+#: migrations/0001_initial.py:76
+#, python-format
+msgid ""
+"Connection confirmation to your application:\n"
+"User:%(username)s\n"
+"Password:%(password)s\n"
+msgstr ""
+"Connection confirmation to your application:\n"
+"User:%(username)s\n"
+"Password:%(password)s\n"
+
+#: views.py:42
 msgid "Change mailing parameters"
 msgstr "Change mailing parameters"
 
-#: views.py:43
+#: views.py:45
 msgid "Mailing parameters"
 msgstr "Mailing parameters"
 
-#: views.py:52
+#: views.py:49
 msgid "EMail configuration"
 msgstr "EMail configuration"
 
-#: views.py:62
+#: views.py:61 views.py:81
 msgid "Modify"
 msgstr "Modify"
 
-#: views.py:68
+#: views.py:67
 msgid "Send"
 msgstr "Send"
 
-#: views.py:75 views.py:81
+#: views.py:70
+msgid "Default message"
+msgstr "Default messages"
+
+#: views.py:88 views.py:94
 msgid "EMail try"
 msgstr "EMail try"
 
-#: views.py:79
+#: views.py:92
 msgid "Bad email parameter!"
 msgstr "Bad email parameter!"
 
-#: views.py:81
+#: views.py:94
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:82
+#: views.py:95
 msgid "EMail send, check it."
 msgstr "EMail send, check it."

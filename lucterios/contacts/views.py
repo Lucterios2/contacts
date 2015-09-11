@@ -305,3 +305,4 @@ class PostalCodeList(XferListEditor):
 def config_contacts(xfer):
     Params.fill(xfer, ['contacts-mailtoconfig'], 1, 10)
     xfer.params['params'].append('contacts-mailtoconfig')
+    return True

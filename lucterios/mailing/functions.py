@@ -93,3 +93,10 @@ def send_email(recipients, subject, body, files=None):
     finally:
         if server:
             server.quit()
+
+
+def send_connection_by_email(recipients, alias, passwd):
+    subject = _("Connection password")
+    msg_connection = Params.getvalue(
+        'mailing-msg-connection').replace('{[newline]}', '\n') % {'username': alias, 'password': passwd}
+    send_email(recipients, subject, msg_connection)

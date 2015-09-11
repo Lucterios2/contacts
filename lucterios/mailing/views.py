@@ -34,7 +34,9 @@ from lucterios.framework.xfercomponents import XferCompButton, XferCompImage,\
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
 from lucterios.framework.error import LucteriosException, IMPORTANT
-from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.mailing.functions import will_mail_send, send_email,\
+    send_connection_by_email
+from lucterios.framework import signal_and_lock
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
@@ -44,14 +46,11 @@ class Configuration(XferContainerCustom):
 
     def fillresponse(self):
         XferContainerCustom.fillresponse(self)
+        self.new_tab(_('EMail configuration'))
         img = XferCompImage('img')
         img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
-        lbl = XferCompLabelForm('title')
-        lbl.set_value_as_title(_('EMail configuration'))
-        lbl.set_location(1, 0, 2)
-        self.add_component(lbl)
 
         conf_params = ['mailing-smtpserver', 'mailing-smtpport',
                        'mailing-smtpsecurity', 'mailing-smtpuser', 'mailing-smtppass']
@@ -68,6 +67,20 @@ class Configuration(XferContainerCustom):
                 _('Send'), ''), {'close': CLOSE_NO})
             self.add_component(btn)
 
+        self.new_tab(_('Default message'))
+        img = XferCompImage('img')
+        img.set_value(self.icon_path())
+        img.set_location(0, 0, 1, 6)
+        self.add_component(img)
+
+        msg_params = ['mailing-msg-connection']
+        Params.fill(self, msg_params, 1, 1)
+        btn = XferCompButton('editmsg')
+        btn.set_location(1, 10, 2)
+        btn.set_action(self.request, ParamEdit.get_action(
+            _('Modify'), 'images/edit.png'), {'close': CLOSE_NO, 'params': {'params': msg_params}})
+        self.add_component(btn)
+
 
 @MenuManage.describ('CORE.change_parameter')
 class SendEmailTry(XferContainerAcknowledge):
@@ -80,3 +93,13 @@ class SendEmailTry(XferContainerAcknowledge):
         send_email(
             None, _("EMail try"), _('EMail sent to check configuration'))
         self.message(_("EMail send, check it."))
+
+
+@signal_and_lock.Signal.decorate('send_connection')
+def send_connection_email(email_adress, username, passwd):
+    if will_mail_send():
+        if email_adress and username and passwd:
+            send_connection_by_email(email_adress, username, passwd)
+        return True
+    else:
+        return False
