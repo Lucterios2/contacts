@@ -44,6 +44,10 @@ from lucterios.CORE.parameters import Params
 from lucterios.CORE.models import Parameter
 from lucterios.contacts.tests_contacts import change_ourdetail
 from asyncore import ExitNow
+from _io import BytesIO
+from os.path import join, dirname
+from lucterios.framework.tools import get_binay
+from io import SEEK_END
 
 
 def decode_b64(data):
@@ -180,6 +184,13 @@ class ConfigurationTest(LucteriosTest):
             "EXCEPTION/MESSAGE", "Mauvais paramètrage du courriel")
         self.assertEqual(0, self.server.count())
 
+    def check_first_message(self, subject, nb_multi):
+        msg = email.message_from_string(self.server.get(0)[3])
+        self.assertTrue(subject in msg.get(
+            'Content-Type', ''), msg.get('Content-Type', ''))
+        self.assertEqual(nb_multi, len(msg.get_payload()))
+        return msg.get_payload()
+
     def test_tryemail_success(self):
         self.config('localhost', 1025)
         self.assertEqual(0, self.server.count())
@@ -193,10 +204,10 @@ class ConfigurationTest(LucteriosTest):
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(
             ['mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
-        msg = email.message_from_string(self.server.get(0)[3])
-        self.assertEqual('Essai de courriel', msg.get('Subject', ''))
+        msg, = self.check_first_message('Essai de courriel', 1)
         self.assertEqual('text/plain', msg.get_content_type())
-        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        self.assertEqual(
+            'base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual(
             'Courriel envoyé pour vérifier la configuration', decode_b64(msg.get_payload()))
 
@@ -232,8 +243,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg = email.message_from_string(self.server.get(0)[3])
-        self.assertEqual('send correct config', msg.get('Subject', ''))
+        msg, = self.check_first_message('send correct config', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
@@ -249,8 +259,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg = email.message_from_string(self.server.get(0)[3])
-        self.assertEqual('send html', msg.get('Subject', ''))
+        msg, = self.check_first_message('send html', 1)
         self.assertEqual('text/html', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual(
@@ -264,8 +273,7 @@ class ConfigurationTest(LucteriosTest):
             self.assertEqual(True, will_mail_send())
             send_email('toto@machin.com', 'send with auth', 'OK!')
             self.assertEqual(1, self.server.count())
-            msg = email.message_from_string(self.server.get(0)[3])
-            self.assertEqual('send with auth', msg.get('Subject', ''))
+            msg, = self.check_first_message('send with auth', 1)
             self.assertEqual('OK!', decode_b64(msg.get_payload()))
             self.assertEqual(
                 ['', 'toto', 'abc123'], self.server.smtp.auth_params)
@@ -293,3 +301,37 @@ class ConfigurationTest(LucteriosTest):
             self.assertTrue(
                 'unknown protocol' in six.text_type(error), six.text_type(error))
         self.assertEqual(0, self.server.count())
+
+    def test_send_with_files(self):
+        file1 = BytesIO(get_binay('blablabla\blabla.'))
+        file2 = open(
+            join(dirname(__file__), 'images', 'config_mail.png'), mode='rb')
+        try:
+            self.config('localhost', 1025)
+            self.assertEqual(0, self.server.count())
+            self.assertEqual(True, will_mail_send())
+            send_email('toto@machin.com', 'send with files', '2 files sent!',
+                       [('filename1.txt', file1), ('filename2.png', file2)])
+            self.assertEqual(1, self.server.count())
+            self.assertEqual(
+                'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
+            self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
+            msg, msg_f1, msg_f2 = self.check_first_message(
+                'send with files', 3)
+            self.assertEqual('text/plain', msg.get_content_type())
+            self.assertEqual(
+                'base64', msg.get('Content-Transfer-Encoding', ''))
+            self.assertEqual('2 files sent!', decode_b64(msg.get_payload()))
+            self.assertEqual(None, self.server.smtp.auth_params)
+            self.assertTrue('filename1.txt' in msg_f1.get(
+                'Content-Type', ''), msg_f1.get('Content-Type', ''))
+            self.assertEqual(
+                'blablabla\blabla.', decode_b64(msg_f1.get_payload()))
+            self.assertTrue('filename2.png' in msg_f2.get(
+                'Content-Type', ''), msg_f2.get('Content-Type', ''))
+            file2.seek(0, SEEK_END)
+            self.assertEqual(
+                file2.tell(), len(b64decode(msg_f2.get_payload())))
+        finally:
+            file1.close()
+            file2.close()

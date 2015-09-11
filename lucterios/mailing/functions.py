@@ -35,6 +35,9 @@ from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.contacts.models import LegalEntity
 from datetime import datetime
 from lucterios.framework.tools import get_binay
+from email.utils import formatdate
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 
 def will_mail_send():
@@ -42,7 +45,7 @@ def will_mail_send():
     return (sender_email != '') and (Params.getvalue('mailing-smtpserver') != '')
 
 
-def send_email(recipients, subject, body):
+def send_email(recipients, subject, body, files=None):
     smtp_server = Params.getvalue('mailing-smtpserver')
     sender_email = LegalEntity.objects.get(id=1).email
     if (sender_email == '') or (smtp_server == ''):
@@ -60,11 +63,20 @@ def send_email(recipients, subject, body):
         subtype = 'html'
     else:
         subtype = 'plain'
-    msg = MIMEText(body, subtype, 'utf-8')
-    msg['To'] = ",".join(recipients)
-    msg['From'] = sender_email
-    msg['Subject'] = six.text_type(subject)
-    msg['Date'] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    msg = MIMEMultipart(
+        From=sender_email,
+        To=",".join(recipients),
+        Date=formatdate(localtime=True),
+        Subject=six.text_type(subject)
+    )
+    msg.attach(MIMEText(body, subtype, 'utf-8'))
+    if files:
+        for filename, file in files:
+            msg.attach(MIMEApplication(
+                file.read(),
+                Content_Disposition='attachment; filename="%s"' % filename,
+                Name=filename
+            ))
     server = None
     try:
         if smtp_security == 2:

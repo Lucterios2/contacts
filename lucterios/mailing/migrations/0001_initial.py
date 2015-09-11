@@ -69,6 +69,16 @@ def initial_values(apps, schema_editor):
     param.value = ''
     param.save()
 
+    param = Parameter.objects.create(
+        name='mailing-msg-connection', typeparam=0)
+    param.title = _("mailing-msg-connection")
+    param.args = "{'Multi': True}"
+    param.value = _('''Connection confirmation to your application:
+User:%(username)s
+Password:%(password)s
+''')
+    param.save()
+
 
 class Migration(migrations.Migration):
 

@@ -230,7 +230,7 @@ class ContactsMigrate(MigrateAbstract):
                     param_value = '0'
             if pname != '':
                 self.print_log(
-                    "=> parameter of account %s - %s", (pname, param_value))
+                    "=> parameter of contacts %s - %s", (pname, param_value))
                 Parameter.change_value(pname, param_value)
 
     def run(self):
