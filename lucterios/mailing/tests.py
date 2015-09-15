@@ -25,11 +25,15 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from shutil import rmtree
 from threading import Thread
+from asyncore import ExitNow
 from base64 import b64decode
+from os.path import join, dirname
 import smtpd
 import asyncore
 import logging
 import email
+from _io import BytesIO
+from io import SEEK_END
 
 from django.utils import six
 
@@ -37,24 +41,42 @@ from lucterios.framework.test import LucteriosTest
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.error import LucteriosException
-
-from lucterios.mailing.views import Configuration, SendEmailTry
-from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.framework.tools import get_binay
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.models import Parameter
-from lucterios.contacts.tests_contacts import change_ourdetail
-from asyncore import ExitNow
-from _io import BytesIO
-from os.path import join, dirname
-from lucterios.framework.tools import get_binay
-from io import SEEK_END
 from lucterios.CORE.views_usergroup import UsersEdit
+
+from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
+from lucterios.mailing.views import Configuration, SendEmailTry
+from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageValid,\
+    MessageEmail
+from unittest.case import TestCase
 
 
 def decode_b64(data):
     byte_string = data.encode('utf-8')
     decoded = b64decode(byte_string)
     return decoded.decode('utf-8')
+
+
+def configSMTP(server, port, security=0, user='', passwd=''):
+    param = Parameter.objects.get(name='mailing-smtpserver')
+    param.value = server
+    param.save()
+    param = Parameter.objects.get(name='mailing-smtpport')
+    param.value = port
+    param.save()
+    param = Parameter.objects.get(name='mailing-smtpsecurity')
+    param.value = security
+    param.save()
+    param = Parameter.objects.get(name='mailing-smtpuser')
+    param.value = user
+    param.save()
+    param = Parameter.objects.get(name='mailing-smtppass')
+    param.value = passwd
+    param.save()
+    Params.clear()
 
 
 class TestSMTPChannel(smtpd.SMTPChannel):
@@ -100,7 +122,10 @@ class TestSMTPServer(smtpd.SMTPServer):
             "email %s => %s", mailfrom, rcpttos)
 
 
-class TestReceiver(object):
+class TestReceiver(TestCase):
+
+    def __init__(self):
+        TestCase.__init__(self, methodName='stop')
 
     def start(self, port):
         self.smtp = TestSMTPServer(('0.0.0.0', port), None)
@@ -120,6 +145,13 @@ class TestReceiver(object):
     def get(self, index):
         return self.smtp.emails[index]
 
+    def check_first_message(self, subject, nb_multi):
+        msg = email.message_from_string(self.get(0)[3])
+        self.assertTrue(subject in msg.get(
+            'Content-Type', ''), msg.get('Content-Type', ''))
+        self.assertEqual(nb_multi, len(msg.get_payload()))
+        return msg.get_payload()
+
 
 class ConfigurationTest(LucteriosTest):
 
@@ -137,24 +169,6 @@ class ConfigurationTest(LucteriosTest):
     def tearDown(self):
         self.server.stop()
         LucteriosTest.tearDown(self)
-
-    def config(self, server, port, security=0, user='', passwd=''):
-        param = Parameter.objects.get(name='mailing-smtpserver')
-        param.value = server
-        param.save()
-        param = Parameter.objects.get(name='mailing-smtpport')
-        param.value = port
-        param.save()
-        param = Parameter.objects.get(name='mailing-smtpsecurity')
-        param.value = security
-        param.save()
-        param = Parameter.objects.get(name='mailing-smtpuser')
-        param.value = user
-        param.save()
-        param = Parameter.objects.get(name='mailing-smtppass')
-        param.value = passwd
-        param.save()
-        Params.clear()
 
     def test_config(self):
         self.factory.xfer = Configuration()
@@ -177,7 +191,7 @@ class ConfigurationTest(LucteriosTest):
             'COMPONENTS/LABELFORM[@name="mailing-msg-connection"]', 'Confirmation de connexion à votre application:\nAlias:%(username)s\nMot de passe:%(password)s\n')
 
     def test_tryemail_noconfig(self):
-        self.config('', 25)
+        configSMTP('', 25)
         self.assertEqual(0, self.server.count())
         self.factory.xfer = SendEmailTry()
         self.call('/lucterios.mailing/sendEmailTry', {}, False)
@@ -187,15 +201,8 @@ class ConfigurationTest(LucteriosTest):
             "EXCEPTION/MESSAGE", "Mauvais paramètrage du courriel")
         self.assertEqual(0, self.server.count())
 
-    def check_first_message(self, subject, nb_multi):
-        msg = email.message_from_string(self.server.get(0)[3])
-        self.assertTrue(subject in msg.get(
-            'Content-Type', ''), msg.get('Content-Type', ''))
-        self.assertEqual(nb_multi, len(msg.get_payload()))
-        return msg.get_payload()
-
     def test_tryemail_success(self):
-        self.config('localhost', 1025)
+        configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.factory.xfer = SendEmailTry()
         self.call('/lucterios.mailing/sendEmailTry', {}, False)
@@ -207,7 +214,7 @@ class ConfigurationTest(LucteriosTest):
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(
             ['mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
-        msg, = self.check_first_message('Essai de courriel', 1)
+        msg, = self.server.check_first_message('Essai de courriel', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual(
             'base64', msg.get('Content-Transfer-Encoding', ''))
@@ -215,7 +222,7 @@ class ConfigurationTest(LucteriosTest):
             'Courriel envoyé pour vérifier la configuration', decode_b64(msg.get_payload()))
 
     def test_send_no_config(self):
-        self.config('', 25)
+        configSMTP('', 25)
         self.assertEqual(0, self.server.count())
         self.assertEqual(False, will_mail_send())
         try:
@@ -226,7 +233,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(0, self.server.count())
 
     def test_send_bad_config(self):
-        self.config('localhost', 1125)
+        configSMTP('localhost', 1125)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
         try:
@@ -238,7 +245,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(0, self.server.count())
 
     def test_send_ok(self):
-        self.config('localhost', 1025)
+        configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
         send_email('toto@machin.com', 'send correct config', 'Yessss!!!')
@@ -246,43 +253,43 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg, = self.check_first_message('send correct config', 1)
+        msg, = self.server.check_first_message('send correct config', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
         self.assertEqual(None, self.server.smtp.auth_params)
 
     def test_send_html(self):
-        self.config('localhost', 1025)
+        configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
         send_email('toto@machin.com', 'send html',
-                   '<html><body><h1>Yessss!!!</h1></body><html>')
+                   '<html><body><h1>Yessss!!!</h1></body></html>')
         self.assertEqual(1, self.server.count())
         self.assertEqual(
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg, = self.check_first_message('send html', 1)
+        msg, = self.server.check_first_message('send html', 1)
         self.assertEqual('text/html', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual(
-            '<html><body><h1>Yessss!!!</h1></body><html>', decode_b64(msg.get_payload()))
+            '<html><body><h1>Yessss!!!</h1></body></html>', decode_b64(msg.get_payload()))
 
     def test_send_with_auth(self):
         if six.PY3:
             self.server.smtp.with_authentificate = True
-            self.config('localhost', 1025, 0, 'toto', 'abc123')
+            configSMTP('localhost', 1025, 0, 'toto', 'abc123')
             self.assertEqual(0, self.server.count())
             self.assertEqual(True, will_mail_send())
             send_email('toto@machin.com', 'send with auth', 'OK!')
             self.assertEqual(1, self.server.count())
-            msg, = self.check_first_message('send with auth', 1)
+            msg, = self.server.check_first_message('send with auth', 1)
             self.assertEqual('OK!', decode_b64(msg.get_payload()))
             self.assertEqual(
                 ['', 'toto', 'abc123'], self.server.smtp.auth_params)
 
     def test_send_with_starttls(self):
-        self.config('localhost', 1025, 1)
+        configSMTP('localhost', 1025, 1)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
         try:
@@ -294,7 +301,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(0, self.server.count())
 
     def test_send_with_ssl(self):
-        self.config('localhost', 1025, 2)
+        configSMTP('localhost', 1025, 2)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
         try:
@@ -310,7 +317,7 @@ class ConfigurationTest(LucteriosTest):
         file2 = open(
             join(dirname(__file__), 'images', 'config_mail.png'), mode='rb')
         try:
-            self.config('localhost', 1025)
+            configSMTP('localhost', 1025)
             self.assertEqual(0, self.server.count())
             self.assertEqual(True, will_mail_send())
             send_email('toto@machin.com', 'send with files', '2 files sent!',
@@ -319,7 +326,7 @@ class ConfigurationTest(LucteriosTest):
             self.assertEqual(
                 'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
             self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-            msg, msg_f1, msg_f2 = self.check_first_message(
+            msg, msg_f1, msg_f2 = self.server.check_first_message(
                 'send with files', 3)
             self.assertEqual('text/plain', msg.get_content_type())
             self.assertEqual(
@@ -340,14 +347,14 @@ class ConfigurationTest(LucteriosTest):
             file2.close()
 
     def test_user_withoutconfig(self):
-        self.config('', 25)
+        configSMTP('', 25)
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
         self.assert_count_equal('COMPONENTS/*', 39)
 
     def test_user_withconfig(self):
-        self.config('localhost', 1025)
+        configSMTP('localhost', 1025)
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
         self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
@@ -356,15 +363,221 @@ class ConfigurationTest(LucteriosTest):
             'COMPONENTS/LABELFORM[@name="lbl_password_generate"]', "{[b]}Générer un nouveau mot de passe?{[/b]}")
 
     def test_user_change_password(self):
-        self.config('localhost', 1025)
+        configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {'SAVE': 'YES', 'user_actif': '1',
                                       "password_generate": 'o', "email": 'admin@super.com'}, False)
         self.assert_observer('Core.Acknowledge', 'CORE', 'usersEdit')
         self.assertEqual(1, self.server.count())
-        msg, = self.check_first_message('Mot de passe de connexion', 1)
+        msg, = self.server.check_first_message('Mot de passe de connexion', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual(
             'Confirmation de connexion à votre application:\nAlias:admin\nMot de passe:', decode_b64(msg.get_payload())[:72])
+
+
+class MailingTest(LucteriosTest):
+
+    def setUp(self):
+        self.xfer_class = XferContainerAcknowledge
+        LucteriosTest.setUp(self)
+        change_ourdetail()
+        create_jack()
+
+    def test_messages(self):
+        self.factory.xfer = MessageList()
+        self.call('/lucterios.mailing/messageList', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 0)
+
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {}, False)
+        self.assert_observer(
+            'Core.Custom', 'lucterios.mailing', 'messageAddModify')
+        self.assert_count_equal('COMPONENTS/*', 5)
+
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                          '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageAddModify')
+
+        self.factory.xfer = MessageList()
+        self.call('/lucterios.mailing/messageList', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 1)
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="message"]/RECORD[1]/VALUE[@name="status"]', "ouvert")
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="message"]/RECORD[1]/VALUE[@name="date"]', '---')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="message"]/RECORD[1]/VALUE[@name="subject"]', 'new message')
+
+        self.factory.xfer = MessageDel()
+        self.call('/lucterios.mailing/messageDel',
+                  {'message': '1', 'CONFIRME': 'YES'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageDel')
+
+        self.factory.xfer = MessageList()
+        self.call('/lucterios.mailing/messageList', {}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 0)
+
+    def test_show_message(self):
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                          '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageAddModify')
+
+        self.factory.xfer = MessageShow()
+        self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 0)
+
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.AbstractContact', 'CRITERIA': ''}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': 'name||5||truc'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+
+        self.factory.xfer = MessageShow()
+        self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal('ACTIONS/ACTION', 3)
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Valider', 'images/ok.png', 'lucterios.mailing', 'messageValid', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[2]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="status"]', 'ouvert')
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/ACTIONS/ACTION', 2)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 3)
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD[1]/VALUE[@name="model"]', "Personne Physique")
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD[1]/VALUE[@name="filter"]', '{[b]}genre{[/b]} égal {[i]}"Homme"{[/i]}')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD[2]/VALUE[@name="model"]', "Contact Générique")
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD[3]/VALUE[@name="model"]', "Personne Morale")
+
+        self.factory.xfer = MessageDelRecipient()
+        self.call('/lucterios.mailing/messageDelRecipient',
+                  {'message': '1', 'recipient_list': '1', 'CONFIRME': 'YES'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageDelRecipient')
+
+        self.factory.xfer = MessageShow()
+        self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
+
+    def test_validate_message(self):
+        configSMTP('', 25)
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                          '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
+        self.factory.xfer = MessageValid()
+        self.call('/lucterios.mailing/messageValid',
+                  {'message': '1', 'CONFIRME': 'YES'}, False)
+        self.assert_observer(
+            'Core.Acknowledge', 'lucterios.mailing', 'messageValid')
+
+        self.factory.xfer = MessageShow()
+        self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_count_equal('COMPONENTS/*', 12)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'fermé')
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/ACTIONS/ACTION', 0)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="contact_nb"]', 'Message défini pour 2 contacts')
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
+
+        configSMTP('localhost', 1025)
+        self.factory.xfer = MessageShow()
+        self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_count_equal('ACTIONS/ACTION', 3)
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[2]', ('Courriels', 'lucterios.mailing/images/email.png', 'lucterios.mailing', 'messageEmail', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
+
+    def test_email_message(self):
+        configSMTP('localhost', 1025)
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                          '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
+        self.factory.xfer = MessageValid()
+        self.call('/lucterios.mailing/messageValid',
+                  {'message': '1', 'CONFIRME': 'YES'}, False)
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.assertEqual(0, server.count())
+            self.factory.xfer = MessageEmail()
+            self.call('/lucterios.mailing/messageEmail',
+                      {'message': '1', 'CONFIRME': 'YES'}, False)
+            self.assert_observer(
+                'Core.DialogBox', 'lucterios.mailing', 'messageEmail')
+            self.assertEqual(2, server.count())
+            self.assertEqual(
+                'mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(
+                ['mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            msg, = server.check_first_message('new message', 1)
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual(
+                'base64', msg.get('Content-Transfer-Encoding', ''))
+            self.assertEqual(
+                '<html><body><b><font color="blue">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye</body></html>', decode_b64(msg.get_payload()))
+        finally:
+            server.stop()

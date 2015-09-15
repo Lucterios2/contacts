@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-11 15:00+0000\n"
+"POT-Creation-Date: 2015-09-15 10:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -295,7 +295,7 @@ msgstr "structure type"
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:94 models.py:110 tools.py:54
+#: models.py:94 models.py:110 tools.py:59
 msgid "model"
 msgstr "model"
 
@@ -319,7 +319,7 @@ msgstr "Real"
 msgid "Boolean"
 msgstr "Boolean"
 
-#: models.py:97 tools.py:72 views_contacts.py:321
+#: models.py:97 tools.py:77 views_contacts.py:321
 msgid "Select"
 msgstr "Select"
 
@@ -446,6 +446,10 @@ msgstr "our detail"
 #: tools.py:40
 msgid "Select contact"
 msgstr "Select contact"
+
+#: tools.py:48
+msgid "ok"
+msgstr ""
 
 #: views.py:45 views.py:56
 msgid "View my account."
