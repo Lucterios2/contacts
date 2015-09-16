@@ -105,7 +105,7 @@ class MessageLetter(XferPrintReporting):
     field_id = 'message'
     caption = _("Write message")
 
-    def filter_callback(self, items):
+    def items_callback(self):
         items = []
         for current_contact in self.item.get_contacts():
             new_item = deepcopy(self.item)
