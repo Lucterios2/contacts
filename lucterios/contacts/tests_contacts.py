@@ -388,7 +388,7 @@ class ContactsTest(LucteriosTest):
         csv_value = b64decode(
             six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 6, str(content_csv))
+        self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
         self.assertEqual(
             content_csv[3].strip(), '"prénom";"nom";"adresse";"ville";"tel";"courriel";')
@@ -459,11 +459,12 @@ class ContactsTest(LucteriosTest):
         resp.save()
 
         print_field_list = Individual.get_all_print_fields()
-        self.assertEqual(33, len(print_field_list))
+        self.assertEqual(36, len(print_field_list))
         print_text = ""
 
         for print_field_item in print_field_list:
-            print_text += "#%s " % print_field_item[1]
+            if 'image' not in print_field_item[1]:
+                print_text += "#%s " % print_field_item[1]
         self.assertEqual(
             "#firstname #lastname #address #postal_code #city #country #tel1 #tel2 #email #comment ", print_text[:86])
         self.assertEqual(
@@ -782,7 +783,7 @@ class ContactsTest(LucteriosTest):
         csv_value = b64decode(
             six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 6, str(content_csv))
+        self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
         self.assertEqual(
             content_csv[3].strip(), '"nom";"adresse";"ville";"tel";"courriel";')
@@ -1072,7 +1073,7 @@ class ContactsTest(LucteriosTest):
                   {'individual': '2', "SAVE": "YES", "custom_1": 'boum!', "custom_2": "-67", "custom_3": "9.9", "custom_5": "2", "custom_6": "a{[br/]}z"}, False)
 
         print_field_list = Individual.get_all_print_fields()
-        self.assertEqual(46, len(print_field_list))
+        self.assertEqual(49, len(print_field_list))
         print_text = ""
         for print_field_item in print_field_list:
             if 'custom_' in print_field_item[1]:

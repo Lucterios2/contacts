@@ -29,6 +29,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
 from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
+from lucterios.framework.filetools import get_user_path, readimage_to_base64
+from os.path import exists, join, dirname
+import imghdr
 
 
 class PostalCode(LucteriosModel):
@@ -208,6 +211,10 @@ class AbstractContact(LucteriosModel):
                 contactcustomfield__field__id=cf_model.id)))
         return fieldnames
 
+    @classmethod
+    def get_print_fields(cls):
+        return [(_('contact'), 'str'), 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email']
+
     def get_custom_fields(self):
         import inspect
         fields = []
@@ -226,6 +233,17 @@ class AbstractContact(LucteriosModel):
         for cf_name, cf_model in item.get_custom_fields():
             fields.append((cf_model.name, cf_name))
         return fields
+
+    @property
+    def image(self):
+        img_path = get_user_path(
+            "contacts", "Image_%s.jpg" % self.abstractcontact_ptr_id)
+        if exists(img_path):
+            img = readimage_to_base64(img_path)
+        else:
+            img = readimage_to_base64(
+                join(dirname(__file__), "images", "NoImage.png"))
+        return img.decode('ascii')
 
     def __getattr__(self, name):
 
@@ -303,7 +321,7 @@ class LegalEntity(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
+        return ["image", "name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
                 'email', 'comment', 'identify_number', 'OUR_DETAIL']
 
     def __str__(self):
@@ -359,7 +377,7 @@ class Individual(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
+        return ["image", "firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
                 'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
 
     def __str__(self):

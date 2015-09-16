@@ -9,12 +9,13 @@ from lucterios.framework.xferadvance import XferListEditor
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
-from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage,\
-    CLOSE_YES, CLOSE_NO
+from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, CLOSE_NO,\
+    SELECT_SINGLE, FORMTYPE_MODAL
 from lucterios.contacts.tools import ContactSelection
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.mailing.functions import will_mail_send
-from lucterios.framework.error import LucteriosException, MINOR
+from lucterios.CORE.xferprint import XferPrintReporting
+from copy import deepcopy
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)
@@ -28,6 +29,12 @@ class MessageList(XferListEditor):
     field_id = 'message'
     caption = _("Messages")
 
+    def fillresponse(self):
+        XferListEditor.fillresponse(self)
+        grid = self.get_components(self.field_id)
+        grid.add_action(self.request, MessageClone.get_action(_("clone"), "images/add.png"),
+                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+
 
 @ActionsManage.affect('Message', 'modify', 'add')
 @MenuManage.describ('mailing.add_message')
@@ -37,6 +44,22 @@ class MessageAddModify(XferAddEditor):
     field_id = 'message'
     caption_add = _("Add message")
     caption_modify = _("Modify message")
+
+
+@MenuManage.describ('mailing.add_message')
+class MessageClone(XferContainerAcknowledge):
+    icon = "mailing.png"
+    model = Message
+    field_id = 'message'
+    caption = _("Add message")
+
+    def fillresponse(self):
+        self.item.id = None
+        self.item.date = None
+        self.item.status = 0
+        self.item.save()
+        self.redirect_action(ActionsManage.get_act_changed(
+            self.model.__name__, 'show', '', ''), {'params': {self.field_id: self.item.id}})
 
 
 @ActionsManage.affect('Message', 'show')
@@ -76,13 +99,19 @@ class MessageValid(XferContainerAcknowledge):
 
 @ActionsManage.affect('Message', 'letter')
 @MenuManage.describ('mailing.add_message')
-class MessageLetter(XferContainerAcknowledge):
+class MessageLetter(XferPrintReporting):
     icon = "mailing.png"
     model = Message
     field_id = 'message'
+    caption = _("Write message")
 
-    def fillresponse(self):
-        raise LucteriosException(MINOR, 'Not implemented')
+    def filter_callback(self, items):
+        items = []
+        for current_contact in self.item.get_contacts():
+            new_item = deepcopy(self.item)
+            new_item.contact = current_contact
+            items.append(new_item)
+        return items
 
 
 @ActionsManage.affect('Message', 'email')
@@ -97,7 +126,7 @@ class MessageEmail(XferContainerAcknowledge):
         if self.confirme(_("Do you want to sent this message?")):
             nb_sent, nb_failed = self.item.send_email()
             self.message(
-                _("Message sent to %d contact.{[br/]}Failure to %d contacts.") % (nb_sent, nb_failed))
+                _("Message sent to %(nbsent)d contact.{[br/]}Failure to %(nbfailed)d contacts.") % {'nbsent': nb_sent, 'nbfailed': nb_failed})
 
 
 @ActionsManage.affect('Message', 'delete')

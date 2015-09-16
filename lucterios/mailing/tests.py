@@ -50,7 +50,7 @@ from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 from lucterios.mailing.views import Configuration, SendEmailTry
 from lucterios.mailing.functions import will_mail_send, send_email
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageValid,\
-    MessageEmail
+    MessageEmail, MessageLetter
 from unittest.case import TestCase
 
 
@@ -435,7 +435,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal('COMPONENTS/*', 12)
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal(
             'ACTIONS/ACTION[1]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
@@ -463,7 +463,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal(
             'ACTIONS/ACTION[1]', ('Valider', 'images/ok.png', 'lucterios.mailing', 'messageValid', 0, 1, 1))
@@ -495,7 +495,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 11)
+        self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
 
@@ -519,7 +519,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 12)
+        self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'fermé')
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="recipient_list"]/ACTIONS/ACTION', 0)
@@ -581,3 +581,26 @@ class MailingTest(LucteriosTest):
                 '<html><body><b><font color="blue">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye</body></html>', decode_b64(msg.get_payload()))
         finally:
             server.stop()
+
+    def test_letter_message(self):
+        self.factory.xfer = MessageAddModify()
+        self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                          '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.call('/lucterios.mailing/messageValidRecipient',
+                  {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
+        self.factory.xfer = MessageValid()
+        self.call('/lucterios.mailing/messageValid',
+                  {'message': '1', 'CONFIRME': 'YES'}, False)
+
+        self.factory.xfer = MessageLetter()
+        self.call('/lucterios.mailing/messageLetter',
+                  {'message': '1', 'PRINT_MODE': '3', 'MODEL': 5}, False)
+        self.assert_observer(
+            'Core.Print', 'lucterios.mailing', 'messageLetter')
+        pdf_value = b64decode(
+            six.text_type(self.get_first_xpath('PRINT').text))
+        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))

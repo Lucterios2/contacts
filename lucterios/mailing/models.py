@@ -31,9 +31,9 @@ from django.apps import apps
 from lucterios.framework.models import LucteriosModel
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.tools import toHtml
-from lucterios.contacts.models import AbstractContact
 from lucterios.mailing.functions import will_mail_send, send_email
 from datetime import date
+from lucterios.contacts.models import AbstractContact
 
 
 class Message(LucteriosModel):
@@ -43,6 +43,8 @@ class Message(LucteriosModel):
         verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close'))))
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
+    contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_(
+        'contact'), null=True, on_delete=models.SET_NULL)
 
     @classmethod
     def get_default_fields(cls):
@@ -50,11 +52,15 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_show_fields(cls):
-        return [('status', 'date'), 'recipients', 'subject', 'body']
+        return [('status', 'date'), 'subject', 'recipients', 'body']
 
     @classmethod
     def get_edit_fields(cls):
         return ['subject', 'body']
+
+    @classmethod
+    def get_print_fields(cls):
+        return ['status', 'date', 'subject', 'body', 'contact', 'OUR_DETAIL']
 
     def get_recipients(self):
         for item in self.recipients.split('\n'):

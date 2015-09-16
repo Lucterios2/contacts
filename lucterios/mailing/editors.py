@@ -40,14 +40,9 @@ class MessageEditor(LucteriosEditor):
         return LucteriosEditor.edit(self, xfer)
 
     def show(self, xfer):
-        xfer.move_components('lbl_body', 0, 1)
-        xfer.move_components('body', 0, 1)
+        xfer.move_components('lbl_body', 0, 2)
+        xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
-        lbl = XferCompLabelForm('sep_body')
-        lbl.set_location(obj_recipients.col - 1, obj_recipients.row + 1, 4)
-        lbl.set_value("{[hr/]}")
-        xfer.add_component(lbl)
-        xfer.remove_component('recipients')
         new_recipients = XferCompGrid('recipient_list')
         new_recipients.set_location(
             obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
@@ -58,17 +53,23 @@ class MessageEditor(LucteriosEditor):
             new_recipients.set_value(compid, "model", model_title)
             new_recipients.set_value(compid, "filter", filter_desc)
             compid += 1
+        if compid > 0:
+            nb_contact = len(self.item.get_contacts())
+            contact_nb = XferCompLabelForm('contact_nb')
+            contact_nb.set_location(
+                obj_recipients.col, obj_recipients.row + 1, obj_recipients.colspan)
+            contact_nb.set_value(
+                _("Message defined for %d contacts") % nb_contact)
+            xfer.add_component(contact_nb)
+        lbl = XferCompLabelForm('sep_body')
+        lbl.set_location(obj_recipients.col - 1, obj_recipients.row + 2, 4)
+        lbl.set_value("{[hr/]}")
+        xfer.add_component(lbl)
+        xfer.remove_component('recipients')
         if self.item.status == 0:
             new_recipients.add_action(xfer.request, ActionsManage.get_act_changed(xfer.model.__name__, 'del_recipients', _(
                 "Delete"), "images/delete.png"), {'modal': FORMTYPE_MODAL, 'unique': SELECT_SINGLE})
             new_recipients.add_action(xfer.request, ActionsManage.get_act_changed(xfer.model.__name__, 'add_recipients', _(
                 "Add"), "images/add.png"), {'modal': FORMTYPE_MODAL, 'unique': SELECT_NONE})
         xfer.add_component(new_recipients)
-        if self.item.status == 1:
-            nb_contact = len(self.item.get_contacts())
-            contact_nb = XferCompLabelForm('contact_nb')
-            contact_nb.set_location(1, xfer.get_max_row() + 1, 4)
-            contact_nb.set_value(
-                _("Message defined for %d contacts") % nb_contact)
-            xfer.add_component(contact_nb)
         return LucteriosEditor.show(self, xfer)
