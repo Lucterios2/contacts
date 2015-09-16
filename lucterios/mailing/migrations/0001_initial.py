@@ -34,7 +34,6 @@ from lucterios.CORE.models import Parameter
 
 
 def initial_values(apps, schema_editor):
-    # pylint: disable=unused-argument, no-member
     translation.activate(settings.LANGUAGE_CODE)
 
     param = Parameter.objects.create(name='mailing-smtpserver', typeparam=0)
