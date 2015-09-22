@@ -32,7 +32,7 @@ class MessageList(XferListEditor):
     def fillresponse(self):
         XferListEditor.fillresponse(self)
         grid = self.get_components(self.field_id)
-        grid.add_action(self.request, MessageClone.get_action(_("clone"), "images/add.png"),
+        grid.add_action(self.request, MessageClone.get_action(_("clone"), "images/clone.png"),
                         {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
 
 
