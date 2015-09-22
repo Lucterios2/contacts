@@ -29,8 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO
 from lucterios.framework.xfergraphic import XferContainerCustom,\
     XferContainerAcknowledge
-from lucterios.framework.xfercomponents import XferCompButton, XferCompImage,\
-    XferCompLabelForm
+from lucterios.framework.xfercomponents import XferCompButton, XferCompImage
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
 from lucterios.framework.error import LucteriosException, IMPORTANT
