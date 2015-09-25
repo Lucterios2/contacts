@@ -174,7 +174,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Configuration()
         self.call('/lucterios.mailing/configuration', {}, False)
         self.assert_observer(
-            'Core.Custom', 'lucterios.mailing', 'configuration')
+            'core.custom', 'lucterios.mailing', 'configuration')
         self.assert_count_equal('CONTEXT', 0)
         self.assert_count_equal('COMPONENTS/*', 18)
         self.assert_xml_equal(
@@ -196,7 +196,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = SendEmailTry()
         self.call('/lucterios.mailing/sendEmailTry', {}, False)
         self.assert_observer(
-            'CORE.Exception', 'lucterios.mailing', 'sendEmailTry')
+            'core.exception', 'lucterios.mailing', 'sendEmailTry')
         self.assert_xml_equal(
             "EXCEPTION/MESSAGE", "Mauvais paramètrage du courriel")
         self.assertEqual(0, self.server.count())
@@ -207,7 +207,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = SendEmailTry()
         self.call('/lucterios.mailing/sendEmailTry', {}, False)
         self.assert_observer(
-            'Core.DialogBox', 'lucterios.mailing', 'sendEmailTry')
+            'core.dialogbox', 'lucterios.mailing', 'sendEmailTry')
         self.assert_xml_equal('TEXT', 'Courriel envoyé, veuillez verifier.')
         self.assertEqual(1, self.server.count())
         self.assertEqual(
@@ -350,14 +350,14 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('', 25)
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
-        self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
+        self.assert_observer('core.custom', 'CORE', 'usersEdit')
         self.assert_count_equal('COMPONENTS/*', 39)
 
     def test_user_withconfig(self):
         configSMTP('localhost', 1025)
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
-        self.assert_observer('Core.Custom', 'CORE', 'usersEdit')
+        self.assert_observer('core.custom', 'CORE', 'usersEdit')
         self.assert_count_equal('COMPONENTS/*', 41)
         self.assert_xml_equal(
             'COMPONENTS/LABELFORM[@name="lbl_password_generate"]', "{[b]}Générer un nouveau mot de passe?{[/b]}")
@@ -368,7 +368,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {'SAVE': 'YES', 'user_actif': '1',
                                       "password_generate": 'o', "email": 'admin@super.com'}, False)
-        self.assert_observer('Core.Acknowledge', 'CORE', 'usersEdit')
+        self.assert_observer('core.acknowledge', 'CORE', 'usersEdit')
         self.assertEqual(1, self.server.count())
         msg, = self.server.check_first_message('Mot de passe de connexion', 1)
         self.assertEqual('text/plain', msg.get_content_type())
@@ -388,24 +388,24 @@ class MailingTest(LucteriosTest):
     def test_messages(self):
         self.factory.xfer = MessageList()
         self.call('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
         self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 0)
 
         self.factory.xfer = MessageAddModify()
         self.call('/lucterios.mailing/messageAddModify', {}, False)
         self.assert_observer(
-            'Core.Custom', 'lucterios.mailing', 'messageAddModify')
+            'core.custom', 'lucterios.mailing', 'messageAddModify')
         self.assert_count_equal('COMPONENTS/*', 5)
 
         self.factory.xfer = MessageAddModify()
         self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
                                                           '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageAddModify')
+            'core.acknowledge', 'lucterios.mailing', 'messageAddModify')
 
         self.factory.xfer = MessageList()
         self.call('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
         self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 1)
         self.assert_xml_equal(
             'COMPONENTS/GRID[@name="message"]/RECORD[1]/VALUE[@name="status"]', "ouvert")
@@ -418,11 +418,11 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageDel',
                   {'message': '1', 'CONFIRME': 'YES'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageDel')
+            'core.acknowledge', 'lucterios.mailing', 'messageDel')
 
         self.factory.xfer = MessageList()
         self.call('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageList')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
         self.assert_count_equal('COMPONENTS/GRID[@name="message"]/RECORD', 0)
 
     def test_show_message(self):
@@ -430,11 +430,11 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
                                                           '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageAddModify')
+            'core.acknowledge', 'lucterios.mailing', 'messageAddModify')
 
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('COMPONENTS/*', 12)
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal(
@@ -448,21 +448,21 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+            'core.acknowledge', 'lucterios.mailing', 'messageValidRecipient')
         self.factory.xfer = MessageValidRecipient()
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.AbstractContact', 'CRITERIA': ''}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+            'core.acknowledge', 'lucterios.mailing', 'messageValidRecipient')
         self.factory.xfer = MessageValidRecipient()
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': 'name||5||truc'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageValidRecipient')
+            'core.acknowledge', 'lucterios.mailing', 'messageValidRecipient')
 
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal(
@@ -490,11 +490,11 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageDelRecipient',
                   {'message': '1', 'recipient_list': '1', 'CONFIRME': 'YES'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageDelRecipient')
+            'core.acknowledge', 'lucterios.mailing', 'messageDelRecipient')
 
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
@@ -514,11 +514,11 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageValid',
                   {'message': '1', 'CONFIRME': 'YES'}, False)
         self.assert_observer(
-            'Core.Acknowledge', 'lucterios.mailing', 'messageValid')
+            'core.acknowledge', 'lucterios.mailing', 'messageValid')
 
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'fermé')
         self.assert_count_equal(
@@ -536,7 +536,7 @@ class MailingTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
-        self.assert_observer('Core.Custom', 'lucterios.mailing', 'messageShow')
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal(
             'ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
@@ -567,7 +567,7 @@ class MailingTest(LucteriosTest):
             self.call('/lucterios.mailing/messageEmail',
                       {'message': '1', 'CONFIRME': 'YES'}, False)
             self.assert_observer(
-                'Core.DialogBox', 'lucterios.mailing', 'messageEmail')
+                'core.dialogbox', 'lucterios.mailing', 'messageEmail')
             self.assertEqual(2, server.count())
             self.assertEqual(
                 'mr-sylvestre@worldcompany.com', server.get(0)[1])
@@ -600,7 +600,7 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageLetter',
                   {'message': '1', 'PRINT_MODE': '3', 'MODEL': 5}, False)
         self.assert_observer(
-            'Core.Print', 'lucterios.mailing', 'messageLetter')
+            'core.print', 'lucterios.mailing', 'messageLetter')
         pdf_value = b64decode(
             six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
