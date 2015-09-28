@@ -148,7 +148,7 @@ class PostalCodeTest(LucteriosTest):
                   {'SAVE': 'YES', 'postal_code': '96999', 'city': 'Trifouilly', 'country': 'LOIN'}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'postalCodeAdd')
-        self.assert_count_equal('CONTEXT/PARAM', 4)
+        self.assert_count_equal('CONTEXT/PARAM', 3)
 
         self.factory.xfer = PostalCodeList()
         self.call('/lucterios.contacts/postalCodeList',
@@ -287,7 +287,7 @@ class ConfigurationTest(LucteriosTest):
                                                            "identify_number": 'AZERTY123DDSQ'}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'currentAddModify')
-        self.assert_count_equal('CONTEXT/PARAM', 11)
+        self.assert_count_equal('CONTEXT/PARAM', 10)
 
         self.factory.xfer = CurrentStructure()
         self.call('/lucterios.contacts/currentStructure', {}, False)
