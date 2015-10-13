@@ -30,7 +30,7 @@ setup(
     name="lucterios-contacts",
     version=__version__,
     author="Lucterios",
-    author_email="support@lucterios.org",
+    author_email="info@lucterios.org",
     url="http://www.lucterios.org",
     description="contacts managment module for Lucterios framework.",
     long_description="""
@@ -40,9 +40,8 @@ setup(
     platforms=('Any',),
     license="GNU General Public License v3",
     classifiers=[
-        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
-        'Framework :: Django :: 1.7',
+        'Framework :: Django :: 1.8',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
