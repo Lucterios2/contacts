@@ -892,31 +892,31 @@ class ContactsTest(LucteriosTest):
     def test_custom_fields_added(self):
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'aaa', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '0', 'args_multi': '0', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
+                                                               'kind': '0', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'bbb', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '1', 'args_multi': '0', 'args_min': '0', 'args_max': '100', 'args_prec': '0', 'args_list': ''}, False)
+                                                               'kind': '1', 'args_multi': 'n', 'args_min': '0', 'args_max': '100', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ccc', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '2', 'args_multi': '0', 'args_min': '-10.0', 'args_max': '10.0', 'args_prec': '1', 'args_list': ''}, False)
+                                                               'kind': '2', 'args_multi': 'n', 'args_min': '-10.0', 'args_max': '10.0', 'args_prec': '1', 'args_list': ''}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ddd', 'modelname': 'contacts.LegalEntity',
-                                                               'kind': '3', 'args_multi': '0', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
+                                                               'kind': '3', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
         self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'eee', 'modelname': 'contacts.Individual',
-                                                               'kind': '4', 'args_multi': '0', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': 'U,V,W,X,Y,Z'}, False)
+                                                               'kind': '4', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': 'U,V,W,X,Y,Z'}, False)
         self.assert_observer(
             'core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 

@@ -127,10 +127,12 @@ parent.get('args_list').setVisible(type==4);
         for arg_name in ['min', 'max', 'prec', 'list', 'multi']:
             args_val = xfer.getparam('args_' + arg_name)
             if args_val is not None:
-                if arg_name != 'list':
-                    args[arg_name] = float(args_val)
-                else:
+                if arg_name == 'list':
                     args[arg_name] = args_val
+                elif arg_name == 'multi':
+                    args[arg_name] = (args_val != 'False') and (args_val != '0') and (args_val != '') and (args_val != 'n') 
+                else:
+                    args[arg_name] = float(args_val)
         self.item.args = six.text_type(args)
         LucteriosEditor.saving(self, xfer)
         self.item.save()
