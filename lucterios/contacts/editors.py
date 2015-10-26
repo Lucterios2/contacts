@@ -130,7 +130,8 @@ parent.get('args_list').setVisible(type==4);
                 if arg_name == 'list':
                     args[arg_name] = args_val
                 elif arg_name == 'multi':
-                    args[arg_name] = (args_val != 'False') and (args_val != '0') and (args_val != '') and (args_val != 'n') 
+                    args[arg_name] = (args_val != 'False') and (
+                        args_val != '0') and (args_val != '') and (args_val != 'n')
                 else:
                     args[arg_name] = float(args_val)
         self.item.args = six.text_type(args)
