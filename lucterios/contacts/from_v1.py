@@ -242,4 +242,6 @@ class ContactsMigrate(MigrateAbstract):
         finally:
             self.old_db.close()
         self.old_db.objectlinks['abstracts'] = self.abstract_list
+        self.old_db.objectlinks['legalentity'] = self.legalentity_list
+        self.old_db.objectlinks['individual'] = self.individual_list
         return
