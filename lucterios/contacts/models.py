@@ -24,6 +24,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 from os.path import exists, join, dirname
+import logging
 
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -182,7 +183,7 @@ class AbstractContact(LucteriosModel):
     postal_code = models.CharField(
         _('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
-    country = models.CharField(_('country'), max_length=100, blank=False)
+    country = models.CharField(_('country'), max_length=100, blank=True)
     tel1 = models.CharField(_('tel1'), max_length=15, blank=True)
     tel2 = models.CharField(_('tel2'), max_length=15, blank=True)
     email = models.EmailField(_('email'), blank=True)
@@ -224,16 +225,82 @@ class AbstractContact(LucteriosModel):
             select_list.extend(sub_class.get_select_contact_type())
         return select_list
 
-    def get_custom_fields(self):
+    @classmethod
+    def get_custom_fields(cls):
         import inspect
         fields = []
         model_list = []
-        for sub_class in inspect.getmro(self.__class__):
+        for sub_class in inspect.getmro(cls):
             if hasattr(sub_class, "get_long_name"):
                 model_list.append(sub_class.get_long_name())
         for cf_model in CustomField.objects.filter(modelname__in=model_list):
             fields.append((cf_model.get_fieldname(), cf_model))
         return fields
+
+    @classmethod
+    def get_import_fields(cls):
+        fields = []
+        for field in cls.get_edit_fields():
+            if isinstance(field, tuple):
+                fields.extend(field)
+            else:
+                fields.append(field)
+        for field in cls.get_custom_fields():
+            fields.append((field[0], field[1].name))
+        return fields
+
+    @classmethod
+    def import_data(cls, csv_data):
+        from django.db.models.fields import IntegerField
+        nb = 0
+        for rowdata in csv_data:
+            try:
+                new_item = cls()
+                for fieldname, fieldvalue in rowdata.items():
+                    dep_field = cls.get_field_by_name(fieldname)
+                    if isinstance(dep_field, IntegerField):
+                        if (dep_field.choices is not None) and (len(dep_field.choices) > 0):
+                            for choice in dep_field.choices:
+                                if fieldvalue == choice[1]:
+                                    fieldvalue = choice[0]
+                        if not isinstance(fieldvalue, int):
+                            fieldvalue = 0
+                    setattr(new_item, fieldname, fieldvalue)
+                new_item.save()
+                new_item.set_custom_values(rowdata)
+                nb += 1
+            except:
+                logging.getLogger(
+                    'lucterios.contacts').exception("import_data")
+                pass
+        return nb
+
+    def set_custom_values(self, params):
+        for cf_name, cf_model in self.get_custom_fields():
+            if cf_name in params.keys():
+                cf_value = params[cf_name]
+                cf_id = int(cf_name[7:])
+                cf_model = CustomField.objects.get(id=cf_id)
+                try:
+                    if cf_model.kind == 1:
+                        cf_value = int(cf_value)
+                    if cf_model.kind == 2:
+                        cf_value = float(cf_value)
+                    if cf_model.kind == 3:
+                        cf_value = (cf_value != 'False') and (cf_value != '0') and (
+                            cf_value != '') and (cf_value != 'n')
+                    if cf_model.kind == 4:
+                        args_list = cf_model.get_args()['list']
+                        if args_list.count(cf_value) > 0:
+                            cf_value = args_list.index(cf_value)
+                        else:
+                            cf_value = int(cf_value)
+                except:
+                    cf_value = ""
+                ccf_model = ContactCustomField.objects.get_or_create(
+                    contact=self, field=cf_model)
+                ccf_model[0].value = six.text_type(cf_value)
+                ccf_model[0].save()
 
     @classmethod
     def get_all_print_fields(cls, with_plugin=True):
@@ -255,7 +322,6 @@ class AbstractContact(LucteriosModel):
         return img.decode('ascii')
 
     def __getattr__(self, name):
-
         if name == "str":
             return six.text_type(self.get_final_child())
         elif name[:7] == "custom_":
@@ -288,7 +354,6 @@ class AbstractContact(LucteriosModel):
         raise AttributeError(name)
 
     class Meta(object):
-
         verbose_name = _('generic contact')
         verbose_name_plural = _('generic contacts')
 

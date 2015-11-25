@@ -23,23 +23,33 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+from datetime import datetime
+from _io import StringIO, TextIOWrapper
+from csv import DictReader
+from _csv import QUOTE_NONE, QUOTE_ALL
+from copy import deepcopy
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
+from django.apps.registry import apps
+from django.db.models.fields import DateField
 from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
     FORMTYPE_MODAL
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid,\
+    XferCompSelect, XferCompUpLoad
+from lucterios.framework import signal_and_lock
+from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
-from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual, \
-    CustomField
-from lucterios.framework import signal_and_lock
 from lucterios.CORE.parameters import Params
+from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual, \
+    CustomField, AbstractContact
 
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
@@ -299,6 +309,234 @@ class PostalCodeList(XferListEditor):
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = Q(postal_code__startswith=filter_postal_code)
+
+
+@MenuManage.describ('contacts.change_postalcode', FORMTYPE_MODAL, 'contact.conf', _('Tool to import contacts from CSV file.'))
+class ContactImport(XferContainerCustom):
+    caption = _("Contact import")
+    icon = "contactsConfig.png"
+
+    def __init__(self, **kwargs):
+        XferContainerCustom.__init__(self, **kwargs)
+        self.model = None
+        self.quotechar = ""
+        self.delimiter = ""
+        self.encoding = ""
+        self.dateformat = ""
+        self.spamreader = None
+
+    def _select_csv_parameters(self):
+        lbl = XferCompLabelForm('lbl_modelname')
+        lbl.set_value_as_name(_('model'))
+        lbl.set_location(1, 0)
+        self.add_component(lbl)
+        model_select = XferCompSelect('modelname')
+        model_select.set_value("")
+        model_select.set_select(AbstractContact.get_select_contact_type(False))
+        model_select.set_location(2, 0, 3)
+        self.add_component(model_select)
+        lbl = XferCompLabelForm('lbl_csvcontent')
+        lbl.set_value_as_name(_('CSV file'))
+        lbl.set_location(1, 1)
+        self.add_component(lbl)
+        upld = XferCompUpLoad('csvcontent')
+        upld.http_file = True
+        upld.add_filter(".csv")
+        upld.set_location(2, 1, 3)
+        self.add_component(upld)
+        lbl = XferCompLabelForm('lbl_encoding')
+        lbl.set_value_as_name(_('encoding'))
+        lbl.set_location(1, 2)
+        self.add_component(lbl)
+        lbl = XferCompEdit('encoding')
+        lbl.set_value('utf-8')
+        lbl.set_location(2, 2)
+        self.add_component(lbl)
+        lbl = XferCompLabelForm('lbl_dateformat')
+        lbl.set_value_as_name(_('date format'))
+        lbl.set_location(3, 2)
+        self.add_component(lbl)
+        lbl = XferCompEdit('dateformat')
+        lbl.set_value('%d/%m/%Y')
+        lbl.set_location(4, 2)
+        self.add_component(lbl)
+        lbl = XferCompLabelForm('lbl_delimiter')
+        lbl.set_value_as_name(_('delimiter'))
+        lbl.set_location(1, 3)
+        self.add_component(lbl)
+        lbl = XferCompEdit('delimiter')
+        lbl.set_value(';')
+        lbl.set_location(2, 3)
+        self.add_component(lbl)
+        lbl = XferCompLabelForm('lbl_quotechar')
+        lbl.set_value_as_name(_('quotechar'))
+        lbl.set_location(3, 3)
+        self.add_component(lbl)
+        lbl = XferCompEdit('quotechar')
+        lbl.set_value("'")
+        lbl.set_location(4, 3)
+        self.add_component(lbl)
+        return lbl
+
+    def _read_csv(self):
+        if self.quotechar == '':
+            current_quoting = QUOTE_NONE
+        else:
+            current_quoting = QUOTE_ALL
+        if 'csvcontent' in self.request.FILES.keys():
+            csvfile = TextIOWrapper(
+                self.request.FILES['csvcontent'].file, encoding=self.encoding, errors='replace')
+            self.params['csvcontent'] = "".join(csvfile.readlines())
+            csvfile.seek(0)
+        else:
+            csvfile = StringIO(self.getparam('csvcontent', ''))
+        self.spamreader = DictReader(
+            csvfile, delimiter=self.delimiter, quotechar=self.quotechar, quoting=current_quoting)
+        if (self.spamreader.fieldnames is None) or (len(self.spamreader.fieldnames) == 0):
+            raise LucteriosException(IMPORTANT, _('CSV file unvalid!'))
+
+    def _select_fields(self):
+        select_list = [('', None)]
+        for fieldname in self.spamreader.fieldnames:
+            select_list.append((fieldname, fieldname))
+        row = 0
+        for fieldname in self.model.get_import_fields():
+            if isinstance(fieldname, tuple):
+                fieldname, title = fieldname
+                is_need = False
+            else:
+                dep_field = self.model.get_field_by_name(fieldname)
+                title = dep_field.verbose_name
+                is_need = not dep_field.blank and not dep_field.null
+            lbl = XferCompLabelForm('lbl_' + fieldname)
+            lbl.set_value_as_name(title)
+            lbl.set_location(1, row)
+            self.add_component(lbl)
+            lbl = XferCompSelect('fld_' + fieldname)
+            lbl.set_select(deepcopy(select_list))
+            lbl.set_value("")
+            lbl.set_needed(is_need)
+            lbl.set_location(2, row)
+            self.add_component(lbl)
+            row += 1
+
+    def _show_initial_csv(self):
+        tbl = XferCompGrid('CSV')
+        for fieldname in self.spamreader.fieldnames:
+            tbl.add_header(fieldname, fieldname)
+        row_idx = 1
+        for row in self.spamreader:
+            if row[self.spamreader.fieldnames[-1]] is not None:
+                for fieldname in self.spamreader.fieldnames:
+                    tbl.set_value(row_idx, fieldname, row[fieldname])
+                row_idx += 1
+        tbl.set_location(1, 1, 2)
+        self.add_component(tbl)
+
+    def _read_csv_and_convert(self):
+        fields_association = {}
+        for param_key in self.params.keys():
+            if (param_key[:4] == 'fld_') and (self.params[param_key] != ""):
+                fields_association[param_key[4:]] = self.params[param_key]
+        fields_description = []
+        for fieldname in self.model.get_import_fields():
+            if isinstance(fieldname, tuple):
+                fieldname, title = fieldname
+            else:
+                dep_field = self.model.get_field_by_name(fieldname)
+                title = dep_field.verbose_name
+                is_date = isinstance(dep_field, DateField)
+            if fieldname in fields_association.keys():
+                fields_description.append(
+                    (fieldname, title, is_date))
+        self._read_csv()
+        csv_readed = []
+        for row in self.spamreader:
+            if row[self.spamreader.fieldnames[-1]] is not None:
+                new_row = {}
+                for field_description in fields_description:
+                    if field_description[2]:
+                        try:
+                            new_row[field_description[0]] = datetime.strptime(
+                                row[fields_association[field_description[0]]], self.dateformat).date()
+                        except (TypeError, ValueError):
+                            new_row[field_description[0]] = datetime.today()
+                    else:
+                        new_row[field_description[0]] = row[
+                            fields_association[field_description[0]]]
+                csv_readed.append(new_row)
+        return fields_description, csv_readed
+
+    def fillresponse(self, modelname, quotechar, delimiter, encoding, dateformat, step=0):
+        if modelname is not None:
+            self.model = apps.get_model(modelname)
+        self.quotechar = quotechar
+        self.delimiter = delimiter
+        self.encoding = encoding
+        self.dateformat = dateformat
+
+        img = XferCompImage('img')
+        img.set_value(self.icon_path())
+        img.set_location(0, 0, 1, 6)
+        self.add_component(img)
+        if step == 0:
+            lbl = self._select_csv_parameters()
+            step = 1
+        elif step == 1:
+            lbl = XferCompLabelForm('lbl_modelname')
+            lbl.set_value_as_name(_('model'))
+            lbl.set_location(1, 0)
+            self.add_component(lbl)
+            lbl = XferCompLabelForm('modelname')
+            lbl.set_value(self.model._meta.verbose_name.title())
+            lbl.set_location(2, 0)
+            self.add_component(lbl)
+            self._read_csv()
+            self.new_tab(_("Fields"))
+            self._select_fields()
+            self.new_tab(_("Current content"))
+            self._show_initial_csv()
+            step = 2
+        elif step == 2:
+            lbl = XferCompLabelForm('lbl_modelname')
+            lbl.set_value_as_name(_('model'))
+            lbl.set_location(1, 0)
+            self.add_component(lbl)
+            lbl = XferCompLabelForm('modelname')
+            lbl.set_value(self.model._meta.verbose_name.title())
+            lbl.set_location(2, 0)
+            self.add_component(lbl)
+            fields_description, csv_readed = self._read_csv_and_convert()
+            tbl = XferCompGrid('CSV')
+            for field_description in fields_description:
+                tbl.add_header(field_description[0], field_description[1])
+            row_idx = 1
+            for row in csv_readed:
+                for field_description in fields_description:
+                    tbl.set_value(
+                        row_idx, field_description[0], row[field_description[0]])
+                row_idx += 1
+            tbl.set_location(1, 1, 2)
+            self.add_component(tbl)
+            lbl = XferCompLabelForm('nb_line')
+            lbl.set_value(_("Total number of contacts: %d") % (row_idx - 1))
+            lbl.set_location(1, 2, 2)
+            self.add_component(lbl)
+            step = 3
+        elif step == 3:
+            fields_description, csv_readed = self._read_csv_and_convert()
+            nb = self.model.import_data(csv_readed)
+            lbl = XferCompLabelForm('result')
+            lbl.set_value_as_header(_("%d contacts are been imported") % nb)
+            lbl.set_location(1, 2, 2)
+            self.add_component(lbl)
+            step = 4
+        if step < 4:
+            self.add_action(self.get_action(_('Ok'), "images/ok.png"),
+                            {'close': CLOSE_NO, 'modal': FORMTYPE_REFRESH, 'params': {'step': step}})
+            self.add_action(WrapAction(_("Cancel"), "images/cancel.png"), {})
+        else:
+            self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 
 @signal_and_lock.Signal.decorate('config')

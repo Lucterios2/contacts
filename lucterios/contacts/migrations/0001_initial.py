@@ -211,7 +211,7 @@ class Migration(migrations.Migration):
                 ('city', models.CharField(
                     max_length=100, verbose_name='city', blank=False)),
                 ('country', models.CharField(
-                    max_length=100, verbose_name='country', blank=False)),
+                    max_length=100, verbose_name='country', blank=True)),
                 ('tel1', models.CharField(
                     max_length=15, blank=True, verbose_name='tel1')),
                 ('tel2', models.CharField(

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-16 15:37+0000\n"
+"POT-Creation-Date: 2015-11-25 17:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -129,43 +129,43 @@ msgstr "date"
 msgid "contact"
 msgstr "contact"
 
-#: views.py:42
+#: views.py:41
 msgid "Change mailing parameters"
 msgstr "Change mailing parameters"
 
-#: views.py:45
+#: views.py:44
 msgid "Mailing parameters"
 msgstr "Mailing parameters"
 
-#: views.py:49
+#: views.py:48
 msgid "EMail configuration"
 msgstr "EMail configuration"
 
-#: views.py:61 views.py:81
+#: views.py:60 views.py:80
 msgid "Modify"
 msgstr "Modify"
 
-#: views.py:67
+#: views.py:66
 msgid "Send"
 msgstr "Send"
 
-#: views.py:70
+#: views.py:69
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:88 views.py:94
+#: views.py:87 views.py:93
 msgid "EMail try"
 msgstr "EMail try"
 
-#: views.py:92
+#: views.py:91
 msgid "Bad email parameter!"
 msgstr "Bad email parameter!"
 
-#: views.py:94
+#: views.py:93
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:95
+#: views.py:94
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 

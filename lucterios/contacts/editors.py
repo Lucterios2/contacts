@@ -37,8 +37,7 @@ from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
-from lucterios.contacts.models import AbstractContact, PostalCode, ContactCustomField, \
-    CustomField
+from lucterios.contacts.models import AbstractContact, PostalCode
 from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
 
@@ -284,16 +283,7 @@ class AbstractContactEditor(LucteriosEditor):
                     image.save(image_file, 'JPEG', quality=90)
             unlink(tmp_file)
         LucteriosEditor.saving(self, xfer)
-        for cf_name, cf_model in self.item.get_custom_fields():
-            cf_value = xfer.getparam(cf_name)
-            if cf_value is not None:
-                cf_id = int(cf_name[7:])
-                cf_model = CustomField.objects.get(
-                    id=cf_id)
-                ccf_model = ContactCustomField.objects.get_or_create(
-                    contact=self.item, field=cf_model)
-                ccf_model[0].value = six.text_type(cf_value)
-                ccf_model[0].save()
+        self.item.set_custom_values(xfer.params)
 
     def add_email_selector(self, xfer, col, row, colspan):
 
