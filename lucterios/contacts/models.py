@@ -23,6 +23,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+from os.path import exists, join, dirname
 
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -30,8 +31,6 @@ from django.db import models
 
 from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
-from os.path import exists, join, dirname
-import imghdr
 
 
 class PostalCode(LucteriosModel):
@@ -214,6 +213,16 @@ class AbstractContact(LucteriosModel):
     @classmethod
     def get_print_fields(cls):
         return [(_('contact'), 'str'), 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email']
+
+    @classmethod
+    def get_select_contact_type(cls, with_current=True):
+        select_list = []
+        if with_current:
+            select_list.append(
+                (cls.get_long_name(), cls._meta.verbose_name.title()))
+        for sub_class in cls.__subclasses__():
+            select_list.extend(sub_class.get_select_contact_type())
+        return select_list
 
     def get_custom_fields(self):
         import inspect

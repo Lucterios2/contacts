@@ -84,31 +84,39 @@ def initial_values(apps, schema_editor):
     param.save()
 
 
+def _save_postalcodes(postalcode, pc_list):
+    try:
+        with transaction.atomic():
+            postalcode.objects.bulk_create(pc_list)
+    except IntegrityError as err:
+        getLogger(__name__).warning(
+            six.text_type(" --- IntegrityError:") + six.text_type(err))
+    return []
+
+
 def initial_postalcodes(apps, schema_editor):
-    # pylint: disable=unused-argument
     import codecs
     pcfilename_prefix = 'postalcode_'
     if (len(sys.argv) >= 2) and (sys.argv[1] == 'test'):
         pcfilename_prefix = 'postalcode_frDOMTOM'
     postalcode = apps.get_model("contacts", "PostalCode")
+    pc_list = []
     migrat_dir = dirname(__file__)
     for pcfile in listdir(migrat_dir):
         if pcfile.endswith(".csv") and pcfile.startswith(pcfilename_prefix):
             with codecs.open(join(migrat_dir, pcfile), 'r', 'utf-8') as flpc:
                 for line in flpc.readlines():
-                    try:
-                        postal_code, city, country = six.text_type(
-                            line).split(';')[:3]
-                        with transaction.atomic():
-                            newpc = postalcode.objects.create()
-                            newpc.postal_code = six.text_type(
-                                postal_code).strip()
-                            newpc.city = six.text_type(city).strip()
-                            newpc.country = six.text_type(country).strip()
-                            newpc.save()
-                    except IntegrityError:
-                        getLogger(__name__).warning(
-                            six.text_type(" --- IntegrityError:") + six.text_type(line))
+                    postal_code, city, country = six.text_type(
+                        line).split(';')[:3]
+                    newpc = postalcode()
+                    newpc.postal_code = six.text_type(postal_code).strip()
+                    newpc.city = six.text_type(city).strip()
+                    newpc.country = six.text_type(country).strip()
+                    pc_list.append(newpc)
+                    if len(pc_list) > 900:
+                        pc_list = _save_postalcodes(postalcode, pc_list)
+    if len(pc_list) > 0:
+        pc_list = _save_postalcodes(postalcode, pc_list)
 
 
 class Migration(migrations.Migration):

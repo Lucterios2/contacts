@@ -94,15 +94,9 @@ class CustomFieldEditor(LucteriosEditor):
         xfer.remove_component('modelname')
         model_current = obj_model.value
         xfer.tab = obj_model.tab
-        model_list = []
-        model_list.append((AbstractContact.get_long_name(), AbstractContact._meta.verbose_name.title(
-        )))
-        for sub_class in AbstractContact.__subclasses__():
-            model_list.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title(
-            )))
         model_select = XferCompSelect('modelname')
         model_select.set_value(model_current)
-        model_select.set_select(model_list)
+        model_select.set_select(AbstractContact.get_select_contact_type())
         model_select.set_location(
             obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
         model_select.set_size(obj_model.vmin, obj_model.hmin)
