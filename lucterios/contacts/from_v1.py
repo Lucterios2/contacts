@@ -141,16 +141,12 @@ class ContactsMigrate(MigrateAbstract):
         legalentity_mdl.objects.all().delete()
         cur = self.old_db.open()
         cur.execute(
-            "SELECT id, superId, raisonSociale, type, siren FROM org_lucterios_contacts_personneMorale")
+            "SELECT id, superId, raisonSociale, type, siren FROM org_lucterios_contacts_personneMorale ORDER BY id")
         for legalentityid, legalentity_super, legalentity_name, legalentity_type, legalentity_siren in cur.fetchall():
             self.print_log(
                 "=> LegalEntity[%d] %s (siren=%s)", (legalentityid, legalentity_name, legalentity_siren))
-            if legalentityid == 1:
-                new_legalentity = legalentity_mdl.objects.create(
-                    id=1, name=legalentity_name)
-            else:
-                new_legalentity = legalentity_mdl.objects.create(
-                    name=legalentity_name)
+            new_legalentity = legalentity_mdl.objects.create(
+                name=legalentity_name)
             assign_abstact_values(new_legalentity, legalentity_super)
             if legalentity_type in self.structuretype_list.keys():
                 new_legalentity.structure_type = self.structuretype_list[
@@ -158,6 +154,8 @@ class ContactsMigrate(MigrateAbstract):
             if legalentity_siren is not None:
                 new_legalentity.identify_number = legalentity_siren
             new_legalentity.save()
+            if (legalentityid == 1) and (new_legalentity.id !=1):
+                raise Exception("No first legal entity")
             self.legalentity_list[legalentityid] = new_legalentity
             self.abstract_list[legalentity_super] = new_legalentity
 
