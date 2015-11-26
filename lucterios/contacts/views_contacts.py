@@ -40,6 +40,7 @@ from lucterios.contacts.models import LegalEntity, Individual, Responsability, \
     AbstractContact
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
+from django.apps.registry import apps
 
 MenuManage.add_sub(
     "office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
@@ -357,6 +358,8 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
+        self.add_action(AbstractContactFindDouble.get_action(
+            _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
 
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
@@ -369,6 +372,26 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
+        self.add_action(AbstractContactFindDouble.get_action(
+            _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
+
+
+@MenuManage.describ('contacts.add_abstractcontact')
+class AbstractContactFindDouble(XferListEditor):
+    caption = _("Contact duplication searching")
+    icon = "contacts.png"
+    model = AbstractContact
+    field_id = 'abstractcontact'
+
+    def fillresponse_header(self):
+        self.action_grid = self.action_grid[:-1]
+        self.filter = self.model.get_query_for_duplicate()
+
+    def fillresponse(self, modelname, field_id):
+        if modelname is not None:
+            self.model = apps.get_model(modelname)
+        self.field_id = field_id
+        XferListEditor.fillresponse(self)
 
 
 @ActionsManage.affect('AbstractContact', 'show')
