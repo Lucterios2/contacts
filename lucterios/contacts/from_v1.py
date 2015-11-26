@@ -139,6 +139,11 @@ class ContactsMigrate(MigrateAbstract):
                 copyfile(old_image_filename, new_image_filename)
         legalentity_mdl = apps.get_model("contacts", "LegalEntity")
         legalentity_mdl.objects.all().delete()
+        individual_mdl = apps.get_model("contacts", "Individual")
+        individual_mdl.objects.all().delete()
+        abstractcontact_mdl = apps.get_model("contacts", "AbstractContact")
+        abstractcontact_mdl.objects.all().delete()
+
         cur = self.old_db.open()
         cur.execute(
             "SELECT id, superId, raisonSociale, type, siren FROM org_lucterios_contacts_personneMorale ORDER BY id")
@@ -154,13 +159,12 @@ class ContactsMigrate(MigrateAbstract):
             if legalentity_siren is not None:
                 new_legalentity.identify_number = legalentity_siren
             new_legalentity.save()
-            if (legalentityid == 1) and (new_legalentity.id !=1):
-                raise Exception("No first legal entity")
+            if (legalentityid == 1) and (new_legalentity.id != 1):
+                new_legalentity.id = 1
+                new_legalentity.save()
             self.legalentity_list[legalentityid] = new_legalentity
             self.abstract_list[legalentity_super] = new_legalentity
 
-        individual_mdl = apps.get_model("contacts", "Individual")
-        individual_mdl.objects.all().delete()
         cur = self.old_db.open()
         cur.execute(
             "SELECT id, superId, nom, prenom, sexe, user FROM org_lucterios_contacts_personnePhysique")
