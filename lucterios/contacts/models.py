@@ -239,41 +239,21 @@ class AbstractContact(LucteriosModel):
 
     @classmethod
     def get_import_fields(cls):
-        fields = []
-        for field in cls.get_edit_fields():
-            if isinstance(field, tuple):
-                fields.extend(field)
-            else:
-                fields.append(field)
+        fields = super(AbstractContact, cls).get_import_fields()
         for field in cls.get_custom_fields():
             fields.append((field[0], field[1].name))
         return fields
 
     @classmethod
-    def import_data(cls, csv_data):
-        from django.db.models.fields import IntegerField
-        nb = 0
-        for rowdata in csv_data:
-            try:
-                new_item = cls()
-                for fieldname, fieldvalue in rowdata.items():
-                    dep_field = cls.get_field_by_name(fieldname)
-                    if isinstance(dep_field, IntegerField):
-                        if (dep_field.choices is not None) and (len(dep_field.choices) > 0):
-                            for choice in dep_field.choices:
-                                if fieldvalue == choice[1]:
-                                    fieldvalue = choice[0]
-                        if not isinstance(fieldvalue, int):
-                            fieldvalue = 0
-                    setattr(new_item, fieldname, fieldvalue)
-                new_item.save()
+    def import_data(cls, rowdata):
+        try:
+            new_item = super(AbstractContact, cls).import_data(rowdata)
+            if new_item is not None:
                 new_item.set_custom_values(rowdata)
-                nb += 1
-            except:
-                logging.getLogger(
-                    'lucterios.contacts').exception("import_data")
-                pass
-        return nb
+            return new_item
+        except:
+            logging.getLogger('lucterios.contacts').exception("import_data")
+            return None
 
     def set_custom_values(self, params):
         for cf_name, cf_model in self.get_custom_fields():
@@ -409,10 +389,10 @@ class LegalEntity(AbstractContact):
         return msg
 
     class Meta(object):
-
         verbose_name = _('legal entity')
         verbose_name_plural = _('legal entities')
         default_permissions = []
+        ordering = ['name']
 
 
 class Individual(AbstractContact):
@@ -458,10 +438,10 @@ class Individual(AbstractContact):
         return '%s %s' % (self.lastname, self.firstname)
 
     class Meta(object):
-
         verbose_name = _('individual')
         verbose_name_plural = _('individuals')
         default_permissions = []
+        ordering = ['lastname', 'firstname']
 
 
 class Responsability(LucteriosModel):

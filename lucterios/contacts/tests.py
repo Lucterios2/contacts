@@ -23,19 +23,21 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+from base64 import b64decode
+from shutil import rmtree
+from os.path import join, dirname, exists
+
+from django.utils import six
 
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
-from django.utils import six
-from lucterios.contacts.models import LegalEntity
-from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
-from os.path import join, dirname, exists
 from lucterios.CORE.models import LucteriosUser
-from base64 import b64decode
+
+from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
+from lucterios.contacts.models import LegalEntity
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 
 

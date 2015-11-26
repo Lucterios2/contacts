@@ -23,25 +23,29 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+from shutil import rmtree
+from os.path import join, dirname, exists
+from _io import StringIO
+from base64 import b64decode
+
+from django.utils import six
 
 from lucterios.framework.test import LucteriosTest
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.contacts.views import Configuration, CustomFieldAddModify
-from django.utils import six
-from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
-    Function, Responsability, CustomField, ContactCustomField
-from shutil import rmtree
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
     get_user_path
-from os.path import join, dirname, exists
+from lucterios.framework.xfersearch import get_search_query_from_criteria
+from lucterios.CORE.views_usergroup import UsersEdit
+
+from lucterios.contacts.views import Configuration, CustomFieldAddModify,\
+    ContactImport
+from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
+    Function, Responsability, CustomField, ContactCustomField
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch, \
     LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel
-from lucterios.CORE.views_usergroup import UsersEdit
-from base64 import b64decode
-from lucterios.framework.xfersearch import get_search_query_from_criteria
 
 
 def change_ourdetail():
@@ -1125,3 +1129,130 @@ class ContactsTest(LucteriosTest):
         find_indiv = list(
             Individual.objects.filter(q_res))
         self.assertEqual(1, len(find_indiv), find_indiv)
+
+    def test_import_contacts(self):
+        csv_content = """value;nom;adresse;codePostal;ville;fixe;portable;mail;Num;Type
+4.6;USIF;37 avenue de la plage;99673;TOUINTOUIN;0502851031;0439423854;pierre572@free.fr;1000029;Type B
+7.1;NOJAXU;11 avenue du puisatier;99247;BELLEVUE;0022456300;0020055601;amandine723@hotmail.fr;1000030;Type A
+2.9;GOC;33 impasse du 11 novembre;99150;BIDON SUR MER;0632763718;0310231012;marie762@free.fr;1000031;Type C
+5.4;UHADIK;1 impasse de l'Oisan;99410;VIENVITEVOIR;0699821944;0873988470;marie439@orange.fr;1000032;Type B
+7.1;NOJAXU;11 avenue du puisatier;99247;BELLEVUE;0022456300;0020055601;amandine723@hotmail.fr;1000030;Type A
+"""
+        self._initial_custom_values()
+
+        self.factory.xfer = ContactImport()
+        self.call('/lucterios.contacts/contactImport', {}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'contactImport')
+        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
+            'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '1'}))
+
+        self.factory.xfer = ContactImport()
+        self.call('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': '',
+                                                        'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'contactImport')
+        self.assert_count_equal('COMPONENTS/*', 6 + 2 * 15)
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="lbl_name"]', "{[b]}nom{[/b]}")
+        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_name"]/CASE', 10)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_structure_type"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_address"]/CASE', 10)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_postal_code"]/CASE', 10)
+        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_city"]/CASE', 10)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_country"]/CASE', 11)
+        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_tel1"]/CASE', 11)
+        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_tel2"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_email"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_comment"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_identify_number"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_custom_1"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_custom_2"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_custom_3"]/CASE', 11)
+        self.assert_count_equal(
+            'COMPONENTS/SELECT[@name="fld_custom_4"]/CASE', 11)
+        cases_id = []
+        cases_val = []
+        for case_idx in range(1, 12):
+            xml_value = self.get_first_xpath(
+                'COMPONENTS/SELECT[@name="fld_custom_4"]/CASE[%d]' % case_idx)
+            cases_id.append(xml_value.get('id'))
+            cases_val.append(xml_value.text)
+        self.assertEqual(
+            "|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_id))
+        self.assertEqual(
+            "---|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_val))
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/HEADER', 10)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
+            'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '2'}))
+        self.assert_count_equal('CONTEXT/PARAM', 7)
+        self.assert_xml_equal('CONTEXT/PARAM[@name="csvcontent"]', csv_content)
+
+        self.factory.xfer = ContactImport()
+        self.call('/lucterios.contacts/contactImport', {'step': 2, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
+                                                        'dateformat': '%d/%m/%Y', 'csvcontent': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                        "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
+                                                        "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'contactImport')
+        self.assert_count_equal('COMPONENTS/*', 5)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/HEADER', 9)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
+            'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
+
+        self.factory.xfer = ContactImport()
+        self.call('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
+                                                        'dateformat': '%d/%m/%Y', 'csvcontent': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                        "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
+                                                        "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'contactImport')
+        self.assert_count_equal('COMPONENTS/*', 2)
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="result"]', "{[center]}{[i]}4 contacts ont été importés{[/i]}{[/center]}")
+        self.assert_count_equal('ACTIONS/ACTION', 1)
+
+        self.factory.xfer = LegalEntityList()
+        self.call('/lucterios.contacts/legalEntityList', {}, False)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 5)
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD[1]/VALUE[@name="name"]', 'GOC')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD[2]/VALUE[@name="name"]', 'NOJAXU')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD[3]/VALUE[@name="name"]', 'UHADIK')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD[4]/VALUE[@name="name"]', 'USIF')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD[5]/VALUE[@name="name"]', 'WoldCompany')
+
+        self.factory.xfer = LegalEntityList()
+        self.call(
+            '/lucterios.contacts/legalEntityList', {"structure_type": 2}, False)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)

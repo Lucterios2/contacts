@@ -525,9 +525,14 @@ class ContactImport(XferContainerCustom):
             step = 3
         elif step == 3:
             fields_description, csv_readed = self._read_csv_and_convert()
-            nb = self.model.import_data(csv_readed)
+            items_imported = {}
+            for rowdata in csv_readed:
+                new_item = self.model.import_data(rowdata)
+                if new_item is not None:
+                    items_imported[new_item.id] = new_item
             lbl = XferCompLabelForm('result')
-            lbl.set_value_as_header(_("%d contacts are been imported") % nb)
+            lbl.set_value_as_header(
+                _("%d contacts are been imported") % len(items_imported))
             lbl.set_location(1, 2, 2)
             self.add_component(lbl)
             step = 4

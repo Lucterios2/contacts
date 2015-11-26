@@ -256,7 +256,7 @@ class Migration(migrations.Migration):
                                                      to='contacts.StructureType', verbose_name='structure type', null=True)),
             ],
             options={'verbose_name': 'legal entity', 'default_permissions': [
-            ], 'verbose_name_plural': 'legal entities'},
+            ], 'verbose_name_plural': 'legal entities', 'ordering': ['name']},
             bases=('contacts.abstractcontact',),
         ),
         migrations.CreateModel(
@@ -274,7 +274,7 @@ class Migration(migrations.Migration):
                                            on_delete=models.deletion.SET_NULL, verbose_name='user')),
             ],
             options={'verbose_name': 'individual', 'default_permissions': [
-            ], 'verbose_name_plural': 'individuals'},
+            ], 'verbose_name_plural': 'individuals', 'ordering': ['lastname', 'firstname']},
             bases=('contacts.abstractcontact',),
         ),
         migrations.CreateModel(
