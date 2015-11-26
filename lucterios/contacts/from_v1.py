@@ -160,8 +160,10 @@ class ContactsMigrate(MigrateAbstract):
                 new_legalentity.identify_number = legalentity_siren
             new_legalentity.save()
             if (legalentityid == 1) and (new_legalentity.id != 1):
+                other_le = legalentity_mdl.objects.get(id=new_legalentity.id)
                 new_legalentity.id = 1
                 new_legalentity.save()
+                other_le.delete()
             self.legalentity_list[legalentityid] = new_legalentity
             self.abstract_list[legalentity_super] = new_legalentity
 
