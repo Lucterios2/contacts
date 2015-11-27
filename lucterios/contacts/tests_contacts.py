@@ -45,7 +45,8 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch, \
-    LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel
+    LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel,\
+    AbstractContactFindDouble, AbstractContactMerge, AbstractContactShow
 
 
 def change_ourdetail():
@@ -1129,6 +1130,102 @@ class ContactsTest(LucteriosTest):
         find_indiv = list(
             Individual.objects.filter(q_res))
         self.assertEqual(1, len(find_indiv), find_indiv)
+
+    def test_duplicate_merge(self):
+        self._initial_custom_values()
+        self.factory.xfer = AbstractContactFindDouble()
+        self.call('/lucterios.contacts/abstractContactFindDouble',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'abstractContactFindDouble')
+        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_coordcomp_equal(
+            'COMPONENTS/GRID[@name="individual"]', (0, 1, 2, 1))
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+
+        create_jack()
+
+        self.factory.xfer = IndividualList()
+        self.call('/lucterios.contacts/individualList', {}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'individualList')
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+
+        self.factory.xfer = AbstractContactFindDouble()
+        self.call('/lucterios.contacts/abstractContactFindDouble',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'abstractContactFindDouble')
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assert_attrib_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
+        self.assert_attrib_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD[2]', 'id', '3')
+
+        self.factory.xfer = AbstractContactMerge()
+        self.call('/lucterios.contacts/abstractContactMerge',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3'}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'abstractContactMerge')
+        self.assert_count_equal('COMPONENTS/*', 3)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/HEADER', 2)
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD', 2)
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[1]/VALUE[@name="select"]', '1')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[2]/VALUE[@name="select"]', '0')
+
+        self.factory.xfer = AbstractContactMerge()
+        self.call('/lucterios.contacts/abstractContactMerge',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'abstractcontact': '3'}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'abstractContactMerge')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[1]/VALUE[@name="select"]', '0')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal(
+            'COMPONENTS/GRID[@name="abstractcontact"]/RECORD[2]/VALUE[@name="select"]', '1')
+
+        self.factory.xfer = AbstractContactMerge()
+        self.call('/lucterios.contacts/abstractContactMerge',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
+        self.assert_observer(
+            'core.acknowledge', 'lucterios.contacts', 'abstractContactMerge')
+        self.assert_action_equal(
+            'ACTION', (None, None, 'lucterios.contacts', 'abstractContactShow', 1, 1, 1, {"abstractcontact": "2"}))
+
+        self.factory.xfer = IndividualList()
+        self.call('/lucterios.contacts/individualList', {}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'individualList')
+        self.assert_count_equal(
+            'COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+
+        self.factory.xfer = AbstractContactShow()
+        self.call('/lucterios.contacts/abstractContactShow',
+                  {"abstractcontact": "2"}, False)
+        self.assert_observer(
+            'core.custom', 'lucterios.contacts', 'abstractContactShow')
+        self.assert_count_equal('COMPONENTS/*', 38)
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme")
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="firstname"]', "jack")
+        self.assert_xml_equal(
+            'COMPONENTS/LABELFORM[@name="lastname"]', "MISTER")
+        self.assert_xml_equal(
+            'COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
 
     def test_import_contacts(self):
         csv_content = """value;nom;adresse;codePostal;ville;fixe;portable;mail;Num;Type

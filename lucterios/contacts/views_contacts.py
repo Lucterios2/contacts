@@ -23,24 +23,27 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.db.models import Q
+from django.apps.registry import apps
 
-from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage
+from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage,\
+    SELECT_MULTI
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
-from lucterios.framework.xfergraphic import XferContainerCustom
+from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
 from lucterios.framework.xfersearch import XferSearchEditor
-from lucterios.CORE.models import LucteriosUser
-from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, \
-    XferPrintLabel
-from lucterios.contacts.models import LegalEntity, Individual, Responsability, \
-    AbstractContact
 from lucterios.framework import signal_and_lock
+
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
-from django.apps.registry import apps
+from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, XferPrintLabel
+
+from lucterios.contacts.models import LegalEntity, Individual, Responsability, AbstractContact
+from lucterios.framework.error import LucteriosException, IMPORTANT
 
 MenuManage.add_sub(
     "office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
@@ -358,6 +361,8 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
+        self.get_components(self.field_id).add_action(self.request, AbstractContactMerge.get_action(
+            _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
         self.add_action(AbstractContactFindDouble.get_action(
             _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
 
@@ -372,6 +377,8 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
+        self.get_components(self.field_id).add_action(self.request, AbstractContactMerge.get_action(
+            _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
         self.add_action(AbstractContactFindDouble.get_action(
             _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
 
@@ -392,6 +399,60 @@ class AbstractContactFindDouble(XferListEditor):
             self.model = apps.get_model(modelname)
         self.field_id = field_id
         XferListEditor.fillresponse(self)
+        self.get_components(self.field_id).add_action(self.request, AbstractContactMerge.get_action(
+            _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI})
+
+
+@MenuManage.describ('contacts.add_abstractcontact')
+class AbstractContactMerge(XferContainerAcknowledge):
+    caption = _("Contacts merge")
+    icon = "contacts.png"
+    model = AbstractContact
+    field_id = 'abstractcontact'
+
+    def fillresponse(self, modelname, field_id):
+        if modelname is not None:
+            self.model = apps.get_model(modelname)
+        self.items = self.model.objects.filter(
+            id__in=self.getparam(field_id, ()))
+        if len(self.items) < 2:
+            raise LucteriosException(
+                IMPORTANT, _("Impossible: you must to select many records!"))
+        if self.item.id is None:
+            self.item = self.items[0]
+        if self.getparam("CONFIRME") is None:
+            dlg = self.create_custom()
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0)
+            dlg.add_component(img)
+            lbl = XferCompLabelForm('title')
+            lbl.set_value_as_title(self.caption)
+            lbl.set_location(1, 0)
+            dlg.add_component(lbl)
+            grid = XferCompGrid(self.field_id)
+            grid.add_header('value', _('designation'))
+            grid.add_header('select', _('is main?'), 'bool')
+            for item in self.items:
+                grid.set_value(item.id, 'value', six.text_type(item))
+                grid.set_value(item.id, 'select', item.id == self.item.id)
+            grid.set_location(1, 1)
+            grid.add_action(self.request, AbstractContactShow.get_action(
+                _("Edit"), "images/show.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+            grid.add_action(self.request, self.get_action(
+                _("Select"), "images/ok.png"), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+            dlg.add_component(grid)
+            dlg.add_action(self.get_action(_('Ok'), "images/ok.png"),
+                           {'close': CLOSE_YES, 'modal': FORMTYPE_MODAL, 'params': {'CONFIRME': 'YES', self.field_id: self.item.id}})
+            dlg.add_action(WrapAction(_("Cancel"), "images/cancel.png"), {})
+        else:
+            alias_objects = []
+            for item in self.items:
+                if item.id != self.item.id:
+                    alias_objects.append(item)
+            self.item.merge_objects(alias_objects)
+            self.redirect_action(AbstractContactShow.get_action(
+                '', ''), {'params': {'abstractcontact': self.item.id}})
 
 
 @ActionsManage.affect('AbstractContact', 'show')

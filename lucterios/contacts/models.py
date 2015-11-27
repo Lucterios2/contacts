@@ -311,9 +311,18 @@ class AbstractContact(LucteriosModel):
             if self.id is None:
                 ccf_value = ""
             else:
-                ccf_model = ContactCustomField.objects.get_or_create(
+                ccf_models = ContactCustomField.objects.filter(
                     contact=self, field=cf_model)
-                ccf_value = ccf_model[0].value
+                if len(ccf_models) == 0:
+                    ccf_model = ContactCustomField.objects.create(
+                        contact=self, field=cf_model)
+                elif len(ccf_models) == 1:
+                    ccf_model = ccf_models[0]
+                else:
+                    ccf_model = ccf_models[0]
+                    for old_model in ccf_models[1:]:
+                        old_model.delete()
+                ccf_value = ccf_model.value
             if cf_model.kind == 0:
                 return six.text_type(ccf_value)
             if ccf_value == '':
