@@ -40,6 +40,7 @@ from lucterios.framework.editors import LucteriosEditor
 from lucterios.contacts.models import AbstractContact, PostalCode
 from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
+from lucterios.framework import signal_and_lock
 
 
 class CustomFieldEditor(LucteriosEditor):
@@ -270,6 +271,7 @@ class AbstractContactEditor(LucteriosEditor):
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
         self._show_custom_field(xfer, obj_addr.col)
+        signal_and_lock.Signal.call_signal("show_contact", self.item, xfer)
 
     def saving(self, xfer):
         uploadlogo = xfer.getparam('uploadlogo')
@@ -326,6 +328,7 @@ class IndividualEditor(AbstractContactEditor):
         AbstractContactEditor.show(self, xfer)
         obj_user = xfer.get_components('user')
         obj_user.colspan = 2
+        xfer.tab = obj_user.tab
         btn = XferCompButton('userbtn')
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)

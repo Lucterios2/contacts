@@ -449,8 +449,8 @@ class AbstractContactMerge(XferContainerAcknowledge):
             alias_objects = []
             for item in self.items:
                 if item.id != self.item.id:
-                    alias_objects.append(item)
-            self.item.merge_objects(alias_objects)
+                    alias_objects.append(item.get_final_child())
+            self.item.get_final_child().merge_objects(alias_objects)
             self.redirect_action(AbstractContactShow.get_action(
                 '', ''), {'params': {'abstractcontact': self.item.id}})
 

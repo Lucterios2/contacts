@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-27 13:47+0000\n"
+"POT-Creation-Date: 2015-11-27 14:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,31 +22,31 @@ msgstr ""
 msgid "Lucterios contacts"
 msgstr "Lucterios contacts"
 
-#: editors.py:50
+#: editors.py:51
 msgid "multi-line"
 msgstr "multi-line"
 
-#: editors.py:58
+#: editors.py:59
 msgid "min"
 msgstr "min"
 
-#: editors.py:66
+#: editors.py:67
 msgid "max"
 msgstr "max"
 
-#: editors.py:74
+#: editors.py:75
 msgid "precision"
 msgstr "précision"
 
-#: editors.py:82
+#: editors.py:83
 msgid "list"
 msgstr "liste"
 
-#: editors.py:224
+#: editors.py:225
 msgid "image"
 msgstr "image"
 
-#: editors.py:296
+#: editors.py:298
 msgid "Write to all"
 msgstr "Ecrire à tous"
 
