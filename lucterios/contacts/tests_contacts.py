@@ -563,7 +563,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="responsability"]/RECORD', 0)
         self.assert_count_equal(
-            'COMPONENTS/GRID[@name="responsability"]/ACTIONS/ACTION', 3)
+            'COMPONENTS/GRID[@name="responsability"]/ACTIONS/ACTION', 4)
 
         self.factory.xfer = ResponsabilityAdd()
         self.call('/lucterios.contacts/responsabilityAdd',

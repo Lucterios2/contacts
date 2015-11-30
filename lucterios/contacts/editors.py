@@ -33,7 +33,8 @@ from lucterios.framework.filetools import save_from_base64, get_user_path, open_
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
     XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
     XferCompLinkLabel
-from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO
+from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO,\
+    SELECT_SINGLE
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
@@ -319,7 +320,9 @@ class LegalEntityEditor(AbstractContactEditor):
         if self.item.id == 1:
             xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
-        return AbstractContactEditor.show(self, xfer)
+        xfer.get_components('responsability').add_action(xfer.request, ActionsManage.get_act_changed('Individual', 'showresp', _("Show"), 'images/show.png'),
+                                                         {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE}, 0)
+        AbstractContactEditor.show(self, xfer)
 
 
 class IndividualEditor(AbstractContactEditor):

@@ -63,7 +63,7 @@ class LegalEntityAddModify(XferAddEditor):
 
 
 @ActionsManage.affect('LegalEntity', 'show')
-@MenuManage.describ('contacts.change_legalentity')
+@MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityShow(XferShowEditor):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
@@ -72,7 +72,7 @@ class LegalEntityShow(XferShowEditor):
 
 
 @ActionsManage.affect('LegalEntity', 'print')
-@MenuManage.describ('contacts.change_legalentity')
+@MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityPrint(XferPrintAction):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
@@ -162,6 +162,19 @@ class IndividualShow(XferShowEditor):
     field_id = 'individual'
 
 
+@ActionsManage.affect('Individual', 'showresp')
+@MenuManage.describ('contacts.change_abstractcontact')
+class IndividualShowResp(XferContainerAcknowledge):
+    caption = _("Show individual")
+    icon = "individual.png"
+    model = Responsability
+    field_id = 'responsability'
+
+    def fillresponse(self):
+        self.redirect_action(IndividualShow.get_action(
+            '', ''), {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.individual_id)}})
+
+
 @ActionsManage.affect('Individual', 'print')
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualPrint(XferPrintAction):
@@ -249,7 +262,7 @@ class IndividualListing(XferPrintListing):
 class IndividualUserAdd(XferContainerCustom):
 
     caption = _("Add as an users")
-    icon = "user.png"
+    icon = "images/user.png"
     model = LucteriosUser
 
     def fillresponse(self):
@@ -462,6 +475,11 @@ class AbstractContactShow(XferShowEditor):
     model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Show contact")
+
+    def fillresponse(self, field_id):
+        if field_id is not None:
+            self.field_id = field_id
+        XferShowEditor.fillresponse(self)
 
 
 @ActionsManage.affect('AbstractContact', 'delete')
