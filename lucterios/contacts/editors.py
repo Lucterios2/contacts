@@ -34,7 +34,7 @@ from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, 
     XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
     XferCompLinkLabel
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO,\
-    SELECT_SINGLE
+    SELECT_SINGLE, CLOSE_YES
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
@@ -42,6 +42,7 @@ from lucterios.contacts.models import AbstractContact, PostalCode
 from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
 from lucterios.framework import signal_and_lock
+from lucterios.CORE.views import ObjectPromote
 
 
 class CustomFieldEditor(LucteriosEditor):
@@ -272,6 +273,12 @@ class AbstractContactEditor(LucteriosEditor):
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
         self._show_custom_field(xfer, obj_addr.col)
+        if (len(self.item.__class__.get_select_contact_type(False)) > 0):
+            btn = XferCompButton('btn_promote')
+            btn.set_location(new_col + 1, xfer.get_max_row() + 1, 4)
+            btn.set_action(xfer.request, ObjectPromote.get_action(
+                _('Promote'), "images/config.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_YES, 'params': {'modelname': xfer.model.get_long_name(), 'field_id': xfer.field_id}})
+            xfer.add_component(btn)
         signal_and_lock.Signal.call_signal("show_contact", self.item, xfer)
 
     def saving(self, xfer):

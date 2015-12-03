@@ -216,16 +216,6 @@ class AbstractContact(LucteriosModel):
         return [(_('contact'), 'str'), 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email']
 
     @classmethod
-    def get_select_contact_type(cls, with_current=True):
-        select_list = []
-        if with_current:
-            select_list.append(
-                (cls.get_long_name(), cls._meta.verbose_name.title()))
-        for sub_class in cls.__subclasses__():
-            select_list.extend(sub_class.get_select_contact_type())
-        return select_list
-
-    @classmethod
     def get_custom_fields(cls):
         import inspect
         fields = []
@@ -247,7 +237,8 @@ class AbstractContact(LucteriosModel):
     @classmethod
     def import_data(cls, rowdata, dateformat):
         try:
-            new_item = super(AbstractContact, cls).import_data(rowdata, dateformat)
+            new_item = super(AbstractContact, cls).import_data(
+                rowdata, dateformat)
             if new_item is not None:
                 new_item.set_custom_values(rowdata)
             return new_item
