@@ -531,7 +531,7 @@ class ContactImport(XferContainerCustom):
             fields_description, csv_readed = self._read_csv_and_convert()
             items_imported = {}
             for rowdata in csv_readed:
-                new_item = self.model.import_data(rowdata)
+                new_item = self.model.import_data(rowdata, dateformat)
                 if new_item is not None:
                     items_imported[new_item.id] = new_item
             lbl = XferCompLabelForm('result')

@@ -245,9 +245,9 @@ class AbstractContact(LucteriosModel):
         return fields
 
     @classmethod
-    def import_data(cls, rowdata):
+    def import_data(cls, rowdata, dateformat):
         try:
-            new_item = super(AbstractContact, cls).import_data(rowdata)
+            new_item = super(AbstractContact, cls).import_data(rowdata, dateformat)
             if new_item is not None:
                 new_item.set_custom_values(rowdata)
             return new_item
