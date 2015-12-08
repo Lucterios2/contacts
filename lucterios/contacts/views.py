@@ -331,7 +331,8 @@ class ContactImport(XferContainerCustom):
         lbl.set_location(1, 0)
         self.add_component(lbl)
         model_select = XferCompSelect('modelname')
-        model_select.set_value("")
+        if self.model is not None:
+            model_select.set_value(self.model.get_long_name())
         model_select.set_select(AbstractContact.get_select_contact_type(False))
         model_select.set_location(2, 0, 3)
         self.add_component(model_select)
@@ -349,7 +350,7 @@ class ContactImport(XferContainerCustom):
         lbl.set_location(1, 2)
         self.add_component(lbl)
         lbl = XferCompEdit('encoding')
-        lbl.set_value('utf-8')
+        lbl.set_value(self.encoding)
         lbl.set_location(2, 2)
         self.add_component(lbl)
         lbl = XferCompLabelForm('lbl_dateformat')
@@ -357,7 +358,7 @@ class ContactImport(XferContainerCustom):
         lbl.set_location(3, 2)
         self.add_component(lbl)
         lbl = XferCompEdit('dateformat')
-        lbl.set_value('%d/%m/%Y')
+        lbl.set_value(self.dateformat)
         lbl.set_location(4, 2)
         self.add_component(lbl)
         lbl = XferCompLabelForm('lbl_delimiter')
@@ -365,7 +366,7 @@ class ContactImport(XferContainerCustom):
         lbl.set_location(1, 3)
         self.add_component(lbl)
         lbl = XferCompEdit('delimiter')
-        lbl.set_value(';')
+        lbl.set_value(self.delimiter)
         lbl.set_location(2, 3)
         self.add_component(lbl)
         lbl = XferCompLabelForm('lbl_quotechar')
@@ -373,7 +374,7 @@ class ContactImport(XferContainerCustom):
         lbl.set_location(3, 3)
         self.add_component(lbl)
         lbl = XferCompEdit('quotechar')
-        lbl.set_value("'")
+        lbl.set_value(self.quotechar)
         lbl.set_location(4, 3)
         self.add_component(lbl)
         return lbl
@@ -386,10 +387,20 @@ class ContactImport(XferContainerCustom):
         if 'csvcontent' in self.request.FILES.keys():
             csvfile = TextIOWrapper(
                 self.request.FILES['csvcontent'].file, encoding=self.encoding, errors='replace')
-            self.params['csvcontent'] = "".join(csvfile.readlines())
+            csvcontent = "".join(csvfile.readlines())
+            for param_idx in range(0, int(len(csvcontent) / 2048) + 2):
+                self.params['csvcontent%d' % param_idx] = csvcontent[
+                    2048 * param_idx:2048 * (param_idx + 1)]
             csvfile.seek(0)
         else:
-            csvfile = StringIO(self.getparam('csvcontent', ''))
+            csvcontent = ""
+            for param_idx in range(0, 1000):
+                curent_content = self.getparam('csvcontent%d' % param_idx)
+                if curent_content is None:
+                    break
+                else:
+                    csvcontent += "" + curent_content
+            csvfile = StringIO(csvcontent)
         self.spamreader = DictReader(
             csvfile, delimiter=self.delimiter, quotechar=self.quotechar, quoting=current_quoting)
         if (self.spamreader.fieldnames is None) or (len(self.spamreader.fieldnames) == 0):
@@ -432,6 +443,10 @@ class ContactImport(XferContainerCustom):
                 row_idx += 1
         tbl.set_location(1, 1, 2)
         self.add_component(tbl)
+        lbl = XferCompLabelForm('nb_line')
+        lbl.set_value(_("Total number of contacts: %d") % (row_idx - 1))
+        lbl.set_location(1, 2, 2)
+        self.add_component(lbl)
 
     def _read_csv_and_convert(self):
         fields_association = {}
@@ -467,7 +482,7 @@ class ContactImport(XferContainerCustom):
                 csv_readed.append(new_row)
         return fields_description, csv_readed
 
-    def fillresponse(self, modelname, quotechar, delimiter, encoding, dateformat, step=0):
+    def fillresponse(self, modelname, quotechar="'", delimiter=",", encoding="utf-8", dateformat="%d/%m/%Y", step=0):
         if modelname is not None:
             self.model = apps.get_model(modelname)
         if six.PY2:
@@ -541,6 +556,9 @@ class ContactImport(XferContainerCustom):
             self.add_component(lbl)
             step = 4
         if step < 4:
+            if step > 1:
+                self.add_action(self.get_action(_('Back'), "images/left.png"),
+                                {'close': CLOSE_NO, 'modal': FORMTYPE_REFRESH, 'params': {'step': step - 2}})
             self.add_action(self.get_action(_('Ok'), "images/ok.png"),
                             {'close': CLOSE_NO, 'modal': FORMTYPE_REFRESH, 'params': {'step': step}})
             self.add_action(WrapAction(_("Cancel"), "images/cancel.png"), {})

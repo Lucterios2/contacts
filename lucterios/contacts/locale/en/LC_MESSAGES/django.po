@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-03 14:13+0000\n"
+"POT-Creation-Date: 2015-12-08 16:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -303,8 +303,8 @@ msgstr "structure type"
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:97 models.py:113 tools.py:59 views.py:330 views.py:491
-#: views.py:506
+#: models.py:97 models.py:113 tools.py:59 views.py:330 views.py:506
+#: views.py:521
 msgid "model"
 msgstr "model"
 
@@ -472,7 +472,7 @@ msgstr "My account"
 msgid "Edit"
 msgstr "Edit"
 
-#: views.py:80 views.py:115 views.py:218 views.py:548
+#: views.py:80 views.py:115 views.py:218 views.py:566
 msgid "Close"
 msgstr "Close"
 
@@ -599,53 +599,57 @@ msgstr "Tool to import contacts from CSV file."
 msgid "Contact import"
 msgstr "Contact import"
 
-#: views.py:339
+#: views.py:340
 msgid "CSV file"
 msgstr "CSV file"
 
-#: views.py:348
+#: views.py:349
 msgid "encoding"
 msgstr "encoding"
 
-#: views.py:356
+#: views.py:357
 msgid "date format"
 msgstr "date format"
 
-#: views.py:364
+#: views.py:365
 msgid "delimiter"
 msgstr "delimiter"
 
-#: views.py:372
+#: views.py:373
 msgid "quotechar"
 msgstr "quotechar"
 
-#: views.py:396
+#: views.py:407
 msgid "CSV file unvalid!"
 msgstr "CSV file unvalid!"
 
-#: views.py:499
-msgid "Fields"
-msgstr "Fields"
-
-#: views.py:501
-msgid "Current content"
-msgstr "Current content"
-
-#: views.py:526
+#: views.py:447 views.py:541
 #, python-format
 msgid "Total number of contacts: %d"
 msgstr "Total number of contacts: %d"
 
-#: views.py:539
+#: views.py:514
+msgid "Fields"
+msgstr "Fields"
+
+#: views.py:516
+msgid "Current content"
+msgstr "Current content"
+
+#: views.py:554
 #, python-format
 msgid "%d contacts are been imported"
 msgstr "%d contacts are been imported"
 
-#: views.py:544 views_contacts.py:274
+#: views.py:560
+msgid "Back"
+msgstr "Back"
+
+#: views.py:562 views_contacts.py:274
 msgid "Ok"
 msgstr "Ok"
 
-#: views.py:546 views_contacts.py:275
+#: views.py:564 views_contacts.py:275
 msgid "Cancel"
 msgstr "Cancel"
 

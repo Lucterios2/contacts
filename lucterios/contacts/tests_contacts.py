@@ -1252,7 +1252,7 @@ class ContactsTest(LucteriosTest):
                                                         'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
         self.assert_observer(
             'core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('COMPONENTS/*', 6 + 2 * 15)
+        self.assert_count_equal('COMPONENTS/*', 7 + 2 * 15)
         self.assert_xml_equal(
             'COMPONENTS/LABELFORM[@name="lbl_name"]', "{[b]}nom{[/b]}")
         self.assert_count_equal('COMPONENTS/SELECT[@name="fld_name"]/CASE', 10)
@@ -1298,15 +1298,16 @@ class ContactsTest(LucteriosTest):
             'COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
+            'Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '0'}))
+        self.assert_action_equal('ACTIONS/ACTION[2]', (six.text_type(
             'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '2'}))
-        self.assert_count_equal('CONTEXT/PARAM', 7)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="csvcontent"]', csv_content)
+        self.assert_count_equal('CONTEXT/PARAM', 8)
 
         self.factory.xfer = ContactImport()
         self.call('/lucterios.contacts/contactImport', {'step': 2, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
-                                                        'dateformat': '%d/%m/%Y', 'csvcontent': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                        'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
                                                         "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
                                                         "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer(
@@ -1318,13 +1319,13 @@ class ContactsTest(LucteriosTest):
             'COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
         self.assert_count_equal(
             'COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
+        self.assert_count_equal('ACTIONS/ACTION', 3)
+        self.assert_action_equal('ACTIONS/ACTION[2]', (six.text_type(
             'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
 
         self.factory.xfer = ContactImport()
         self.call('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
-                                                        'dateformat': '%d/%m/%Y', 'csvcontent': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                        'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
                                                         "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
                                                         "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer(
