@@ -365,7 +365,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
-            'Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1, {'individual': '2'}))
+            'Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1))
         self.assert_action_equal(
             'ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
         self.assert_count_equal('COMPONENTS/*', 29)

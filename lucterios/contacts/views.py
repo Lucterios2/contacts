@@ -69,8 +69,12 @@ class Account(XferContainerCustom):
         try:
             self.item = Individual.objects.get(
                 user=self.request.user)
-            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"),
-                            {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.id)}})
+            self.item = self.item.get_final_child()
+            self.model = Individual
+            self.field_id = 'individual'
+            self.params['individual'] = six.text_type(self.item.id)
+            self.add_action(AccountAddModify.get_action(
+                _("Edit"), "images/edit.png"), {'close': CLOSE_NO})
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(
                 id=self.request.user.id)
