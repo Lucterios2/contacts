@@ -9,6 +9,7 @@ Sommaire:
 .. toctree::
    :maxdepth: 2
 
-
+   configuration.rst
+   mailing.rst
 
 

@@ -9,6 +9,8 @@ Sommaire:
 .. toctree::
    :maxdepth: 2
 
-
+   individual.rst
+   legal_entity.rst
+   configuration.rst
 
 
