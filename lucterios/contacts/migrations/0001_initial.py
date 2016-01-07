@@ -26,12 +26,12 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from os import listdir
 from os.path import dirname, join
+from logging import getLogger
 import sys
 
 from django.db import models, migrations, transaction
 from django.db.utils import IntegrityError
 from django.conf import settings
-from django.utils.log import getLogger
 from django.utils import six, translation
 from django.utils.translation import ugettext_lazy as _
 
