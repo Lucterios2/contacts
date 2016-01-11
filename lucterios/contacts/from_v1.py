@@ -52,7 +52,7 @@ class ContactsMigrate(MigrateAbstract):
         cur = self.old_db.open()
         cur.execute("SELECT id, nom FROM org_lucterios_contacts_fonctions")
         for functionid, function_name in cur.fetchall():
-            self.print_log("=> Function %s", (function_name,))
+            self.print_debug("=> Function %s", (function_name,))
             self.function_list[functionid] = function_mdl.objects.create(
                 name=function_name)
 
@@ -62,7 +62,7 @@ class ContactsMigrate(MigrateAbstract):
         cur = self.old_db.open()
         cur.execute("SELECT id, nom FROM org_lucterios_contacts_typesMorales")
         for structuretypeid, structuretype_name in cur.fetchall():
-            self.print_log("=> StructureType %s", (structuretype_name,))
+            self.print_debug("=> StructureType %s", (structuretype_name,))
             self.structuretype_list[structuretypeid] = structuretype_mdl.objects.create(
                 name=structuretype_name)
 
@@ -82,7 +82,7 @@ class ContactsMigrate(MigrateAbstract):
         cur.execute(
             "SELECT id, class, description, type, param FROM org_lucterios_contacts_champPerso")
         for customfield_val in cur.fetchall():
-            self.print_log("=> CustomField %s", customfield_val[2])
+            self.print_debug("=> CustomField %s", customfield_val[2])
             if customfield_val[1] in modelnames_relation.keys():
                 old_args = ""
                 args = {
@@ -108,7 +108,7 @@ class ContactsMigrate(MigrateAbstract):
                     import sys
                     import traceback
                     traceback.print_exc(file=sys.stdout)
-                    self.print_log(
+                    self.print_debug(
                         "--- CustomField: error args=%s/%s", (customfield_val[4], old_args))
                 new_cf = customfield_mdl.objects.create(
                     name=customfield_val[2], kind=customfield_val[3])
@@ -148,7 +148,7 @@ class ContactsMigrate(MigrateAbstract):
         cur.execute(
             "SELECT id, superId, raisonSociale, type, siren FROM org_lucterios_contacts_personneMorale ORDER BY id")
         for legalentityid, legalentity_super, legalentity_name, legalentity_type, legalentity_siren in cur.fetchall():
-            self.print_log(
+            self.print_debug(
                 "=> LegalEntity[%d] %s (siren=%s)", (legalentityid, legalentity_name, legalentity_siren))
             new_legalentity = legalentity_mdl.objects.create(
                 name=legalentity_name)
@@ -171,8 +171,8 @@ class ContactsMigrate(MigrateAbstract):
         cur.execute(
             "SELECT id, superId, nom, prenom, sexe, user FROM org_lucterios_contacts_personnePhysique")
         for individualid, individual_super, individual_lastname, individual_firstname, individual_sexe, individual_user in cur.fetchall():
-            self.print_log("=> Individual %s %s (user=%s)",
-                           (individual_firstname, individual_lastname, individual_user))
+            self.print_debug("=> Individual %s %s (user=%s)",
+                             (individual_firstname, individual_lastname, individual_user))
             new_individual = individual_mdl.objects.create(
                 firstname=individual_firstname, lastname=individual_lastname)
             assign_abstact_values(new_individual, individual_super)
@@ -203,8 +203,8 @@ class ContactsMigrate(MigrateAbstract):
                     if fonction in self.function_list.keys():
                         ids.append(self.function_list[fonction].pk)
 
-                self.print_log("=> Responsability %s %s =%s", (six.text_type(self.individual_list[
-                               physique]), six.text_type(self.legalentity_list[morale]), six.text_type(ids)))
+                self.print_debug("=> Responsability %s %s =%s", (six.text_type(self.individual_list[
+                    physique]), six.text_type(self.legalentity_list[morale]), six.text_type(ids)))
                 new_resp.functions = function_mdl.objects.filter(id__in=ids)
                 new_resp.save()
         contactcustomfield_mdl = apps.get_model(
@@ -213,7 +213,7 @@ class ContactsMigrate(MigrateAbstract):
         cur = self.old_db.open()
         cur.execute(
             "SELECT contact, champ, value FROM org_lucterios_contacts_personneChamp")
-        self.print_log("=> ContactCustomField %d", len(list(cur.fetchall())))
+        self.print_debug("=> ContactCustomField %d", len(list(cur.fetchall())))
         for contactcustomfield_val in cur.fetchall():
             abs_contact = self.abstract_list[contactcustomfield_val[0]]
             if (contactcustomfield_val[2] != '') and (contactcustomfield_val[1] in self.customfield_list.keys()):
@@ -233,7 +233,7 @@ class ContactsMigrate(MigrateAbstract):
                 if param_value == '':
                     param_value = '0'
             if pname != '':
-                self.print_log(
+                self.print_debug(
                     "=> parameter of contacts %s - %s", (pname, param_value))
                 Parameter.change_value(pname, param_value)
 
@@ -245,6 +245,8 @@ class ContactsMigrate(MigrateAbstract):
             self._relations()
         finally:
             self.old_db.close()
+        self.print_info("Nb individuals:%d", len(self.individual_list))
+        self.print_info("Nb legal entities:%d", len(self.legalentity_list))
         self.old_db.objectlinks['abstracts'] = self.abstract_list
         self.old_db.objectlinks['legalentity'] = self.legalentity_list
         self.old_db.objectlinks['individual'] = self.individual_list

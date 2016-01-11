@@ -51,7 +51,7 @@ class MailingMigrate(MigrateAbstract):
             if param_name == 'MailConnectionMsg':
                 pname = 'mailing-msg-connection'
             if pname != '':
-                self.print_log(
+                self.print_debug(
                     "=> parameter of mailing %s - %s", (pname, param_value))
                 Parameter.change_value(pname, param_value)
 
