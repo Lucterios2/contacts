@@ -169,7 +169,7 @@ class ContactsTest(LucteriosTest):
 
     def test_individual_image(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_2.jpg')))
-        logo_path = join(dirname(__file__), 'help', 'EditIndividual.png')
+        logo_path = join(dirname(__file__), 'docs', 'en', 'EditIndividual.png')
         logo_stream = "image.png;" + \
             readimage_to_base64(logo_path, False).decode("utf-8")
 
@@ -179,7 +179,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer(
             'core.custom', 'lucterios.contacts', 'individualShow')
         self.assert_xml_equal(
-            'COMPONENTS/IMAGE[@name="logoimg"]', "lucterios.contacts/images/NoImage.png")
+            'COMPONENTS/IMAGE[@name="logoimg"]', "/static/lucterios.contacts/images/NoImage.png")
 
         self.factory.xfer = IndividualAddModify()
         self.call('/lucterios.contacts/individualAddModify',

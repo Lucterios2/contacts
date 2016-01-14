@@ -315,7 +315,7 @@ class ConfigurationTest(LucteriosTest):
     def test_send_with_files(self):
         file1 = BytesIO(get_binay('blablabla\blabla.'))
         file2 = open(
-            join(dirname(__file__), 'images', 'config_mail.png'), mode='rb')
+            join(dirname(__file__), 'static', 'lucterios.mailing', 'images', 'config_mail.png'), mode='rb')
         try:
             configSMTP('localhost', 1025)
             self.assertEqual(0, self.server.count())

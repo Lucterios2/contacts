@@ -63,7 +63,7 @@ class PostalCodeTest(LucteriosTest):
             'ACTIONS/ACTION', ('Fermer', 'images/close.png'))
         self.assert_count_equal('COMPONENTS/*', 5)
         self.assert_comp_equal(
-            'COMPONENTS/IMAGE[@name="img"]', 'lucterios.contacts/images/postalCode.png', (0, 0, 1, 1))
+            'COMPONENTS/IMAGE[@name="img"]', '/static/lucterios.contacts/images/postalCode.png', (0, 0, 1, 1))
         self.assert_comp_equal(
             'COMPONENTS/LABELFORM[@name="filtre"]', '{[b]}Filtrer par code postal{[/b]}', (1, 0, 1, 1))
         self.assert_comp_equal(
@@ -247,7 +247,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal(
             'COMPONENTS/LABELFORM[@name="identify_number"]', None, (2, 8, 3, 1, 1))
         self.assert_comp_equal(
-            'COMPONENTS/IMAGE[@name="logoimg"]', "lucterios.contacts/images/NoImage.png", (0, 2, 1, 6, 1))
+            'COMPONENTS/IMAGE[@name="logoimg"]', "/static/lucterios.contacts/images/NoImage.png", (0, 2, 1, 6, 1))
         self.assert_coordcomp_equal(
             'COMPONENTS/GRID[@name="responsability"]', (1, 0, 1, 1, 2))
 
@@ -330,7 +330,7 @@ class ConfigurationTest(LucteriosTest):
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
-        logo_path = join(dirname(__file__), 'images', 'ourDetails.png')
+        logo_path = join(dirname(__file__), "static", 'lucterios.contacts', 'images', 'ourDetails.png')
         logo_stream = "image.jpg;" + \
             readimage_to_base64(logo_path, False).decode("utf-8")
 
@@ -392,7 +392,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal(
             'COMPONENTS/LABELFORM[@name="comment"]', None, (2, 7, 3, 1, 1))
         self.assert_comp_equal(
-            'COMPONENTS/IMAGE[@name="logoimg"]', "lucterios.contacts/images/NoImage.png", (0, 2, 1, 6, 1))
+            'COMPONENTS/IMAGE[@name="logoimg"]', "/static/lucterios.contacts/images/NoImage.png", (0, 2, 1, 6, 1))
 
     def test_accountmodify(self):
         self.factory.xfer = AccountAddModify()

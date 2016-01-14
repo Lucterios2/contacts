@@ -34,7 +34,7 @@ from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, 
     XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
     XferCompLinkLabel
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO,\
-    SELECT_SINGLE, CLOSE_YES
+    SELECT_SINGLE, CLOSE_YES, get_icon_path
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
@@ -269,7 +269,7 @@ class AbstractContactEditor(LucteriosEditor):
             img.type = 'jpg'
             img.set_value(readimage_to_base64(img_path))
         else:
-            img.set_value("lucterios.contacts/images/NoImage.png")
+            img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
         self._show_custom_field(xfer, obj_addr.col)

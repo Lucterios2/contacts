@@ -289,7 +289,7 @@ class AbstractContact(LucteriosModel):
             img = readimage_to_base64(img_path)
         else:
             img = readimage_to_base64(
-                join(dirname(__file__), "images", "NoImage.png"))
+                join(dirname(__file__), "static", 'lucterios.contacts', "images", "NoImage.png"))
         return img.decode('ascii')
 
     def __getattr__(self, name):

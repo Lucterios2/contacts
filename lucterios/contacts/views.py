@@ -37,7 +37,7 @@ from django.db.models.fields import DateField
 from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
-    FORMTYPE_MODAL
+    FORMTYPE_MODAL, get_icon_path
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid,\
@@ -104,7 +104,7 @@ class CurrentStructure(XferContainerCustom):
     def fillresponse(self):
         self.params['legal_entity'] = '1'
         img = XferCompImage('img')
-        img.set_value('lucterios.contacts/images/fields.png')
+        img.set_value(get_icon_path('lucterios.contacts/images/fields.png'))
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -195,7 +195,7 @@ class Configuration(XferContainerCustom):
     def _fill_customfield(self):
         self.new_tab(_("Custom field"))
         img = XferCompImage('imgField')
-        img.set_value('lucterios.contacts/images/fields.png')
+        img.set_value(get_icon_path('lucterios.contacts/images/fields.png'))
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleField')
