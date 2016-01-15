@@ -548,7 +548,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer(
             'core.exception', 'lucterios.contacts', 'legalEntityDel')
         self.assert_xml_equal(
-            "EXCEPTION/MESSAGE", "Vous ne pouvez supprimer cette structure morale!")
+            "EXCEPTION/MESSAGE", "Vous ne pouvez pas supprimer cette structure morale!")
 
     def test_legalentity_responsability(self):
         self.factory.xfer = LegalEntityShow()
@@ -1123,7 +1123,7 @@ class ContactsTest(LucteriosTest):
         filter_result, desc_result = get_search_query_from_criteria(
             "custom_1||5||beau", Individual)
         self.assertEqual(
-            {'0': '{[b]}aaa{[/b]} contiens {[i]}"beau"{[/i]}'}, desc_result)
+            {'0': '{[b]}aaa{[/b]} contient {[i]}"beau"{[/i]}'}, desc_result)
         q_res = Q(contactcustomfield__field__id=1) & Q(
             **{'contactcustomfield__value__contains': 'beau'})
         self.assertEqual(six.text_type(q_res), six.text_type(filter_result))

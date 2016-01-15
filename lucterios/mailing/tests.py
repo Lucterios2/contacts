@@ -208,7 +208,7 @@ class ConfigurationTest(LucteriosTest):
         self.call('/lucterios.mailing/sendEmailTry', {}, False)
         self.assert_observer(
             'core.dialogbox', 'lucterios.mailing', 'sendEmailTry')
-        self.assert_xml_equal('TEXT', 'Courriel envoyé, veuillez verifier.')
+        self.assert_xml_equal('TEXT', 'Courriel envoyé, veuillez le vérifier.')
         self.assertEqual(1, self.server.count())
         self.assertEqual(
             'mr-sylvestre@worldcompany.com', self.server.get(0)[1])
