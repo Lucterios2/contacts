@@ -8,19 +8,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-18 09:43+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2016-01-08 16:11+0000\n"
+"PO-Revision-Date: 2016-01-11 23:12+0000\n"
+"Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Translated-Using: django-rosetta 0.7.8\n"
 
 #: __init__.py:41
 msgid "Lucterios contacts"
-msgstr "Lucterios contacts"
+msgstr "contacts Lucterios "
 
 #: editors.py:53
 msgid "multi-line"
@@ -76,8 +77,8 @@ msgid "help-individual_list-detail"
 msgstr ""
 "<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes Physiques</i> vous "
 "permet de consulter la liste des personnes que vous avez déjà enregistrées. "
-"Étant donné que la liste peut devenir importante, il est possible de filtrer "
-"les personnes par leur nom.</p><p>Depuis cet écran, vous avez aussi la "
+"Étant donné que la liste peut devenir importante, il est possible de filtrer"
+" les personnes par leur nom.</p><p>Depuis cet écran, vous avez aussi la "
 "possibilité d'imprimer la liste des personnes. </p>"
 
 #: help/01_individual.html:11
@@ -88,8 +89,8 @@ msgstr "Edition d'un contact physique"
 msgid "help-individual_edit-detail"
 msgstr ""
 "<p>Depuis la liste précédente, vous avez la possibilité d'ajouter une "
-"nouvelle personne. Vous pouvez ré-éditer cette fiche depuis sa visualisation."
-"</p>"
+"nouvelle personne. Vous pouvez ré-éditer cette fiche depuis sa "
+"visualisation.</p>"
 
 #: help/01_individual.html:15
 msgid "help-individual_show"
@@ -102,7 +103,7 @@ msgstr ""
 "visualiser une personne.</p> <p>Cela vous permettra de consulter la fiche "
 "d'une personne précédemment enregistrée dans votre base. Vous pouvez "
 "modifier cette fiche ou l'imprimer. Vous pouvez également lui donner un "
-"alias de connexion à l'application associé à un droit d'accès (voir Les "
+"alias de connexion à l'application associée à un droit d'accès (voir Les "
 "utilisateurs). Si cette personne n'est pas référencée dans d'autres "
 "enregistrements de l'application, vous avez la possibilité de la supprimer. "
 "</p>"
@@ -117,9 +118,9 @@ msgstr ""
 "<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne "
 "physique</i> de personne physique vous permet de définir un critère de "
 "recherche sur une personne physique.</p><p>Une fois validé, l'outil va "
-"rechercher dans la base toutes les personnes correspondantes à ces critères. "
-"Vous pourrez alors imprimer cette liste ou en visualiser/modifier une fiche."
-"</p>"
+"rechercher dans la base toutes les personnes correspondantes à ces critères."
+" Vous pourrez alors imprimer cette liste ou en visualiser/modifier une "
+"fiche.</p>"
 
 #: help/02_legal_entity.html:2
 msgid "02_legal_entity.html"
@@ -139,11 +140,11 @@ msgstr "Liste de vos contacts moraux"
 msgid "help-legal_entity_list-detail"
 msgstr ""
 "<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes</i> morales vous "
-"permet de consulter la liste des structures que vous avez déjà enregistrées. "
-"Chaque contact moral est associé à une catégorie. Dans cette liste, vous "
+"permet de consulter la liste des structures que vous avez déjà enregistrées."
+" Chaque contact moral est associé à une catégorie. Dans cette liste, vous "
 "consultez vos structures filtrées par ces catégories.</p><p>Depuis cet "
-"écran, vous avez aussi la possibilité d'imprimer la liste des structures. </"
-"p>"
+"écran, vous avez aussi la possibilité d'imprimer la liste des structures. "
+"</p>"
 
 #: help/02_legal_entity.html:11
 msgid "help-legal_entity_edit"
@@ -189,9 +190,9 @@ msgstr "Recherche d'un contact moral"
 #: help/02_legal_entity.html:24
 msgid "help-legal_entity_find-detail"
 msgstr ""
-"<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne morale</"
-"i> de personne morale vous permet de définir un critère de recherche sur une "
-"structure morale.</p>"
+"<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne "
+"morale</i> de personne morale vous permet de définir un critère de recherche"
+" sur une structure morale.</p>"
 
 #: help/03_configuration.html:2
 msgid "03_configuration.html"
@@ -212,17 +213,17 @@ msgid "help-configuration_contact-detail"
 msgstr ""
 "<p>Dans cet écran, vous avez la possibilité de créer ou de modifier une "
 "définition de fonction, ou responsabilité, pour associer une personne "
-"physique à une structure morale. Vous pouvez créer ou modifier une catégorie "
-"de structure morale pour vous aider dans la classification de vos contacts "
+"physique à une structure morale. Vous pouvez créer ou modifier une catégorie"
+" de structure morale pour vous aider dans la classification de vos contacts "
 "moraux.</p> <p>Il se peut que vous ayez besoin de préciser des informations "
 "supplémentaires pour vos différents contacts. Vous avez ici la possibilité "
 "d'ajouter des champs personnels pour chaque type de contacts. Pour ajouter "
 "un champ, vous devez simplement donner son titre ainsi que définir son type "
-"et éventuellement les compléments nécessaires.<br/>5 types are possibles:"
-"<ul><li>chaîne de texte</li><li>nombre entier</li><li>nombre à virgule "
-"(réel)</li><li>valeur Oui/Non (booléen)</li><li>choix dans une liste "
-"(énumération)</li></ul> Dans le cas de l'énumération, vous devez définir la "
-"liste des valeurs possibles (mots) séparées par un point-virgule.</p>"
+"et éventuellement les compléments nécessaires.<br/>5 types are "
+"possibles:<ul><li>chaîne de texte</li><li>nombre entier</li><li>nombre à "
+"virgule (réel)</li><li>valeur Oui/Non (booléen)</li><li>choix dans une liste"
+" (énumération)</li></ul> Dans le cas de l'énumération, vous devez définir la"
+" liste des valeurs possibles (mots) séparées par un point-virgule.</p>"
 
 #: help/03_configuration.html:10
 msgid "help-configuration_postalCode"
@@ -300,7 +301,7 @@ msgstr "pays"
 
 #: models.py:56
 msgid "postal codes"
-msgstr "code postaux"
+msgstr "codes postaux"
 
 #: models.py:74
 msgid "individual function"
@@ -325,7 +326,7 @@ msgstr "modèle"
 
 #: models.py:99
 msgid "kind"
-msgstr "type"
+msgstr "genre"
 
 #: models.py:99
 msgid "String"
@@ -345,7 +346,7 @@ msgstr "Booléen"
 
 #: models.py:100 tools.py:77 views_contacts.py:337
 msgid "Select"
-msgstr "Selection"
+msgstr "Sélection"
 
 #: models.py:101
 msgid "arguments"
@@ -413,7 +414,7 @@ msgstr "002@Responsables"
 
 #: models.py:388
 msgid "You cannot delete this legal entity!"
-msgstr "Vous ne pouvez supprimer cette structure morale!"
+msgstr "Vous ne pouvez pas supprimer cette structure morale!"
 
 #: models.py:392 models.py:451
 msgid "legal entity"
@@ -469,7 +470,7 @@ msgstr "Nos coordonnées"
 
 #: tools.py:40
 msgid "Select contact"
-msgstr "Selection un contact"
+msgstr "Sélection un contact"
 
 #: tools.py:48
 msgid "ok"
@@ -614,7 +615,7 @@ msgstr "Outil d'import de contacts via fichier CSV"
 
 #: views.py:320
 msgid "Contact import"
-msgstr "Import de contacts"
+msgstr "Importation de contacts"
 
 #: views.py:344
 msgid "CSV file"
@@ -794,11 +795,11 @@ msgstr "Recherche de contacts en duplication"
 
 #: views_contacts.py:427
 msgid "Show contact"
-msgstr "Voir un contact"
+msgstr "Afficher un contact"
 
 #: views_contacts.py:441
 msgid "Delete contact"
-msgstr "Supprime un contact"
+msgstr "Supprimer un contact"
 
 #: views_contacts.py:456
 #, python-format
