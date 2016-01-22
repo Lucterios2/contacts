@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-08 16:11+0000\n"
+"POT-Creation-Date: 2016-01-21 16:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,170 +56,6 @@ msgstr "Write to all"
 #: editors.py:330 views_contacts.py:340
 msgid "Show"
 msgstr "Show"
-
-#: help/01_individual.html:2
-msgid "01_individual.html"
-msgstr "Individuals"
-
-#: help/01_individual.html:4
-msgid "help-individual_intro"
-msgstr "<p>Individual is a humain, man or woman, to memorize </p>"
-
-#: help/01_individual.html:6
-msgid "help-individual_list"
-msgstr "List of yours individuals"
-
-#: help/01_individual.html:8
-msgid "help-individual_list-detail"
-msgstr ""
-"<p> The menu <i>Office/Addresses and Contacts/Individuals</i> allows you to "
-"view the list of people you have already registered.As the list can become "
-"important, it is possible to filter people by name. </p><p> In this screen, "
-"you also have the possibility to print the list of people. </p>"
-
-#: help/01_individual.html:11
-msgid "help-individual_edit"
-msgstr "Edit an individual"
-
-#: help/01_individual.html:12
-msgid "help-individual_edit-detail"
-msgstr ""
-"<p> In the previous list, you can add a new person. You can re-edit this "
-"file since its show screen. </p>"
-
-#: help/01_individual.html:15
-msgid "help-individual_show"
-msgstr "Show a individual"
-
-#: help/01_individual.html:16
-msgid "help-individual_show-detail"
-msgstr ""
-"<p> In the list of individuals, you have the option of viewing a person. </ "
-"p><p> This will allow you to view the profile of a person previously saved "
-"in your database. You can edit this record or print it. You can also give "
-"him a connection alias to the associated application to a right of access "
-"(see Users). If that person is not referenced in other recordings of the "
-"application, you have the option to delete it. </ p>"
-
-#: help/01_individual.html:19
-msgid "help-individual_find"
-msgstr "Search a Individual"
-
-#: help/01_individual.html:20
-msgid "help-individual_find-detail"
-msgstr ""
-"<p> The menu <i>Office/Addresses and Contacts/Individual search</i> lets you "
-"define a search on an individual. </p><p> After validation, the tool will "
-"search the database all relevant persons these criteria. You can then print "
-"the list or view / edit a form. </p>"
-
-#: help/02_legal_entity.html:2
-msgid "02_legal_entity.html"
-msgstr "Legal entity"
-
-#: help/02_legal_entity.html:4
-msgid "help-legal_entity_intro"
-msgstr ""
-"<p> A legal entity is a structure or a person of organization (company, "
-"association, administration, ...), to memorize. </p>"
-
-#: help/02_legal_entity.html:6
-msgid "help-legal_entity_list"
-msgstr "list of your legal entities"
-
-#: help/02_legal_entity.html:8
-msgid "help-legal_entity_list-detail"
-msgstr ""
-"<p> The menu <i>Office/Addresses and Contacts/Legal entities</i> lets you "
-"consult the list of structures you have already registered. Each moral "
-"contact is associated with a category. In this list, you see your structures "
-"filtered by these categories. </p><p> From this screen, you also have the "
-"possibility to print the list of structures. </p>"
-
-#: help/02_legal_entity.html:11
-msgid "help-legal_entity_edit"
-msgstr "Edit a legal entity"
-
-#: help/02_legal_entity.html:12
-msgid "help-legal_entity_edit-detail"
-msgstr ""
-"<p> In the previous list, you can create a new structure. You can re-edit it "
-"in its showing screen. </p>"
-
-#: help/02_legal_entity.html:15
-msgid "help-legal_entity_show"
-msgstr "Show a legal entity"
-
-#: help/02_legal_entity.html:16
-msgid "help-legal_entity_show-detail"
-msgstr ""
-"<p> In the list of legal entities, you can view a structure. </ p><p> This "
-"will allow you to view the profile of a previously entered into your "
-"database structure. You can edit this record or print it. If that structure "
-"is not referenced in other recording application, you can delete it. </ p>"
-
-#: help/02_legal_entity.html:19
-msgid "help-legal_entity_responsability"
-msgstr "Responsability of a legal entity"
-
-#: help/02_legal_entity.html:20
-msgid "help-legal_entity_responsability-detail"
-msgstr ""
-"<p> You have the ability to associate an individual to your organization. </"
-"p><p> Select the new responsible: if the person does not exist in your "
-"database, you will be able to create it.You can also add a function to a "
-"specific charge. </p>"
-
-#: help/02_legal_entity.html:23
-msgid "help-legal_entity_find"
-msgstr "Search a legal entity"
-
-#: help/02_legal_entity.html:24
-msgid "help-legal_entity_find-detail"
-msgstr ""
-"<p> The menu <i>Office/Addresses and Contacts/Legal entity search</i> lets "
-"you define a search on a moral structure. </p>"
-
-#: help/03_configuration.html:2
-msgid "03_configuration.html"
-msgstr "Configuration and parameters"
-
-#: help/03_configuration.html:4
-msgid "help-configuration_intro"
-msgstr ""
-"<p> In the Menu <i>Management/Modules (conf.) </i> you have at your disposal "
-"tools to configure the contact management. </p>"
-
-#: help/03_configuration.html:6
-msgid "help-configuration_contact"
-msgstr "Contact configuration"
-
-#: help/03_configuration.html:8
-msgid "help-configuration_contact-detail"
-msgstr ""
-"<p> In this screen, you can create or edit a responsibility function "
-"definition, using to link an individual to a legal entity. You can create or "
-"edit a structure type to assist in the classification of your legal "
-"entities . </p><p> It may be that you need to specify additional information "
-"for your different contacts. Here you can add custom fields for each type of "
-"contact.To add a field, you simply must give its title and define its type "
-"and possibly necessary complements.<br/>5 types are possibles:<ul><li>text "
-"string</li><li>integer</li><li>point number (real)</li><li>value yes/no "
-"(boolean)</li><li>choose from a list (enumeration)</li></ul>In the case of "
-"the enumeration, you must define the list of possible values ​​(words) "
-"separated by a semicolon. </p>"
-
-#: help/03_configuration.html:10
-msgid "help-configuration_postalCode"
-msgstr "Postal codes/cities"
-
-#: help/03_configuration.html:12
-msgid "help-configuration_postalCode-detail"
-msgstr ""
-"<p> To help you in your contact entry, the tool will automatically search "
-"the city associated with the postal code that you entered. In this screen, "
-"you can add missing zip codes. By default, the French and Swiss postal codes "
-"are inserted. </p>"
 
 #: migrations/0001_initial.py:51 migrations/0001_initial.py:64
 msgid "listing"
@@ -790,3 +626,141 @@ msgstr "Total number of legal entities: %d"
 #, python-format
 msgid "Total number of individuals: %d"
 msgstr "Total number of individuals: %d"
+
+#~ msgid "01_individual.html"
+#~ msgstr "Individuals"
+
+#~ msgid "help-individual_intro"
+#~ msgstr "<p>Individual is a humain, man or woman, to memorize </p>"
+
+#~ msgid "help-individual_list"
+#~ msgstr "List of yours individuals"
+
+#~ msgid "help-individual_list-detail"
+#~ msgstr ""
+#~ "<p> The menu <i>Office/Addresses and Contacts/Individuals</i> allows you "
+#~ "to view the list of people you have already registered.As the list can "
+#~ "become important, it is possible to filter people by name. </p><p> In "
+#~ "this screen, you also have the possibility to print the list of people. </"
+#~ "p>"
+
+#~ msgid "help-individual_edit"
+#~ msgstr "Edit an individual"
+
+#~ msgid "help-individual_edit-detail"
+#~ msgstr ""
+#~ "<p> In the previous list, you can add a new person. You can re-edit this "
+#~ "file since its show screen. </p>"
+
+#~ msgid "help-individual_show"
+#~ msgstr "Show a individual"
+
+#~ msgid "help-individual_show-detail"
+#~ msgstr ""
+#~ "<p> In the list of individuals, you have the option of viewing a person. "
+#~ "</ p><p> This will allow you to view the profile of a person previously "
+#~ "saved in your database. You can edit this record or print it. You can "
+#~ "also give him a connection alias to the associated application to a right "
+#~ "of access (see Users). If that person is not referenced in other "
+#~ "recordings of the application, you have the option to delete it. </ p>"
+
+#~ msgid "help-individual_find"
+#~ msgstr "Search a Individual"
+
+#~ msgid "help-individual_find-detail"
+#~ msgstr ""
+#~ "<p> The menu <i>Office/Addresses and Contacts/Individual search</i> lets "
+#~ "you define a search on an individual. </p><p> After validation, the tool "
+#~ "will search the database all relevant persons these criteria. You can "
+#~ "then print the list or view / edit a form. </p>"
+
+#~ msgid "02_legal_entity.html"
+#~ msgstr "Legal entity"
+
+#~ msgid "help-legal_entity_intro"
+#~ msgstr ""
+#~ "<p> A legal entity is a structure or a person of organization (company, "
+#~ "association, administration, ...), to memorize. </p>"
+
+#~ msgid "help-legal_entity_list"
+#~ msgstr "list of your legal entities"
+
+#~ msgid "help-legal_entity_list-detail"
+#~ msgstr ""
+#~ "<p> The menu <i>Office/Addresses and Contacts/Legal entities</i> lets you "
+#~ "consult the list of structures you have already registered. Each moral "
+#~ "contact is associated with a category. In this list, you see your "
+#~ "structures filtered by these categories. </p><p> From this screen, you "
+#~ "also have the possibility to print the list of structures. </p>"
+
+#~ msgid "help-legal_entity_edit"
+#~ msgstr "Edit a legal entity"
+
+#~ msgid "help-legal_entity_edit-detail"
+#~ msgstr ""
+#~ "<p> In the previous list, you can create a new structure. You can re-edit "
+#~ "it in its showing screen. </p>"
+
+#~ msgid "help-legal_entity_show"
+#~ msgstr "Show a legal entity"
+
+#~ msgid "help-legal_entity_show-detail"
+#~ msgstr ""
+#~ "<p> In the list of legal entities, you can view a structure. </ p><p> "
+#~ "This will allow you to view the profile of a previously entered into your "
+#~ "database structure. You can edit this record or print it. If that "
+#~ "structure is not referenced in other recording application, you can "
+#~ "delete it. </ p>"
+
+#~ msgid "help-legal_entity_responsability"
+#~ msgstr "Responsability of a legal entity"
+
+#~ msgid "help-legal_entity_responsability-detail"
+#~ msgstr ""
+#~ "<p> You have the ability to associate an individual to your organization. "
+#~ "</p><p> Select the new responsible: if the person does not exist in your "
+#~ "database, you will be able to create it.You can also add a function to a "
+#~ "specific charge. </p>"
+
+#~ msgid "help-legal_entity_find"
+#~ msgstr "Search a legal entity"
+
+#~ msgid "help-legal_entity_find-detail"
+#~ msgstr ""
+#~ "<p> The menu <i>Office/Addresses and Contacts/Legal entity search</i> "
+#~ "lets you define a search on a moral structure. </p>"
+
+#~ msgid "03_configuration.html"
+#~ msgstr "Configuration and parameters"
+
+#~ msgid "help-configuration_intro"
+#~ msgstr ""
+#~ "<p> In the Menu <i>Management/Modules (conf.) </i> you have at your "
+#~ "disposal tools to configure the contact management. </p>"
+
+#~ msgid "help-configuration_contact"
+#~ msgstr "Contact configuration"
+
+#~ msgid "help-configuration_contact-detail"
+#~ msgstr ""
+#~ "<p> In this screen, you can create or edit a responsibility function "
+#~ "definition, using to link an individual to a legal entity. You can create "
+#~ "or edit a structure type to assist in the classification of your legal "
+#~ "entities . </p><p> It may be that you need to specify additional "
+#~ "information for your different contacts. Here you can add custom fields "
+#~ "for each type of contact.To add a field, you simply must give its title "
+#~ "and define its type and possibly necessary complements.<br/>5 types are "
+#~ "possibles:<ul><li>text string</li><li>integer</li><li>point number "
+#~ "(real)</li><li>value yes/no (boolean)</li><li>choose from a list "
+#~ "(enumeration)</li></ul>In the case of the enumeration, you must define "
+#~ "the list of possible values ​​(words) separated by a semicolon. </p>"
+
+#~ msgid "help-configuration_postalCode"
+#~ msgstr "Postal codes/cities"
+
+#~ msgid "help-configuration_postalCode-detail"
+#~ msgstr ""
+#~ "<p> To help you in your contact entry, the tool will automatically search "
+#~ "the city associated with the postal code that you entered. In this "
+#~ "screen, you can add missing zip codes. By default, the French and Swiss "
+#~ "postal codes are inserted. </p>"
