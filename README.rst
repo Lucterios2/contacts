@@ -18,8 +18,14 @@ To contribute to Lucterios:
 Featuring of Contacts modules
 -----------------------------
 
-* Add, modify and delete legal entities
-* Add, modify and delete individuals
-* Add, remove responsability (individual) for a legal entities
-* Allow to define customize fields
-* Configuration
+* contacts
+ * Add, modify and delete legal entities
+ * Add, modify and delete individuals
+ * Add, remove responsability (individual) for a legal entities
+ * Allow to define customize fields
+ * Configuration
+* mailing
+ * Create message for mailing
+ * Associate message to a criteria of contacts
+ * Send message by email
+ * Generate message in PDF for letters
