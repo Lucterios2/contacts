@@ -59,7 +59,7 @@ class Account(XferContainerCustom):
 
     def fillresponse(self):
         img = XferCompImage('img')
-        img.set_value('lucterios.contacts/images/account.png')
+        img.set_value(get_icon_path('lucterios.contacts/images/account.png'))
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -149,7 +149,7 @@ class Configuration(XferContainerCustom):
     def _fill_functions(self):
         self.new_tab(_("Functions and responsabilities"))
         img = XferCompImage('imgFunction')
-        img.set_value('lucterios.contacts/images/function.png')
+        img.set_value(get_icon_path('lucterios.contacts/images/function.png'))
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleFunction')
@@ -172,7 +172,7 @@ class Configuration(XferContainerCustom):
     def _fill_structuretype(self):
         self.new_tab(_("Structure type"))
         img = XferCompImage('imgType')
-        img.set_value('lucterios.contacts/images/category.png')
+        img.set_value(get_icon_path('lucterios.contacts/images/category.png'))
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleType')
