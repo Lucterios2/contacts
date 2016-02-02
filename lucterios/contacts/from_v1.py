@@ -148,6 +148,8 @@ class ContactsMigrate(MigrateAbstract):
         cur.execute(
             "SELECT id, superId, raisonSociale, type, siren FROM org_lucterios_contacts_personneMorale ORDER BY id")
         for legalentityid, legalentity_super, legalentity_name, legalentity_type, legalentity_siren in cur.fetchall():
+            if legalentity_name is None:
+                legalentity_name = ''
             self.print_debug(
                 "=> LegalEntity[%d] %s (siren=%s)", (legalentityid, legalentity_name, legalentity_siren))
             new_legalentity = legalentity_mdl.objects.create(
