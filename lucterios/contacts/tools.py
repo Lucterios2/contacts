@@ -38,6 +38,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
     model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Select contact")
+    mode_select = SELECT_SINGLE
     select_class = None
     final_class = None
 
@@ -48,26 +49,20 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
                 self.final_class.get_action(_('ok'), "images/ok.png"), {})
         model_current = self.getparam('modelname')
         if model_current is None:
-            self.model = AbstractContact
+            current_model = self.model
         else:
-            self.model = apps.get_model(model_current)
-        self.field_id = self.model.__name__.lower()
-        self.item = self.model()
+            current_model = apps.get_model(model_current)
+        self.field_id = current_model.__name__.lower()
+        self.item = current_model()
         XferSearchEditor.fillresponse(self)
         self.remove_component('title')
         lbl = XferCompLabelForm('modelname_lbl')
         lbl.set_value_as_title(_('model'))
         lbl.set_location(1, 0)
         self.add_component(lbl)
-        list_of_modal = []
-        list_of_modal.append((AbstractContact.get_long_name(
-        ), AbstractContact._meta.verbose_name.title()))
-        for sub_class in AbstractContact.__subclasses__():
-            list_of_modal.append((sub_class.get_long_name(), sub_class._meta.verbose_name.title(
-            )))
         selected_model = XferCompSelect('modelname')
         selected_model.set_value(model_current)
-        selected_model.set_select(list_of_modal)
+        selected_model.set_select(self.model.get_select_contact_type())
         selected_model.set_location(2, 0, 3)
         selected_model.set_action(
             self.request, self.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
@@ -75,4 +70,4 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
             grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"), {
-                            'close': CLOSE_YES, 'unique': SELECT_SINGLE, 'params': {'pkname': self.field_id}}, 0)
+                            'close': CLOSE_YES, 'unique': self.mode_select, 'params': {'pkname': self.field_id}}, 0)
