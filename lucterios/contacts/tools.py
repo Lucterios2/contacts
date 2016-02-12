@@ -36,6 +36,7 @@ from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 class ContactSelection(XferSavedCriteriaSearchEditor):
     icon = "contacts.png"
     model = AbstractContact
+    inital_model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Select contact")
     mode_select = SELECT_SINGLE
@@ -49,11 +50,11 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
                 self.final_class.get_action(_('ok'), "images/ok.png"), {})
         model_current = self.getparam('modelname')
         if model_current is None:
-            current_model = self.model
+            self.model = self.inital_model
         else:
-            current_model = apps.get_model(model_current)
-        self.field_id = current_model.__name__.lower()
-        self.item = current_model()
+            self.model = apps.get_model(model_current)
+        self.field_id = self.model.__name__.lower()
+        self.item = self.model()
         XferSearchEditor.fillresponse(self)
         self.remove_component('title')
         lbl = XferCompLabelForm('modelname_lbl')
@@ -62,7 +63,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         self.add_component(lbl)
         selected_model = XferCompSelect('modelname')
         selected_model.set_value(model_current)
-        selected_model.set_select(self.model.get_select_contact_type())
+        selected_model.set_select(self.inital_model.get_select_contact_type())
         selected_model.set_location(2, 0, 3)
         selected_model.set_action(
             self.request, self.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
