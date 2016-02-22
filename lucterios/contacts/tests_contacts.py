@@ -965,7 +965,7 @@ class ContactsTest(LucteriosTest):
 
     def _initial_custom_values(self):
 
-        initial_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},
+        add_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},
                           {'name': 'bbb', 'modelname': 'contacts.AbstractContact', 'kind': '1',
                               'args': "{'multi':False,'min':0, 'max':100, 'prec':0, 'list':[]}"},
                           {'name': 'ccc', 'modelname': 'contacts.AbstractContact', 'kind': '2',
@@ -975,7 +975,7 @@ class ContactsTest(LucteriosTest):
                           {'name': 'eee', 'modelname': 'contacts.Individual', 'kind': '4', 'args':
                               "{'multi':False,'min':0, 'max':0, 'prec':0, 'list':['U','V','W','X','Y','Z']}"},
                           {'name': 'fff', 'modelname': 'contacts.Individual', 'kind': '0', 'args': "{'multi':True,'min':0, 'max':0, 'prec':0, 'list':[]}"}]
-        for initial_value in initial_values:
+        for initial_value in add_values:
             CustomField.objects.create(
                 **initial_value)
 

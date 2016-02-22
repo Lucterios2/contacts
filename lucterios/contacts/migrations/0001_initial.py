@@ -39,7 +39,7 @@ from lucterios.contacts.models import LegalEntity, Individual
 from lucterios.CORE.models import PrintModel, Parameter
 
 
-def initial_values(apps, schema_editor):
+def add_values(apps, schema_editor):
     # pylint: disable=unused-argument, no-member
     translation.activate(settings.LANGUAGE_CODE)
     legalentity = apps.get_model("contacts", "LegalEntity")
@@ -296,5 +296,5 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.RunPython(initial_postalcodes),
-        migrations.RunPython(initial_values),
+        migrations.RunPython(add_values),
     ]
