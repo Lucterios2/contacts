@@ -964,18 +964,17 @@ class ContactsTest(LucteriosTest):
             'COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="kind"]', 'Sélection')
 
     def _initial_custom_values(self):
-
-        add_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},
+        initial_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},
                           {'name': 'bbb', 'modelname': 'contacts.AbstractContact', 'kind': '1',
-                              'args': "{'multi':False,'min':0, 'max':100, 'prec':0, 'list':[]}"},
+                           'args': "{'multi':False,'min':0, 'max':100, 'prec':0, 'list':[]}"},
                           {'name': 'ccc', 'modelname': 'contacts.AbstractContact', 'kind': '2',
-                              'args': "{'multi':False,'min':-10.0, 'max':10.0, 'prec':1, 'list':[]}"},
+                           'args': "{'multi':False,'min':-10.0, 'max':10.0, 'prec':1, 'list':[]}"},
                           {'name': 'ddd', 'modelname': 'contacts.LegalEntity', 'kind': '3',
-                              'args': "{'multi':False,'min':0, 'max':0, 'prec':0, 'list':[]}"},
+                           'args': "{'multi':False,'min':0, 'max':0, 'prec':0, 'list':[]}"},
                           {'name': 'eee', 'modelname': 'contacts.Individual', 'kind': '4', 'args':
-                              "{'multi':False,'min':0, 'max':0, 'prec':0, 'list':['U','V','W','X','Y','Z']}"},
+                           "{'multi':False,'min':0, 'max':0, 'prec':0, 'list':['U','V','W','X','Y','Z']}"},
                           {'name': 'fff', 'modelname': 'contacts.Individual', 'kind': '0', 'args': "{'multi':True,'min':0, 'max':0, 'prec':0, 'list':[]}"}]
-        for initial_value in add_values:
+        for initial_value in initial_values:
             CustomField.objects.create(
                 **initial_value)
 

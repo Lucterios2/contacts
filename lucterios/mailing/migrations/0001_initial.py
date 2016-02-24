@@ -33,7 +33,7 @@ from django.db import migrations
 from lucterios.CORE.models import Parameter
 
 
-def add_values(apps, schema_editor):
+def initial_values(apps, schema_editor):
     translation.activate(settings.LANGUAGE_CODE)
 
     param = Parameter.objects.create(name='mailing-smtpserver', typeparam=0)
@@ -87,5 +87,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_values),
+        migrations.RunPython(initial_values),
     ]
