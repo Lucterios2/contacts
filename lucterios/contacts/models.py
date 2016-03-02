@@ -446,9 +446,9 @@ class Individual(AbstractContact):
 
 class Responsability(LucteriosModel):
     individual = models.ForeignKey(
-        Individual, verbose_name=_('individual'), null=False)
+        Individual, verbose_name=_('individual'), null=False, on_delete=models.CASCADE)
     legal_entity = models.ForeignKey(
-        LegalEntity, verbose_name=_('legal entity'), null=False)
+        LegalEntity, verbose_name=_('legal entity'), null=False, on_delete=models.CASCADE)
     functions = models.ManyToManyField(
         Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]

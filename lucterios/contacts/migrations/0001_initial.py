@@ -232,9 +232,9 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
                 ('value', models.TextField(verbose_name='value', default='')),
                 ('contact', models.ForeignKey(
-                    to='contacts.AbstractContact', verbose_name='contact')),
+                    to='contacts.AbstractContact', verbose_name='contact', on_delete=models.CASCADE)),
                 ('field', models.ForeignKey(
-                    to='contacts.CustomField', verbose_name='field')),
+                    to='contacts.CustomField', verbose_name='field', on_delete=models.CASCADE)),
             ],
             options={
                 'default_permissions': [],
@@ -247,7 +247,7 @@ class Migration(migrations.Migration):
             name='LegalEntity',
             fields=[
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True,
-                                                             to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
+                                                             to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True, on_delete=models.CASCADE)),
                 ('name', models.CharField(
                     max_length=100, verbose_name='name', blank=False)),
                 ('identify_number', models.CharField(
@@ -262,7 +262,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Individual',
             fields=[
-                ('abstractcontact_ptr', models.OneToOneField(auto_created=True,
+                ('abstractcontact_ptr', models.OneToOneField(auto_created=True, on_delete=models.CASCADE,
                                                              to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True)),
                 ('firstname', models.CharField(
                     max_length=50, verbose_name='firstname')),
@@ -284,10 +284,10 @@ class Migration(migrations.Migration):
                     serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('functions', models.ManyToManyField(
                     blank=True, verbose_name='functions', to='contacts.Function')),
-                ('individual', models.ForeignKey(
-                    verbose_name='individual', to='contacts.Individual')),
-                ('legal_entity', models.ForeignKey(
-                    verbose_name='legal entity', to='contacts.LegalEntity')),
+                ('individual', models.ForeignKey(on_delete=models.CASCADE,
+                                                 verbose_name='individual', to='contacts.Individual')),
+                ('legal_entity', models.ForeignKey(on_delete=models.CASCADE,
+                                                   verbose_name='legal entity', to='contacts.LegalEntity')),
             ],
             options={
                 'verbose_name_plural': 'responsabilities',
