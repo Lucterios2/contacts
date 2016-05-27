@@ -443,26 +443,29 @@ class AbstractContactDel(XferDelete):
 
 @signal_and_lock.Signal.decorate('summary')
 def summary_contacts(xfer):
-    row = xfer.get_max_row() + 1
-    lab = XferCompLabelForm('contactstitle')
-    lab.set_value_as_infocenter(_("Addresses and contacts"))
-    lab.set_location(0, row, 4)
-    xfer.add_component(lab)
-    nb_legal_entities = len(
-        LegalEntity.objects.all())
-    lbl_doc = XferCompLabelForm('lbl_nblegalentities')
-    lbl_doc.set_location(0, row + 1, 4)
-    lbl_doc.set_value_center(
-        _("Total number of legal entities: %d") % nb_legal_entities)
-    xfer.add_component(lbl_doc)
-    nb_individual = len(Individual.objects.all())
-    lbl_doc = XferCompLabelForm('lbl_nbindividuals')
-    lbl_doc.set_location(0, row + 2, 4)
-    lbl_doc.set_value_center(
-        _("Total number of individuals: %d") % nb_individual)
-    xfer.add_component(lbl_doc)
-    lab = XferCompLabelForm('contactsend')
-    lab.set_value_center('{[hr/]}')
-    lab.set_location(0, row + 3, 4)
-    xfer.add_component(lab)
-    return True
+    if WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact'):
+        row = xfer.get_max_row() + 1
+        lab = XferCompLabelForm('contactstitle')
+        lab.set_value_as_infocenter(_("Addresses and contacts"))
+        lab.set_location(0, row, 4)
+        xfer.add_component(lab)
+        nb_legal_entities = len(
+            LegalEntity.objects.all())
+        lbl_doc = XferCompLabelForm('lbl_nblegalentities')
+        lbl_doc.set_location(0, row + 1, 4)
+        lbl_doc.set_value_center(
+            _("Total number of legal entities: %d") % nb_legal_entities)
+        xfer.add_component(lbl_doc)
+        nb_individual = len(Individual.objects.all())
+        lbl_doc = XferCompLabelForm('lbl_nbindividuals')
+        lbl_doc.set_location(0, row + 2, 4)
+        lbl_doc.set_value_center(
+            _("Total number of individuals: %d") % nb_individual)
+        xfer.add_component(lbl_doc)
+        lab = XferCompLabelForm('contactsend')
+        lab.set_value_center('{[hr/]}')
+        lab.set_location(0, row + 3, 4)
+        xfer.add_component(lab)
+        return True
+    else:
+        return False
