@@ -443,7 +443,17 @@ class AbstractContactDel(XferDelete):
 
 @signal_and_lock.Signal.decorate('summary')
 def summary_contacts(xfer):
-    if WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact'):
+    is_right = WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact')
+    try:
+        current_individual = Individual.objects.get(user=xfer.request.user)
+        row = xfer.get_max_row() + 1
+        lab = XferCompLabelForm('contactsidentity')
+        lab.set_value_as_header(six.text_type(current_individual))
+        lab.set_location(0, row, 4)
+        xfer.add_component(lab)
+    except:
+        current_individual = None
+    if is_right:
         row = xfer.get_max_row() + 1
         lab = XferCompLabelForm('contactstitle')
         lab.set_value_as_infocenter(_("Addresses and contacts"))
@@ -462,6 +472,7 @@ def summary_contacts(xfer):
         lbl_doc.set_value_center(
             _("Total number of individuals: %d") % nb_individual)
         xfer.add_component(lbl_doc)
+    if is_right or (current_individual is not None):
         lab = XferCompLabelForm('contactsend')
         lab.set_value_center('{[hr/]}')
         lab.set_location(0, row + 3, 4)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-21 16:50+0000\n"
+"POT-Creation-Date: 2016-05-27 20:44+0000\n"
 "PO-Revision-Date: 2016-01-11 23:12+0000\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,69 +47,69 @@ msgstr "liste"
 msgid "image"
 msgstr "image"
 
-#: editors.py:280
+#: editors.py:281
 msgid "Promote"
 msgstr "Promouvoir"
 
-#: editors.py:306
+#: editors.py:307
 msgid "Write to all"
 msgstr "Ecrire à tous"
 
-#: editors.py:330 views_contacts.py:340
+#: editors.py:331 views_contacts.py:340
 msgid "Show"
 msgstr "Voir"
 
-#: migrations/0001_initial.py:51 migrations/0001_initial.py:64
+#: migrations/0001_initial.py:50 migrations/0001_initial.py:63
 msgid "listing"
 msgstr "liste"
 
-#: migrations/0001_initial.py:52 models.py:63 models.py:80 models.py:98
+#: migrations/0001_initial.py:51 models.py:63 models.py:80 models.py:98
 #: models.py:342
 msgid "name"
 msgstr "nom"
 
-#: migrations/0001_initial.py:53 migrations/0001_initial.py:67 models.py:182
+#: migrations/0001_initial.py:52 migrations/0001_initial.py:66 models.py:182
 msgid "address"
 msgstr "adresse"
 
-#: migrations/0001_initial.py:54 migrations/0001_initial.py:68 models.py:40
+#: migrations/0001_initial.py:53 migrations/0001_initial.py:67 models.py:40
 #: models.py:185
 msgid "city"
 msgstr "ville"
 
-#: migrations/0001_initial.py:55 migrations/0001_initial.py:69
+#: migrations/0001_initial.py:54 migrations/0001_initial.py:68
 msgid "tel"
 msgstr "tel"
 
-#: migrations/0001_initial.py:56 migrations/0001_initial.py:70 models.py:189
+#: migrations/0001_initial.py:55 migrations/0001_initial.py:69 models.py:189
 msgid "email"
 msgstr "courriel"
 
-#: migrations/0001_initial.py:59 migrations/0001_initial.py:73
+#: migrations/0001_initial.py:58 migrations/0001_initial.py:72
 msgid "label"
 msgstr "étiquette"
 
-#: migrations/0001_initial.py:65 models.py:401
+#: migrations/0001_initial.py:64 models.py:401
 msgid "firstname"
 msgstr "prénom"
 
-#: migrations/0001_initial.py:66 models.py:402
+#: migrations/0001_initial.py:65 models.py:402
 msgid "lastname"
 msgstr "nom"
 
-#: migrations/0001_initial.py:79
+#: migrations/0001_initial.py:78
 msgid "contacts-mailtoconfig"
 msgstr "Type d'envoie de courriel"
 
-#: migrations/0001_initial.py:80
+#: migrations/0001_initial.py:79
 msgid "contacts-mailtoconfig.0"
 msgstr "A ..."
 
-#: migrations/0001_initial.py:81
+#: migrations/0001_initial.py:80
 msgid "contacts-mailtoconfig.1"
 msgstr "Copie à ..."
 
-#: migrations/0001_initial.py:81
+#: migrations/0001_initial.py:80
 msgid "contacts-mailtoconfig.2"
 msgstr "Copie caché à ..."
 
@@ -141,8 +141,8 @@ msgstr "type de structure"
 msgid "structure types"
 msgstr "types de structure"
 
-#: models.py:97 models.py:113 tools.py:59 views.py:334 views.py:510
-#: views.py:525
+#: models.py:97 models.py:113 tools.py:61 views.py:402 views.py:578
+#: views.py:593
 msgid "model"
 msgstr "modèle"
 
@@ -166,7 +166,7 @@ msgstr "Réel"
 msgid "Boolean"
 msgstr "Booléen"
 
-#: models.py:100 tools.py:77 views_contacts.py:337
+#: models.py:100 tools.py:73 views_contacts.py:337
 msgid "Select"
 msgstr "Sélection"
 
@@ -226,7 +226,7 @@ msgstr "contacts génériques"
 msgid "identify number"
 msgstr "N° SIRET/SIREN"
 
-#: models.py:353 models.py:411
+#: models.py:353 models.py:411 views.py:90
 msgid "001@Identity"
 msgstr "001@Identité"
 
@@ -290,206 +290,223 @@ msgstr "responsabilités"
 msgid "our detail"
 msgstr "Nos coordonnées"
 
-#: tools.py:40
+#: tools.py:41
 msgid "Select contact"
 msgstr "Sélection un contact"
 
-#: tools.py:48
+#: tools.py:50
 msgid "ok"
 msgstr "ok"
 
-#: views.py:55 views.py:66
+#: views.py:68 views.py:78
+msgid "Bad access!"
+msgstr "Mauvais access!"
+
+#: views.py:75
+msgid "Modify"
+msgstr "Modifier"
+
+#: views.py:81 views.py:126
 msgid "View my account."
 msgstr "Visualiser la fiche de mon compte."
 
-#: views.py:57 views.py:92 views.py:93
+#: views.py:83 views.py:160 views.py:161
 msgid "My account"
 msgstr "Mon compte"
 
-#: views.py:77 views.py:81 views.py:116
+#: views.py:87
+msgid "Legal entity"
+msgstr "Personne morale"
+
+#: views.py:108 views.py:115 views.py:137 views.py:142 views.py:184
 msgid "Edit"
 msgstr "Editer"
 
-#: views.py:84 views.py:119 views.py:222 views.py:570
+#: views.py:112 views_contacts.py:94 views_contacts.py:116
+#: views_contacts.py:132
+msgid "Legal entities"
+msgstr "Personnes morales"
+
+#: views.py:152 views.py:187 views.py:290 views.py:638
 msgid "Close"
 msgstr "Fermer"
 
-#: views.py:97 views.py:111
+#: views.py:165 views.py:179
 msgid "Our structure and its management"
 msgstr "Fiche de notre structure et de ses responsables"
 
-#: views.py:99 views.py:127 views.py:136 views.py:137
+#: views.py:167 views.py:195 views.py:204 views.py:205
 msgid "Our details"
 msgstr "Nos coordonnées"
 
-#: views.py:118
+#: views.py:186
 msgid "Print"
 msgstr "Imprimer"
 
-#: views.py:141
+#: views.py:209
 msgid "Contact"
 msgstr "Contact"
 
-#: views.py:144
+#: views.py:212
 msgid "Management functions of individuals and categories of legal entities."
 msgstr ""
 "Gestion des fonctions des personnes physiques et des catégories de "
 "structures morales."
 
-#: views.py:146
+#: views.py:214
 msgid "Contacts configuration"
 msgstr "Configuration des contacts"
 
-#: views.py:150
+#: views.py:218
 msgid "Functions and responsabilities"
 msgstr "Fonctions et responsabilités"
 
-#: views.py:156
+#: views.py:224
 msgid "Functions list"
 msgstr "Liste de fonctions"
 
-#: views.py:169
+#: views.py:237
 #, python-format
 msgid "Number of function show: %d"
 msgstr "Nombre de fonctions affichées: %d"
 
-#: views.py:173
+#: views.py:241
 msgid "Structure type"
 msgstr "Type de structure"
 
-#: views.py:179
+#: views.py:247
 msgid "Structure types list"
 msgstr "Liste des types de structure"
 
-#: views.py:192
+#: views.py:260
 #, python-format
 msgid "Number of structure type show: %d"
 msgstr "Nombre de types de structure affichés: %d"
 
-#: views.py:196
+#: views.py:264
 msgid "Custom field"
 msgstr "Champ personnalisé"
 
-#: views.py:202
+#: views.py:270
 msgid "custom field list"
 msgstr "liste de champs personnalisés"
 
-#: views.py:215
+#: views.py:283
 #, python-format
 msgid "Number of custom field show: %d"
 msgstr "Nombre de champs personnalisés affichés: %d"
 
-#: views.py:231 views.py:285
+#: views.py:299 views.py:353
 msgid "Add function"
 msgstr "Ajout d'un fonction"
 
-#: views.py:232
+#: views.py:300
 msgid "Modify function"
 msgstr "Modifier une fonction"
 
-#: views.py:238
+#: views.py:306
 msgid "Delete function"
 msgstr "Supprimer une fonction"
 
-#: views.py:250
+#: views.py:318
 msgid "Add custom field"
 msgstr "Ajouter un champ personnalisé"
 
-#: views.py:251
+#: views.py:319
 msgid "Modify custom field"
 msgstr "Modifier un champ personnalisé"
 
-#: views.py:257
+#: views.py:325
 msgid "Delete custom field"
 msgstr "Supprimer un champ personnalisé"
 
-#: views.py:269
+#: views.py:337
 msgid "Add structure type"
 msgstr "Ajouter un type de structure"
 
-#: views.py:270
+#: views.py:338
 msgid "Modify structure type"
 msgstr "Modifier un type de structure"
 
-#: views.py:276
+#: views.py:344
 msgid "Delete structure type"
 msgstr "Supprimer un type de structure"
 
-#: views.py:286
+#: views.py:354
 msgid "Add postal code"
 msgstr "Ajouter un code postal"
 
-#: views.py:292
+#: views.py:360
 msgid "Management of postal codes associated with their communes."
 msgstr "Gestion des codes postaux associés à leurs communes."
 
-#: views.py:294
+#: views.py:362
 msgid "Postal code"
 msgstr "Code postal"
 
-#: views.py:306
+#: views.py:374
 msgid "Filtrer by postal code"
 msgstr "Filtrer par code postal"
 
-#: views.py:318
+#: views.py:386
 msgid "Tool to import contacts from CSV file."
 msgstr "Outil d'import de contacts via fichier CSV"
 
-#: views.py:320
+#: views.py:388
 msgid "Contact import"
 msgstr "Importation de contacts"
 
-#: views.py:344
+#: views.py:412
 msgid "CSV file"
 msgstr "Fichier CSV"
 
-#: views.py:353
+#: views.py:421
 msgid "encoding"
 msgstr "encodage"
 
-#: views.py:361
+#: views.py:429
 msgid "date format"
 msgstr "format de date"
 
-#: views.py:369
+#: views.py:437
 msgid "delimiter"
 msgstr "délimiteur"
 
-#: views.py:377
+#: views.py:445
 msgid "quotechar"
 msgstr "caractère de quote"
 
-#: views.py:411
+#: views.py:479
 msgid "CSV file unvalid!"
 msgstr "Fichier CSV invalide!"
 
-#: views.py:451 views.py:545
+#: views.py:519 views.py:613
 #, python-format
 msgid "Total number of contacts: %d"
 msgstr "Nombre total de contacts: %d"
 
-#: views.py:518
+#: views.py:586
 msgid "Fields"
 msgstr "Champs"
 
-#: views.py:520
+#: views.py:588
 msgid "Current content"
 msgstr "Contenu courant"
 
-#: views.py:558
+#: views.py:626
 #, python-format
 msgid "%d contacts are been imported"
 msgstr "%d contacts ont été importés"
 
-#: views.py:564
+#: views.py:632
 msgid "Back"
 msgstr "Retour"
 
-#: views.py:566 views_contacts.py:274
+#: views.py:634 views_contacts.py:274
 msgid "Ok"
 msgstr "Ok"
 
-#: views.py:568 views_contacts.py:275
+#: views.py:636 views_contacts.py:275
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -501,7 +518,7 @@ msgstr "Bureautique"
 msgid "Office tools"
 msgstr "Outils bureautiques"
 
-#: views_contacts.py:51 views_contacts.py:448
+#: views_contacts.py:51 views_contacts.py:459
 msgid "Addresses and contacts"
 msgstr "Adresses et Contacts"
 
@@ -533,10 +550,6 @@ msgid ""
 msgstr ""
 "Gestion d'une structure ou d'une organisation de personnes (entreprise, "
 "association, administration, ...)"
-
-#: views_contacts.py:94 views_contacts.py:116 views_contacts.py:132
-msgid "Legal entities"
-msgstr "Personnes morales"
 
 #: views_contacts.py:151
 msgid "Add individual"
@@ -623,163 +636,12 @@ msgstr "Afficher un contact"
 msgid "Delete contact"
 msgstr "Supprimer un contact"
 
-#: views_contacts.py:456
+#: views_contacts.py:467
 #, python-format
 msgid "Total number of legal entities: %d"
 msgstr "Nombre total de structures morales: %d"
 
-#: views_contacts.py:462
+#: views_contacts.py:473
 #, python-format
 msgid "Total number of individuals: %d"
 msgstr "Nombre total de contacts physiques: %d"
-
-#~ msgid "01_individual.html"
-#~ msgstr "Les contact physiques"
-
-#~ msgid "help-individual_intro"
-#~ msgstr ""
-#~ "<p>Un contact physique est une personne, homme ou femme, à mémoriser. </p>"
-
-#~ msgid "help-individual_list"
-#~ msgstr "Liste de vos contacts physiques"
-
-#~ msgid "help-individual_list-detail"
-#~ msgstr ""
-#~ "<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes Physiques</i> "
-#~ "vous permet de consulter la liste des personnes que vous avez déjà "
-#~ "enregistrées. Étant donné que la liste peut devenir importante, il est "
-#~ "possible de filtrer les personnes par leur nom.</p><p>Depuis cet écran, "
-#~ "vous avez aussi la possibilité d'imprimer la liste des personnes. </p>"
-
-#~ msgid "help-individual_edit"
-#~ msgstr "Edition d'un contact physique"
-
-#~ msgid "help-individual_edit-detail"
-#~ msgstr ""
-#~ "<p>Depuis la liste précédente, vous avez la possibilité d'ajouter une "
-#~ "nouvelle personne. Vous pouvez ré-éditer cette fiche depuis sa "
-#~ "visualisation.</p>"
-
-#~ msgid "help-individual_show"
-#~ msgstr "Visualisation d'un contact physique"
-
-#~ msgid "help-individual_show-detail"
-#~ msgstr ""
-#~ "<p>Depuis la liste des personnes physiques, vous avez la possibilité de "
-#~ "visualiser une personne.</p> <p>Cela vous permettra de consulter la fiche "
-#~ "d'une personne précédemment enregistrée dans votre base. Vous pouvez "
-#~ "modifier cette fiche ou l'imprimer. Vous pouvez également lui donner un "
-#~ "alias de connexion à l'application associée à un droit d'accès (voir Les "
-#~ "utilisateurs). Si cette personne n'est pas référencée dans d'autres "
-#~ "enregistrements de l'application, vous avez la possibilité de la "
-#~ "supprimer. </p>"
-
-#~ msgid "help-individual_find"
-#~ msgstr "Recherche d'un contact physique"
-
-#~ msgid "help-individual_find-detail"
-#~ msgstr ""
-#~ "<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne "
-#~ "physique</i> de personne physique vous permet de définir un critère de "
-#~ "recherche sur une personne physique.</p><p>Une fois validé, l'outil va "
-#~ "rechercher dans la base toutes les personnes correspondantes à ces "
-#~ "critères. Vous pourrez alors imprimer cette liste ou en visualiser/"
-#~ "modifier une fiche.</p>"
-
-#~ msgid "02_legal_entity.html"
-#~ msgstr "Les contacts moraux"
-
-#~ msgid "help-legal_entity_intro"
-#~ msgstr ""
-#~ "<p>Un contact moral est une structure ou d'une organisation de personne "
-#~ "(entreprise, association, administration, ...), à mémoriser. </p>"
-
-#~ msgid "help-legal_entity_list"
-#~ msgstr "Liste de vos contacts moraux"
-
-#~ msgid "help-legal_entity_list-detail"
-#~ msgstr ""
-#~ "<p>Le menu <i>Bureautique/Adresses et Contacts/Personnes</i> morales vous "
-#~ "permet de consulter la liste des structures que vous avez déjà "
-#~ "enregistrées. Chaque contact moral est associé à une catégorie. Dans "
-#~ "cette liste, vous consultez vos structures filtrées par ces catégories.</"
-#~ "p><p>Depuis cet écran, vous avez aussi la possibilité d'imprimer la liste "
-#~ "des structures. </p>"
-
-#~ msgid "help-legal_entity_edit"
-#~ msgstr "Edition d'un contact moral"
-
-#~ msgid "help-legal_entity_edit-detail"
-#~ msgstr ""
-#~ "<p> Depuis la liste précédente, vous avez la possibilité de créer une "
-#~ "nouvelle structure. Vous pouvez ré-éditer cette fiche depuis sa "
-#~ "visualisation.</p>"
-
-#~ msgid "help-legal_entity_show"
-#~ msgstr "Visualisation d'un contact moral"
-
-#~ msgid "help-legal_entity_show-detail"
-#~ msgstr ""
-#~ "<p> Depuis la liste des personnes morales, vous avez la possibilité de "
-#~ "visualiser une structure.</p><p>Cela vous permettra de consulter la fiche "
-#~ "d'une structure précédemment entrée dans votre base. Vous pouvez modifier "
-#~ "cette fiche ou l'imprimer. Si cette personne n'est pas référencée dans "
-#~ "d'autre enregistrement de l'application, vous avez la possibilité de la "
-#~ "supprimer. </p>"
-
-#~ msgid "help-legal_entity_responsability"
-#~ msgstr "Responsables d'un contact moral"
-
-#~ msgid "help-legal_entity_responsability-detail"
-#~ msgstr ""
-#~ "<p>Vous avez la possibilité d'associer une personne physique à votre "
-#~ "structure.</p><p>Choisissez le nouveau responsable: si la personne "
-#~ "n'existe pas dans votre base, vous aurez la possibilité de la créer. Vous "
-#~ "pourrez également ajouter une fonction à un responsable défini.</p>"
-
-#~ msgid "help-legal_entity_find"
-#~ msgstr "Recherche d'un contact moral"
-
-#~ msgid "help-legal_entity_find-detail"
-#~ msgstr ""
-#~ "<p>Le menu <i>Bureautique/Adresses et Contacts/Recherche de personne "
-#~ "morale</i> de personne morale vous permet de définir un critère de "
-#~ "recherche sur une structure morale.</p>"
-
-#~ msgid "03_configuration.html"
-#~ msgstr "Configuration et paramétrage"
-
-#~ msgid "help-configuration_intro"
-#~ msgstr ""
-#~ "<p>Dans le menu <i>Administration/Modules (conf.)</i> vous avez à votre "
-#~ "disposition des outils pour configurer la gestion des contacts. </p>"
-
-#~ msgid "help-configuration_contact"
-#~ msgstr "Configuration des contacts"
-
-#~ msgid "help-configuration_contact-detail"
-#~ msgstr ""
-#~ "<p>Dans cet écran, vous avez la possibilité de créer ou de modifier une "
-#~ "définition de fonction, ou responsabilité, pour associer une personne "
-#~ "physique à une structure morale. Vous pouvez créer ou modifier une "
-#~ "catégorie de structure morale pour vous aider dans la classification de "
-#~ "vos contacts moraux.</p> <p>Il se peut que vous ayez besoin de préciser "
-#~ "des informations supplémentaires pour vos différents contacts. Vous avez "
-#~ "ici la possibilité d'ajouter des champs personnels pour chaque type de "
-#~ "contacts. Pour ajouter un champ, vous devez simplement donner son titre "
-#~ "ainsi que définir son type et éventuellement les compléments nécessaires."
-#~ "<br/>5 types are possibles:<ul><li>chaîne de texte</li><li>nombre entier</"
-#~ "li><li>nombre à virgule (réel)</li><li>valeur Oui/Non (booléen)</"
-#~ "li><li>choix dans une liste (énumération)</li></ul> Dans le cas de "
-#~ "l'énumération, vous devez définir la liste des valeurs possibles (mots) "
-#~ "séparées par un point-virgule.</p>"
-
-#~ msgid "help-configuration_postalCode"
-#~ msgstr "Codes postaux/villes"
-
-#~ msgid "help-configuration_postalCode-detail"
-#~ msgstr ""
-#~ "<p> To help you in your contact entry, the tool will automatically search "
-#~ "the city associated with the postal code that you entered.In this screen, "
-#~ "you can add missing zip codes.By default, the French and Swiss postal "
-#~ "codes are inserted. </p>"

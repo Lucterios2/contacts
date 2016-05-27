@@ -37,11 +37,11 @@ from django.db.models.fields import DateField
 from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
-    FORMTYPE_MODAL, get_icon_path
+    FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES
 from lucterios.framework.xfergraphic import XferContainerCustom
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid,\
-    XferCompSelect, XferCompUpLoad
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
+    XferCompSelect, XferCompUpLoad, XferCompButton
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.CORE.models import LucteriosUser
@@ -49,13 +49,73 @@ from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
 from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual, \
-    CustomField, AbstractContact
+    CustomField, AbstractContact, Responsability
+from lucterios.contacts.views_contacts import LegalEntityAddModify, \
+    LegalEntityShow
+from lucterios.framework.filetools import get_user_path, readimage_to_base64
+from os.path import exists
+
+
+@ActionsManage.affect('LegalEntity', 'currentmodify')
+@MenuManage.describ(None)
+class CurrentLegalEntityModify(LegalEntityAddModify):
+    
+    def fillresponse(self):
+        try:
+            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
+            LegalEntityAddModify.fillresponse(self)
+        except:
+            raise LucteriosException(IMPORTANT, _("Bad access!"))
+
+@MenuManage.describ(None)
+class CurrentLegalEntityShow(LegalEntityShow):
+    def fillresponse(self):
+        try:
+            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
+            self.action_list = [('currentmodify', _("Modify"), "images/edit.png", CLOSE_YES)]
+            LegalEntityShow.fillresponse(self)
+        except:
+            raise LucteriosException(IMPORTANT, _("Bad access!"))
 
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
 class Account(XferContainerCustom):
     caption = _("My account")
     icon = "account.png"
+
+    def add_legalentity(self, legal_entity):
+        self.new_tab(_("Legal entity"))
+        self.item = legal_entity
+        fields = LegalEntity.get_show_fields()
+        self.fill_from_model(1, 1, True, fields[_('001@Identity')])
+        self.get_components('name').colspan = 2
+        self.get_components('structure_type').colspan = 2
+        img_path = get_user_path(
+            "contacts", "Image_%s.jpg" % legal_entity.abstractcontact_ptr_id)
+        img = XferCompImage('logoimg')
+        if exists(img_path):
+            img.type = 'jpg'
+            img.set_value(readimage_to_base64(img_path))
+        else:
+            img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
+        img.set_location(0, 2, 1, 6)
+        self.add_component(img)
+        
+        btn = XferCompButton('btn_edit')
+        btn.set_is_mini(True)
+        btn.set_location(4, 1, 1, 2)
+        btn.set_action(self.request, CurrentLegalEntityModify.get_action(
+            _('Edit'), "images/edit.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'params': {'legal_entity': legal_entity.id}})
+        self.add_component(btn)
+
+    def add_legalentities(self, legal_entities):
+        self.new_tab(_("Legal entities"))
+        grid = XferCompGrid('legal_entity')
+        grid.set_model(legal_entities, LegalEntity.get_default_fields())
+        grid.add_action(self.request, CurrentLegalEntityShow.get_action(_("Edit"), "images/show.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.set_location(1, 1, 2)
+        grid.set_size(200, 500)
+        self.add_component(grid)
 
     def fillresponse(self):
         img = XferCompImage('img')
@@ -75,12 +135,20 @@ class Account(XferContainerCustom):
             self.params['individual'] = six.text_type(self.item.id)
             self.add_action(AccountAddModify.get_action(
                 _("Edit"), "images/edit.png"), {'close': CLOSE_NO})
+            is_individual = True
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(
                 id=self.request.user.id)
             self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {
                             'close': CLOSE_NO, 'params': {'user_actif': six.text_type(self.request.user.id)}})
+            is_individual = False
         self.fill_from_model(1, 1, True)
+        if is_individual:
+            legal_entities = LegalEntity.objects.filter(responsability__individual=self.item).exclude(id=1)
+            if len(legal_entities) == 1:
+                self.add_legalentity(legal_entities[0])
+            elif len(legal_entities) > 1:
+                self.add_legalentities(legal_entities)
         self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 

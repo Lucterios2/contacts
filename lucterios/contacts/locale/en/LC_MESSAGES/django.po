@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-21 16:50+0000\n"
+"POT-Creation-Date: 2016-05-27 20:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,69 +45,69 @@ msgstr "list"
 msgid "image"
 msgstr "image"
 
-#: editors.py:280
+#: editors.py:281
 msgid "Promote"
 msgstr "Promote"
 
-#: editors.py:306
+#: editors.py:307
 msgid "Write to all"
 msgstr "Write to all"
 
-#: editors.py:330 views_contacts.py:340
+#: editors.py:331 views_contacts.py:340
 msgid "Show"
 msgstr "Show"
 
-#: migrations/0001_initial.py:51 migrations/0001_initial.py:64
+#: migrations/0001_initial.py:50 migrations/0001_initial.py:63
 msgid "listing"
 msgstr "listing"
 
-#: migrations/0001_initial.py:52 models.py:63 models.py:80 models.py:98
+#: migrations/0001_initial.py:51 models.py:63 models.py:80 models.py:98
 #: models.py:342
 msgid "name"
 msgstr "name"
 
-#: migrations/0001_initial.py:53 migrations/0001_initial.py:67 models.py:182
+#: migrations/0001_initial.py:52 migrations/0001_initial.py:66 models.py:182
 msgid "address"
 msgstr "address"
 
-#: migrations/0001_initial.py:54 migrations/0001_initial.py:68 models.py:40
+#: migrations/0001_initial.py:53 migrations/0001_initial.py:67 models.py:40
 #: models.py:185
 msgid "city"
 msgstr "city"
 
-#: migrations/0001_initial.py:55 migrations/0001_initial.py:69
+#: migrations/0001_initial.py:54 migrations/0001_initial.py:68
 msgid "tel"
 msgstr "phone"
 
-#: migrations/0001_initial.py:56 migrations/0001_initial.py:70 models.py:189
+#: migrations/0001_initial.py:55 migrations/0001_initial.py:69 models.py:189
 msgid "email"
 msgstr "email"
 
-#: migrations/0001_initial.py:59 migrations/0001_initial.py:73
+#: migrations/0001_initial.py:58 migrations/0001_initial.py:72
 msgid "label"
 msgstr "label"
 
-#: migrations/0001_initial.py:65 models.py:401
+#: migrations/0001_initial.py:64 models.py:401
 msgid "firstname"
 msgstr "firstname"
 
-#: migrations/0001_initial.py:66 models.py:402
+#: migrations/0001_initial.py:65 models.py:402
 msgid "lastname"
 msgstr "lastname"
 
-#: migrations/0001_initial.py:79
+#: migrations/0001_initial.py:78
 msgid "contacts-mailtoconfig"
 msgstr "Email type sending"
 
-#: migrations/0001_initial.py:80
+#: migrations/0001_initial.py:79
 msgid "contacts-mailtoconfig.0"
 msgstr "To"
 
-#: migrations/0001_initial.py:81
+#: migrations/0001_initial.py:80
 msgid "contacts-mailtoconfig.1"
 msgstr "CC"
 
-#: migrations/0001_initial.py:81
+#: migrations/0001_initial.py:80
 msgid "contacts-mailtoconfig.2"
 msgstr "BCC"
 
@@ -139,8 +139,8 @@ msgstr "structure type"
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:97 models.py:113 tools.py:59 views.py:334 views.py:510
-#: views.py:525
+#: models.py:97 models.py:113 tools.py:61 views.py:402 views.py:578
+#: views.py:593
 msgid "model"
 msgstr "model"
 
@@ -164,7 +164,7 @@ msgstr "Real"
 msgid "Boolean"
 msgstr "Boolean"
 
-#: models.py:100 tools.py:77 views_contacts.py:337
+#: models.py:100 tools.py:73 views_contacts.py:337
 msgid "Select"
 msgstr "Select"
 
@@ -224,7 +224,7 @@ msgstr "generic contacts"
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:353 models.py:411
+#: models.py:353 models.py:411 views.py:90
 msgid "001@Identity"
 msgstr "001@Identity"
 
@@ -288,204 +288,221 @@ msgstr "responsabilities"
 msgid "our detail"
 msgstr "our detail"
 
-#: tools.py:40
+#: tools.py:41
 msgid "Select contact"
 msgstr "Select contact"
 
-#: tools.py:48
+#: tools.py:50
 msgid "ok"
 msgstr "ok"
 
-#: views.py:55 views.py:66
+#: views.py:68 views.py:78
+msgid "Bad access!"
+msgstr "Bad access!"
+
+#: views.py:75
+msgid "Modify"
+msgstr "Modify"
+
+#: views.py:81 views.py:126
 msgid "View my account."
 msgstr "View my account."
 
-#: views.py:57 views.py:92 views.py:93
+#: views.py:83 views.py:160 views.py:161
 msgid "My account"
 msgstr "My account"
 
-#: views.py:77 views.py:81 views.py:116
+#: views.py:87
+msgid "Legal entity"
+msgstr "Legal entity"
+
+#: views.py:108 views.py:115 views.py:137 views.py:142 views.py:184
 msgid "Edit"
 msgstr "Edit"
 
-#: views.py:84 views.py:119 views.py:222 views.py:570
+#: views.py:112 views_contacts.py:94 views_contacts.py:116
+#: views_contacts.py:132
+msgid "Legal entities"
+msgstr "Legal entities"
+
+#: views.py:152 views.py:187 views.py:290 views.py:638
 msgid "Close"
 msgstr "Close"
 
-#: views.py:97 views.py:111
+#: views.py:165 views.py:179
 msgid "Our structure and its management"
 msgstr "Our structure and its management"
 
-#: views.py:99 views.py:127 views.py:136 views.py:137
+#: views.py:167 views.py:195 views.py:204 views.py:205
 msgid "Our details"
 msgstr "Our details"
 
-#: views.py:118
+#: views.py:186
 msgid "Print"
 msgstr "Print"
 
-#: views.py:141
+#: views.py:209
 msgid "Contact"
 msgstr "Contact"
 
-#: views.py:144
+#: views.py:212
 msgid "Management functions of individuals and categories of legal entities."
 msgstr "Management functions of individuals and categories of legal entities."
 
-#: views.py:146
+#: views.py:214
 msgid "Contacts configuration"
 msgstr "Contacts configuration"
 
-#: views.py:150
+#: views.py:218
 msgid "Functions and responsabilities"
 msgstr "Functions and responsabilities"
 
-#: views.py:156
+#: views.py:224
 msgid "Functions list"
 msgstr "Functions list"
 
-#: views.py:169
+#: views.py:237
 #, python-format
 msgid "Number of function show: %d"
 msgstr "Number of function show: %d"
 
-#: views.py:173
+#: views.py:241
 msgid "Structure type"
 msgstr "Structure type"
 
-#: views.py:179
+#: views.py:247
 msgid "Structure types list"
 msgstr "Structure types list"
 
-#: views.py:192
+#: views.py:260
 #, python-format
 msgid "Number of structure type show: %d"
 msgstr "Number of structure type show: %d"
 
-#: views.py:196
+#: views.py:264
 msgid "Custom field"
 msgstr "Custom field"
 
-#: views.py:202
+#: views.py:270
 msgid "custom field list"
 msgstr "custom field list"
 
-#: views.py:215
+#: views.py:283
 #, python-format
 msgid "Number of custom field show: %d"
 msgstr "Number of custom field show: %d"
 
-#: views.py:231 views.py:285
+#: views.py:299 views.py:353
 msgid "Add function"
 msgstr "Add function"
 
-#: views.py:232
+#: views.py:300
 msgid "Modify function"
 msgstr "Modify function"
 
-#: views.py:238
+#: views.py:306
 msgid "Delete function"
 msgstr "Delete function"
 
-#: views.py:250
+#: views.py:318
 msgid "Add custom field"
 msgstr "Add custom field"
 
-#: views.py:251
+#: views.py:319
 msgid "Modify custom field"
 msgstr "Modify custom field"
 
-#: views.py:257
+#: views.py:325
 msgid "Delete custom field"
 msgstr "Delete custom field"
 
-#: views.py:269
+#: views.py:337
 msgid "Add structure type"
 msgstr "Add structure type"
 
-#: views.py:270
+#: views.py:338
 msgid "Modify structure type"
 msgstr "Modify structure type"
 
-#: views.py:276
+#: views.py:344
 msgid "Delete structure type"
 msgstr "Delete structure type"
 
-#: views.py:286
+#: views.py:354
 msgid "Add postal code"
 msgstr "Add postal code"
 
-#: views.py:292
+#: views.py:360
 msgid "Management of postal codes associated with their communes."
 msgstr "Management of postal codes associated with their communes."
 
-#: views.py:294
+#: views.py:362
 msgid "Postal code"
 msgstr "Postal code"
 
-#: views.py:306
+#: views.py:374
 msgid "Filtrer by postal code"
 msgstr "Filtrer by postal code"
 
-#: views.py:318
+#: views.py:386
 msgid "Tool to import contacts from CSV file."
 msgstr "Tool to import contacts from CSV file."
 
-#: views.py:320
+#: views.py:388
 msgid "Contact import"
 msgstr "Contact import"
 
-#: views.py:344
+#: views.py:412
 msgid "CSV file"
 msgstr "CSV file"
 
-#: views.py:353
+#: views.py:421
 msgid "encoding"
 msgstr "encoding"
 
-#: views.py:361
+#: views.py:429
 msgid "date format"
 msgstr "date format"
 
-#: views.py:369
+#: views.py:437
 msgid "delimiter"
 msgstr "delimiter"
 
-#: views.py:377
+#: views.py:445
 msgid "quotechar"
 msgstr "quotechar"
 
-#: views.py:411
+#: views.py:479
 msgid "CSV file unvalid!"
 msgstr "CSV file unvalid!"
 
-#: views.py:451 views.py:545
+#: views.py:519 views.py:613
 #, python-format
 msgid "Total number of contacts: %d"
 msgstr "Total number of contacts: %d"
 
-#: views.py:518
+#: views.py:586
 msgid "Fields"
 msgstr "Fields"
 
-#: views.py:520
+#: views.py:588
 msgid "Current content"
 msgstr "Current content"
 
-#: views.py:558
+#: views.py:626
 #, python-format
 msgid "%d contacts are been imported"
 msgstr "%d contacts are been imported"
 
-#: views.py:564
+#: views.py:632
 msgid "Back"
 msgstr "Back"
 
-#: views.py:566 views_contacts.py:274
+#: views.py:634 views_contacts.py:274
 msgid "Ok"
 msgstr "Ok"
 
-#: views.py:568 views_contacts.py:275
+#: views.py:636 views_contacts.py:275
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -497,7 +514,7 @@ msgstr "Office"
 msgid "Office tools"
 msgstr "Office tools"
 
-#: views_contacts.py:51 views_contacts.py:448
+#: views_contacts.py:51 views_contacts.py:459
 msgid "Addresses and contacts"
 msgstr "Addresses and contacts"
 
@@ -528,10 +545,6 @@ msgid ""
 msgstr ""
 "Management of a structure or organization of people (company, association, "
 "administration, ...)"
-
-#: views_contacts.py:94 views_contacts.py:116 views_contacts.py:132
-msgid "Legal entities"
-msgstr "Legal entities"
 
 #: views_contacts.py:151
 msgid "Add individual"
@@ -617,150 +630,12 @@ msgstr "Show contact"
 msgid "Delete contact"
 msgstr "Delete contact"
 
-#: views_contacts.py:456
+#: views_contacts.py:467
 #, python-format
 msgid "Total number of legal entities: %d"
 msgstr "Total number of legal entities: %d"
 
-#: views_contacts.py:462
+#: views_contacts.py:473
 #, python-format
 msgid "Total number of individuals: %d"
 msgstr "Total number of individuals: %d"
-
-#~ msgid "01_individual.html"
-#~ msgstr "Individuals"
-
-#~ msgid "help-individual_intro"
-#~ msgstr "<p>Individual is a humain, man or woman, to memorize </p>"
-
-#~ msgid "help-individual_list"
-#~ msgstr "List of yours individuals"
-
-#~ msgid "help-individual_list-detail"
-#~ msgstr ""
-#~ "<p> The menu <i>Office/Addresses and Contacts/Individuals</i> allows you "
-#~ "to view the list of people you have already registered.As the list can "
-#~ "become important, it is possible to filter people by name. </p><p> In "
-#~ "this screen, you also have the possibility to print the list of people. </"
-#~ "p>"
-
-#~ msgid "help-individual_edit"
-#~ msgstr "Edit an individual"
-
-#~ msgid "help-individual_edit-detail"
-#~ msgstr ""
-#~ "<p> In the previous list, you can add a new person. You can re-edit this "
-#~ "file since its show screen. </p>"
-
-#~ msgid "help-individual_show"
-#~ msgstr "Show a individual"
-
-#~ msgid "help-individual_show-detail"
-#~ msgstr ""
-#~ "<p> In the list of individuals, you have the option of viewing a person. "
-#~ "</ p><p> This will allow you to view the profile of a person previously "
-#~ "saved in your database. You can edit this record or print it. You can "
-#~ "also give him a connection alias to the associated application to a right "
-#~ "of access (see Users). If that person is not referenced in other "
-#~ "recordings of the application, you have the option to delete it. </ p>"
-
-#~ msgid "help-individual_find"
-#~ msgstr "Search a Individual"
-
-#~ msgid "help-individual_find-detail"
-#~ msgstr ""
-#~ "<p> The menu <i>Office/Addresses and Contacts/Individual search</i> lets "
-#~ "you define a search on an individual. </p><p> After validation, the tool "
-#~ "will search the database all relevant persons these criteria. You can "
-#~ "then print the list or view / edit a form. </p>"
-
-#~ msgid "02_legal_entity.html"
-#~ msgstr "Legal entity"
-
-#~ msgid "help-legal_entity_intro"
-#~ msgstr ""
-#~ "<p> A legal entity is a structure or a person of organization (company, "
-#~ "association, administration, ...), to memorize. </p>"
-
-#~ msgid "help-legal_entity_list"
-#~ msgstr "list of your legal entities"
-
-#~ msgid "help-legal_entity_list-detail"
-#~ msgstr ""
-#~ "<p> The menu <i>Office/Addresses and Contacts/Legal entities</i> lets you "
-#~ "consult the list of structures you have already registered. Each moral "
-#~ "contact is associated with a category. In this list, you see your "
-#~ "structures filtered by these categories. </p><p> From this screen, you "
-#~ "also have the possibility to print the list of structures. </p>"
-
-#~ msgid "help-legal_entity_edit"
-#~ msgstr "Edit a legal entity"
-
-#~ msgid "help-legal_entity_edit-detail"
-#~ msgstr ""
-#~ "<p> In the previous list, you can create a new structure. You can re-edit "
-#~ "it in its showing screen. </p>"
-
-#~ msgid "help-legal_entity_show"
-#~ msgstr "Show a legal entity"
-
-#~ msgid "help-legal_entity_show-detail"
-#~ msgstr ""
-#~ "<p> In the list of legal entities, you can view a structure. </ p><p> "
-#~ "This will allow you to view the profile of a previously entered into your "
-#~ "database structure. You can edit this record or print it. If that "
-#~ "structure is not referenced in other recording application, you can "
-#~ "delete it. </ p>"
-
-#~ msgid "help-legal_entity_responsability"
-#~ msgstr "Responsability of a legal entity"
-
-#~ msgid "help-legal_entity_responsability-detail"
-#~ msgstr ""
-#~ "<p> You have the ability to associate an individual to your organization. "
-#~ "</p><p> Select the new responsible: if the person does not exist in your "
-#~ "database, you will be able to create it.You can also add a function to a "
-#~ "specific charge. </p>"
-
-#~ msgid "help-legal_entity_find"
-#~ msgstr "Search a legal entity"
-
-#~ msgid "help-legal_entity_find-detail"
-#~ msgstr ""
-#~ "<p> The menu <i>Office/Addresses and Contacts/Legal entity search</i> "
-#~ "lets you define a search on a moral structure. </p>"
-
-#~ msgid "03_configuration.html"
-#~ msgstr "Configuration and parameters"
-
-#~ msgid "help-configuration_intro"
-#~ msgstr ""
-#~ "<p> In the Menu <i>Management/Modules (conf.) </i> you have at your "
-#~ "disposal tools to configure the contact management. </p>"
-
-#~ msgid "help-configuration_contact"
-#~ msgstr "Contact configuration"
-
-#~ msgid "help-configuration_contact-detail"
-#~ msgstr ""
-#~ "<p> In this screen, you can create or edit a responsibility function "
-#~ "definition, using to link an individual to a legal entity. You can create "
-#~ "or edit a structure type to assist in the classification of your legal "
-#~ "entities . </p><p> It may be that you need to specify additional "
-#~ "information for your different contacts. Here you can add custom fields "
-#~ "for each type of contact.To add a field, you simply must give its title "
-#~ "and define its type and possibly necessary complements.<br/>5 types are "
-#~ "possibles:<ul><li>text string</li><li>integer</li><li>point number "
-#~ "(real)</li><li>value yes/no (boolean)</li><li>choose from a list "
-#~ "(enumeration)</li></ul>In the case of the enumeration, you must define "
-#~ "the list of possible values ​​(words) separated by a semicolon. </p>"
-
-#~ msgid "help-configuration_postalCode"
-#~ msgstr "Postal codes/cities"
-
-#~ msgid "help-configuration_postalCode-detail"
-#~ msgstr ""
-#~ "<p> To help you in your contact entry, the tool will automatically search "
-#~ "the city associated with the postal code that you entered. In this "
-#~ "screen, you can add missing zip codes. By default, the French and Swiss "
-#~ "postal codes are inserted. </p>"
