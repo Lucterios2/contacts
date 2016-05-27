@@ -24,8 +24,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
-from os import listdir
-from os.path import dirname, join
+from os.path import dirname, join, isfile
 from logging import getLogger
 import sys
 
@@ -84,7 +83,7 @@ def initial_values(apps, schema_editor):
     param.save()
 
 
-def _save_postalcodes(postalcode, pc_list):
+def save_postalcodes(postalcode, pc_list):
     try:
         with transaction.atomic():
             postalcode.objects.bulk_create(pc_list)
@@ -94,29 +93,49 @@ def _save_postalcodes(postalcode, pc_list):
     return []
 
 
-def initial_postalcodes(apps, schema_editor):
+def import_file_postalcode(postalcode, migrat_file):
     import codecs
-    pcfilename_prefix = 'postalcode_'
-    if (len(sys.argv) >= 2) and (sys.argv[1] == 'test'):
-        pcfilename_prefix = 'postalcode_frDOMTOM'
+    pc_list = []
+    if isfile(migrat_file):
+        with codecs.open(migrat_file, 'r', 'utf-8') as flpc:
+            for line in flpc.readlines():
+                postal_code, city, country = six.text_type(line).split(';')[:3]
+                newpc = postalcode()
+                newpc.postal_code = six.text_type(postal_code).strip()
+                newpc.city = six.text_type(city).strip()
+                newpc.country = six.text_type(country).strip()
+                pc_list.append(newpc)
+                if len(pc_list) > 900:
+                    pc_list = save_postalcodes(postalcode, pc_list)
+    return pc_list
+
+
+def initial_postalcodes(apps, schema_editor):
     postalcode = apps.get_model("contacts", "PostalCode")
+    pcfile_list = ['postalcode_frDOMTOM.csv']
+    if not (len(sys.argv) >= 2) or (sys.argv[1] != 'test'):
+        pcfile_list.append("postalcode_ch.csv")
+        pcfile_list.append("postalcode_fr01.csv")
+        pcfile_list.append("postalcode_fr02.csv")
+        pcfile_list.append("postalcode_fr03.csv")
+        pcfile_list.append("postalcode_fr04.csv")
+        pcfile_list.append("postalcode_fr05.csv")
+        pcfile_list.append("postalcode_fr06.csv")
+        pcfile_list.append("postalcode_fr07.csv")
+        pcfile_list.append("postalcode_fr08.csv")
+        pcfile_list.append("postalcode_fr09.csv")
+        pcfile_list.append("postalcode_fr10.csv")
+        pcfile_list.append("postalcode_fr11.csv")
+        pcfile_list.append("postalcode_fr12.csv")
+        pcfile_list.append("postalcode_fr13.csv")
+        pcfile_list.append("postalcode_fr14.csv")
     pc_list = []
     migrat_dir = dirname(__file__)
-    for pcfile in listdir(migrat_dir):
-        if pcfile.endswith(".csv") and pcfile.startswith(pcfilename_prefix):
-            with codecs.open(join(migrat_dir, pcfile), 'r', 'utf-8') as flpc:
-                for line in flpc.readlines():
-                    postal_code, city, country = six.text_type(
-                        line).split(';')[:3]
-                    newpc = postalcode()
-                    newpc.postal_code = six.text_type(postal_code).strip()
-                    newpc.city = six.text_type(city).strip()
-                    newpc.country = six.text_type(country).strip()
-                    pc_list.append(newpc)
-                    if len(pc_list) > 900:
-                        pc_list = _save_postalcodes(postalcode, pc_list)
+    for pcfile in pcfile_list:
+        pc_list.extend(
+            import_file_postalcode(postalcode, join(migrat_dir, pcfile)))
     if len(pc_list) > 0:
-        pc_list = _save_postalcodes(postalcode, pc_list)
+        pc_list = save_postalcodes(postalcode, pc_list)
 
 
 class Migration(migrations.Migration):
