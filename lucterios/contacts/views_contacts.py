@@ -444,15 +444,17 @@ class AbstractContactDel(XferDelete):
 @signal_and_lock.Signal.decorate('summary')
 def summary_contacts(xfer):
     is_right = WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact')
-    try:
-        current_individual = Individual.objects.get(user=xfer.request.user)
-        row = xfer.get_max_row() + 1
-        lab = XferCompLabelForm('contactsidentity')
-        lab.set_value_as_header(six.text_type(current_individual))
-        lab.set_location(0, row, 4)
-        xfer.add_component(lab)
-    except:
-        current_individual = None
+    current_individual = None
+    if not xfer.request.user.is_anonymous():
+        try:
+            current_individual = Individual.objects.get(user=xfer.request.user)
+            row = xfer.get_max_row() + 1
+            lab = XferCompLabelForm('contactsidentity')
+            lab.set_value_as_header(six.text_type(current_individual))
+            lab.set_location(0, row, 4)
+            xfer.add_component(lab)
+        except:
+            current_individual = None
     if is_right:
         row = xfer.get_max_row() + 1
         lab = XferCompLabelForm('contactstitle')
