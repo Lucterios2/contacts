@@ -362,7 +362,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Account()
         self.call('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
-        self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+        self.assert_xml_equal('TITLE', six.text_type('Votre compte'))
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
             'Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1))
@@ -416,7 +416,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Account()
         self.call('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
-        self.assert_xml_equal('TITLE', six.text_type('Mon compte'))
+        self.assert_xml_equal('TITLE', six.text_type('Votre compte'))
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
             'Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif': '1'}))
