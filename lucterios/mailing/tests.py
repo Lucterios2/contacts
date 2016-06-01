@@ -147,8 +147,8 @@ class TestReceiver(TestCase):
 
     def check_first_message(self, subject, nb_multi):
         msg = email.message_from_string(self.get(0)[3])
-        self.assertTrue(subject in msg.get(
-            'Content-Type', ''), msg.get('Content-Type', ''))
+        self.assertEqual(
+            subject, msg.get('Subject', ''), msg.get('Subject', ''))
         self.assertEqual(nb_multi, len(msg.get_payload()))
         return msg.get_payload()
 

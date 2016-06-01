@@ -27,17 +27,16 @@ from __future__ import unicode_literals
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTP_SSL
 
+from email.utils import formatdate
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.CORE.parameters import Params
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.contacts.models import LegalEntity
-from datetime import datetime
-from lucterios.framework.tools import get_binay
-from email.utils import formatdate
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
 
 
 def will_mail_send():
@@ -63,12 +62,11 @@ def send_email(recipients, subject, body, files=None):
         subtype = 'html'
     else:
         subtype = 'plain'
-    msg = MIMEMultipart(
-        From=sender_email,
-        To=",".join(recipients),
-        Date=formatdate(localtime=True),
-        Subject=six.text_type(subject)
-    )
+    msg = MIMEMultipart()
+    msg['Date'] = formatdate(localtime=True)
+    msg['Subject'] = six.text_type(subject)
+    msg['To'] = ", ".join(recipients)
+    msg['From'] = sender_email
     msg.attach(MIMEText(body, subtype, 'utf-8'))
     if files:
         for filename, file in files:
