@@ -59,28 +59,33 @@ from os.path import exists
 @ActionsManage.affect('LegalEntity', 'currentmodify')
 @MenuManage.describ(None)
 class CurrentLegalEntityModify(LegalEntityAddModify):
-    
+
     def fillresponse(self):
         try:
-            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
+            Responsability.objects.get(
+                individual__user=self.request.user, legal_entity=self.item)
             LegalEntityAddModify.fillresponse(self)
         except:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
+
 @MenuManage.describ(None)
 class CurrentLegalEntityShow(LegalEntityShow):
+
     def fillresponse(self):
         try:
-            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
-            self.action_list = [('currentmodify', _("Modify"), "images/edit.png", CLOSE_YES)]
+            Responsability.objects.get(
+                individual__user=self.request.user, legal_entity=self.item)
+            self.action_list = [
+                ('currentmodify', _("Modify"), "images/edit.png", CLOSE_YES)]
             LegalEntityShow.fillresponse(self)
         except:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
 
-@MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View my account.'))
+@MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View your account.'))
 class Account(XferContainerCustom):
-    caption = _("My account")
+    caption = _("Your account")
     icon = "account.png"
 
     def add_legalentity(self, legal_entity):
@@ -97,10 +102,11 @@ class Account(XferContainerCustom):
             img.type = 'jpg'
             img.set_value(readimage_to_base64(img_path))
         else:
-            img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
+            img.set_value(
+                get_icon_path("lucterios.contacts/images/NoImage.png"))
         img.set_location(0, 2, 1, 6)
         self.add_component(img)
-        
+
         btn = XferCompButton('btn_edit')
         btn.set_is_mini(True)
         btn.set_location(4, 1, 1, 2)
@@ -112,7 +118,8 @@ class Account(XferContainerCustom):
         self.new_tab(_("Legal entities"))
         grid = XferCompGrid('legal_entity')
         grid.set_model(legal_entities, LegalEntity.get_default_fields())
-        grid.add_action(self.request, CurrentLegalEntityShow.get_action(_("Edit"), "images/show.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique':SELECT_SINGLE})
+        grid.add_action(self.request, CurrentLegalEntityShow.get_action(
+            _("Edit"), "images/show.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
         grid.set_location(1, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -144,7 +151,8 @@ class Account(XferContainerCustom):
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
-            legal_entities = LegalEntity.objects.filter(responsability__individual=self.item).exclude(id=1)
+            legal_entities = LegalEntity.objects.filter(
+                responsability__individual=self.item).exclude(id=1)
             if len(legal_entities) == 1:
                 self.add_legalentity(legal_entities[0])
             elif len(legal_entities) > 1:
