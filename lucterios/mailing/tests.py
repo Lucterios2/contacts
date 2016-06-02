@@ -43,7 +43,7 @@ from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.error import LucteriosException
 from lucterios.framework.tools import get_binay
 from lucterios.CORE.parameters import Params
-from lucterios.CORE.models import Parameter
+from lucterios.CORE.models import Parameter, LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
@@ -373,8 +373,12 @@ class ConfigurationTest(LucteriosTest):
         msg, = self.server.check_first_message('Mot de passe de connexion', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        content_msg = decode_b64(msg.get_payload())
         self.assertEqual(
             'Confirmation de connexion à votre application:\nAlias:admin\nMot de passe:', decode_b64(msg.get_payload())[:72])
+        password = content_msg[72:].strip()
+        user = LucteriosUser.objects.get(id=1)
+        self.assertTrue(user.check_password(password), content_msg)
 
 
 class MailingTest(LucteriosTest):

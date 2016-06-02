@@ -181,6 +181,11 @@ class ContactsMigrate(MigrateAbstract):
             new_individual.genre = individual_sexe + 1
             if individual_user in self.user_list.keys():
                 new_individual.user = self.user_list[individual_user]
+                new_individual.user.first_name = new_individual.firstname
+                new_individual.user.last_name = new_individual.lastname
+                new_individual.user.email = new_individual.email
+                new_individual.user.save()
+                self.user_list[individual_user] = new_individual.user
             new_individual.save()
             self.individual_list[individualid] = new_individual
             self.abstract_list[individual_super] = new_individual
