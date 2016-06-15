@@ -28,32 +28,37 @@ from _io import StringIO, TextIOWrapper
 from csv import DictReader
 from _csv import QUOTE_NONE, QUOTE_ALL
 from copy import deepcopy
+from os.path import exists
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.apps.registry import apps
 from django.db.models.fields import DateField
 from django.db.models import Q
+from django.db import IntegrityError
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
     FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES
-from lucterios.framework.xfergraphic import XferContainerCustom
+from lucterios.framework.xfergraphic import XferContainerCustom,\
+    XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
     XferCompSelect, XferCompUpLoad, XferCompButton
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
+from lucterios.framework.filetools import get_user_path, readimage_to_base64
+
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.xferprint import XferPrintAction
-from lucterios.CORE.parameters import Params
+from lucterios.CORE.parameters import Params, notfree_mode_connect
+
 from lucterios.contacts.models import PostalCode, Function, StructureType, LegalEntity, Individual, \
     CustomField, AbstractContact, Responsability
 from lucterios.contacts.views_contacts import LegalEntityAddModify, \
     LegalEntityShow
-from lucterios.framework.filetools import get_user_path, readimage_to_base64
-from os.path import exists
 
 
 @ActionsManage.affect('LegalEntity', 'currentmodify')
@@ -202,6 +207,97 @@ class CurrentStructurePrint(XferPrintAction):
     field_id = 1
     caption = _("Our details")
     action_class = CurrentStructure
+
+
+def right_create_account(request):
+    if not notfree_mode_connect():
+        return False
+    if (len(settings.AUTHENTICATION_BACKENDS) != 1) or (settings.AUTHENTICATION_BACKENDS[0] != 'django.contrib.auth.backends.ModelBackend'):
+        return False
+    if (signal_and_lock.Signal.call_signal("send_connection", None, None, None) == 0):
+        return False
+    if Params.getvalue("contacts-createaccount") == 0:
+        return False
+    return not request.user.is_authenticated()
+
+
+@MenuManage.describ(right_create_account, FORMTYPE_MODAL, 'core.general', _("To ask an account"))
+class CreateAccount(XferContainerAcknowledge):
+    icon = "account.png"
+    model = Individual
+    field_id = 'individual'
+    caption = _("Create account")
+
+    def create_dlg(self, username, legalentity):
+        dlg = self.create_custom(self.model)
+        img = XferCompImage('img')
+        img.set_value(self.icon_path())
+        img.set_location(0, 0, 1, 6)
+        dlg.add_component(img)
+        dlg.fill_from_model(1, 0, False, ['genre', 'lastname', 'firstname', 'email'])
+        dlg.get_components('email').mask = '^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-_])+\.)+([a-zA-Z0-9]{2,4})+$'
+        row = dlg.get_max_row() + 1
+        lbl = XferCompLabelForm("username_lbl")
+        lbl.set_location(1, row)
+        lbl.set_value_as_name(_('username'))
+        dlg.add_component(lbl)
+        edt = XferCompEdit("username")
+        edt.set_location(2, row)
+        edt.set_needed(True)
+        edt.set_value(username)
+        dlg.add_component(edt)
+        if Params.getvalue("contacts-createaccount") == 2:
+            row = dlg.get_max_row() + 1
+            lbl = XferCompLabelForm("legalentity_lbl")
+            lbl.set_location(1, row)
+            lbl.set_value_as_name(_("your structure name"))
+            dlg.add_component(lbl)
+            edt = XferCompEdit("legalentity")
+            edt.set_location(2, row)
+            edt.set_needed(True)
+            edt.set_value(legalentity)
+            dlg.add_component(edt)
+        lbl = XferCompLabelForm("error_lbl")
+        lbl.set_location(2, row + 1)
+        lbl.set_color('red')
+        lbl.set_value(self.getparam('error', ''))
+        dlg.add_component(lbl)
+        dlg.add_action(self.get_action(_('Ok'), 'images/ok.png'), {'params': {"SAVE": "YES"}})
+        dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'), {})
+
+    def fillresponse(self, username='', legalentity=''):
+        if self.getparam("SAVE") != 'YES':
+            self.create_dlg(username, legalentity)
+        else:
+            self.create_account(username, legalentity)
+
+    def create_account(self, username, legalentity):
+        try:
+            user = LucteriosUser()
+            user.username = username
+            user.first_name = self.item.firstname
+            user.last_name = self.item.lastname
+            user.email = self.item.email
+            user.save()
+            self.item.address = '---'
+            self.item.postal_code = '---'
+            self.item.city = '---'
+            self.item.user = user
+            self.item.save()
+            if legalentity != '':
+                entity = LegalEntity()
+                entity.name = legalentity
+                entity.address = '---'
+                entity.postal_code = '---'
+                entity.city = '---'
+                entity.save()
+                Responsability.objects.create(individual=self.item, legal_entity=entity)
+            self.item.user.generate_password()
+            self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
+        except IntegrityError:
+            self.redirect_act = (self.get_action('', ''), {'params': {"SAVE": "", 'error': _("This account exists yet!")}})
+            #raise LucteriosException(IMPORTANT, _("This record exists yet!"))
+            #self.raise_except(_("This record exists yet!"), CreateAccount)
 
 
 @MenuManage.describ('CORE.add_parameter')
@@ -648,6 +744,7 @@ class ContactImport(XferContainerCustom):
 
 @signal_and_lock.Signal.decorate('config')
 def config_contacts(xfer):
-    Params.fill(xfer, ['contacts-mailtoconfig'], 1, 10)
-    xfer.params['params'].append('contacts-mailtoconfig')
+    new_params = ['contacts-mailtoconfig', 'contacts-createaccount']
+    Params.fill(xfer, new_params, 1, 10)
+    xfer.params['params'].extend(new_params)
     return True

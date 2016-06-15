@@ -285,8 +285,7 @@ class IndividualUserValid(XferSave):
     def fillresponse(self, individual):
         XferSave.fillresponse(self)
         if self.except_msg == '':
-            obj_indiv = Individual.objects.get(
-                pk=individual)
+            obj_indiv = Individual.objects.get(pk=individual)
             obj_indiv.user = self.item
             obj_indiv.save()
             obj_indiv.editor.saving(self)

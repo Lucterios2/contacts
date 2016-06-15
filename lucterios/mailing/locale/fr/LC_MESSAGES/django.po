@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-01 12:59+0000\n"
+"POT-Creation-Date: 2016-06-15 16:02+0000\n"
 "PO-Revision-Date: 2016-01-14 22:03+0000\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,11 +44,11 @@ msgstr "Suppression"
 msgid "Add"
 msgstr "Ajout"
 
-#: functions.py:52
+#: functions.py:51
 msgid "Email not configure!"
 msgstr "Courriel non configuré!"
 
-#: functions.py:99
+#: functions.py:97
 msgid "Connection password"
 msgstr "Mot de passe de connexion"
 
