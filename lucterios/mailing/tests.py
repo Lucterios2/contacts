@@ -52,6 +52,10 @@ from lucterios.mailing.functions import will_mail_send, send_email
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageValid,\
     MessageEmail, MessageLetter
 from unittest.case import TestCase
+from lucterios.CORE.views import AskPassword, AskPasswordAct
+from django.contrib.auth.models import AnonymousUser
+from lucterios.contacts.views import CreateAccount
+from lucterios.contacts.models import Individual, LegalEntity
 
 
 def decode_b64(data):
@@ -608,3 +612,174 @@ class MailingTest(LucteriosTest):
         pdf_value = b64decode(
             six.text_type(self.get_first_xpath('PRINT').text))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+
+
+class UserTest(LucteriosTest):
+
+    def setUp(self):
+        self.xfer_class = XferContainerAcknowledge
+        LucteriosTest.setUp(self)
+        self.factory.user = AnonymousUser()
+        change_ourdetail()
+        create_jack(LucteriosUser.objects.create(first_name='jack', last_name='MISTER', username='jack', email='jack@worldcompany.com'))
+
+    def test_pwd_forget(self):
+        configSMTP('localhost', 1025)
+        self.factory.xfer = AskPassword()
+        self.call('/lucterios.CORE/askPassword', {}, False)
+        self.assert_observer('core.custom', 'lucterios.CORE', 'askPassword')
+        self.assert_count_equal('CONTEXT', 0)
+        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="email"]', None)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.assertEqual(0, server.count())
+
+            self.factory.xfer = AskPasswordAct()
+            self.call('/lucterios.CORE/askPasswordAct', {"email": "inconnu@worldcompany.com"}, False)
+            self.assert_observer('core.acknowledge', 'lucterios.CORE', 'askPasswordAct')
+            self.assertEqual(0, server.count())
+
+            self.factory.xfer = AskPasswordAct()
+            self.call('/lucterios.CORE/askPasswordAct', {"email": "jack@worldcompany.com"}, False)
+            self.assert_observer('core.acknowledge', 'lucterios.CORE', 'askPasswordAct')
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['jack@worldcompany.com'], server.get(0)[2])
+            msg, = server.check_first_message('Mot de passe de connexion', 1)
+            self.assertEqual('text/plain', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg.get_payload())
+            self.assertEqual('Confirmation de connexion à votre application:\nAlias:jack\nMot de passe:', message[:71])
+            password = message[71:]
+        finally:
+            server.stop()
+        user = LucteriosUser.objects.get(id=2)
+        self.assertTrue(user.check_password(password), 'success after change')
+
+    def test_no_new_account(self):
+        self.factory.xfer = CreateAccount()
+        self.call('/lucterios.contact/createAccount', {}, False)
+        self.assert_observer('core.exception', 'lucterios.contact', 'createAccount')
+
+    def test_new_account(self):
+        param = Parameter.objects.get(name='contacts-createaccount')
+        param.value = '1'
+        param.save()
+        configSMTP('localhost', 1025)
+
+        self.factory.xfer = CreateAccount()
+        self.call('/lucterios.contact/createAccount', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contact', 'createAccount')
+        self.assert_count_equal('CONTEXT', 0)
+        self.assert_count_equal('COMPONENTS/*', 12)
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="genre"]', '1')
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="firstname"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="lastname"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="username"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="email"]', None)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.factory.xfer = CreateAccount()
+            self.call('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
+                                                            'lastname': 'DUPONT', 'username': 'admin', 'email': 'pierre@worldcompany.com'}, False)
+            self.assert_observer('core.acknowledge', 'lucterios.contacts', 'createAccount')
+            self.assert_count_equal('CONTEXT/PARAM', 6)
+            self.assert_count_equal('ACTION', 1)
+            self.assert_action_equal('ACTION', (None, None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {
+                                     "SAVE": None, "error": "Ce compte existes déjà!"}))
+            self.assertEqual(0, server.count())
+
+            self.factory.xfer = CreateAccount()
+            self.call('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
+                                                            'lastname': 'DUPONT', 'username': 'pierre', 'email': 'pierre@worldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.contacts', 'createAccount')
+            self.assert_xml_equal('TEXT', 'Votre compte est créé{[br/]}Vous allez recevoir un courriel avec votre mot de passe.')
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['pierre@worldcompany.com'], server.get(0)[2])
+            msg, = server.check_first_message('Mot de passe de connexion', 1)
+            self.assertEqual('text/plain', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg.get_payload())
+            self.assertEqual('Confirmation de connexion à votre application:\nAlias:pierre\nMot de passe:', message[:73])
+            password = message[73:]
+        finally:
+            server.stop()
+        user = LucteriosUser.objects.get(id=3)
+        self.assertEqual('pierre', user.first_name)
+        self.assertEqual('DUPONT', user.last_name)
+        self.assertEqual('pierre', user.username)
+        self.assertEqual('pierre@worldcompany.com', user.email)
+        self.assertTrue(user.check_password(password), 'success after change')
+        cont = Individual.objects.filter(user=user)
+        self.assertEqual(1, len(cont))
+        self.assertEqual('pierre', cont[0].firstname)
+        self.assertEqual('DUPONT', cont[0].lastname)
+        self.assertEqual(1, cont[0].genre)
+        self.assertEqual('pierre@worldcompany.com', cont[0].email)
+        self.assertEqual('---', cont[0].address)
+        self.assertEqual('---', cont[0].postal_code)
+        self.assertEqual('---', cont[0].city)
+        moral = LegalEntity.objects.filter(responsability__individual__user=user)
+        self.assertEqual(0, len(moral))
+        self.assertEqual(1, len(LegalEntity.objects.all()))
+
+    def test_new_account_with_structure(self):
+        param = Parameter.objects.get(name='contacts-createaccount')
+        param.value = '2'
+        param.save()
+        configSMTP('localhost', 1025)
+
+        self.factory.xfer = CreateAccount()
+        self.call('/lucterios.contact/createAccount', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contact', 'createAccount')
+        self.assert_count_equal('CONTEXT', 0)
+        self.assert_count_equal('COMPONENTS/*', 14)
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="genre"]', '1')
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="firstname"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="lastname"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="username"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="email"]', None)
+        self.assert_xml_equal('COMPONENTS/EDIT[@name="legalentity"]', None)
+        self.assert_count_equal('ACTIONS/ACTION', 2)
+
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.factory.xfer = CreateAccount()
+            self.call('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1, 'legalentity': 'Chez moi',
+                                                            'lastname': 'DUPONT', 'username': 'pierre', 'email': 'pierre@worldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.contacts', 'createAccount')
+            self.assert_xml_equal('TEXT', 'Votre compte est créé{[br/]}Vous allez recevoir un courriel avec votre mot de passe.')
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['pierre@worldcompany.com'], server.get(0)[2])
+            msg, = server.check_first_message('Mot de passe de connexion', 1)
+            self.assertEqual('text/plain', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg.get_payload())
+            self.assertEqual('Confirmation de connexion à votre application:\nAlias:pierre\nMot de passe:', message[:73])
+            password = message[73:]
+        finally:
+            server.stop()
+        user = LucteriosUser.objects.get(id=3)
+        self.assertEqual('pierre', user.username)
+        self.assertTrue(user.check_password(password), 'success after change')
+        cont = Individual.objects.filter(user=user)
+        self.assertEqual(1, len(cont))
+        self.assertEqual('pierre', cont[0].firstname)
+        moral = LegalEntity.objects.filter(responsability__individual__user=user)
+        self.assertEqual(1, len(moral))
+        self.assertEqual('Chez moi', moral[0].name)
+        self.assertEqual('pierre@worldcompany.com', moral[0].email)
+        self.assertEqual('---', moral[0].address)
+        self.assertEqual('---', moral[0].postal_code)
+        self.assertEqual('---', moral[0].city)
+        self.assertEqual(2, len(LegalEntity.objects.all()))

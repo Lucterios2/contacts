@@ -37,7 +37,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.apps.registry import apps
 from django.db.models.fields import DateField
 from django.db.models import Q
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
     FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES
@@ -271,33 +271,37 @@ class CreateAccount(XferContainerAcknowledge):
         else:
             self.create_account(username, legalentity)
 
+    @transaction.atomic
+    def create_account_atomic(self, username, legalentity):
+        user = LucteriosUser()
+        user.username = username
+        user.first_name = self.item.firstname
+        user.last_name = self.item.lastname
+        user.email = self.item.email
+        user.save()
+        self.item.address = '---'
+        self.item.postal_code = '---'
+        self.item.city = '---'
+        self.item.user = user
+        self.item.save()
+        if legalentity != '':
+            entity = LegalEntity()
+            entity.name = legalentity
+            entity.address = '---'
+            entity.postal_code = '---'
+            entity.city = '---'
+            entity.email = self.item.email
+            entity.save()
+            Responsability.objects.create(individual=self.item, legal_entity=entity)
+
+    @transaction.non_atomic_requests
     def create_account(self, username, legalentity):
         try:
-            user = LucteriosUser()
-            user.username = username
-            user.first_name = self.item.firstname
-            user.last_name = self.item.lastname
-            user.email = self.item.email
-            user.save()
-            self.item.address = '---'
-            self.item.postal_code = '---'
-            self.item.city = '---'
-            self.item.user = user
-            self.item.save()
-            if legalentity != '':
-                entity = LegalEntity()
-                entity.name = legalentity
-                entity.address = '---'
-                entity.postal_code = '---'
-                entity.city = '---'
-                entity.save()
-                Responsability.objects.create(individual=self.item, legal_entity=entity)
+            self.create_account_atomic(username, legalentity)
             self.item.user.generate_password()
             self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
         except IntegrityError:
             self.redirect_act = (self.get_action('', ''), {'params': {"SAVE": "", 'error': _("This account exists yet!")}})
-            #raise LucteriosException(IMPORTANT, _("This record exists yet!"))
-            #self.raise_except(_("This record exists yet!"), CreateAccount)
 
 
 @MenuManage.describ('CORE.add_parameter')
