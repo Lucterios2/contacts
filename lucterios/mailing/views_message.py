@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from copy import deepcopy
 
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.mailing.models import Message
-
-from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT,\
-    TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE
+from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
-from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, CLOSE_NO,\
-    SELECT_SINGLE, FORMTYPE_MODAL, CLOSE_YES, SELECT_MULTI
-from lucterios.contacts.tools import ContactSelection
+from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.mailing.functions import will_mail_send
 from lucterios.CORE.xferprint import XferPrintReporting
-from copy import deepcopy
-from asyncio.locks import Condition
+
+from lucterios.contacts.tools import ContactSelection
+
+from lucterios.mailing.functions import will_mail_send
+from lucterios.mailing.models import Message
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)

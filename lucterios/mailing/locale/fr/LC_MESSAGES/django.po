@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-15 16:02+0000\n"
+"POT-Creation-Date: 2016-06-21 13:32+0000\n"
 "PO-Revision-Date: 2016-01-14 22:03+0000\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,18 +31,10 @@ msgstr "modèle"
 msgid "filter"
 msgstr "filtre"
 
-#: editors.py:62
+#: editors.py:60
 #, python-format
 msgid "Message defined for %d contacts"
 msgstr "Message défini pour %d contacts"
-
-#: editors.py:71
-msgid "Delete"
-msgstr "Suppression"
-
-#: editors.py:73
-msgid "Add"
-msgstr "Ajout"
 
 #: functions.py:51
 msgid "Email not configure!"
@@ -179,81 +171,86 @@ msgstr "Publipostage"
 msgid "Create and send mailing to contacts."
 msgstr "Créer et envoyer un publipostage à des contacts"
 
-#: views_message.py:25
+#: views_message.py:24
 msgid "Manage list of message for mailing."
 msgstr "Gestion de liste de messages pour publipostage"
 
-#: views_message.py:30
+#: views_message.py:29
 msgid "Messages"
 msgstr "Messages"
 
-#: views_message.py:35
-msgid "clone"
-msgstr "dupliquer"
-
-#: views_message.py:45 views_message.py:54
+#: views_message.py:39 views_message.py:49
 msgid "Add message"
 msgstr "Ajout de message"
 
-#: views_message.py:46
+#: views_message.py:40
 msgid "Modify message"
 msgstr "Modification d'un messages"
 
-#: views_message.py:71
+#: views_message.py:65
 msgid "Show message"
 msgstr "Voir un message"
 
-#: views_message.py:76
+#: views_message.py:68
 msgid "Valid"
 msgstr "Valider"
 
-#: views_message.py:80
-msgid "Letters"
-msgstr "Lettres"
-
-#: views_message.py:83
-msgid "Emails"
-msgstr "Courriels"
-
-#: views_message.py:93
+#: views_message.py:74
 msgid "Valid message"
 msgstr "Validation de message"
 
-#: views_message.py:96
+#: views_message.py:77
 msgid "Do you want to close this message?"
 msgstr "Voulez vous clôturer ce message?"
 
-#: views_message.py:106
+#: views_message.py:81
+msgid "Letters"
+msgstr "Lettres"
+
+#: views_message.py:87
 msgid "Write message"
 msgstr "Impression d'un message"
 
-#: views_message.py:123
+#: views_message.py:98
+msgid "Emails"
+msgstr "Courriels"
+
+#: views_message.py:104
 msgid "Send message"
 msgstr "Envoie d'un message"
 
-#: views_message.py:126
+#: views_message.py:107
 msgid "Do you want to sent this message?"
 msgstr "Voulez vous envoyer ce message?"
 
-#: views_message.py:129
+#: views_message.py:110
 #, python-format
 msgid ""
 "Message sent to %(nbsent)d contact.{[br/]}Failure to %(nbfailed)d contacts."
 msgstr ""
 "Message envoyé à %(nbsent)d contacts.{[br/]}Echec pour %(nbfailed)d contacts."
 
-#: views_message.py:138
+#: views_message.py:119
 msgid "Delete message"
 msgstr "Suppression d'un messages"
 
-#: views_message.py:146 views_message.py:158
+#: views_message.py:127 views_message.py:139
 msgid "Add recipient to message"
 msgstr "Ajout d'un destinataire"
 
-#: views_message.py:168
+#: views_message.py:149
 msgid "Delete recipient"
 msgstr "Supprimer un destinataire"
 
-#: views_message.py:171
+#: views_message.py:152
 msgid "Do you want to delete this recipient?"
 msgstr "Voulez vous supprimer ce destinataire?"
+
+#~ msgid "Delete"
+#~ msgstr "Suppression"
+
+#~ msgid "Add"
+#~ msgstr "Ajout"
+
+#~ msgid "clone"
+#~ msgstr "dupliquer"
