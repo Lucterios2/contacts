@@ -31,10 +31,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
-    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, \
-    XferCompLinkLabel
-from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO,\
-    SELECT_SINGLE, CLOSE_YES, get_icon_path, WrapAction
+    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel
+from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO, CLOSE_YES, get_icon_path, WrapAction
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
@@ -43,7 +41,6 @@ from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.views import ObjectPromote
-from lucterios.framework.xferadvance import TITLE_ADD
 
 
 class CustomFieldEditor(LucteriosEditor):
@@ -100,8 +97,7 @@ class CustomFieldEditor(LucteriosEditor):
         model_select = XferCompSelect('modelname')
         model_select.set_value(model_current)
         model_select.set_select(AbstractContact.get_select_contact_type())
-        model_select.set_location(
-            obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
+        model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
         model_select.set_size(obj_model.vmin, obj_model.hmin)
         xfer.add_component(model_select)
         self._edit_add_args(xfer, obj_kind)
@@ -188,8 +184,7 @@ class AbstractContactEditor(LucteriosEditor):
         city_select.set_location(
             obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
         city_select.set_size(obj_city.vmin, obj_city.hmin)
-        city_select.set_action(
-            xfer.request, xfer.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        city_select.set_action(xfer.request, xfer.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         xfer.add_component(city_select)
 
     def _edit_custom_field(self, xfer, init_col):
@@ -212,8 +207,7 @@ class AbstractContactEditor(LucteriosEditor):
 
     def edit(self, xfer):
         obj_pstcd = xfer.get_components('postal_code')
-        obj_pstcd.set_action(
-            xfer.request, xfer.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        obj_pstcd.set_action(xfer.request, xfer.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         obj_city = xfer.get_components('city')
         postalcode_current = obj_pstcd.value
         list_postalcode = PostalCode.objects.filter(
@@ -278,8 +272,8 @@ class AbstractContactEditor(LucteriosEditor):
             if (len(self.item.__class__.get_select_contact_type(False)) > 0):
                 btn = XferCompButton('btn_promote')
                 btn.set_location(new_col + 1, xfer.get_max_row() + 1, 4)
-                btn.set_action(xfer.request, ObjectPromote.get_action(
-                    _('Promote'), "images/config.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_YES, 'params': {'modelname': xfer.model.get_long_name(), 'field_id': xfer.field_id}})
+                btn.set_action(xfer.request, ObjectPromote.get_action(_('Promote'), "images/config.png"), modal=FORMTYPE_MODAL,
+                               close=CLOSE_YES, params={'modelname': xfer.model.get_long_name(), 'field_id': xfer.field_id})
                 xfer.add_component(btn)
         signal_and_lock.Signal.call_signal("show_contact", self.item, xfer)
 
@@ -345,12 +339,12 @@ class IndividualEditor(AbstractContactEditor):
         if self.item.user is None:
             act = ActionsManage.get_action_url('LucteriosUser', 'UserAdd', xfer)
             act.set_value("", "images/add.png")
-            btn.set_action(xfer.request, act, {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
+            btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO)
         else:
             act = ActionsManage.get_action_url('LucteriosUser', 'Edit', xfer)
             act.set_value("", "images/edit.png")
-            btn.set_action(xfer.request, act, {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO,
-                                               'params': {'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'}})
+            btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO,
+                           params={'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'})
         xfer.add_component(btn)
 
     def saving(self, xfer):

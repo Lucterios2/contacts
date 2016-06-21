@@ -102,8 +102,7 @@ class LegalEntityList(XferListEditor):
     def fillresponse_header(self):
         self.fill_from_model(0, 2, False, ['structure_type'])
         obj_strtype = self.get_components('structure_type')
-        obj_strtype.set_action(
-            self.request, self.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        obj_strtype.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
             self.filter = Q(structure_type=int(structure_type))
@@ -175,7 +174,7 @@ class IndividualShowResp(XferContainerAcknowledge):
 
     def fillresponse(self):
         self.redirect_action(IndividualShow.get_action('', ''),
-                             {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.individual_id)}})
+                             close=CLOSE_NO, params={'individual': six.text_type(self.item.individual_id)})
 
 
 @ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
@@ -214,8 +213,7 @@ class IndividualList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self.get_action(),
-                        {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 2)
         self.add_component(comp)
         if name_filter != "":
@@ -273,8 +271,8 @@ class IndividualUserAdd(XferContainerCustom):
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, False, ['username'])
-        self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'), {})
-        self.add_action(WrapAction(_('Cancel'), 'images/cancel.png'), {})
+        self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
+        self.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
 
 
 @MenuManage.describ('auth.add_user')
@@ -291,7 +289,7 @@ class IndividualUserValid(XferSave):
             obj_indiv.save()
             obj_indiv.editor.saving(self)
             self.redirect_action(ActionsManage.get_action_url('LucteriosUser', 'Edit', self),
-                                 {'params': {'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'}})
+                                 params={'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'})
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
@@ -316,8 +314,7 @@ class ResponsabilityAdd(XferContainerCustom):
         self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self.get_action(),
-                        {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(2, 2)
         self.add_component(comp)
         identfilter = []
@@ -334,11 +331,11 @@ class ResponsabilityAdd(XferContainerCustom):
         grid.set_model(items, None, self)
         grid.set_location(2, 3)
         grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png"),
-                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_YES, 'unique': SELECT_SINGLE, 'params': {"SAVE": "YES"}})
+                        modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
         grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
-                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+                        modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.add_action(self.request, IndividualAddModify.get_action(TITLE_ADD, "images/add.png"),
-                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
+                        modal=FORMTYPE_MODAL, close=CLOSE_NO)
         self.add_component(grid)
 
 
@@ -373,9 +370,9 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
             self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
-                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
+                                                          close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
         self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
-                        {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
+                        params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
 
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
@@ -390,9 +387,9 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
             self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
-                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
+                                                          close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
         self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
-                        {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
+                        params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
 
 
 @MenuManage.describ('contacts.add_abstractcontact')
@@ -413,7 +410,7 @@ class AbstractContactFindDouble(XferListEditor):
         XferListEditor.fillresponse(self)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
             self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
-                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI})
+                                                          close=CLOSE_NO, unique=SELECT_MULTI)
 
 
 @ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)

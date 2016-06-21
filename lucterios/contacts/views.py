@@ -44,7 +44,7 @@ from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REF
 from lucterios.framework.xfergraphic import XferContainerCustom,\
     XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor,\
-    TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, action_list_sorted
+    TITLE_DELETE, TITLE_ADD, TITLE_MODIFY
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
     XferCompSelect, XferCompUpLoad, XferCompButton
 from lucterios.framework import signal_and_lock
@@ -81,7 +81,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
         try:
             Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityShow.fillresponse(self)
-            self.add_action(CurrentLegalEntityModify.get_action(_("Modify"), "images/edit.png"), {'close': CLOSE_YES}, 0)
+            self.add_action(CurrentLegalEntityModify.get_action(_("Modify"), "images/edit.png"), close=CLOSE_YES, pos_act=0)
         except:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
@@ -114,7 +114,7 @@ class Account(XferContainerCustom):
         btn.set_is_mini(True)
         btn.set_location(4, 1, 1, 2)
         btn.set_action(self.request, CurrentLegalEntityModify.get_action(
-            _('Edit'), "images/edit.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'params': {'legal_entity': legal_entity.id}})
+            _('Edit'), "images/edit.png"), modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'legal_entity': legal_entity.id})
         self.add_component(btn)
 
     def add_legalentities(self, legal_entities):
@@ -122,7 +122,7 @@ class Account(XferContainerCustom):
         grid = XferCompGrid('legal_entity')
         grid.set_model(legal_entities, LegalEntity.get_default_fields())
         grid.add_action(self.request, CurrentLegalEntityShow.get_action(
-            _("Edit"), "images/show.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+            _("Edit"), "images/show.png"), modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.set_location(1, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -143,14 +143,13 @@ class Account(XferContainerCustom):
             self.model = Individual
             self.field_id = 'individual'
             self.params['individual'] = six.text_type(self.item.id)
-            self.add_action(AccountAddModify.get_action(
-                _("Edit"), "images/edit.png"), {'close': CLOSE_NO})
+            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO)
             is_individual = True
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(
                 id=self.request.user.id)
-            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), {
-                            'close': CLOSE_NO, 'params': {'user_actif': six.text_type(self.request.user.id)}})
+            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"),
+                            close=CLOSE_NO, params={'user_actif': six.text_type(self.request.user.id)})
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
@@ -160,7 +159,7 @@ class Account(XferContainerCustom):
                 self.add_legalentity(legal_entities[0])
             elif len(legal_entities) > 1:
                 self.add_legalentities(legal_entities)
-        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+        self.add_action(WrapAction(_("Close"), "images/close.png"))
 
 
 @MenuManage.describ(None)
@@ -192,10 +191,10 @@ class CurrentStructure(XferContainerCustom):
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
         self.add_action(CurrentStructureAddModify.get_action(
-            _("Edit"), "images/edit.png"), {'close': CLOSE_NO})
+            _("Edit"), "images/edit.png"), close=CLOSE_NO)
         self.add_action(CurrentStructurePrint.get_action(
-            _("Print"), "images/print.png"), {'close': CLOSE_NO})
-        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+            _("Print"), "images/print.png"), close=CLOSE_NO)
+        self.add_action(WrapAction(_("Close"), "images/close.png"))
 
 
 @MenuManage.describ('')
@@ -260,8 +259,8 @@ class CreateAccount(XferContainerAcknowledge):
         lbl.set_color('red')
         lbl.set_value(self.getparam('error', ''))
         dlg.add_component(lbl)
-        dlg.add_action(self.get_action(_('Ok'), 'images/ok.png'), {'params': {"SAVE": "YES"}})
-        dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'), {})
+        dlg.add_action(self.get_action(_('Ok'), 'images/ok.png'), params={"SAVE": "YES"})
+        dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
 
     def fillresponse(self, username='', legalentity=''):
         if self.getparam("SAVE") != 'YES':
@@ -299,7 +298,7 @@ class CreateAccount(XferContainerAcknowledge):
             self.item.user.generate_password()
             self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
         except IntegrityError:
-            self.redirect_act = (self.get_action('', ''), {'params': {"SAVE": "", 'error': _("This account exists yet!")}})
+            self.redirect_act = (self.get_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': _("This account exists yet!")})
 
 
 @MenuManage.describ('CORE.add_parameter')
@@ -360,7 +359,7 @@ class Configuration(XferListEditor):
         self._fill_functions()
         self._fill_structuretype()
         self._fill_customfield()
-        self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+        self.add_action(WrapAction(_("Close"), "images/close.png"))
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
@@ -439,8 +438,7 @@ class PostalCodeList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
-        comp.set_action(self.request, self.get_action(),
-                        {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = Q(postal_code__startswith=filter_postal_code)
@@ -703,12 +701,12 @@ class ContactImport(XferContainerCustom):
         if step < 4:
             if step > 1:
                 self.add_action(self.get_action(_('Back'), "images/left.png"),
-                                {'close': CLOSE_NO, 'modal': FORMTYPE_REFRESH, 'params': {'step': step - 2}})
+                                close=CLOSE_NO, modal=FORMTYPE_REFRESH, params={'step': step - 2})
             self.add_action(self.get_action(_('Ok'), "images/ok.png"),
-                            {'close': CLOSE_NO, 'modal': FORMTYPE_REFRESH, 'params': {'step': step}})
-            self.add_action(WrapAction(_("Cancel"), "images/cancel.png"), {})
+                            close=CLOSE_NO, modal=FORMTYPE_REFRESH, params={'step': step})
+            self.add_action(WrapAction(_("Cancel"), "images/cancel.png"))
         else:
-            self.add_action(WrapAction(_("Close"), "images/close.png"), {})
+            self.add_action(WrapAction(_("Close"), "images/close.png"))
 
 
 @signal_and_lock.Signal.decorate('config')

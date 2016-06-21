@@ -27,15 +27,15 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO
-from lucterios.framework.xfergraphic import XferContainerCustom,\
-    XferContainerAcknowledge
+from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xfercomponents import XferCompButton, XferCompImage
+from lucterios.framework.error import LucteriosException, IMPORTANT
+from lucterios.framework import signal_and_lock
+
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
-from lucterios.framework.error import LucteriosException, IMPORTANT
-from lucterios.mailing.functions import will_mail_send, send_email,\
-    send_connection_by_email
-from lucterios.framework import signal_and_lock
+
+from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
@@ -56,14 +56,12 @@ class Configuration(XferContainerCustom):
         Params.fill(self, conf_params, 1, 1)
         btn = XferCompButton('editparam')
         btn.set_location(3, 1, 1, 5)
-        btn.set_action(self.request, ParamEdit.get_action(
-            _('Modify'), 'images/edit.png'), {'close': CLOSE_NO, 'params': {'params': conf_params}})
+        btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': conf_params})
         self.add_component(btn)
         if will_mail_send():
             btn = XferCompButton('tryemail')
             btn.set_location(1, 10, 2)
-            btn.set_action(self.request, SendEmailTry.get_action(
-                _('Send'), ''), {'close': CLOSE_NO})
+            btn.set_action(self.request, SendEmailTry.get_action(_('Send'), ''), close=CLOSE_NO)
             self.add_component(btn)
 
         self.new_tab(_('Default message'))
@@ -76,8 +74,7 @@ class Configuration(XferContainerCustom):
         Params.fill(self, msg_params, 1, 1)
         btn = XferCompButton('editmsg')
         btn.set_location(1, 10, 2)
-        btn.set_action(self.request, ParamEdit.get_action(
-            _('Modify'), 'images/edit.png'), {'close': CLOSE_NO, 'params': {'params': msg_params}})
+        btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': msg_params})
         self.add_component(btn)
 
 
