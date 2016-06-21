@@ -43,6 +43,7 @@ from lucterios.CORE.parameters import Params
 from lucterios.framework.models import get_value_converted
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.views import ObjectPromote
+from lucterios.framework.xferadvance import TITLE_ADD
 
 
 class CustomFieldEditor(LucteriosEditor):
@@ -328,8 +329,6 @@ class LegalEntityEditor(AbstractContactEditor):
         if self.item.id == 1:
             xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
-        xfer.get_components('responsability').add_action(xfer.request, ActionsManage.get_act_changed('Individual', 'showresp', _("Show"), 'images/show.png'),
-                                                         {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE}, 0)
         AbstractContactEditor.show(self, xfer)
 
 
@@ -344,11 +343,14 @@ class IndividualEditor(AbstractContactEditor):
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.item.user is None:
-            btn.set_action(xfer.request, ActionsManage.get_act_changed('Individual', 'useradd', "", 'images/add.png'),
-                           {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
+            act = ActionsManage.get_action_url('LucteriosUser', 'UserAdd', xfer)
+            act.set_value("", "images/add.png")
+            btn.set_action(xfer.request, act, {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
         else:
-            btn.set_action(xfer.request, ActionsManage.get_act_changed('LucteriosUser', 'edit', '', 'images/edit.png'),
-                           {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'params': {'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'}})
+            act = ActionsManage.get_action_url('LucteriosUser', 'Edit', xfer)
+            act.set_value("", "images/edit.png")
+            btn.set_action(xfer.request, act, {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO,
+                                               'params': {'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'}})
         xfer.add_component(btn)
 
     def saving(self, xfer):

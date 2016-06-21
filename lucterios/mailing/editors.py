@@ -56,20 +56,14 @@ class MessageEditor(LucteriosEditor):
         if compid > 0:
             nb_contact = len(self.item.get_contacts())
             contact_nb = XferCompLabelForm('contact_nb')
-            contact_nb.set_location(
-                obj_recipients.col, obj_recipients.row + 1, obj_recipients.colspan)
-            contact_nb.set_value(
-                _("Message defined for %d contacts") % nb_contact)
+            contact_nb.set_location(obj_recipients.col, obj_recipients.row + 1, obj_recipients.colspan)
+            contact_nb.set_value(_("Message defined for %d contacts") % nb_contact)
             xfer.add_component(contact_nb)
         lbl = XferCompLabelForm('sep_body')
         lbl.set_location(obj_recipients.col - 1, obj_recipients.row + 2, 4)
         lbl.set_value("{[hr/]}")
         xfer.add_component(lbl)
         xfer.remove_component('recipients')
-        if self.item.status == 0:
-            new_recipients.add_action(xfer.request, ActionsManage.get_act_changed(xfer.model.__name__, 'del_recipients', _(
-                "Delete"), "images/delete.png"), {'modal': FORMTYPE_MODAL, 'unique': SELECT_SINGLE})
-            new_recipients.add_action(xfer.request, ActionsManage.get_act_changed(xfer.model.__name__, 'add_recipients', _(
-                "Add"), "images/add.png"), {'modal': FORMTYPE_MODAL, 'unique': SELECT_NONE})
+        new_recipients.add_action_notified(xfer, 'recipient_list')
         xfer.add_component(new_recipients)
         return LucteriosEditor.show(self, xfer)

@@ -5,23 +5,24 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.mailing.models import Message
 
-from lucterios.framework.xferadvance import XferListEditor
+from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT,\
+    TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
 from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, CLOSE_NO,\
-    SELECT_SINGLE, FORMTYPE_MODAL
+    SELECT_SINGLE, FORMTYPE_MODAL, CLOSE_YES, SELECT_MULTI
 from lucterios.contacts.tools import ContactSelection
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
 from lucterios.mailing.functions import will_mail_send
 from lucterios.CORE.xferprint import XferPrintReporting
 from copy import deepcopy
+from asyncio.locks import Condition
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)
 
 
-@ActionsManage.affect('Message', 'list')
 @MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for mailing.'))
 class MessageList(XferListEditor):
     icon = "mailing.png"
@@ -29,14 +30,9 @@ class MessageList(XferListEditor):
     field_id = 'message'
     caption = _("Messages")
 
-    def fillresponse(self):
-        XferListEditor.fillresponse(self)
-        grid = self.get_components(self.field_id)
-        grid.add_action(self.request, MessageClone.get_action(_("clone"), "images/clone.png"),
-                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
 
-
-@ActionsManage.affect('Message', 'modify', 'add')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES, condition=lambda xfer: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageAddModify(XferAddEditor):
     icon = "mailing.png"
@@ -46,6 +42,7 @@ class MessageAddModify(XferAddEditor):
     caption_modify = _("Modify message")
 
 
+@ActionsManage.affect_grid(TITLE_CLONE, "images/clone.png", unique=SELECT_SINGLE)
 @MenuManage.describ('mailing.add_message')
 class MessageClone(XferContainerAcknowledge):
     icon = "mailing.png"
@@ -58,11 +55,10 @@ class MessageClone(XferContainerAcknowledge):
         self.item.date = None
         self.item.status = 0
         self.item.save()
-        self.redirect_action(ActionsManage.get_act_changed(
-            self.model.__name__, 'show', '', ''), {'params': {self.field_id: self.item.id}})
+        self.redirect_action(MessageShow.get_action('', ''), {'params': {self.field_id: self.item.id}})
 
 
-@ActionsManage.affect('Message', 'show')
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
 @MenuManage.describ('mailing.change_message')
 class MessageShow(XferShowEditor):
     icon = "mailing.png"
@@ -70,21 +66,8 @@ class MessageShow(XferShowEditor):
     field_id = 'message'
     caption = _("Show message")
 
-    def fillresponse(self):
-        if (self.item.status == 0) and (self.item.recipients != ''):
-            self.action_list.insert(
-                0, (('valid', _("Valid"), "images/ok.png", CLOSE_NO)))
-        if self.item.status == 1:
-            self.action_list = []
-            self.action_list.append(
-                ('letter', _("Letters"), "lucterios.mailing/images/letter.png", CLOSE_NO))
-            if will_mail_send():
-                self.action_list.append(
-                    ('email', _("Emails"), "lucterios.mailing/images/email.png", CLOSE_NO))
-        XferShowEditor.fillresponse(self)
 
-
-@ActionsManage.affect('Message', 'valid')
+@ActionsManage.affect_show(_("Valid"), "images/ok.png", intop=True, condition=lambda xfer: (xfer.item.status == 0) and (xfer.item.recipients != ''))
 @MenuManage.describ('mailing.add_message')
 class MessageValid(XferContainerAcknowledge):
     icon = "mailing.png"
@@ -97,7 +80,7 @@ class MessageValid(XferContainerAcknowledge):
             self.item.valid()
 
 
-@ActionsManage.affect('Message', 'letter')
+@ActionsManage.affect_show(_("Letters"), "lucterios.mailing/images/letter.png", condition=lambda xfer: xfer.item.status == 1)
 @MenuManage.describ('mailing.add_message')
 class MessageLetter(XferPrintReporting):
     icon = "mailing.png"
@@ -114,7 +97,7 @@ class MessageLetter(XferPrintReporting):
         return items
 
 
-@ActionsManage.affect('Message', 'email')
+@ActionsManage.affect_show(_("Emails"), "lucterios.mailing/images/email.png", condition=lambda xfer: (xfer.item.status == 1) and will_mail_send())
 @MenuManage.describ('mailing.add_message')
 class MessageEmail(XferContainerAcknowledge):
     icon = "mailing.png"
@@ -129,7 +112,7 @@ class MessageEmail(XferContainerAcknowledge):
                 _("Message sent to %(nbsent)d contact.{[br/]}Failure to %(nbfailed)d contacts.") % {'nbsent': nb_sent, 'nbfailed': nb_failed})
 
 
-@ActionsManage.affect('Message', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('mailing.delete_message')
 class MessageDel(XferDelete):
     icon = "mailing.png"
@@ -149,7 +132,7 @@ class MessageValidRecipient(XferContainerAcknowledge):
         self.item.add_recipient(modelname, CRITERIA)
 
 
-@ActionsManage.affect('Message', 'add_recipients')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageAddRecipient(ContactSelection):
     icon = "mailing.png"
@@ -159,7 +142,7 @@ class MessageAddRecipient(ContactSelection):
     final_class = MessageValidRecipient
 
 
-@ActionsManage.affect('Message', 'del_recipients')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_SINGLE, model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageDelRecipient(XferContainerAcknowledge):
     icon = "mailing.png"

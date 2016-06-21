@@ -40,10 +40,11 @@ from django.db.models import Q
 from django.db import IntegrityError, transaction
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
-    FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES
+    FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI
 from lucterios.framework.xfergraphic import XferContainerCustom,\
     XferContainerAcknowledge
-from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor
+from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor,\
+    TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, action_list_sorted
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
     XferCompSelect, XferCompUpLoad, XferCompButton
 from lucterios.framework import signal_and_lock
@@ -61,7 +62,6 @@ from lucterios.contacts.views_contacts import LegalEntityAddModify, \
     LegalEntityShow
 
 
-@ActionsManage.affect('LegalEntity', 'currentmodify')
 @MenuManage.describ(None)
 class CurrentLegalEntityModify(LegalEntityAddModify):
 
@@ -79,11 +79,9 @@ class CurrentLegalEntityShow(LegalEntityShow):
 
     def fillresponse(self):
         try:
-            Responsability.objects.get(
-                individual__user=self.request.user, legal_entity=self.item)
-            self.action_list = [
-                ('currentmodify', _("Modify"), "images/edit.png", CLOSE_YES)]
+            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityShow.fillresponse(self)
+            self.add_action(CurrentLegalEntityModify.get_action(_("Modify"), "images/edit.png"), {'close': CLOSE_YES}, 0)
         except:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
@@ -318,7 +316,7 @@ MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
-class Configuration(XferContainerCustom):
+class Configuration(XferListEditor):
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
 
@@ -332,18 +330,7 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_("Functions list"))
         img.set_location(1, 0)
         self.add_component(img)
-        self.model = Function
-        dbfunction = Function.objects.all()
-        grid = XferCompGrid("function")
-        grid.set_model(dbfunction, None, self)
-        grid.add_actions(self)
-        grid.set_location(0, 1, 2)
-        grid.set_size(200, 500)
-        self.add_component(grid)
-        lbl = XferCompLabelForm("nbFunction")
-        lbl.set_location(0, 2, 2)
-        lbl.set_value(_("Number of function show: %d") % grid.nb_lines)
-        self.add_component(lbl)
+        self.fill_grid(0, Function, "function", Function.objects.all())
 
     def _fill_structuretype(self):
         self.new_tab(_("Structure type"))
@@ -355,18 +342,7 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_('Structure types list'))
         img.set_location(1, 0)
         self.add_component(img)
-        self.model = StructureType
-        dbcategorie = StructureType.objects.all()
-        grid = XferCompGrid("structure_type")
-        grid.set_model(dbcategorie, None, self)
-        grid.add_actions(self)
-        grid.set_location(0, 1, 2)
-        grid.set_size(200, 500)
-        self.add_component(grid)
-        lbl = XferCompLabelForm("nbType")
-        lbl.set_location(0, 2, 2)
-        lbl.set_value(_("Number of structure type show: %d") % grid.nb_lines)
-        self.add_component(lbl)
+        self.fill_grid(0, StructureType, "structure_type", StructureType.objects.all())
 
     def _fill_customfield(self):
         self.new_tab(_("Custom field"))
@@ -378,18 +354,7 @@ class Configuration(XferContainerCustom):
         img.set_value_as_title(_('custom field list'))
         img.set_location(1, 0)
         self.add_component(img)
-        self.model = CustomField
-        dbcustom = CustomField.objects.all()
-        grid = XferCompGrid("custom_field")
-        grid.set_model(dbcustom, None, self)
-        grid.add_actions(self)
-        grid.set_location(0, 1, 2)
-        grid.set_size(200, 500)
-        self.add_component(grid)
-        lbl = XferCompLabelForm("nbField")
-        lbl.set_location(0, 2, 2)
-        lbl.set_value(_("Number of custom field show: %d") % grid.nb_lines)
-        self.add_component(lbl)
+        self.fill_grid(0, CustomField, "custom_field", CustomField.objects.all())
 
     def fillresponse(self):
         self._fill_functions()
@@ -398,7 +363,7 @@ class Configuration(XferContainerCustom):
         self.add_action(WrapAction(_("Close"), "images/close.png"), {})
 
 
-@ActionsManage.affect('Function', 'add')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):
     icon = "function.png"
@@ -408,7 +373,7 @@ class FunctionAddModify(XferAddEditor):
     caption_modify = _("Modify function")
 
 
-@ActionsManage.affect('Function', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class FunctionDel(XferDelete):
     caption = _("Delete function")
@@ -417,7 +382,8 @@ class FunctionDel(XferDelete):
     field_id = 'function'
 
 
-@ActionsManage.affect('CustomField', 'add', 'edit')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", unique=SELECT_SINGLE)
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldAddModify(XferAddEditor):
     icon = "fields.png"
@@ -427,7 +393,7 @@ class CustomFieldAddModify(XferAddEditor):
     caption_modify = _("Modify custom field")
 
 
-@ActionsManage.affect('CustomField', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldDel(XferDelete):
     caption = _("Delete custom field")
@@ -436,7 +402,7 @@ class CustomFieldDel(XferDelete):
     field_id = 'custom_field'
 
 
-@ActionsManage.affect('StructureType', 'add')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeAddModify(XferAddEditor):
     icon = "function.png"
@@ -446,23 +412,13 @@ class StructureTypeAddModify(XferAddEditor):
     caption_modify = _("Modify structure type")
 
 
-@ActionsManage.affect('StructureType', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeDel(XferDelete):
     caption = _("Delete structure type")
     icon = "function.png"
     model = StructureType
     field_id = 'structure_type'
-
-
-@ActionsManage.affect('PostalCode', 'add')
-@MenuManage.describ('contacts.add_postalcode')
-class PostalCodeAdd(XferAddEditor):
-    caption_add = _("Add function")
-    caption_modify = _("Add postal code")
-    icon = "postalCode.png"
-    model = PostalCode
-    field_id = 'postalCode'
 
 
 @MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
@@ -475,8 +431,7 @@ class PostalCodeList(XferListEditor):
     def fillresponse_header(self):
         filter_postal_code = self.getparam('filter_postal_code')
         if filter_postal_code is None:
-            local_struct = LegalEntity.objects.get(
-                id=1)
+            local_struct = LegalEntity.objects.get(id=1)
             filter_postal_code = six.text_type(local_struct.postal_code)
         lbl = XferCompLabelForm('filtre')
         lbl.set_value_as_name(_('Filtrer by postal code'))
@@ -489,6 +444,16 @@ class PostalCodeList(XferListEditor):
         comp.set_location(1, 1)
         self.add_component(comp)
         self.filter = Q(postal_code__startswith=filter_postal_code)
+
+
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@MenuManage.describ('contacts.add_postalcode')
+class PostalCodeAdd(XferAddEditor):
+    caption_add = _("Add function")
+    caption_modify = _("Add postal code")
+    icon = "postalCode.png"
+    model = PostalCode
+    field_id = 'postalCode'
 
 
 @MenuManage.describ('contacts.change_postalcode', FORMTYPE_MODAL, 'contact.conf', _('Tool to import contacts from CSV file.'))

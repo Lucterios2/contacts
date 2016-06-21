@@ -509,6 +509,7 @@ class MailingTest(LucteriosTest):
 
     def test_validate_message(self):
         configSMTP('', 25)
+        self.assertFalse(will_mail_send(), 'no email')
         self.factory.xfer = MessageAddModify()
         self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
                                                           '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
@@ -524,6 +525,7 @@ class MailingTest(LucteriosTest):
         self.assert_observer(
             'core.acknowledge', 'lucterios.mailing', 'messageValid')
 
+        self.assertFalse(will_mail_send(), 'no email')
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
@@ -542,6 +544,7 @@ class MailingTest(LucteriosTest):
             'ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
 
         configSMTP('localhost', 1025)
+        self.assertTrue(will_mail_send(), 'with email')
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')

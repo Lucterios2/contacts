@@ -32,7 +32,9 @@ from django.apps.registry import apps
 from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage, SELECT_MULTI
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
-from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave
+from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
+    TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
+    TITLE_LISTING
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
 from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework import signal_and_lock
@@ -51,7 +53,8 @@ MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/conta
                    _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
 
 
-@ActionsManage.affect('LegalEntity', 'add', 'modify')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class LegalEntityAddModify(XferAddEditor):
     icon = "legalEntity.png"
@@ -61,7 +64,7 @@ class LegalEntityAddModify(XferAddEditor):
     caption_modify = _("Modify legal entity")
 
 
-@ActionsManage.affect('LegalEntity', 'show')
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityShow(XferShowEditor):
     caption = _("Show legal entity")
@@ -70,7 +73,7 @@ class LegalEntityShow(XferShowEditor):
     field_id = 'legal_entity'
 
 
-@ActionsManage.affect('LegalEntity', 'print')
+@ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityPrint(XferPrintAction):
     caption = _("Show legal entity")
@@ -80,7 +83,7 @@ class LegalEntityPrint(XferPrintAction):
     action_class = LegalEntityShow
 
 
-@ActionsManage.affect('LegalEntity', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class LegalEntityDel(XferDelete):
     caption = _("Delete legal entity")
@@ -110,7 +113,7 @@ class LegalEntityList(XferListEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 2)
 
 
-@ActionsManage.affect('LegalEntity', 'listing')
+@ActionsManage.affect_list(TITLE_LISTING, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityListing(XferPrintListing):
     caption = _("Legal entities")
@@ -126,7 +129,7 @@ class LegalEntityListing(XferPrintListing):
             return XferPrintListing.get_filter(self)
 
 
-@ActionsManage.affect('LegalEntity', 'label')
+@ActionsManage.affect_list(TITLE_LABEL, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityLabel(XferPrintLabel):
     caption = _("Legal entities")
@@ -142,7 +145,8 @@ class LegalEntityLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect('Individual', 'add', 'modify')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class IndividualAddModify(XferAddEditor):
     icon = "individual.png"
@@ -152,7 +156,7 @@ class IndividualAddModify(XferAddEditor):
     caption_modify = _("Modify individual")
 
 
-@ActionsManage.affect('Individual', 'show')
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualShow(XferShowEditor):
     caption = _("Show individual")
@@ -161,7 +165,7 @@ class IndividualShow(XferShowEditor):
     field_id = 'individual'
 
 
-@ActionsManage.affect('Individual', 'showresp')
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualShowResp(XferContainerAcknowledge):
     caption = _("Show individual")
@@ -170,11 +174,11 @@ class IndividualShowResp(XferContainerAcknowledge):
     field_id = 'responsability'
 
     def fillresponse(self):
-        self.redirect_action(IndividualShow.get_action(
-            '', ''), {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.individual_id)}})
+        self.redirect_action(IndividualShow.get_action('', ''),
+                             {'close': CLOSE_NO, 'params': {'individual': six.text_type(self.item.individual_id)}})
 
 
-@ActionsManage.affect('Individual', 'print')
+@ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualPrint(XferPrintAction):
     caption = _("Show individual")
@@ -184,7 +188,7 @@ class IndividualPrint(XferPrintAction):
     action_class = IndividualShow
 
 
-@ActionsManage.affect('Individual', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class IndividualDel(XferDelete):
     caption = _("Delete individual")
@@ -223,7 +227,7 @@ class IndividualList(XferListEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 2)
 
 
-@ActionsManage.affect('Individual', 'label')
+@ActionsManage.affect_list(TITLE_LABEL, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualLabel(XferPrintLabel):
     caption = _("Individuals")
@@ -239,7 +243,7 @@ class IndividualLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect('Individual', 'listing')
+@ActionsManage.affect_list(TITLE_LISTING, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualListing(XferPrintListing):
     caption = _("Individuals")
@@ -256,10 +260,9 @@ class IndividualListing(XferPrintListing):
             return XferPrintListing.get_filter(self)
 
 
-@ActionsManage.affect('Individual', 'useradd')
+@ActionsManage.affect_show("", 'images/add.png')
 @MenuManage.describ('auth.add_user')
 class IndividualUserAdd(XferContainerCustom):
-
     caption = _("Add as an users")
     icon = "images/user.png"
     model = LucteriosUser
@@ -270,14 +273,12 @@ class IndividualUserAdd(XferContainerCustom):
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, False, ['username'])
-        self.add_action(
-            IndividualUserValid.get_action(_('Ok'), 'images/ok.png'), {})
+        self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'), {})
         self.add_action(WrapAction(_('Cancel'), 'images/cancel.png'), {})
 
 
 @MenuManage.describ('auth.add_user')
 class IndividualUserValid(XferSave):
-
     caption = _("Add as an users")
     icon = "user.png"
     model = LucteriosUser
@@ -289,14 +290,13 @@ class IndividualUserValid(XferSave):
             obj_indiv.user = self.item
             obj_indiv.save()
             obj_indiv.editor.saving(self)
-            self.redirect_action(ActionsManage.get_act_changed('LucteriosUser', 'edit', '', ''), {
-                                 'params': {'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'}})
+            self.redirect_action(ActionsManage.get_action_url('LucteriosUser', 'Edit', self),
+                                 {'params': {'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'}})
 
 
-@ActionsManage.affect('Responsability', 'add')
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
 @MenuManage.describ('contacts.change_responsability')
 class ResponsabilityAdd(XferContainerCustom):
-
     caption = _("Add responsability")
     icon = "function.png"
     model = Responsability
@@ -335,24 +335,23 @@ class ResponsabilityAdd(XferContainerCustom):
         grid.set_location(2, 3)
         grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png"),
                         {'modal': FORMTYPE_MODAL, 'close': CLOSE_YES, 'unique': SELECT_SINGLE, 'params': {"SAVE": "YES"}})
-        grid.add_action(self.request, IndividualShow.get_action(
-            _("Show"), "images/edit.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
-        grid.add_action(self.request, ActionsManage.get_act_changed("Individual", "add", _(
-            "Add"), "images/add.png"), {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
+        grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
+                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO, 'unique': SELECT_SINGLE})
+        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_ADD, "images/add.png"),
+                        {'modal': FORMTYPE_MODAL, 'close': CLOSE_NO})
         self.add_component(grid)
 
 
-@ActionsManage.affect('Responsability', 'edit')
+@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_responsability')
 class ResponsabilityModify(XferAddEditor):
-
     caption = _("Modify responsability")
     icon = "function.png"
     model = Responsability
     field_id = 'responsability'
 
 
-@ActionsManage.affect('Responsability', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_responsability')
 class ResponsabilityDel(XferDelete):
 
@@ -373,10 +372,10 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(
-                _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
-        self.add_action(AbstractContactFindDouble.get_action(
-            _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
+        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
+                        {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
 
 
 @MenuManage.describ('contacts.change_abstractcontact', FORMTYPE_NOMODAL, 'contact.actions', _('To find a legal entity following a set of criteria.'))
@@ -390,10 +389,10 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(
-                _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
-        self.add_action(AbstractContactFindDouble.get_action(
-            _("duplicate"), "images/clone.png"), {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI, 'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}})
+        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
+                        {'params': {'modelname': self.model.get_long_name(), 'field_id': self.field_id}}, 0)
 
 
 @MenuManage.describ('contacts.add_abstractcontact')
@@ -413,11 +412,11 @@ class AbstractContactFindDouble(XferListEditor):
         self.field_id = field_id
         XferListEditor.fillresponse(self)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(
-                _("Merge"), "images/clone.png"), {'close': CLOSE_NO, 'unique': SELECT_MULTI})
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+                                                          {'close': CLOSE_NO, 'unique': SELECT_MULTI})
 
 
-@ActionsManage.affect('AbstractContact', 'show')
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class AbstractContactShow(XferShowEditor):
     icon = "contacts.png"
@@ -431,7 +430,7 @@ class AbstractContactShow(XferShowEditor):
         XferShowEditor.fillresponse(self)
 
 
-@ActionsManage.affect('AbstractContact', 'delete')
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class AbstractContactDel(XferDelete):
     icon = "contacts.png"

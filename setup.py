@@ -62,5 +62,5 @@ setup(
         "lucterios.mailing.migrations": ['*'],
         "lucterios.mailing": ['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["lucterios ==2.0.*", "Pillow ==2.8"],
+    install_requires=["lucterios ==2.1.*", "Pillow ==2.8"],
 )

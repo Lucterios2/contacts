@@ -35,8 +35,7 @@ from lucterios.CORE.models import Parameter
 
 def addon_create_account(apps, schema_editor):
     translation.activate(settings.LANGUAGE_CODE)
-    param = Parameter.objects.create(
-        name='contacts-createaccount', typeparam=4)
+    param = Parameter.objects.create(name='contacts-createaccount', typeparam=4)
     param.title = _("contacts-createaccount")
     param.param_titles = (_("contacts-createaccount.0"),
                           _("contacts-createaccount.1"), _("contacts-createaccount.2"))

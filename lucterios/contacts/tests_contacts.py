@@ -241,8 +241,8 @@ class ContactsTest(LucteriosTest):
         self.assert_xml_equal('CONTEXT/PARAM[@name="individual"]', "2")
         self.assert_xml_equal('CONTEXT/PARAM[@name="username"]', "jacko")
         self.assert_count_equal('ACTION', 1)
-        self.assert_action_equal('ACTION', (None, None, "CORE", "usersEdit", 1, 1, 1, {
-                                 "user_actif": "2", "IDENT_READ": "YES"}))
+        self.assert_action_equal('ACTION', ('Ajouter', "images/add.png", "CORE", "usersEdit", 1, 1, 1,
+                                            {"user_actif": "2", "IDENT_READ": "YES"}))
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {'individual': '2', 'username':
                                       'jacko', 'user_actif': '2', 'IDENT_READ': 'YES'}, False)
@@ -1201,10 +1201,8 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = ObjectMerge()
         self.call('/lucterios.contacts/objectMerge',
                   {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
-        self.assert_observer(
-            'core.acknowledge', 'lucterios.contacts', 'objectMerge')
-        self.assert_action_equal(
-            'ACTION', (None, None, 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
+        self.assert_action_equal('ACTION', ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
 
         self.factory.xfer = IndividualList()
         self.call('/lucterios.contacts/individualList', {}, False)
