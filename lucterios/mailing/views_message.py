@@ -66,7 +66,6 @@ class MessageShow(XferShowEditor):
     caption = _("Show message")
 
 
-# @ActionsManage.affect_show(_("Valid"), "images/ok.png", intop=True, condition=lambda xfer: (xfer.item.status == 0) and (xfer.item.recipients != ''))
 @ActionsManage.affect_transition("status")
 @MenuManage.describ('mailing.add_message')
 class MessageTransition(XferTransition):
