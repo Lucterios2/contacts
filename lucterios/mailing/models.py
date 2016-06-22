@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.apps import apps
+from django_fsm import FSMIntegerField, transition
 
 from lucterios.framework.models import LucteriosModel
 from lucterios.framework.xfersearch import get_search_query_from_criteria
@@ -39,8 +40,7 @@ from lucterios.contacts.models import AbstractContact
 class Message(LucteriosModel):
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
-    status = models.IntegerField(
-        verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close'))))
+    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close'))))
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_(
@@ -93,11 +93,11 @@ class Message(LucteriosModel):
                 self.recipients = "\n".join(recipient_list)
                 self.save()
 
+    transitionname__valid = _("Valid")
+
+    @transition(field=status, source=0, target=1, conditions=[lambda item:item.recipients != ''])
     def valid(self):
-        if (self.status == 0) and (self.recipients != ''):
-            self.date = date.today()
-            self.status = 1
-            self.save()
+        self.date = date.today()
 
     def send_email(self):
         nb_sent, nb_failed = 0, 0
@@ -112,3 +112,6 @@ class Message(LucteriosModel):
                     except:
                         nb_failed += 1
         return nb_sent, nb_failed
+
+    class Meta(object):
+        pass

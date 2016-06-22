@@ -46,8 +46,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         self.action_list = []
         if self.final_class is not None:
-            self.add_action(
-                self.final_class.get_action(_('ok'), "images/ok.png"), {})
+            self.add_action(self.final_class.get_action(_('ok'), "images/ok.png"))
         model_current = self.getparam('modelname')
         if model_current is None:
             self.model = self.inital_model

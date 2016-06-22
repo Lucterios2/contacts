@@ -4,7 +4,8 @@ from copy import deepcopy
 
 from django.utils.translation import ugettext_lazy as _
 
-from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE
+from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
+    XferTransition
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
@@ -65,17 +66,13 @@ class MessageShow(XferShowEditor):
     caption = _("Show message")
 
 
-@ActionsManage.affect_show(_("Valid"), "images/ok.png", intop=True, condition=lambda xfer: (xfer.item.status == 0) and (xfer.item.recipients != ''))
+# @ActionsManage.affect_show(_("Valid"), "images/ok.png", intop=True, condition=lambda xfer: (xfer.item.status == 0) and (xfer.item.recipients != ''))
+@ActionsManage.affect_transition("status")
 @MenuManage.describ('mailing.add_message')
-class MessageValid(XferContainerAcknowledge):
+class MessageTransition(XferTransition):
     icon = "mailing.png"
     model = Message
     field_id = 'message'
-    caption = _("Valid message")
-
-    def fillresponse(self):
-        if self.confirme(_("Do you want to close this message?")):
-            self.item.valid()
 
 
 @ActionsManage.affect_show(_("Letters"), "lucterios.mailing/images/letter.png", condition=lambda xfer: xfer.item.status == 1)

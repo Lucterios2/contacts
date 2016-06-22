@@ -49,8 +49,8 @@ from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 from lucterios.mailing.views import Configuration, SendEmailTry
 from lucterios.mailing.functions import will_mail_send, send_email
-from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageValid,\
-    MessageEmail, MessageLetter
+from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
+    MessageDelRecipient, MessageEmail, MessageLetter, MessageTransition
 from unittest.case import TestCase
 from lucterios.CORE.views import AskPassword, AskPasswordAct
 from django.contrib.auth.models import AnonymousUser
@@ -474,7 +474,7 @@ class MailingTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal('ACTIONS/ACTION', 3)
         self.assert_action_equal(
-            'ACTIONS/ACTION[1]', ('Valider', 'images/ok.png', 'lucterios.mailing', 'messageValid', 0, 1, 1))
+            'ACTIONS/ACTION[1]', ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
         self.assert_action_equal(
             'ACTIONS/ACTION[2]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal(
@@ -519,11 +519,11 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageValidRecipient()
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
-        self.factory.xfer = MessageValid()
-        self.call('/lucterios.mailing/messageValid',
-                  {'message': '1', 'CONFIRME': 'YES'}, False)
+        self.factory.xfer = MessageTransition()
+        self.call('/lucterios.mailing/messageTransition',
+                  {'message': '1', 'TRANSITION': 'valid', 'CONFIRME': 'YES'}, False)
         self.assert_observer(
-            'core.acknowledge', 'lucterios.mailing', 'messageValid')
+            'core.acknowledge', 'lucterios.mailing', 'messageTransition')
 
         self.assertFalse(will_mail_send(), 'no email')
         self.factory.xfer = MessageShow()
@@ -567,7 +567,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageValidRecipient()
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
-        self.factory.xfer = MessageValid()
+        self.factory.xfer = MessageTransition()
         self.call('/lucterios.mailing/messageValid',
                   {'message': '1', 'CONFIRME': 'YES'}, False)
         server = TestReceiver()
@@ -603,7 +603,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageValidRecipient()
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
-        self.factory.xfer = MessageValid()
+        self.factory.xfer = MessageTransition()
         self.call('/lucterios.mailing/messageValid',
                   {'message': '1', 'CONFIRME': 'YES'}, False)
 
