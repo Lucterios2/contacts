@@ -32,6 +32,8 @@ from django.db import models
 
 from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
+from lucterios.framework.signal_and_lock import Signal
+from lucterios.CORE.models import Parameter
 
 
 class PostalCode(LucteriosModel):
@@ -494,3 +496,11 @@ class OurDetailPrintPlugin(PrintFieldsPlugIn):
         return our_details.evaluate(text_to_evaluate)
 
 PrintFieldsPlugIn.add_plugin(OurDetailPrintPlugin)
+
+
+@Signal.decorate('checkparam')
+def contacts_checkparam():
+    Parameter.check_and_create(name='contacts-mailtoconfig', typeparam=4, title=_("contacts-mailtoconfig"), args="{'Enum':3}", value='0',
+                               param_titles=(_("contacts-mailtoconfig.0"), _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2")))
+    Parameter.check_and_create(name='contacts-createaccount', typeparam=4, title=_("contacts-createaccount"), args="{'Enum':3}", value='0',
+                               param_titles=(_("contacts-createaccount.0"), _("contacts-createaccount.1"), _("contacts-createaccount.2")))

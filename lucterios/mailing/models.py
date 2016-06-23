@@ -35,6 +35,8 @@ from lucterios.framework.tools import toHtml
 from lucterios.mailing.functions import will_mail_send, send_email
 from datetime import date
 from lucterios.contacts.models import AbstractContact
+from lucterios.CORE.models import Parameter
+from lucterios.framework.signal_and_lock import Signal
 
 
 class Message(LucteriosModel):
@@ -115,3 +117,21 @@ class Message(LucteriosModel):
 
     class Meta(object):
         pass
+
+
+@Signal.decorate('checkparam')
+def mailing_checkparam():
+    Parameter.check_and_create(name='mailing-smtpserver', typeparam=0, title=_("mailing-smtpserver"), args="{'Multi': False}", value='')
+    Parameter.check_and_create(name='mailing-smtpport', typeparam=1, title=_("mailing-smtpport"), args="{'Min': 0, 'Max': 99999}", value='25')
+
+    Parameter.check_and_create(name='mailing-smtpsecurity', typeparam=4, title=_("mailing-smtpsecurity"), args="{'Enum':3}", value='0',
+                               param_titles=(_("mailing-smtpsecurity.0"), _("mailing-smtpsecurity.1"), _("mailing-smtpsecurity.2")))
+
+    Parameter.check_and_create(name='mailing-smtpuser', typeparam=0, title=_("mailing-smtpuser"), args="{'Multi': False}", value='')
+
+    Parameter.check_and_create(name='mailing-smtppass', typeparam=5, title=_("mailing-smtppass"), args="{'Multi': False}", value='')
+    Parameter.check_and_create(name='mailing-msg-connection', typeparam=0, title=_("mailing-msg-connection"), args="{'Multi': True}",
+                               value=_('''Connection confirmation to your application:
+User:%(username)s
+Password:%(password)s
+'''))

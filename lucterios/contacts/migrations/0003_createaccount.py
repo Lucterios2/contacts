@@ -26,22 +26,6 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.db import migrations
-from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-
-from lucterios.CORE.models import Parameter
-
-
-def addon_create_account(apps, schema_editor):
-    translation.activate(settings.LANGUAGE_CODE)
-    param = Parameter.objects.create(name='contacts-createaccount', typeparam=4)
-    param.title = _("contacts-createaccount")
-    param.param_titles = (_("contacts-createaccount.0"),
-                          _("contacts-createaccount.1"), _("contacts-createaccount.2"))
-    param.args = "{'Enum':3}"
-    param.value = '0'
-    param.save()
 
 
 class Migration(migrations.Migration):
@@ -51,5 +35,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(addon_create_account),
     ]

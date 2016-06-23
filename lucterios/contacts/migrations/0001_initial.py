@@ -35,7 +35,7 @@ from django.utils import six, translation
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.contacts.models import LegalEntity, Individual
-from lucterios.CORE.models import PrintModel, Parameter
+from lucterios.CORE.models import PrintModel
 
 
 def initial_values(apps, schema_editor):
@@ -72,15 +72,6 @@ def initial_values(apps, schema_editor):
         name=_("label"), kind=1, modelname=Individual.get_long_name())
     prtmdl.value = "#firstname #lastname{[newline]}#address{[newline]}#postal_code #city"
     prtmdl.save()
-
-    param = Parameter.objects.create(
-        name='contacts-mailtoconfig', typeparam=4)  # pylint: disable=no-member
-    param.title = _("contacts-mailtoconfig")
-    param.param_titles = (_("contacts-mailtoconfig.0"),
-                          _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2"))
-    param.args = "{'Enum':3}"
-    param.value = '0'
-    param.save()
 
 
 def save_postalcodes(postalcode, pc_list):

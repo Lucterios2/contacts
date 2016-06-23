@@ -25,58 +25,8 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
-from django.conf import settings
-from django.utils import six, translation
-from django.utils.translation import ugettext_lazy as _
 from django.db import migrations
-
-from lucterios.CORE.models import Parameter
-
-
-def initial_values(apps, schema_editor):
-    translation.activate(settings.LANGUAGE_CODE)
-
-    param = Parameter.objects.create(name='mailing-smtpserver', typeparam=0)
-    param.title = _("mailing-smtpserver")
-    param.args = "{'Multi': False}"
-    param.value = ''
-    param.save()
-
-    param = Parameter.objects.create(name='mailing-smtpport', typeparam=1)
-    param.title = _("mailing-smtpport")
-    param.args = "{'Min': 0, 'Max': 99999}"
-    param.value = '25'
-    param.save()
-
-    param = Parameter.objects.create(name='mailing-smtpsecurity', typeparam=4)
-    param.title = _("mailing-smtpsecurity")
-    param.param_titles = (_("mailing-smtpsecurity.0"),
-                          _("mailing-smtpsecurity.1"), _("mailing-smtpsecurity.2"))
-    param.args = "{'Enum':3}"
-    param.value = '0'
-    param.save()
-
-    param = Parameter.objects.create(name='mailing-smtpuser', typeparam=0)
-    param.title = _("mailing-smtpuser")
-    param.args = "{'Multi': False}"
-    param.value = ''
-    param.save()
-
-    param = Parameter.objects.create(name='mailing-smtppass', typeparam=5)
-    param.title = _("mailing-smtppass")
-    param.args = "{'Multi': False}"
-    param.value = ''
-    param.save()
-
-    param = Parameter.objects.create(
-        name='mailing-msg-connection', typeparam=0)
-    param.title = _("mailing-msg-connection")
-    param.args = "{'Multi': True}"
-    param.value = _('''Connection confirmation to your application:
-User:%(username)s
-Password:%(password)s
-''')
-    param.save()
+from django.utils import six
 
 
 class Migration(migrations.Migration):
@@ -87,5 +37,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(initial_values),
     ]
