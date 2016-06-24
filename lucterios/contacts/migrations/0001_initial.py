@@ -32,46 +32,21 @@ from django.db import models, migrations, transaction
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.utils import six, translation
-from django.utils.translation import ugettext_lazy as _
 
-from lucterios.contacts.models import LegalEntity, Individual
 from lucterios.CORE.models import PrintModel
 
 
 def initial_values(apps, schema_editor):
-    # pylint: disable=unused-argument, no-member
     translation.activate(settings.LANGUAGE_CODE)
     legalentity = apps.get_model("contacts", "LegalEntity")
     current_entity = legalentity.objects.create(id=1, name="---", address='---',
                                                 postal_code='00000', city='---', country='---')
     current_entity.save()
 
-    prtmdl = PrintModel.objects.create(
-        name=_("listing"), kind=0, modelname=LegalEntity.get_long_name())
-    prtmdl.change_listing(297, 210, [(12, _("name"), "#name"),
-                                     (18, _("address"), "#address"),
-                                     (13, _("city"), "#city"),
-                                     (10, _("tel"), "#tel1{[newline]}#tel2"),
-                                     (13, _("email"), "#email")])
-    prtmdl.save()
-    prtmdl = PrintModel.objects.create(
-        name=_("label"), kind=1, modelname=LegalEntity.get_long_name())
-    prtmdl.value = "#name{[newline]}#address{[newline]}#postal_code #city"
-    prtmdl.save()
-
-    prtmdl = PrintModel.objects.create(
-        name=_("listing"), kind=0, modelname=Individual.get_long_name())
-    prtmdl.change_listing(297, 210, [(8, _("firstname"), "#firstname"),
-                                     (8, _("lastname"), "#lastname"),
-                                     (18, _("address"), "#address"),
-                                     (13, _("city"), "#city"),
-                                     (10, _("tel"), "#tel1{[newline]}#tel2"),
-                                     (13, _("email"), "#email")])
-    prtmdl.save()
-    prtmdl = PrintModel.objects.create(
-        name=_("label"), kind=1, modelname=Individual.get_long_name())
-    prtmdl.value = "#firstname #lastname{[newline]}#address{[newline]}#postal_code #city"
-    prtmdl.save()
+    PrintModel().load_model('lucterios.contacts', "LegalEntity_0001")
+    PrintModel().load_model('lucterios.contacts', "LegalEntity_0002")
+    PrintModel().load_model('lucterios.contacts', "Individual_0001")
+    PrintModel().load_model('lucterios.contacts', "Individual_0002")
 
 
 def save_postalcodes(postalcode, pc_list):

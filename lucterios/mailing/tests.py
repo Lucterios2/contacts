@@ -604,8 +604,12 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageValidRecipient',
                   {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''}, False)
         self.factory.xfer = MessageTransition()
-        self.call('/lucterios.mailing/messageValid',
-                  {'message': '1', 'CONFIRME': 'YES'}, False)
+        self.call('/lucterios.mailing/messageValid', {'message': '1', 'CONFIRME': 'YES'}, False)
+
+        self.factory.xfer = MessageLetter()
+        self.call('/lucterios.mailing/messageLetter', {'message': '1'}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageLetter')
+        self.assert_xml_equal('COMPONENTS/SELECT[@name="MODEL"]', '5')
 
         self.factory.xfer = MessageLetter()
         self.call('/lucterios.mailing/messageLetter',
