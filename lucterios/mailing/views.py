@@ -36,6 +36,8 @@ from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
 
 from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email
+from lucterios.contacts.models import LegalEntity
+from django.utils import six
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
@@ -86,8 +88,14 @@ class SendEmailTry(XferContainerAcknowledge):
     def fillresponse(self):
         if not will_mail_send():
             raise LucteriosException(IMPORTANT, _('Bad email parameter!'))
-        send_email(
-            None, _("EMail try"), _('EMail sent to check configuration'))
+        legal = LegalEntity.objects.get(id=1)
+        address = []
+        address.append("")
+        address.append("")
+        address.append(six.text_type(legal))
+        address.append(legal.address)
+        address.append("%s %s" % (legal.postal_code, legal.city))
+        send_email(None, _("EMail try"), _('EMail sent to check configuration') + "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n"))
         self.message(_("EMail send, check it."))
 
 

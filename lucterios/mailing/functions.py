@@ -44,7 +44,7 @@ def will_mail_send():
     return (sender_email != '') and (Params.getvalue('mailing-smtpserver') != '')
 
 
-def send_email(recipients, subject, body, files=None):
+def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None, withcopy=False):
     smtp_server = Params.getvalue('mailing-smtpserver')
     sender_email = LegalEntity.objects.get(id=1).email
     if (sender_email == '') or (smtp_server == ''):
@@ -66,6 +66,22 @@ def send_email(recipients, subject, body, files=None):
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = six.text_type(subject)
     msg['To'] = ", ".join(recipients)
+    if isinstance(cclist, list):
+        for recipient in recipients:
+            if recipient in cclist:
+                cclist.remove(recipient)
+        msg['Cc'] = ", ".join(cclist)
+        recipients.extend(cclist)
+    if withcopy:
+        if bcclist is None:
+            bcclist = []
+        if sender_email not in bcclist:
+            bcclist.append(sender_email)
+    if isinstance(bcclist, list):
+        for recipient in recipients:
+            if recipient in bcclist:
+                bcclist.remove(recipient)
+        recipients.extend(bcclist)
     msg['From'] = sender_email
     msg.attach(MIMEText(body, subtype, 'utf-8'))
     if files:
