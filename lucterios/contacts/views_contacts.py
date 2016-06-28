@@ -288,7 +288,7 @@ class IndividualUserValid(XferSave):
             obj_indiv.user = self.item
             obj_indiv.save()
             obj_indiv.editor.saving(self)
-            self.redirect_action(ActionsManage.get_action_url('LucteriosUser', 'Edit', self),
+            self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
                                  params={'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'})
 
 

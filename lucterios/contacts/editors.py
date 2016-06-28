@@ -337,11 +337,11 @@ class IndividualEditor(AbstractContactEditor):
         btn.is_mini = True
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.item.user is None:
-            act = ActionsManage.get_action_url('LucteriosUser', 'UserAdd', xfer)
+            act = ActionsManage.get_action_url('CORE.LucteriosUser', 'UserAdd', xfer)
             act.set_value("", "images/add.png")
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO)
         else:
-            act = ActionsManage.get_action_url('LucteriosUser', 'Edit', xfer)
+            act = ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', xfer)
             act.set_value("", "images/edit.png")
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO,
                            params={'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'})
