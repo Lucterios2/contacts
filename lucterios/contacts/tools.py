@@ -31,6 +31,7 @@ from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm
 from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO, CLOSE_YES, SELECT_SINGLE
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
+from lucterios.framework.xferadvance import TITLE_OK
 
 
 class ContactSelection(XferSavedCriteriaSearchEditor):
@@ -46,7 +47,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         self.action_list = []
         if self.final_class is not None:
-            self.add_action(self.final_class.get_action(_('ok'), "images/ok.png"))
+            self.add_action(self.final_class.get_action(TITLE_OK, "images/ok.png"))
         model_current = self.getparam('modelname')
         if model_current is None:
             self.model = self.inital_model
@@ -64,10 +65,9 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         selected_model.set_value(model_current)
         selected_model.set_select(self.inital_model.get_select_contact_type())
         selected_model.set_location(2, 0, 3)
-        selected_model.set_action(
-            self.request, self.get_action(), {'modal': FORMTYPE_REFRESH, 'close': CLOSE_NO})
+        selected_model.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(selected_model)
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
-            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"), {
-                            'close': CLOSE_YES, 'unique': self.mode_select, 'params': {'pkname': self.field_id}}, 0)
+            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"),
+                            close=CLOSE_YES, unique=self.mode_select, params={'pkname': self.field_id}, pos_act=0)
