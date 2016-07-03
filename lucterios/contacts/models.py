@@ -248,6 +248,9 @@ class AbstractContact(LucteriosModel):
             logging.getLogger('lucterios.contacts').exception("import_data")
             return None
 
+    def get_presentation(self):
+        return ""
+
     def set_custom_values(self, params):
         for cf_name, cf_model in self.get_custom_fields():
             if cf_name in params.keys():
@@ -383,6 +386,15 @@ class LegalEntity(AbstractContact):
     def __str__(self):
         return self.name
 
+    def get_presentation(self):
+        sub_contact = []
+        for indiv in Individual.objects.filter(responsability__legal_entity=self):
+            sub_contact.append(indiv.get_presentation())
+        if len(sub_contact) == 0:
+            return self.name
+        else:
+            return "%s (%s)" % (", ".join(sub_contact), self.name)
+
     def can_delete(self):
         msg = AbstractContact.can_delete(self)
         if msg == '':
@@ -438,6 +450,9 @@ class Individual(AbstractContact):
 
     def __str__(self):
         return '%s %s' % (self.lastname, self.firstname)
+
+    def get_presentation(self):
+        return '%s %s' % (self.firstname, self.lastname)
 
     class Meta(object):
         verbose_name = _('individual')
