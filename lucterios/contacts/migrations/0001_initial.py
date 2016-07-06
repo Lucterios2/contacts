@@ -43,10 +43,10 @@ def initial_values(apps, schema_editor):
                                                 postal_code='00000', city='---', country='---')
     current_entity.save()
 
-    PrintModel().load_model('lucterios.contacts', "LegalEntity_0001")
-    PrintModel().load_model('lucterios.contacts', "LegalEntity_0002")
-    PrintModel().load_model('lucterios.contacts', "Individual_0001")
-    PrintModel().load_model('lucterios.contacts', "Individual_0002")
+    PrintModel().load_model('lucterios.contacts', "LegalEntity_0001", is_default=True)
+    PrintModel().load_model('lucterios.contacts', "LegalEntity_0002", is_default=True)
+    PrintModel().load_model('lucterios.contacts', "Individual_0001", is_default=True)
+    PrintModel().load_model('lucterios.contacts', "Individual_0002", is_default=True)
 
 
 def save_postalcodes(postalcode, pc_list):

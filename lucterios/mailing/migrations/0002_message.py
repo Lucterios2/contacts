@@ -11,7 +11,7 @@ from django.db.models import deletion
 
 def addons_values(apps, schema_editor):
     translation.activate(settings.LANGUAGE_CODE)
-    PrintModel().load_model("lucterios.mailing", "Message_0001")
+    PrintModel().load_model("lucterios.mailing", "Message_0001", is_default=True)
 
 
 class Migration(migrations.Migration):
