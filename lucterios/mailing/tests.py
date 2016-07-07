@@ -24,14 +24,8 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 from shutil import rmtree
-from threading import Thread
-from asyncore import ExitNow
 from base64 import b64decode
 from os.path import join, dirname
-import smtpd
-import asyncore
-import logging
-import email
 from _io import BytesIO
 from io import SEEK_END
 
@@ -51,114 +45,11 @@ from lucterios.mailing.views import Configuration, SendEmailTry
 from lucterios.mailing.functions import will_mail_send, send_email
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
     MessageDelRecipient, MessageEmail, MessageLetter, MessageTransition
-from unittest.case import TestCase
 from lucterios.CORE.views import AskPassword, AskPasswordAct
 from django.contrib.auth.models import AnonymousUser
 from lucterios.contacts.views import CreateAccount
 from lucterios.contacts.models import Individual, LegalEntity
-
-
-def decode_b64(data):
-    byte_string = data.encode('utf-8')
-    decoded = b64decode(byte_string)
-    return decoded.decode('utf-8')
-
-
-def configSMTP(server, port, security=0, user='', passwd=''):
-    param = Parameter.objects.get(name='mailing-smtpserver')
-    param.value = server
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpport')
-    param.value = port
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpsecurity')
-    param.value = security
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpuser')
-    param.value = user
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtppass')
-    param.value = passwd
-    param.save()
-    Params.clear()
-
-
-class TestSMTPChannel(smtpd.SMTPChannel):
-
-    def smtp_AUTH(self, arg):
-        if 'PLAIN' in arg:
-            split_args = arg.split(' ')
-            self.smtp_server.auth_params = decode_b64(
-                split_args[1]).split('\0')
-            logging.getLogger("lucterios.mailing.test").info(
-                "smtp_AUTH %s", self.smtp_server.auth_params)
-            self.push('235 Authentication successful.')
-        else:
-            self.push('454 Temporary authentication failure.')
-            raise ExitNow()
-
-    def smtp_EHLO(self, arg):
-        if self.smtp_server.with_authentificate:
-            if not arg:
-                self.push('501 Syntax: EHLO hostname')
-                return
-            if self.seen_greeting:
-                self.push('503 Duplicate HELO/EHLO')
-            else:
-                self.seen_greeting = arg
-                self.extended_smtp = True
-                self.push('250-%s Hello %s' % (self.fqdn, arg))
-                self.push('250-AUTH LOGIN PLAIN')
-                self.push('250 EHLO')
-        else:
-            smtpd.SMTPChannel.smtp_EHLO(self, arg)
-
-
-class TestSMTPServer(smtpd.SMTPServer):
-    channel_class = TestSMTPChannel
-    emails = []
-    with_authentificate = False
-    auth_params = None
-
-    def process_message(self, peer, mailfrom, rcpttos, data):
-        self.emails.append((peer, mailfrom, rcpttos, data))
-        logging.getLogger("lucterios.mailing.test").info(
-            "email %s => %s", mailfrom, rcpttos)
-
-
-class TestReceiver(TestCase):
-
-    def __init__(self):
-        TestCase.__init__(self, methodName='stop')
-
-    def start(self, port):
-        self.smtp = TestSMTPServer(('0.0.0.0', port), None)
-        self.smtp.emails = []
-        self.smtp.with_authentificate = False
-        self.smtp.auth_params = None
-        self.thread = Thread(target=asyncore.loop, kwargs={'timeout': 1})
-        self.thread.start()
-
-    def stop(self):
-        self.smtp.close()
-        self.thread.join()
-
-    def count(self):
-        return len(self.smtp.emails)
-
-    def get(self, index):
-        return self.smtp.emails[index]
-
-    def check_first_message(self, subject, nb_multi, params=None):
-        msg = email.message_from_string(self.get(0)[3])
-        if params is None:
-            params = {}
-        if isinstance(params, dict):
-            params['Subject'] = subject
-            for key, val in params.items():
-                self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
-        self.assertEqual(nb_multi, len(msg.get_payload()))
-        return msg.get_payload()
+from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
 
 
 class ConfigurationTest(LucteriosTest):
@@ -190,7 +81,8 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpsecurity"]', 'Aucune')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpuser"]', None)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtppass"]', None)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-msg-connection"]', 'Confirmation de connexion à votre application:\nAlias:%(username)s\nMot de passe:%(password)s\n')
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-msg-connection"]',
+                              'Confirmation de connexion à votre application:\nAlias:%(username)s\nMot de passe:%(password)s\n')
 
     def test_tryemail_noconfig(self):
         configSMTP('', 25)
@@ -316,7 +208,8 @@ class ConfigurationTest(LucteriosTest):
                    cclist=['titi@machin.com', 'tutu@machin.com', 'tata@machin.com'], bcclist=['toto@machin.com', 'tutu@machin.com', 'tete@machin.com'])
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
-        self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com', 'tata@machin.com', 'tete@machin.com'], self.server.get(0)[2])
+        self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com',
+                          'tata@machin.com', 'tete@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com, titi@machin.com, tyty@machin.com',
                                                                           'Cc': 'tutu@machin.com, tata@machin.com'})
         self.assertEqual('text/plain', msg.get_content_type())
@@ -510,7 +403,8 @@ class MailingTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('COMPONENTS/*', 13)
         self.assert_count_equal('ACTIONS/ACTION', 3)
-        self.assert_action_equal('ACTIONS/ACTION[1]', ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'ouvert')
@@ -559,7 +453,8 @@ class MailingTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="contact_nb"]', 'Message défini pour 2 contacts')
         self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal('ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
 
         configSMTP('localhost', 1025)
@@ -568,8 +463,10 @@ class MailingTest(LucteriosTest):
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('ACTIONS/ACTION', 3)
-        self.assert_action_equal('ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
-        self.assert_action_equal('ACTIONS/ACTION[2]', ('Courriels', 'lucterios.mailing/images/email.png', 'lucterios.mailing', 'messageEmail', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[1]', ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
+        self.assert_action_equal(
+            'ACTIONS/ACTION[2]', ('Courriels', 'lucterios.mailing/images/email.png', 'lucterios.mailing', 'messageEmail', 0, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
 
     def test_email_message(self):
@@ -601,7 +498,8 @@ class MailingTest(LucteriosTest):
             msg, = server.check_first_message('new message', 1)
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-            self.assertEqual('<html><body><b><font color="blue">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye</body></html>', decode_b64(msg.get_payload()))
+            self.assertEqual(
+                '<html><body><b><font color="blue">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye</body></html>', decode_b64(msg.get_payload()))
         finally:
             server.stop()
 
