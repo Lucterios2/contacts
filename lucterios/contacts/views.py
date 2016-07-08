@@ -46,7 +46,7 @@ from lucterios.framework.xfergraphic import XferContainerCustom,\
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor,\
     TITLE_DELETE, TITLE_ADD, TITLE_MODIFY
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
-    XferCompSelect, XferCompUpLoad, XferCompButton
+    XferCompSelect, XferCompUpLoad, XferCompButton, XferCompCaptcha
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
@@ -254,6 +254,15 @@ class CreateAccount(XferContainerAcknowledge):
             edt.set_needed(True)
             edt.set_value(legalentity)
             dlg.add_component(edt)
+        row = dlg.get_max_row() + 1
+        lbl = XferCompLabelForm("captcha_lbl")
+        lbl.set_location(1, row)
+        lbl.set_value_as_name(_("captcha"))
+        dlg.add_component(lbl)
+        edt = XferCompCaptcha("captcha")
+        edt.set_location(2, row)
+        dlg.add_component(edt)
+
         lbl = XferCompLabelForm("error_lbl")
         lbl.set_location(2, row + 1)
         lbl.set_color('red')
