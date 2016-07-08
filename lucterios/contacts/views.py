@@ -159,6 +159,7 @@ class Account(XferContainerCustom):
                 self.add_legalentity(legal_entities[0])
             elif len(legal_entities) > 1:
                 self.add_legalentities(legal_entities)
+            signal_and_lock.Signal.call_signal("add_account", self.item, self)
         self.add_action(WrapAction(_("Close"), "images/close.png"))
 
 
