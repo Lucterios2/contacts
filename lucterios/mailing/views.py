@@ -28,7 +28,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
-from lucterios.framework.xfercomponents import XferCompButton, XferCompImage
+from lucterios.framework.xfercomponents import XferCompButton, XferCompImage,\
+    XferCompLabelForm
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework import signal_and_lock
 
@@ -38,6 +39,7 @@ from lucterios.CORE.views import ParamEdit
 from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email
 from lucterios.contacts.models import LegalEntity
 from django.utils import six
+from lucterios.framework.xferadvance import TITLE_MODIFY
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
@@ -95,7 +97,8 @@ class SendEmailTry(XferContainerAcknowledge):
         address.append(six.text_type(legal))
         address.append(legal.address)
         address.append("%s %s" % (legal.postal_code, legal.city))
-        send_email(None, _("EMail try"), _('EMail sent to check configuration') + "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n"))
+        send_email(None, _("EMail try"), _('EMail sent to check configuration') +
+                   "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n"))
         self.message(_("EMail send, check it."))
 
 
@@ -107,3 +110,22 @@ def send_connection_email(email_adress, username, passwd):
         return True
     else:
         return False
+
+
+@signal_and_lock.Signal.decorate('conf_wizard')
+def conf_wizard_mailing(wizard_ident, xfer):
+    if isinstance(wizard_ident, list) and (xfer is None):
+        wizard_ident.append(("mailing_params", 42))
+    elif (xfer is not None) and (wizard_ident == "mailing_params"):
+        xfer.add_title(_("Lucterios mailing"), _("Mailing parameters"))
+        lbl = XferCompLabelForm("nb_mail_send")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        xfer.add_component(lbl)
+        if will_mail_send():
+            lbl.set_value(_('email properly configured'))
+        else:
+            lbl.set_value(_('email not configured'))
+        btn = XferCompButton("btnconf")
+        btn.set_location(3, xfer.get_max_row())
+        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_NO)
+        xfer.add_component(btn)

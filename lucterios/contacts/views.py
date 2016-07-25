@@ -44,7 +44,7 @@ from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REF
 from lucterios.framework.xfergraphic import XferContainerCustom,\
     XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor,\
-    TITLE_DELETE, TITLE_ADD, TITLE_MODIFY
+    TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, TEXT_TOTAL_NUMBER
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, \
     XferCompSelect, XferCompUpLoad, XferCompButton, XferCompCaptcha
 from lucterios.framework import signal_and_lock
@@ -725,3 +725,55 @@ def config_contacts(xfer):
     Params.fill(xfer, new_params, 1, 10)
     xfer.params['params'].extend(new_params)
     return True
+
+
+@signal_and_lock.Signal.decorate('conf_wizard')
+def conf_wizard_contacts(wizard_ident, xfer):
+    if isinstance(wizard_ident, list) and (xfer is None):
+        wizard_ident.append(("contacts_current", 5))
+        wizard_ident.append(("contacts_params", 40))
+        wizard_ident.append(("contacts_responsable", 41))
+    elif (xfer is not None) and (wizard_ident == "contacts_current"):
+        xfer.add_title(_("Lucterios contacts"), _("Our details"))
+        xfer.model = LegalEntity
+        xfer.item = LegalEntity.objects.get(id=1)
+        xfer.fill_from_model(1, xfer.get_max_row() + 1, True, desc_fields=LegalEntity.get_show_fields()[_('001@Identity')])
+        btn = XferCompButton("btnconf")
+        btn.set_location(2, xfer.get_max_row() + 1)
+        btn.set_is_mini(True)
+        btn.set_action(xfer.request, CurrentStructureAddModify.get_action('', "images/edit.png"), close=CLOSE_NO)
+        xfer.add_component(btn)
+    elif (xfer is not None) and (wizard_ident == "contacts_params"):
+        xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"))
+        lbl = XferCompLabelForm("nb_function")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        lbl.set_value(TEXT_TOTAL_NUMBER % {'name': Function._meta.verbose_name_plural, 'count': len(Function.objects.all())})
+        xfer.add_component(lbl)
+        lbl = XferCompLabelForm("nb_structuretype")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        lbl.set_value(TEXT_TOTAL_NUMBER % {'name': StructureType._meta.verbose_name_plural, 'count': len(StructureType.objects.all())})
+        xfer.add_component(lbl)
+        lbl = XferCompLabelForm("nb_customfield")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        lbl.set_value(TEXT_TOTAL_NUMBER % {'name': CustomField._meta.verbose_name_plural, 'count': len(CustomField.objects.all())})
+        xfer.add_component(lbl)
+        btn = XferCompButton("btnconf")
+        btn.set_location(4, xfer.get_max_row() - 2, 1, 3)
+        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_NO)
+        xfer.add_component(btn)
+
+        lbl = XferCompLabelForm("nb_legalentity")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        lbl.set_value(TEXT_TOTAL_NUMBER % {'name': LegalEntity._meta.verbose_name_plural, 'count': len(LegalEntity.objects.all())})
+        xfer.add_component(lbl)
+        lbl = XferCompLabelForm("nb_individual")
+        lbl.set_location(1, xfer.get_max_row() + 1)
+        lbl.set_value(TEXT_TOTAL_NUMBER % {'name': Individual._meta.verbose_name_plural, 'count': len(Individual.objects.all())})
+        xfer.add_component(lbl)
+        btn = XferCompButton("btnimport")
+        btn.set_location(4, xfer.get_max_row() - 1, 1, 2)
+        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO)
+        xfer.add_component(btn)
+    elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
+        xfer.add_title(_("Lucterios contacts"), _('responsabilities'))
+        xfer.fill_grid(5, Responsability, "responsability", Responsability.objects.filter(legal_entity_id=1))
