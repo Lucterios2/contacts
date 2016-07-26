@@ -734,7 +734,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         wizard_ident.append(("contacts_params", 40))
         wizard_ident.append(("contacts_responsable", 41))
     elif (xfer is not None) and (wizard_ident == "contacts_current"):
-        xfer.add_title(_("Lucterios contacts"), _("Our details"))
+        xfer.add_title(_("Lucterios contacts"), _("Our details"), _('configure our details'))
         xfer.model = LegalEntity
         xfer.item = LegalEntity.objects.get(id=1)
         xfer.fill_from_model(1, xfer.get_max_row() + 1, True, desc_fields=LegalEntity.get_show_fields()[_('001@Identity')])
@@ -744,7 +744,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         btn.set_action(xfer.request, CurrentStructureAddModify.get_action('', "images/edit.png"), close=CLOSE_NO)
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_params"):
-        xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"))
+        xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"), _('configure your contacts'))
         lbl = XferCompLabelForm("nb_function")
         lbl.set_location(1, xfer.get_max_row() + 1)
         lbl.set_value(TEXT_TOTAL_NUMBER % {'name': Function._meta.verbose_name_plural, 'count': len(Function.objects.all())})
@@ -775,5 +775,5 @@ def conf_wizard_contacts(wizard_ident, xfer):
         btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO)
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
-        xfer.add_title(_("Lucterios contacts"), _('responsabilities'))
+        xfer.add_title(_("Lucterios contacts"), _('responsabilities'), _('configure your responsables'))
         xfer.fill_grid(5, Responsability, "responsability", Responsability.objects.filter(legal_entity_id=1))

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-25 16:28+0000\n"
+"POT-Creation-Date: 2016-07-26 12:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -534,6 +534,22 @@ msgstr "%d contacts are been imported"
 #: views.py:713
 msgid "Back"
 msgstr "Back"
+
+#: views.py:737
+#, fuzzy
+#| msgid "our detail"
+msgid "configure our details"
+msgstr "our detail"
+
+#: views.py:747
+#, fuzzy
+#| msgid "generic contacts"
+msgid "configure your contacts"
+msgstr "generic contacts"
+
+#: views.py:778
+msgid "configure your responsables"
+msgstr ""
 
 #: views_contacts.py:50
 msgid "Office"
