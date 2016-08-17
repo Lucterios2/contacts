@@ -60,6 +60,7 @@ from lucterios.contacts.models import PostalCode, Function, StructureType, Legal
     CustomField, AbstractContact, Responsability
 from lucterios.contacts.views_contacts import LegalEntityAddModify, \
     LegalEntityShow
+from lucterios.CORE.views import ParamEdit
 
 
 @MenuManage.describ(None)
@@ -745,6 +746,14 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_params"):
         xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"), _('configure your contacts'))
+        param_lists = ['contacts-mailtoconfig', 'contacts-createaccount']
+        Params.fill(xfer, param_lists, 1, xfer.get_max_row() + 1)
+        btn = XferCompButton('editparam')
+        btn.set_location(4, xfer.get_max_row())
+        btn.set_is_mini(True)
+        btn.set_action(xfer.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png'), close=CLOSE_NO,
+                       params={'params': param_lists})
+        xfer.add_component(btn)
         lbl = XferCompLabelForm("nb_function")
         lbl.set_location(1, xfer.get_max_row() + 1)
         lbl.set_value(TEXT_TOTAL_NUMBER % {'name': Function._meta.verbose_name_plural, 'count': len(Function.objects.all())})
@@ -772,8 +781,9 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(lbl)
         btn = XferCompButton("btnimport")
         btn.set_location(4, xfer.get_max_row() - 1, 1, 2)
-        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO)
+        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO, params={'step': 0})
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
         xfer.add_title(_("Lucterios contacts"), _('responsabilities'), _('configure your responsables'))
+        xfer.params['legal_entity'] = 1
         xfer.fill_grid(5, Responsability, "responsability", Responsability.objects.filter(legal_entity_id=1))

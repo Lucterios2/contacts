@@ -115,7 +115,7 @@ def send_connection_email(email_adress, username, passwd):
 @signal_and_lock.Signal.decorate('conf_wizard')
 def conf_wizard_mailing(wizard_ident, xfer):
     if isinstance(wizard_ident, list) and (xfer is None):
-        wizard_ident.append(("mailing_params", 42))
+        wizard_ident.append(("mailing_params", 52))
     elif (xfer is not None) and (wizard_ident == "mailing_params"):
         xfer.add_title(_("Lucterios mailing"), _("Mailing parameters"))
         lbl = XferCompLabelForm("nb_mail_send")
