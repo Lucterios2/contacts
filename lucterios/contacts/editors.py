@@ -292,23 +292,24 @@ class AbstractContactEditor(LucteriosEditor):
         self.item.set_custom_values(xfer.params)
 
     def add_email_selector(self, xfer, col, row, colspan):
-
-        mailto_type = Params.getvalue("contacts-mailtoconfig")
-        email_list = []
-        for item in xfer.items.exclude(email__isnull=True).exclude(email__exact=''):
-            email_list.append(six.text_type(item.email))
-        if len(email_list) > 0:
-            link = XferCompLinkLabel('emailAll')
-            link.set_value_center(_('Write to all'))
-            if mailto_type == 1:  # CC
-                mailto_prefix = 'mailto:?cc='
-            elif mailto_type == 2:  # BCC
-                mailto_prefix = 'mailto:?bcc='
-            else:  # TO
-                mailto_prefix = 'mailto:'
-            link.set_link(mailto_prefix + ','.join(email_list))
-            link.set_location(col, row, colspan)
-            xfer.add_component(link)
+        contacts_list = xfer.items.exclude(email__isnull=True).exclude(email__exact='')
+        if len(contacts_list) < 100:
+            mailto_type = Params.getvalue("contacts-mailtoconfig")
+            email_list = []
+            for item in contacts_list:
+                email_list.append(six.text_type(item.email))
+            if len(email_list) > 0:
+                link = XferCompLinkLabel('emailAll')
+                link.set_value_center(_('Write to all'))
+                if mailto_type == 1:  # CC
+                    mailto_prefix = 'mailto:?cc='
+                elif mailto_type == 2:  # BCC
+                    mailto_prefix = 'mailto:?bcc='
+                else:  # TO
+                    mailto_prefix = 'mailto:'
+                link.set_link(mailto_prefix + ','.join(email_list))
+                link.set_location(col, row, colspan)
+                xfer.add_component(link)
 
 
 class LegalEntityEditor(AbstractContactEditor):
