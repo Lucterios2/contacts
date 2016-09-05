@@ -1124,7 +1124,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(
             {'0': '{[b]}aaa{[/b]} contient {[i]}"beau"{[/i]}'}, desc_result)
         q_res = Q(contactcustomfield__field__id=1) & Q(
-            **{'contactcustomfield__value__contains': 'beau'})
+            **{'contactcustomfield__value__icontains': 'beau'})
         self.assertEqual(six.text_type(q_res), six.text_type(filter_result))
 
         find_indiv = list(
