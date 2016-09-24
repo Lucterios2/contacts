@@ -277,7 +277,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal(
             'COMPONENTS/MEMO[@name="comment"]', None, (2, 7, 3, 1))
         self.assert_comp_equal(
-            'COMPONENTS/EDIT[@name="identify_number"]', None, (2, 8, 3, 1))
+            'COMPONENTS/MEMO[@name="identify_number"]', None, (2, 8, 3, 1))
         self.assert_coordcomp_equal(
             'COMPONENTS/UPLOAD[@name="uploadlogo"]', (2, 18, 3, 1))
 

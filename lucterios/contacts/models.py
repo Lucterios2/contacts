@@ -97,7 +97,7 @@ class StructureType(LucteriosModel):
 
 class CustomField(LucteriosModel):
     modelname = models.CharField(_('model'), max_length=100)
-    name = models.CharField(_('name'), max_length=100, unique=False)
+    name = models.CharField(_('name'), max_length=200, unique=False)
     kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _(
         'Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
@@ -186,8 +186,8 @@ class AbstractContact(LucteriosModel):
         _('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
     country = models.CharField(_('country'), max_length=100, blank=True)
-    tel1 = models.CharField(_('tel1'), max_length=15, blank=True)
-    tel2 = models.CharField(_('tel2'), max_length=15, blank=True)
+    tel1 = models.CharField(_('tel1'), max_length=20, blank=True)
+    tel2 = models.CharField(_('tel2'), max_length=20, blank=True)
     email = models.EmailField(_('email'), blank=True)
     comment = models.TextField(_('comment'), blank=True)
 
@@ -347,8 +347,7 @@ class LegalEntity(AbstractContact):
     name = models.CharField(_('name'), max_length=100, blank=False)
     structure_type = models.ForeignKey('StructureType', verbose_name=_(
         'structure type'), null=True, on_delete=models.SET_NULL)
-    identify_number = models.CharField(
-        _('identify number'), max_length=100, blank=True)
+    identify_number = models.TextField(_('identify number'), blank=True)
 
     @classmethod
     def get_show_fields(cls):
@@ -412,8 +411,8 @@ class LegalEntity(AbstractContact):
 class Individual(AbstractContact):
     genre = models.IntegerField(
         choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
-    firstname = models.CharField(_('firstname'), max_length=50, blank=False)
-    lastname = models.CharField(_('lastname'), max_length=50, blank=False)
+    firstname = models.CharField(_('firstname'), max_length=100, blank=False)
+    lastname = models.CharField(_('lastname'), max_length=100, blank=False)
     user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_(
         'user'), null=True, on_delete=models.SET_NULL)
 
