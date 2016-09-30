@@ -312,6 +312,11 @@ class CreateAccount(XferContainerAcknowledge):
             self.redirect_act = (self.get_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': _("This account exists yet!")})
 
 
+@signal_and_lock.Signal.decorate('auth_action')
+def auth_action_contact(actions_basic):
+    actions_basic.append(CreateAccount.get_action())
+
+
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
     icon = "ourDetails.png"
