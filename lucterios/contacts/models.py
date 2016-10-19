@@ -432,7 +432,7 @@ class Individual(AbstractContact):
 
     @classmethod
     def get_search_fields(cls):
-        ident_field = ['genre', 'firstname', 'lastname']
+        ident_field = ['lastname', 'firstname', 'genre']
         ident_field.extend(super(Individual, cls).get_search_fields())
         ident_field.extend(
             ['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
