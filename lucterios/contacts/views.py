@@ -744,6 +744,8 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.model = LegalEntity
         xfer.item = LegalEntity.objects.get(id=1)
         xfer.fill_from_model(1, xfer.get_max_row() + 1, True, desc_fields=LegalEntity.get_show_fields()[_('001@Identity')])
+        xfer.remove_component('structure_type')
+        xfer.remove_component('lbl_structure_type')
         btn = XferCompButton("btnconf")
         btn.set_location(2, xfer.get_max_row() + 1)
         btn.set_is_mini(True)

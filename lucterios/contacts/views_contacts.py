@@ -217,8 +217,8 @@ class IndividualList(XferListEditor):
         comp.set_location(1, 2)
         self.add_component(comp)
         if name_filter != "":
-            self.filter = Q(firstname__contains=name_filter) | Q(
-                lastname__contains=name_filter)
+            self.filter = Q(firstname__icontains=name_filter) | Q(
+                lastname__icontains=name_filter)
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
@@ -236,7 +236,7 @@ class IndividualLabel(XferPrintLabel):
     def get_filter(self):
         name_filter = self.getparam('filter')
         if (name_filter is not None) and (name_filter != ""):
-            return [Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+            return [Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)]
         else:
             return XferPrintLabel.get_filter(self)
 
@@ -253,7 +253,7 @@ class IndividualListing(XferPrintListing):
     def get_filter(self):
         name_filter = self.getparam('filter')
         if (name_filter is not None) and (name_filter != ""):
-            return Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)
+            return Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)
         else:
             return XferPrintListing.get_filter(self)
 
@@ -320,7 +320,7 @@ class ResponsabilityAdd(XferContainerCustom):
         identfilter = []
         if name_filter != "":
             identfilter = [
-                Q(firstname__contains=name_filter) | Q(lastname__contains=name_filter)]
+                Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)]
         lbl = XferCompLabelForm('lbl_individual')
         lbl.set_value_as_name(_('individual'))
         lbl.set_location(1, 3)
