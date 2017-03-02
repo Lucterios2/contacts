@@ -791,6 +791,6 @@ def conf_wizard_contacts(wizard_ident, xfer):
         btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO, params={'step': 0})
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
-        xfer.add_title(_("Lucterios contacts"), _('responsabilities'), _('configure your responsables'))
+        xfer.add_title(_("Lucterios contacts"), _('associates'), _('configure your association'))
         xfer.params['legal_entity'] = 1
         xfer.fill_grid(5, Responsability, "responsability", Responsability.objects.filter(legal_entity_id=1))

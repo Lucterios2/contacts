@@ -355,7 +355,7 @@ class LegalEntity(AbstractContact):
         ident_field.extend(super(LegalEntity, cls).get_show_fields())
         ident_field.append('identify_number')
         res_fields = {_('001@Identity'): ident_field, _(
-            '002@Management'): ['responsability_set']}
+            '002@Members'): ['responsability_set']}
         return res_fields
 
     @classmethod
@@ -486,9 +486,8 @@ class Responsability(LucteriosModel):
         return ["legal_entity", "functions"]
 
     class Meta(object):
-
-        verbose_name = _('responsability')
-        verbose_name_plural = _('responsabilities')
+        verbose_name = _('associate')
+        verbose_name_plural = _('associates')
 
 
 class OurDetailPrintPlugin(PrintFieldsPlugIn):
