@@ -72,6 +72,11 @@ class LegalEntityShow(XferShowEditor):
     model = LegalEntity
     field_id = 'legal_entity'
 
+    def _search_model(self):
+        if self.getparam(self.field_id, 0) == 0:
+            self.params[self.field_id] = self.getparam('legalentity', '0')
+        XferShowEditor._search_model(self)
+
 
 @ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
 @MenuManage.describ('contacts.change_abstractcontact')
@@ -301,8 +306,7 @@ class ResponsabilityAdd(XferContainerCustom):
     field_id = 'responsability_set'
 
     def fillresponse(self, legal_entity=0, name_filter=''):
-        self.item.legal_entity = LegalEntity.objects.get(
-            id=legal_entity)
+        self.item.legal_entity = LegalEntity.objects.get(id=legal_entity)
         img = XferCompImage('img')
         img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 3)
@@ -351,7 +355,6 @@ class ResponsabilityModify(XferAddEditor):
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_responsability')
 class ResponsabilityDel(XferDelete):
-
     caption = _("Delete responsability")
     icon = "function.png"
     model = Responsability
