@@ -219,18 +219,13 @@ class ContactsTest(LucteriosTest):
             None, 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
 
         self.factory.xfer = IndividualUserAdd()
-        self.call(
-            '/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'individualUserAdd')
-        self.assert_count_equal('COMPONENTS/*', 3)
-        self.assert_comp_equal(
-            'COMPONENTS/EDIT[@name="username"]', None, (2, 0, 1, 1))
+        self.call('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'individualUserAdd')
+        self.assert_count_equal('COMPONENTS/*', 2)
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="username"]', None, (1, 0, 1, 1))
         self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal(
-            'ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
-        self.assert_action_equal(
-            'ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
+        self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
+        self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
 
         self.factory.xfer = IndividualUserValid()
         self.call('/lucterios.contacts/individualUserValid',
