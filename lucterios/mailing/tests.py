@@ -344,7 +344,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageAddModify()
         self.call('/lucterios.mailing/messageAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageAddModify')
-        self.assert_count_equal('COMPONENTS/*', 5)
+        self.assert_count_equal('COMPONENTS/*', 3)
 
         self.factory.xfer = MessageAddModify()
         self.call('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
@@ -378,7 +378,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 12)
+        self.assert_count_equal('COMPONENTS/*', 7)
         self.assert_count_equal('ACTIONS/ACTION', 2)
         self.assert_action_equal('ACTIONS/ACTION[1]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Fermer', 'images/close.png'))
@@ -400,10 +400,9 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('COMPONENTS/*', 8)
         self.assert_count_equal('ACTIONS/ACTION', 3)
-        self.assert_action_equal(
-            'ACTIONS/ACTION[1]', ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
+        self.assert_action_equal('ACTIONS/ACTION[1]', ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal('ACTIONS/ACTION[3]', ('Fermer', 'images/close.png'))
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'ouvert')
@@ -422,7 +421,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('COMPONENTS/*', 8)
         self.assert_count_equal('COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)
 
     def test_validate_message(self):
@@ -446,7 +445,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.call('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('COMPONENTS/*', 8)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="status"]', 'fermé')
         self.assert_count_equal('COMPONENTS/GRID[@name="recipient_list"]/ACTIONS/ACTION', 0)
         self.assert_count_equal('COMPONENTS/GRID[@name="recipient_list"]/RECORD', 2)

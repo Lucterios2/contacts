@@ -44,8 +44,7 @@ class MessageEditor(LucteriosEditor):
         xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
-        new_recipients.set_location(
-            obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
+        new_recipients.set_location(obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
         new_recipients.add_header("model", _('model'))
         new_recipients.add_header("filter", _('filter'))
         compid = 0
