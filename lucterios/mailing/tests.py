@@ -75,7 +75,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_observer(
             'core.custom', 'lucterios.mailing', 'configuration')
         self.assert_count_equal('CONTEXT', 0)
-        self.assert_count_equal('COMPONENTS/*', 18)
+        self.assert_count_equal('COMPONENTS/*', 2 + 6 + 2 + 2)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpserver"]', None)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpport"]', '25')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpsecurity"]', 'Aucune')

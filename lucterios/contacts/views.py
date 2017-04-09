@@ -333,7 +333,7 @@ MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
 class Configuration(XferListEditor):
-    is_simple_gui = False
+    is_simple_gui = True
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
 
