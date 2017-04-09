@@ -89,6 +89,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
 
 @MenuManage.describ(None, FORMTYPE_MODAL, 'core.general', _('View your account.'))
 class Account(XferContainerCustom):
+    is_simple_gui = True
     caption = _("Your account")
     icon = "account.png"
 
@@ -332,6 +333,7 @@ MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
 class Configuration(XferListEditor):
+    is_simple_gui = False
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
 
@@ -472,6 +474,7 @@ class PostalCodeAdd(XferAddEditor):
 
 @MenuManage.describ('contacts.change_postalcode', FORMTYPE_MODAL, 'contact.conf', _('Tool to import contacts from CSV file.'))
 class ContactImport(XferContainerCustom):
+    is_simple_gui = True
     caption = _("Contact import")
     icon = "contactsConfig.png"
 
@@ -485,56 +488,38 @@ class ContactImport(XferContainerCustom):
         self.spamreader = None
 
     def _select_csv_parameters(self):
-        lbl = XferCompLabelForm('lbl_modelname')
-        lbl.set_value_as_name(_('model'))
-        lbl.set_location(1, 0)
-        self.add_component(lbl)
         model_select = XferCompSelect('modelname')
         if self.model is not None:
             model_select.set_value(self.model.get_long_name())
         model_select.set_select(AbstractContact.get_select_contact_type(False))
-        model_select.set_location(2, 0, 3)
+        model_select.set_location(1, 0, 3)
+        model_select.description = _('model')
         self.add_component(model_select)
-        lbl = XferCompLabelForm('lbl_csvcontent')
-        lbl.set_value_as_name(_('CSV file'))
-        lbl.set_location(1, 1)
-        self.add_component(lbl)
         upld = XferCompUpLoad('csvcontent')
         upld.http_file = True
         upld.add_filter(".csv")
-        upld.set_location(2, 1, 3)
+        upld.set_location(1, 1, 2)
+        upld.description = _('CSV file')
         self.add_component(upld)
-        lbl = XferCompLabelForm('lbl_encoding')
-        lbl.set_value_as_name(_('encoding'))
-        lbl.set_location(1, 2)
-        self.add_component(lbl)
         lbl = XferCompEdit('encoding')
         lbl.set_value(self.encoding)
-        lbl.set_location(2, 2)
-        self.add_component(lbl)
-        lbl = XferCompLabelForm('lbl_dateformat')
-        lbl.set_value_as_name(_('date format'))
-        lbl.set_location(3, 2)
+        lbl.set_location(1, 2)
+        lbl.description = _('encoding')
         self.add_component(lbl)
         lbl = XferCompEdit('dateformat')
         lbl.set_value(self.dateformat)
-        lbl.set_location(4, 2)
-        self.add_component(lbl)
-        lbl = XferCompLabelForm('lbl_delimiter')
-        lbl.set_value_as_name(_('delimiter'))
-        lbl.set_location(1, 3)
+        lbl.set_location(2, 2)
+        lbl.description = _('date format')
         self.add_component(lbl)
         lbl = XferCompEdit('delimiter')
         lbl.set_value(self.delimiter)
-        lbl.set_location(2, 3)
-        self.add_component(lbl)
-        lbl = XferCompLabelForm('lbl_quotechar')
-        lbl.set_value_as_name(_('quotechar'))
-        lbl.set_location(3, 3)
+        lbl.set_location(1, 3)
+        lbl.description = _('delimiter')
         self.add_component(lbl)
         lbl = XferCompEdit('quotechar')
         lbl.set_value(self.quotechar)
-        lbl.set_location(4, 3)
+        lbl.set_location(2, 3)
+        lbl.description = _('quotechar')
         self.add_component(lbl)
         return lbl
 
@@ -560,15 +545,18 @@ class ContactImport(XferContainerCustom):
                 else:
                     csvcontent += "" + curent_content
             csvfile = StringIO(csvcontent)
-        self.spamreader = DictReader(
-            csvfile, delimiter=self.delimiter, quotechar=self.quotechar, quoting=current_quoting)
-        if (self.spamreader.fieldnames is None) or (len(self.spamreader.fieldnames) == 0):
+        self.spamreader = DictReader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar, quoting=current_quoting)
+        try:
+            if (self.spamreader.fieldnames is None) or (len(self.spamreader.fieldnames) == 0):
+                raise Exception("")
+        except:
             raise LucteriosException(IMPORTANT, _('CSV file unvalid!'))
 
     def _select_fields(self):
         select_list = [('', None)]
         for fieldname in self.spamreader.fieldnames:
-            select_list.append((fieldname, fieldname))
+            if fieldname != '':
+                select_list.append((fieldname, fieldname))
         row = 0
         for fieldname in self.model.get_import_fields():
             if isinstance(fieldname, tuple):
@@ -578,27 +566,26 @@ class ContactImport(XferContainerCustom):
                 dep_field = self.model.get_field_by_name(fieldname)
                 title = dep_field.verbose_name
                 is_need = not dep_field.blank and not dep_field.null
-            lbl = XferCompLabelForm('lbl_' + fieldname)
-            lbl.set_value_as_name(title)
-            lbl.set_location(1, row)
-            self.add_component(lbl)
             lbl = XferCompSelect('fld_' + fieldname)
             lbl.set_select(deepcopy(select_list))
             lbl.set_value("")
             lbl.set_needed(is_need)
-            lbl.set_location(2, row)
+            lbl.set_location(1, row)
+            lbl.description = title
             self.add_component(lbl)
             row += 1
 
     def _show_initial_csv(self):
         tbl = XferCompGrid('CSV')
         for fieldname in self.spamreader.fieldnames:
-            tbl.add_header(fieldname, fieldname)
+            if fieldname != '':
+                tbl.add_header(fieldname, fieldname)
         row_idx = 1
         for row in self.spamreader:
             if row[self.spamreader.fieldnames[-1]] is not None:
                 for fieldname in self.spamreader.fieldnames:
-                    tbl.set_value(row_idx, fieldname, row[fieldname])
+                    if fieldname != '':
+                        tbl.set_value(row_idx, fieldname, row[fieldname])
                 row_idx += 1
         tbl.set_location(1, 1, 2)
         self.add_component(tbl)
@@ -661,13 +648,10 @@ class ContactImport(XferContainerCustom):
             lbl = self._select_csv_parameters()
             step = 1
         elif step == 1:
-            lbl = XferCompLabelForm('lbl_modelname')
-            lbl.set_value_as_name(_('model'))
-            lbl.set_location(1, 0)
-            self.add_component(lbl)
             lbl = XferCompLabelForm('modelname')
             lbl.set_value(self.model._meta.verbose_name.title())
-            lbl.set_location(2, 0)
+            lbl.set_location(1, 0)
+            lbl.description = _('model')
             self.add_component(lbl)
             self._read_csv()
             self.new_tab(_("Fields"))
@@ -676,13 +660,10 @@ class ContactImport(XferContainerCustom):
             self._show_initial_csv()
             step = 2
         elif step == 2:
-            lbl = XferCompLabelForm('lbl_modelname')
-            lbl.set_value_as_name(_('model'))
-            lbl.set_location(1, 0)
-            self.add_component(lbl)
             lbl = XferCompLabelForm('modelname')
             lbl.set_value(self.model._meta.verbose_name.title())
-            lbl.set_location(2, 0)
+            lbl.set_location(1, 0)
+            lbl.description = _('model')
             self.add_component(lbl)
             fields_description, csv_readed = self._read_csv_and_convert()
             tbl = XferCompGrid('CSV')
@@ -745,7 +726,6 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.item = LegalEntity.objects.get(id=1)
         xfer.fill_from_model(1, xfer.get_max_row() + 1, True, desc_fields=LegalEntity.get_show_fields()[_('001@Identity')])
         xfer.remove_component('structure_type')
-        xfer.remove_component('lbl_structure_type')
         btn = XferCompButton("btnconf")
         btn.set_location(2, xfer.get_max_row() + 1)
         btn.set_is_mini(True)

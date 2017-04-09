@@ -212,14 +212,11 @@ class IndividualList(XferListEditor):
         name_filter = self.getparam('filter')
         if name_filter is None:
             name_filter = ""
-        lbl = XferCompLabelForm('lbl_filtre')
-        lbl.set_value_as_name(_('Filtrer by name'))
-        lbl.set_location(0, 2)
-        self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
-        comp.set_location(1, 2)
+        comp.set_location(0, 2)
+        comp.description = _('Filtrer by name')
         self.add_component(comp)
         if name_filter != "":
             self.filter = Q(firstname__icontains=name_filter) | Q(
@@ -312,28 +309,22 @@ class ResponsabilityAdd(XferContainerCustom):
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, True, ['legal_entity'])
-        lbl = XferCompLabelForm('lbl_filtre')
-        lbl.set_value_as_name(_('Filtrer by name'))
-        lbl.set_location(1, 2)
-        self.add_component(lbl)
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
-        comp.set_location(2, 2)
+        comp.set_location(1, 2)
+        comp.description = _('Filtrer by name')
         self.add_component(comp)
         identfilter = []
         if name_filter != "":
             identfilter = [
                 Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)]
-        lbl = XferCompLabelForm('lbl_individual')
-        lbl.set_value_as_name(_('individual'))
-        lbl.set_location(1, 3)
-        self.add_component(lbl)
         items = Individual.objects.filter(
             *identfilter)
         grid = XferCompGrid('individual')
         grid.set_model(items, None, self)
-        grid.set_location(2, 3)
+        grid.set_location(1, 3)
+        grid.description = _('individual')
         grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png"),
                         modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
         grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
@@ -463,14 +454,12 @@ def summary_contacts(xfer):
             LegalEntity.objects.all())
         lbl_doc = XferCompLabelForm('lbl_nblegalentities')
         lbl_doc.set_location(0, row + 1, 4)
-        lbl_doc.set_value_center(
-            _("Total number of legal entities: %d") % nb_legal_entities)
+        lbl_doc.set_value_center(_("Total number of legal entities: %d") % nb_legal_entities)
         xfer.add_component(lbl_doc)
         nb_individual = len(Individual.objects.all())
         lbl_doc = XferCompLabelForm('lbl_nbindividuals')
         lbl_doc.set_location(0, row + 2, 4)
-        lbl_doc.set_value_center(
-            _("Total number of individuals: %d") % nb_individual)
+        lbl_doc.set_value_center(_("Total number of individuals: %d") % nb_individual)
         xfer.add_component(lbl_doc)
     if is_right or (current_individual is not None):
         lab = XferCompLabelForm('contactsend')

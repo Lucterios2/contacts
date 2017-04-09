@@ -47,45 +47,30 @@ class CustomFieldEditor(LucteriosEditor):
 
     def _edit_add_args(self, xfer, obj_kind):
         args = self.item.get_args()
-        lbl = XferCompLabelForm('lbl_args_multi')
-        lbl.set_value_as_name(_('multi-line'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 1, 1, 1)
-        xfer.add_component(lbl)
         arg = XferCompCheck('args_multi')
         arg.set_value(args['multi'])
         arg.set_location(obj_kind.col, obj_kind.row + 1, obj_kind.colspan, 1)
+        arg.description = _('multi-line')
         xfer.add_component(arg)
-        lbl = XferCompLabelForm('lbl_args_min')
-        lbl.set_value_as_name(_('min'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 2, 1, 1)
-        xfer.add_component(lbl)
         arg = XferCompFloat('args_min', -10000, -10000, 0)
         arg.set_value(args['min'])
         arg.set_location(obj_kind.col, obj_kind.row + 2, obj_kind.colspan, 1)
+        arg.description = _('min')
         xfer.add_component(arg)
-        lbl = XferCompLabelForm('lbl_args_max')
-        lbl.set_value_as_name(_('max'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 3, 1, 1)
-        xfer.add_component(lbl)
         arg = XferCompFloat('args_max', -10000, -10000, 0)
         arg.set_value(args['max'])
         arg.set_location(obj_kind.col, obj_kind.row + 3, obj_kind.colspan, 1)
+        arg.description = _('max')
         xfer.add_component(arg)
-        lbl = XferCompLabelForm('lbl_args_prec')
-        lbl.set_value_as_name(_('precision'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 4, 1, 1)
-        xfer.add_component(lbl)
         arg = XferCompFloat('args_prec', 0, 10, 0)
         arg.set_value(args['prec'])
         arg.set_location(obj_kind.col, obj_kind.row + 4, obj_kind.colspan, 1)
+        arg.description = _('precision')
         xfer.add_component(arg)
-        lbl = XferCompLabelForm('lbl_args_list')
-        lbl.set_value_as_name(_('list'))
-        lbl.set_location(obj_kind.col - 1, obj_kind.row + 5, 1, 1)
-        xfer.add_component(lbl)
         arg = XferCompEdit('args_list')
         arg.set_value(','.join(args['list']))
         arg.set_location(obj_kind.col, obj_kind.row + 5, obj_kind.colspan, 1)
+        arg.description = _('list')
         xfer.add_component(arg)
 
     def edit(self, xfer):
@@ -103,11 +88,6 @@ class CustomFieldEditor(LucteriosEditor):
         self._edit_add_args(xfer, obj_kind)
         obj_kind.java_script = """
 var type=current.getValue();
-parent.get('lbl_args_multi').setVisible(type==0);
-parent.get('lbl_args_min').setVisible(type==1 || type==2);
-parent.get('lbl_args_max').setVisible(type==1 || type==2);
-parent.get('lbl_args_prec').setVisible(type==2);
-parent.get('lbl_args_list').setVisible(type==4);
 parent.get('args_multi').setVisible(type==0);
 parent.get('args_min').setVisible(type==1 || type==2);
 parent.get('args_max').setVisible(type==1 || type==2);
@@ -181,27 +161,23 @@ class AbstractContactEditor(LucteriosEditor):
         city_select = XferCompSelect('city')
         city_select.set_value(city_current)
         city_select.set_select(city_list)
-        city_select.set_location(
-            obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
+        city_select.set_location(obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
+        city_select.description = obj_city.description
         city_select.set_size(obj_city.vmin, obj_city.hmin)
         city_select.set_action(xfer.request, xfer.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         xfer.add_component(city_select)
 
     def _edit_custom_field(self, xfer, init_col):
-
         col = init_col
         col_offset = 0
         row = xfer.get_max_row() + 5
         for cf_name, cf_model in self.item.get_custom_fields():
-            lbl = XferCompLabelForm('lbl_' + cf_name)
-            lbl.set_location(col + col_offset, row, 1, 1)
-            lbl.set_value_as_name(cf_model.name)
-            xfer.add_component(lbl)
             comp = cf_model.editor.get_comp(getattr(self.item, cf_name))
-            comp.set_location(col + col_offset + 1, row, 1, 1)
+            comp.set_location(col + col_offset, row, 1, 1)
+            comp.description = cf_model.name
             xfer.add_component(comp)
-            col_offset += 2
-            if col_offset == 4:
+            col_offset += 1
+            if col_offset == 2:
                 col_offset = 0
                 row += 1
 
@@ -216,14 +192,11 @@ class AbstractContactEditor(LucteriosEditor):
             self._change_city_select(xfer, list_postalcode, obj_city)
         obj_cmt = xfer.get_components('comment')
         xfer.tab = obj_cmt.tab
-        self._edit_custom_field(xfer, obj_cmt.col - 1)
+        self._edit_custom_field(xfer, obj_cmt.col)
         row = xfer.get_max_row()
-        lbl = XferCompLabelForm('lbl_uploadlogo')
-        lbl.set_value_as_name(_('image'))
-        lbl.set_location(obj_cmt.col - 1, row + 10, 1, 1)
-        xfer.add_component(lbl)
         upload = XferCompUpLoad('uploadlogo')
         upload.set_value('')
+        upload.description = _('image')
         upload.add_filter('.jpg')
         upload.add_filter('.gif')
         upload.add_filter('.png')
@@ -237,28 +210,23 @@ class AbstractContactEditor(LucteriosEditor):
         col_offset = 0
         row = xfer.get_max_row() + 5
         for cf_name, cf_model in self.item.get_custom_fields():
-            lbl = XferCompLabelForm('lbl_' + cf_name)
-            lbl.set_location(col + col_offset, row, 1, 1)
-            lbl.set_value_as_name(cf_model.name)
-            xfer.add_component(lbl)
             val = XferCompLabelForm(cf_name)
-            val.set_location(col + col_offset + 1, row, 1, 1)
-            val.set_value(
-                get_value_converted(getattr(self.item, cf_name), True))
+            val.set_location(col + col_offset, row, 1, 1)
+            val.set_value(get_value_converted(getattr(self.item, cf_name), True))
+            val.description = cf_model.name
             xfer.add_component(val)
-            col_offset += 2
-            if col_offset == 4:
+            col_offset += 1
+            if col_offset == 2:
                 col_offset = 0
                 row += 1
 
     def show(self, xfer):
         LucteriosEditor.show(self, xfer)
-        obj_addr = xfer.get_components('lbl_address')
+        obj_addr = xfer.get_components('address')
         xfer.tab = obj_addr.tab
         new_col = obj_addr.col
         xfer.move(obj_addr.tab, 1, 0)
-        img_path = get_user_path(
-            "contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
+        img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
         img = XferCompImage('logoimg')
         if exists(img_path):
             img.type = 'jpg'
@@ -283,8 +251,7 @@ class AbstractContactEditor(LucteriosEditor):
             tmp_file = save_from_base64(uploadlogo)
             with open(tmp_file, "rb") as image_tmp:
                 image = open_image_resize(image_tmp, 100, 100)
-                img_path = get_user_path(
-                    "contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
+                img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
                 with open(img_path, "wb") as image_file:
                     image.save(image_file, 'JPEG', quality=90)
             unlink(tmp_file)
@@ -316,13 +283,11 @@ class LegalEntityEditor(AbstractContactEditor):
 
     def edit(self, xfer):
         if self.item.id == 1:
-            xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
         return AbstractContactEditor.edit(self, xfer)
 
     def show(self, xfer):
         if self.item.id == 1:
-            xfer.remove_component('lbl_structure_type')
             xfer.remove_component('structure_type')
         AbstractContactEditor.show(self, xfer)
 
