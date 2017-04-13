@@ -274,10 +274,7 @@ class Migration(migrations.Migration):
                 ('legal_entity', models.ForeignKey(on_delete=models.CASCADE,
                                                    verbose_name='legal entity', to='contacts.LegalEntity')),
             ],
-            options={
-                'verbose_name_plural': 'responsabilities',
-                'verbose_name': 'responsability',
-            },
+            options={'verbose_name': 'associate', 'verbose_name_plural': 'associates'},
             bases=(models.Model,),
         ),
         migrations.RunPython(initial_postalcodes),
