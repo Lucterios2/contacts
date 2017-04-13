@@ -885,21 +885,27 @@ class ContactsTest(LucteriosTest):
                   {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
         self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_count_equal('COMPONENTS/GRID[@name="object"]/HEADER', 2)
-        self.assert_count_equal('COMPONENTS/GRID[@name="object"]/RECORD', 2)
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[1]/VALUE[@name="select"]', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[2]/VALUE[@name="select"]', '0')
+        self.assert_count_equal('COMPONENTS/GRID[@name="mrg_object"]/HEADER', 2)
+        self.assert_count_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD', 2)
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="select"]', '1')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="select"]', '0')
 
         self.factory.xfer = ObjectMerge()
         self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'object': '3'}, False)
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN' , 'mrg_object': '3'}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
+        self.assert_action_equal('ACTION', ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "3"}))
+
+        self.factory.xfer = ObjectMerge()
+        self.call('/lucterios.contacts/objectMerge',
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'mrg_object': '3'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[1]/VALUE[@name="select"]', '0')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="object"]/RECORD[2]/VALUE[@name="select"]', '1')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="select"]', '0')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="select"]', '1')
 
         self.factory.xfer = ObjectMerge()
         self.call('/lucterios.contacts/objectMerge',
