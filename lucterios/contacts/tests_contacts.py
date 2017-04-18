@@ -38,7 +38,7 @@ from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import ObjectMerge
 
-from lucterios.contacts.views import Configuration, CustomFieldAddModify,\
+from lucterios.contacts.views import Configuration, CustomFieldAddModify, \
     ContactImport
 from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
     Function, Responsability, CustomField, ContactCustomField
@@ -46,7 +46,7 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
     ResponsabilityModify, LegalEntitySearch, IndividualSearch, \
-    LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel,\
+    LegalEntityListing, LegalEntityLabel, IndividualListing, IndividualLabel, \
     AbstractContactFindDouble, AbstractContactShow
 
 
@@ -894,7 +894,7 @@ class ContactsTest(LucteriosTest):
 
         self.factory.xfer = ObjectMerge()
         self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN' , 'mrg_object': '3'}, False)
+                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN', 'mrg_object': '3'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
         self.assert_action_equal('ACTION', ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "3"}))
 
@@ -1004,7 +1004,7 @@ class ContactsTest(LucteriosTest):
                                                         "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="result"]', "{[center]}{[i]}4 contacts ont été importés{[/i]}{[/center]}")
+        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="result"]', "{[center]}{[i]}4 éléments ont été importés{[/i]}{[/center]}")
         self.assert_count_equal('ACTIONS/ACTION', 1)
 
         self.factory.xfer = LegalEntityList()
