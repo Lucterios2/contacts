@@ -190,7 +190,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER', 3)
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="name"]', "nom")
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="model_title"]', "modèle")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind"]', "type")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind_txt"]', "type")
 
     def test_ourdetails(self):
         self.factory.xfer = CurrentStructure()

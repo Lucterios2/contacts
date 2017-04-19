@@ -30,15 +30,14 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
-from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
+from lucterios.framework.xfercomponents import XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
     XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO, CLOSE_YES, get_icon_path, WrapAction
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
 
-from lucterios.contacts.models import AbstractContact, PostalCode
+from lucterios.contacts.models import PostalCode, CustomField
 from lucterios.CORE.parameters import Params
-from lucterios.framework.models import get_value_converted
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.views import ObjectPromote
 
@@ -52,12 +51,12 @@ class CustomFieldEditor(LucteriosEditor):
         arg.set_location(obj_kind.col, obj_kind.row + 1, obj_kind.colspan, 1)
         arg.description = _('multi-line')
         xfer.add_component(arg)
-        arg = XferCompFloat('args_min', -10000, -10000, 0)
+        arg = XferCompFloat('args_min', -10000, 10000, 0)
         arg.set_value(args['min'])
         arg.set_location(obj_kind.col, obj_kind.row + 2, obj_kind.colspan, 1)
         arg.description = _('min')
         xfer.add_component(arg)
-        arg = XferCompFloat('args_max', -10000, -10000, 0)
+        arg = XferCompFloat('args_max', -10000, 10000, 0)
         arg.set_value(args['max'])
         arg.set_location(obj_kind.col, obj_kind.row + 3, obj_kind.colspan, 1)
         arg.description = _('max')
@@ -73,18 +72,28 @@ class CustomFieldEditor(LucteriosEditor):
         arg.description = _('list')
         xfer.add_component(arg)
 
+    def _get_basic_model(self, xfer):
+        from django.apps import apps
+        return apps.get_model(xfer.getparam('basic_model', 'contacts.AbstractContact'))
+
     def edit(self, xfer):
         obj_model = xfer.get_components('modelname')
         obj_kind = xfer.get_components('kind')
-        xfer.remove_component('modelname')
-        model_current = obj_model.value
         xfer.tab = obj_model.tab
+        sel_models = self._get_basic_model(xfer).get_select_contact_type()
+        model_current = obj_model.value
+        xfer.remove_component('modelname')
         model_select = XferCompSelect('modelname')
+        model_select.description = obj_model.description
         model_select.set_value(model_current)
-        model_select.set_select(AbstractContact.get_select_contact_type())
+        model_select.set_select(sel_models)
         model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
         model_select.set_size(obj_model.vmin, obj_model.hmin)
         xfer.add_component(model_select)
+        if len(sel_models) == 1:
+            xfer.params['modelname'] = sel_models[0][0]
+            model_select.set_value(xfer.params['modelname'])
+            xfer.change_to_readonly('modelname')
         self._edit_add_args(xfer, obj_kind)
         obj_kind.java_script = """
 var type=current.getValue();
@@ -101,10 +110,9 @@ parent.get('args_list').setVisible(type==4);
             args_val = xfer.getparam('args_' + arg_name)
             if args_val is not None:
                 if arg_name == 'list':
-                    args[arg_name] = args_val
+                    args[arg_name] = list(args_val.split(","))
                 elif arg_name == 'multi':
-                    args[arg_name] = (args_val != 'False') and (
-                        args_val != '0') and (args_val != '') and (args_val != 'n')
+                    args[arg_name] = (args_val != 'False') and (args_val != '0') and (args_val != '') and (args_val != 'n')
                 else:
                     args[arg_name] = float(args_val)
         self.item.args = six.text_type(args)
@@ -167,20 +175,6 @@ class AbstractContactEditor(LucteriosEditor):
         city_select.set_action(xfer.request, xfer.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         xfer.add_component(city_select)
 
-    def _edit_custom_field(self, xfer, init_col):
-        col = init_col
-        col_offset = 0
-        row = xfer.get_max_row() + 5
-        for cf_name, cf_model in self.item.get_custom_fields():
-            comp = cf_model.editor.get_comp(getattr(self.item, cf_name))
-            comp.set_location(col + col_offset, row, 1, 1)
-            comp.description = cf_model.name
-            xfer.add_component(comp)
-            col_offset += 1
-            if col_offset == 2:
-                col_offset = 0
-                row += 1
-
     def edit(self, xfer):
         obj_pstcd = xfer.get_components('postal_code')
         obj_pstcd.set_action(xfer.request, xfer.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
@@ -192,7 +186,7 @@ class AbstractContactEditor(LucteriosEditor):
             self._change_city_select(xfer, list_postalcode, obj_city)
         obj_cmt = xfer.get_components('comment')
         xfer.tab = obj_cmt.tab
-        self._edit_custom_field(xfer, obj_cmt.col)
+        CustomField.edit_fields(xfer, obj_cmt.col)
         row = xfer.get_max_row()
         upload = XferCompUpLoad('uploadlogo')
         upload.set_value('')
@@ -204,21 +198,6 @@ class AbstractContactEditor(LucteriosEditor):
         upload.set_location(obj_cmt.col, row + 10, obj_cmt.colspan, 1)
         xfer.add_component(upload)
         return
-
-    def _show_custom_field(self, xfer, init_col):
-        col = init_col
-        col_offset = 0
-        row = xfer.get_max_row() + 5
-        for cf_name, cf_model in self.item.get_custom_fields():
-            val = XferCompLabelForm(cf_name)
-            val.set_location(col + col_offset, row, 1, 1)
-            val.set_value(get_value_converted(getattr(self.item, cf_name), True))
-            val.description = cf_model.name
-            xfer.add_component(val)
-            col_offset += 1
-            if col_offset == 2:
-                col_offset = 0
-                row += 1
 
     def show(self, xfer):
         LucteriosEditor.show(self, xfer)
@@ -235,7 +214,6 @@ class AbstractContactEditor(LucteriosEditor):
             img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
         img.set_location(new_col, obj_addr.row, 1, 6)
         xfer.add_component(img)
-        self._show_custom_field(xfer, obj_addr.col)
         if WrapAction.is_permission(xfer.request, 'contacts.add_abstractcontact'):
             if (len(self.item.__class__.get_select_contact_type(False)) > 0):
                 btn = XferCompButton('btn_promote')

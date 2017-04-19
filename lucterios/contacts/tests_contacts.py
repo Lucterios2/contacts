@@ -379,13 +379,15 @@ class ContactsTest(LucteriosTest):
                 print_text += "#%s " % print_field_item[1]
         self.assertEqual("#firstname #lastname #address #postal_code #city #country #tel1 #tel2 #email #comment ", print_text[:86])
         self.assertEqual("#user.username #responsability_set.legal_entity.name #responsability_set.legal_entity.structure_type.name ", print_text[86:192])
-        self.assertEqual("#responsability_set.legal_entity.address #responsability_set.legal_entity.postal_code #responsability_set.legal_entity.city #responsability_set.legal_entity.country ", print_text[192:357])
+        self.assertEqual(
+            "#responsability_set.legal_entity.address #responsability_set.legal_entity.postal_code #responsability_set.legal_entity.city #responsability_set.legal_entity.country ", print_text[192:357])
         self.assertEqual("#responsability_set.legal_entity.tel1 #responsability_set.legal_entity.tel2 #responsability_set.legal_entity.email ", print_text[357:472])
         self.assertEqual("#responsability_set.legal_entity.comment #responsability_set.legal_entity.identify_number #responsability_set.functions.name ", print_text[472:597])
         self.assertEqual("#OUR_DETAIL.name #OUR_DETAIL.address #OUR_DETAIL.postal_code #OUR_DETAIL.city #OUR_DETAIL.country ", print_text[597:695])
         self.assertEqual("#OUR_DETAIL.tel1 #OUR_DETAIL.tel2 #OUR_DETAIL.email ", print_text[695:747])
         self.assertEqual("#OUR_DETAIL.comment #OUR_DETAIL.identify_number ", print_text[747:795])
-        self.assertEqual("jack MISTER rue de la liberté 97250 LE PRECHEUR MARTINIQUE  02-78-45-12-95 jack@worldcompany.com   WoldCompany  Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   President{[br/]}Secretaire ", indiv_jack.evaluate(print_text[:597]))
+        self.assertEqual(
+            "jack MISTER rue de la liberté 97250 LE PRECHEUR MARTINIQUE  02-78-45-12-95 jack@worldcompany.com   WoldCompany  Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   President{[br/]}Secretaire ", indiv_jack.evaluate(print_text[:597]))
         self.assertEqual("WoldCompany Place des cocotiers 97200 FORT DE FRANCE MARTINIQUE 01-23-45-67-89  mr-sylvestre@worldcompany.com   ", indiv_jack.evaluate(print_text[597:]))
 
     def test_legalentity(self):
@@ -645,7 +647,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER', 3)
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="name"]', "nom")
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="model_title"]', "modèle")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind"]', "type")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind_txt"]', "type")
         self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 0)
 
         self.factory.xfer = CustomFieldAddModify()
@@ -657,8 +659,8 @@ class ContactsTest(LucteriosTest):
         self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
         self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
         self.assert_count_equal('COMPONENTS/*', 9)
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (1, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', 'contacts.AbstractContact', (1, 1, 1, 1))
+        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', 'contacts.AbstractContact', (1, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (1, 1, 1, 1))
         self.assert_comp_equal('COMPONENTS/SELECT[@name="kind"]', '0', (1, 2, 1, 1))
         self.assert_comp_equal('COMPONENTS/CHECK[@name="args_multi"]', '0', (1, 3, 1, 1))
         self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (1, 4, 1, 1))
@@ -698,19 +700,19 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 5)
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="name"]', 'aaa')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="kind"]', 'Chaîne')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="kind_txt"]', 'Chaîne')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="name"]', 'bbb')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="kind"]', 'Entier')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="kind_txt"]', 'Entier [0;100]')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="name"]', 'ccc')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="kind"]', 'Réel')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="kind_txt"]', 'Réel [-10.0;10.0]')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="name"]', 'ddd')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="model_title"]', 'personne morale')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="kind"]', 'Booléen')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="kind_txt"]', 'Booléen')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="name"]', 'eee')
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="model_title"]', 'personne physique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="kind"]', 'Sélection')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="kind_txt"]', 'Sélection (U,V,W,X,Y,Z)')
 
     def _initial_custom_values(self):
         initial_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},

@@ -316,6 +316,7 @@ class CurrentStructureAddModify(XferAddEditor):
     locked = True
     redirect_to_show = False
 
+
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
 
@@ -359,7 +360,7 @@ class Configuration(XferListEditor):
         img.set_value_as_title(_('custom field list'))
         img.set_location(1, 0)
         self.add_component(img)
-        self.fill_grid(0, CustomField, "custom_field", CustomField.objects.all())
+        self.fill_grid(0, CustomField, "custom_field", CustomField.get_filter(AbstractContact))
 
     def fillresponse(self):
         self._fill_functions()
