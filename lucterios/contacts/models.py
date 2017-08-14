@@ -208,6 +208,13 @@ class CustomizeObject(object):
                 ccf_model[0].value = six.text_type(cf_value)
                 ccf_model[0].save()
 
+    def get_custom_by_name(self, custom_name):
+        fields = CustomField.objects.filter(modelname=self.__class__.get_long_name(), name=custom_name)
+        if len(fields) == 1:
+            return getattr(self, fields[0].get_fieldname())
+        else:
+            return None
+
     def __getattr__(self, name):
         if name == "str":
             return six.text_type(self.get_final_child())
