@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-19 10:04+0000\n"
+"POT-Creation-Date: 2017-10-17 18:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: __init__.py:41 views.py:488 views.py:499 views.py:538
+#: __init__.py:42 views.py:488 views.py:499 views.py:538
 msgid "Lucterios contacts"
 msgstr "Lucterios contacts"
 
@@ -57,7 +57,7 @@ msgstr "Write to all"
 msgid "model"
 msgstr "model"
 
-#: models.py:44 models.py:281 models.py:300 models.py:415
+#: models.py:44 models.py:288 models.py:307 models.py:422
 #: printmodel/LegalEntity_0001.py:38
 msgid "name"
 msgstr "name"
@@ -98,194 +98,194 @@ msgstr "custom field"
 msgid "custom fields"
 msgstr "custom fields"
 
-#: models.py:255 models.py:271 models.py:335
+#: models.py:262 models.py:278 models.py:342
 msgid "postal code"
 msgstr "postal code"
 
-#: models.py:256 models.py:336 printmodel/Individual_0001.py:39
+#: models.py:263 models.py:343 printmodel/Individual_0001.py:39
 #: printmodel/LegalEntity_0001.py:38
 msgid "city"
 msgstr "city"
 
-#: models.py:257 models.py:337
+#: models.py:264 models.py:344
 msgid "country"
 msgstr "country"
 
-#: models.py:272
+#: models.py:279
 msgid "postal codes"
 msgstr "postal codes"
 
-#: models.py:292
+#: models.py:299
 msgid "individual function"
 msgstr "Individual function"
 
-#: models.py:293
+#: models.py:300
 msgid "individual functions"
 msgstr "Individual functions"
 
-#: models.py:311 models.py:416
+#: models.py:318 models.py:423
 msgid "structure type"
 msgstr "structure type"
 
-#: models.py:312
+#: models.py:319
 msgid "structure types"
 msgstr "structure types"
 
-#: models.py:319 models.py:345 models.py:368
+#: models.py:326 models.py:352 models.py:375
 msgid "contact"
 msgstr "contact"
 
-#: models.py:320
+#: models.py:327
 msgid "field"
 msgstr "field"
 
-#: models.py:321
+#: models.py:328
 msgid "value"
 msgstr "value"
 
-#: models.py:324
+#: models.py:331
 msgid "custom field value"
 msgstr "custom field value"
 
-#: models.py:325
+#: models.py:332
 msgid "custom field values"
 msgstr "custom field values"
 
-#: models.py:334 printmodel/Individual_0001.py:39
+#: models.py:341 printmodel/Individual_0001.py:39
 #: printmodel/LegalEntity_0001.py:38
 msgid "address"
 msgstr "address"
 
-#: models.py:338
+#: models.py:345
 msgid "tel1"
 msgstr "phone #1"
 
-#: models.py:339
+#: models.py:346
 msgid "tel2"
 msgstr "phone #2"
 
-#: models.py:340 printmodel/Individual_0001.py:39
+#: models.py:347 printmodel/Individual_0001.py:39
 #: printmodel/LegalEntity_0001.py:38
 msgid "email"
 msgstr "email"
 
-#: models.py:341
+#: models.py:348
 msgid "comment"
 msgstr "comment"
 
-#: models.py:408
+#: models.py:415
 msgid "generic contact"
 msgstr "generic contact"
 
-#: models.py:409
+#: models.py:416
 msgid "generic contacts"
 msgstr "generic contacts"
 
-#: models.py:417
+#: models.py:424
 msgid "identify number"
 msgstr "legal number"
 
-#: models.py:424 models.py:490 views.py:88 views.py:491
+#: models.py:431 models.py:497 views.py:88 views.py:491
 msgid "001@Identity"
 msgstr "001@Identity"
 
-#: models.py:424
+#: models.py:431
 msgid "002@Members"
 msgstr "002@Members"
 
-#: models.py:467
+#: models.py:474
 msgid "You cannot delete this legal entity!"
 msgstr "You cannot delete this legal entity!"
 
-#: models.py:471 models.py:532
+#: models.py:478 models.py:539
 msgid "legal entity"
 msgstr "legal entity"
 
-#: models.py:472
+#: models.py:479
 msgid "legal entities"
 msgstr "legal entities"
 
-#: models.py:480
+#: models.py:487
 msgid "Man"
 msgstr "Man"
 
-#: models.py:480
+#: models.py:487
 msgid "Woman"
 msgstr "Woman"
 
-#: models.py:481 printmodel/Individual_0001.py:39
+#: models.py:488 printmodel/Individual_0001.py:39
 msgid "firstname"
 msgstr "firstname"
 
-#: models.py:482 printmodel/Individual_0001.py:39
+#: models.py:489 printmodel/Individual_0001.py:39
 msgid "lastname"
 msgstr "lastname"
 
-#: models.py:483
+#: models.py:490
 msgid "user"
 msgstr "user"
 
-#: models.py:522 models.py:531 views_contacts.py:327
+#: models.py:529 models.py:538 views_contacts.py:327
 msgid "individual"
 msgstr "individual"
 
-#: models.py:523
+#: models.py:530
 msgid "individuals"
 msgstr "individuals"
 
-#: models.py:533
+#: models.py:540
 msgid "functions"
 msgstr "functions"
 
-#: models.py:534
+#: models.py:541
 msgid "Available functions"
 msgstr "Available functions"
 
-#: models.py:534
+#: models.py:541
 msgid "Chosen functions"
 msgstr "Chosen functions"
 
-#: models.py:553
+#: models.py:560
 msgid "associate"
 msgstr "associate"
 
-#: models.py:554 views.py:538
+#: models.py:561 views.py:538
 msgid "associates"
 msgstr "associates"
 
-#: models.py:560
+#: models.py:567
 msgid "our detail"
 msgstr "our detail"
 
-#: models.py:579
+#: models.py:586
 msgid "contacts-mailtoconfig"
 msgstr "Email type sending"
 
-#: models.py:580
+#: models.py:587
 msgid "contacts-mailtoconfig.0"
 msgstr "To"
 
-#: models.py:580
+#: models.py:587
 msgid "contacts-mailtoconfig.1"
 msgstr "CC"
 
-#: models.py:580
+#: models.py:587
 msgid "contacts-mailtoconfig.2"
 msgstr "BCC"
 
-#: models.py:581
+#: models.py:588
 msgid "contacts-createaccount"
 msgstr "Allow to create an account"
 
-#: models.py:582
+#: models.py:589
 msgid "contacts-createaccount.0"
 msgstr "Deny"
 
-#: models.py:582
+#: models.py:589
 msgid "contacts-createaccount.1"
 msgstr "Create only individual"
 
-#: models.py:582
+#: models.py:589
 msgid "contacts-createaccount.2"
 msgstr "Create individual & legal entity"
 

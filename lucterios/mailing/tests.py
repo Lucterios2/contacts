@@ -82,7 +82,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtpuser"]', None)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-smtppass"]', None)
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="mailing-msg-connection"]',
-                              'Confirmation de connexion à votre application:\nAlias:%(username)s\nMot de passe:%(password)s\n')
+                              'Confirmation de connexion à votre application :\nAlias : %(username)s\nMot de passe : %(password)s\n')
 
     def test_tryemail_noconfig(self):
         configSMTP('', 25)
@@ -116,7 +116,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except LucteriosException as error:
-            self.assertEqual(six.text_type(error), 'Courriel non configuré!')
+            self.assertEqual(six.text_type(error), 'Courriel non configuré !')
         self.assertEqual(0, self.server.count())
 
     def test_send_bad_config(self):
@@ -321,8 +321,8 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         content_msg = decode_b64(msg.get_payload())
-        self.assertEqual('Confirmation de connexion à votre application:\nAlias:admin\nMot de passe:', decode_b64(msg.get_payload())[:72])
-        password = content_msg[72:].strip()
+        self.assertEqual('Confirmation de connexion à votre application :\nAlias : admin\nMot de passe : ', decode_b64(msg.get_payload())[:77])
+        password = content_msg[77:].strip()
         user = LucteriosUser.objects.get(id=1)
         self.assertTrue(user.check_password(password), content_msg)
 
@@ -566,8 +566,8 @@ class UserTest(LucteriosTest):
             self.assertEqual('text/plain', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             message = decode_b64(msg.get_payload())
-            self.assertEqual('Confirmation de connexion à votre application:\nAlias:jack\nMot de passe:', message[:71])
-            password = message[71:]
+            self.assertEqual('Confirmation de connexion à votre application :\nAlias : jack\nMot de passe : ', message[:76])
+            password = message[76:]
         finally:
             server.stop()
         user = LucteriosUser.objects.get(id=2)
@@ -607,7 +607,7 @@ class UserTest(LucteriosTest):
             self.assert_count_equal('CONTEXT/PARAM', 6)
             self.assert_count_equal('ACTION', 1)
             self.assert_action_equal('ACTION', (None, None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {
-                                     "SAVE": None, "error": "Ce compte existes déjà!"}))
+                                     "SAVE": None, "error": "Ce compte existe déjà !"}))
             self.assertEqual(0, server.count())
 
             self.factory.xfer = CreateAccount()
@@ -622,8 +622,8 @@ class UserTest(LucteriosTest):
             self.assertEqual('text/plain', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             message = decode_b64(msg.get_payload())
-            self.assertEqual('Confirmation de connexion à votre application:\nAlias:pierre\nMot de passe:', message[:73])
-            password = message[73:]
+            self.assertEqual('Confirmation de connexion à votre application :\nAlias : pierre\nMot de passe : ', message[:78])
+            password = message[78:]
         finally:
             server.stop()
         user = LucteriosUser.objects.get(id=3)
@@ -680,8 +680,8 @@ class UserTest(LucteriosTest):
             self.assertEqual('text/plain', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             message = decode_b64(msg.get_payload())
-            self.assertEqual('Confirmation de connexion à votre application:\nAlias:pierre\nMot de passe:', message[:73])
-            password = message[73:]
+            self.assertEqual('Confirmation de connexion à votre application :\nAlias : pierre\nMot de passe : ', message[:78])
+            password = message[78:]
         finally:
             server.stop()
         user = LucteriosUser.objects.get(id=3)

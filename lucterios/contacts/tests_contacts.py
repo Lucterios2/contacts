@@ -429,7 +429,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntityDel()
         self.call('/lucterios.contacts/legalEntityDel', {'legal_entity': '1'}, False)
         self.assert_observer('core.exception', 'lucterios.contacts', 'legalEntityDel')
-        self.assert_xml_equal("EXCEPTION/MESSAGE", "Vous ne pouvez pas supprimer cette structure morale!")
+        self.assert_xml_equal("EXCEPTION/MESSAGE", "Vous ne pouvez pas supprimer cette structure morale !")
 
     def test_legalentity_responsability(self):
         self.factory.xfer = LegalEntityShow()
