@@ -21,11 +21,11 @@ msgstr ""
 
 #: __init__.py:41 views.py:488 views.py:499 views.py:538
 msgid "Lucterios contacts"
-msgstr "Contacts Lucterios "
+msgstr "Contacts Lucterios"
 
 #: editors.py:52 models.py:78
 msgid "multi-line"
-msgstr "multi-line"
+msgstr "multi-lignes"
 
 #: editors.py:57
 msgid "min"
@@ -53,7 +53,7 @@ msgstr "Promouvoir"
 
 #: editors.py:248
 msgid "Write to all"
-msgstr "Ecrire à tous"
+msgstr "Écrire à tous"
 
 #: models.py:43 models.py:58 tools.py:61
 msgid "model"
@@ -197,7 +197,7 @@ msgstr "002@Membres"
 
 #: models.py:467
 msgid "You cannot delete this legal entity!"
-msgstr "Vous ne pouvez pas supprimer cette structure morale!"
+msgstr "Vous ne pouvez pas supprimer cette structure morale !"
 
 #: models.py:471 models.py:532
 msgid "legal entity"
@@ -261,7 +261,7 @@ msgstr "Nos coordonnées"
 
 #: models.py:579
 msgid "contacts-mailtoconfig"
-msgstr "Type d'envoie de courriel"
+msgstr "Type d'envoi de courriel"
 
 #: models.py:580
 msgid "contacts-mailtoconfig.0"
@@ -301,11 +301,11 @@ msgstr "tel"
 
 #: tools.py:42
 msgid "Select contact"
-msgstr "Sélection un contact"
+msgstr "Sélectionner un contact"
 
 #: views.py:63 views.py:75
 msgid "Bad access!"
-msgstr "Mauvais access!"
+msgstr "Mauvais accès !"
 
 #: views.py:73
 msgid "Modify"
@@ -325,7 +325,7 @@ msgstr "Personne morale"
 
 #: views.py:107 views.py:115 views.py:136 views.py:141 views.py:185
 msgid "Edit"
-msgstr "Editer"
+msgstr "Éditer"
 
 #: views.py:111 views_contacts.py:102 views_contacts.py:123
 #: views_contacts.py:139
@@ -393,7 +393,7 @@ msgstr ""
 
 #: views.py:301
 msgid "This account exists yet!"
-msgstr "Ce compte existes déjà!"
+msgstr "Ce compte existe déjà !"
 
 #: views.py:320
 msgid "Contact"
@@ -415,7 +415,7 @@ msgstr "Fonctions et responsabilités"
 
 #: views.py:336
 msgid "Functions list"
-msgstr "Liste de fonctions"
+msgstr "Liste des fonctions"
 
 #: views.py:342
 msgid "Structure type"
@@ -431,11 +431,11 @@ msgstr "Champ personnalisé"
 
 #: views.py:360
 msgid "custom field list"
-msgstr "liste de champs personnalisés"
+msgstr "liste des champs personnalisés"
 
 #: views.py:378 views.py:457
 msgid "Add function"
-msgstr "Ajout d'un fonction"
+msgstr "Ajout d'une fonction"
 
 #: views.py:379
 msgid "Modify function"
@@ -499,11 +499,11 @@ msgstr "Configurez les informations de votre structure."
 
 #: views.py:499
 msgid "configure your contacts"
-msgstr "Configurez la gestion de vos contacts et importez les."
+msgstr "Configurez la gestion de vos contacts et importez-les."
 
 #: views.py:538
 msgid "configure your association"
-msgstr "Configurez la gestion de vos contacts et importez les."
+msgstr "Configurez la gestion de vos contacts et importez-les."
 
 #: views_contacts.py:50
 msgid "Office"
@@ -621,7 +621,7 @@ msgstr "Recherche de personne morale"
 
 #: views_contacts.py:391
 msgid "Contact duplication searching"
-msgstr "Recherche de contacts en duplication"
+msgstr "Recherche de contacts en double"
 
 #: views_contacts.py:416
 msgid "Show contact"
@@ -634,12 +634,12 @@ msgstr "Supprimer un contact"
 #: views_contacts.py:457
 #, python-format
 msgid "Total number of legal entities: %d"
-msgstr "Nombre total de structures morales: %d"
+msgstr "Nombre total de structures morales : %d"
 
 #: views_contacts.py:462
 #, python-format
 msgid "Total number of individuals: %d"
-msgstr "Nombre total de contacts physiques: %d"
+msgstr "Nombre total de contacts physiques : %d"
 
 #~ msgid "CSV file"
 #~ msgstr "Fichier CSV"
@@ -654,13 +654,13 @@ msgstr "Nombre total de contacts physiques: %d"
 #~ msgstr "délimiteur"
 
 #~ msgid "quotechar"
-#~ msgstr "caractère de quote"
+#~ msgstr "caractère de citation"
 
 #~ msgid "CSV file unvalid!"
-#~ msgstr "Fichier CSV invalide!"
+#~ msgstr "Fichier CSV invalide !"
 
 #~ msgid "Total number of contacts: %d"
-#~ msgstr "Nombre total de contacts: %d"
+#~ msgstr "Nombre total de contacts : %d"
 
 #~ msgid "Fields"
 #~ msgstr "Champs"
