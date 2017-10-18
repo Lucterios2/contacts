@@ -394,7 +394,6 @@ class AbstractContactFindDouble(XferListEditor):
     field_id = 'abstractcontact'
 
     def fillresponse_header(self):
-        self.action_grid = self.action_grid[:-1]
         self.filter = self.model.get_query_for_duplicate()
 
     def fillresponse(self, modelname, field_id):
