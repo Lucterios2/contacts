@@ -483,11 +483,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'responsabilityModify')
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
         self.assert_xml_equal('COMPONENTS/LABELFORM[@name="individual"]', "MISTER jack")
-        self.assert_attrib_equal('COMPONENTS/CHECKLIST[@name="functions_available"]', 'description', "fonctions")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="hd_functions_available"]', "{[center]}{[i]}Fonctions disponibles{[/i]}{[/center]}")
-        self.assert_xml_equal('COMPONENTS/CHECKLIST[@name="functions_available"]', None)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="hd_functions_chosen"]', "{[center]}{[i]}Fonctions choisies{[/i]}{[/center]}")
-        self.assert_xml_equal('COMPONENTS/CHECKLIST[@name="functions_chosen"]', None)
+        self.assert_attrib_equal('COMPONENTS/CHECKLIST[@name="functions"]', 'description', "fonctions")
 
         self.factory.xfer = LegalEntityShow()
         self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)

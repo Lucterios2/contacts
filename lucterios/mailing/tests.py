@@ -299,14 +299,14 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
         self.assert_observer('core.custom', 'CORE', 'usersEdit')
-        self.assert_count_equal('COMPONENTS/*', 29)
+        self.assert_count_equal('COMPONENTS/*', 15)
 
     def test_user_withconfig(self):
         configSMTP('localhost', 1025)
         self.factory.xfer = UsersEdit()
         self.call('/CORE/usersEdit', {}, False)
         self.assert_observer('core.custom', 'CORE', 'usersEdit')
-        self.assert_count_equal('COMPONENTS/*', 30)
+        self.assert_count_equal('COMPONENTS/*', 16)
         self.assert_attrib_equal('COMPONENTS/CHECK[@name="password_generate"]', "description", "Générer un nouveau mot de passe?")
 
     def test_user_change_password(self):
