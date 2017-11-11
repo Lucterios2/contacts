@@ -40,8 +40,6 @@ from lucterios.framework.signal_and_lock import Signal
 
 
 class Message(LucteriosModel):
-    is_simple_gui = True
-
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
     status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close'))))

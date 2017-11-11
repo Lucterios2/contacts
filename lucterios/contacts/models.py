@@ -38,8 +38,6 @@ from lucterios.CORE.models import Parameter
 
 
 class CustomField(LucteriosModel):
-    is_simple_gui = True
-
     modelname = models.CharField(_('model'), max_length=100)
     name = models.CharField(_('name'), max_length=200, unique=False)
     kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
@@ -257,8 +255,6 @@ class CustomizeObject(object):
 
 
 class PostalCode(LucteriosModel):
-    is_simple_gui = True
-
     postal_code = models.CharField(_('postal code'), max_length=10, blank=False)
     city = models.CharField(_('city'), max_length=100, blank=False)
     country = models.CharField(_('country'), max_length=100, blank=False)
@@ -283,8 +279,6 @@ class PostalCode(LucteriosModel):
 
 
 class Function(LucteriosModel):
-    is_simple_gui = True
-
     name = models.CharField(_('name'), max_length=50, unique=True)
 
     def __str__(self):
@@ -302,8 +296,6 @@ class Function(LucteriosModel):
 
 
 class StructureType(LucteriosModel):
-    is_simple_gui = True
-
     name = models.CharField(_('name'), max_length=50, unique=True)
 
     @classmethod
@@ -321,8 +313,6 @@ class StructureType(LucteriosModel):
 
 
 class ContactCustomField(LucteriosModel):
-    is_simple_gui = True
-
     contact = models.ForeignKey('AbstractContact', verbose_name=_('contact'), null=False, on_delete=models.CASCADE)
     field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
     value = models.TextField(_('value'), default="")
@@ -334,7 +324,6 @@ class ContactCustomField(LucteriosModel):
 
 
 class AbstractContact(LucteriosModel, CustomizeObject):
-    is_simple_gui = True
     CustomFieldClass = ContactCustomField
     FieldName = 'contact'
 
@@ -417,8 +406,6 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
 
 class LegalEntity(AbstractContact):
-    is_simple_gui = True
-
     name = models.CharField(_('name'), max_length=100, blank=False)
     structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
     identify_number = models.TextField(_('identify number'), blank=True)
@@ -482,8 +469,6 @@ class LegalEntity(AbstractContact):
 
 
 class Individual(AbstractContact):
-    is_simple_gui = True
-
     genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
     firstname = models.CharField(_('firstname'), max_length=100, blank=False)
     lastname = models.CharField(_('lastname'), max_length=100, blank=False)
@@ -533,8 +518,6 @@ class Individual(AbstractContact):
 
 
 class Responsability(LucteriosModel):
-    is_simple_gui = True
-
     individual = models.ForeignKey(Individual, verbose_name=_('individual'), null=False, on_delete=models.CASCADE)
     legal_entity = models.ForeignKey(LegalEntity, verbose_name=_('legal entity'), null=False, on_delete=models.CASCADE)
     functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)

@@ -44,7 +44,6 @@ from lucterios.framework.xferadvance import TITLE_MODIFY
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
 class Configuration(XferContainerCustom):
-    is_simple_gui = True
     icon = "config_mail.png"
     caption = _("Mailing parameters")
 
