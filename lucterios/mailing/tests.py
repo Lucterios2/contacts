@@ -542,7 +542,7 @@ class UserTest(LucteriosTest):
         self.call('/lucterios.CORE/askPassword', {}, False)
         self.assert_observer('core.custom', 'lucterios.CORE', 'askPassword')
         self.assert_count_equal('CONTEXT', 0)
-        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_count_equal('COMPONENTS/*', 3)
         self.assert_xml_equal('COMPONENTS/EDIT[@name="email"]', None)
         self.assert_count_equal('ACTIONS/ACTION', 2)
 

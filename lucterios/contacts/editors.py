@@ -229,6 +229,7 @@ class AbstractContactEditor(LucteriosEditor):
             tmp_file = save_from_base64(uploadlogo)
             with open(tmp_file, "rb") as image_tmp:
                 image = open_image_resize(image_tmp, 100, 100)
+                image = image.convert("RGB")
                 img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
                 with open(img_path, "wb") as image_file:
                     image.save(image_file, 'JPEG', quality=90)
