@@ -639,7 +639,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = Configuration()
         self.call('/lucterios.contacts/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
-        self.assert_count_equal('COMPONENTS/*', 15)
+        self.assert_count_equal('COMPONENTS/*', 12)
         self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER', 3)
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="name"]', "nom")
         self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="model_title"]', "modèle")
@@ -859,7 +859,7 @@ class ContactsTest(LucteriosTest):
         self.call('/lucterios.contacts/abstractContactFindDouble',
                   {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'abstractContactFindDouble')
-        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_count_equal('COMPONENTS/*', 3)
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="individual"]', (0, 1, 2, 1))
         self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
 

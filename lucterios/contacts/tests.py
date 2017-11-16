@@ -54,84 +54,55 @@ class PostalCodeTest(LucteriosTest):
         self.factory.xfer = PostalCodeList()
         self.call('/lucterios.contacts/postalCodeList',
                   {'filter_postal_code': ''}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'postalCodeList')
+        self.assert_observer('core.custom', 'lucterios.contacts', 'postalCodeList')
         self.assert_xml_equal('TITLE', 'Code postal')
         self.assert_count_equal('CONTEXT/PARAM', 1)
         self.assert_count_equal('ACTIONS/ACTION', 1)
-        self.assert_action_equal(
-            'ACTIONS/ACTION', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 5)
-        self.assert_comp_equal(
-            'COMPONENTS/IMAGE[@name="img"]', '/static/lucterios.contacts/images/postalCode.png', (0, 0, 1, 1))
-        self.assert_comp_equal(
-            'COMPONENTS/LABELFORM[@name="filtre"]', '{[b]}Filtrer par code postal{[/b]}', (1, 0, 1, 1))
-        self.assert_comp_equal(
-            'COMPONENTS/EDIT[@name="filter_postal_code"]', None, (1, 1, 1, 1))
-        self.assert_coordcomp_equal(
-            'COMPONENTS/GRID[@name="postalCode"]', (0, 2, 2, 1))
-        self.assert_comp_equal(
-            'COMPONENTS/LABELFORM[@name="nb_postalCode"]', "Nombre total de codes postaux: 333", (0, 3, 2, 1))
+        self.assert_action_equal('ACTIONS/ACTION', ('Fermer', 'images/close.png'))
+        self.assert_count_equal('COMPONENTS/*', 4)
+        self.assert_comp_equal('COMPONENTS/IMAGE[@name="img"]', '/static/lucterios.contacts/images/postalCode.png', (0, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="filtre"]', '{[b]}Filtrer par code postal{[/b]}', (1, 0, 1, 1))
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="filter_postal_code"]', None, (1, 1, 1, 1))
+        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="postalCode"]', (0, 2, 2, 1))
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'nb_lines', '333')
 
-        self.assert_attrib_equal(
-            'COMPONENTS/GRID[@name="postalCode"]', 'PageMax', '14')
-        self.assert_attrib_equal(
-            'COMPONENTS/GRID[@name="postalCode"]', 'PageNum', '0')
-        self.assert_count_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/HEADER', 3)
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="postal_code"]', "code postal")
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="city"]', "ville")
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="country"]', "pays")
-        self.assert_count_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD', 25)
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97100')
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD[25]/VALUE[@name="postal_code"]', '97131')
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', '14')
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageNum', '0')
+        self.assert_count_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER', 3)
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="postal_code"]', "code postal")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="city"]', "ville")
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/HEADER[@name="country"]', "pays")
+        self.assert_count_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD', 25)
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97100')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[25]/VALUE[@name="postal_code"]', '97131')
 
     def test_listdefault(self):
         self.factory.xfer = PostalCodeList()
         self.call('/lucterios.contacts/postalCodeList', {}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'postalCodeList')
-        self.assert_comp_equal(
-            'COMPONENTS/EDIT[@name="filter_postal_code"]', '97400', (1, 1, 1, 1))
-        self.assert_comp_equal(
-            'COMPONENTS/LABELFORM[@name="nb_postalCode"]', "Nombre total de codes postaux: 6", (0, 3, 2, 1))
+        self.assert_observer('core.custom', 'lucterios.contacts', 'postalCodeList')
+        self.assert_comp_equal('COMPONENTS/EDIT[@name="filter_postal_code"]', '97400', (1, 1, 1, 1))
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'nb_lines', '6')
 
-        self.assert_attrib_equal(
-            'COMPONENTS/GRID[@name="postalCode"]', 'PageMax', None)
-        self.assert_attrib_equal(
-            'COMPONENTS/GRID[@name="postalCode"]', 'PageNum', None)
-        self.assert_count_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD', 6)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageMax', None)
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'PageNum', None)
+        self.assert_count_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD', 6)
 
     def test_filterlist(self):
         self.factory.xfer = PostalCodeList()
         self.call('/lucterios.contacts/postalCodeList',
                   {'filter_postal_code': '973'}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'postalCodeList')
-        self.assert_comp_equal(
-            'COMPONENTS/LABELFORM[@name="nb_postalCode"]', "Nombre total de codes postaux: 27", (0, 3, 2, 1))
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97300')
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD[25]/VALUE[@name="postal_code"]', '97370')
+        self.assert_observer('core.custom', 'lucterios.contacts', 'postalCodeList')
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'nb_lines', '27')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97300')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[25]/VALUE[@name="postal_code"]', '97370')
 
     def test_pagelist(self):
         self.factory.xfer = PostalCodeList()
         self.call('/lucterios.contacts/postalCodeList',
                   {'GRID_PAGE%postalCode': '5', 'filter_postal_code': ''}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'postalCodeList')
-        self.assert_comp_equal(
-            'COMPONENTS/LABELFORM[@name="nb_postalCode"]', "Nombre total de codes postaux: 333", (0, 3, 2, 1))
-        self.assert_xml_equal(
-            'COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97416')
+        self.assert_observer('core.custom', 'lucterios.contacts', 'postalCodeList')
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'nb_lines', '333')
+        self.assert_xml_equal('COMPONENTS/GRID[@name="postalCode"]/RECORD[1]/VALUE[@name="postal_code"]', '97416')
 
     def test_add(self):
         self.factory.xfer = PostalCodeAdd()
@@ -143,16 +114,14 @@ class PostalCodeTest(LucteriosTest):
         self.assert_count_equal('COMPONENTS/*', 4)
 
         self.factory.xfer = PostalCodeAdd()
-        self.call('/lucterios.contacts/postalCodeAdd',
-                  {'SAVE': 'YES', 'postal_code': '96999', 'city': 'Trifouilly', 'country': 'LOIN'}, False)
+        self.call('/lucterios.contacts/postalCodeAdd', {'SAVE': 'YES', 'postal_code': '96999', 'city': 'Trifouilly', 'country': 'LOIN'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'postalCodeAdd')
         self.assert_count_equal('CONTEXT/PARAM', 3)
 
         self.factory.xfer = PostalCodeList()
-        self.call('/lucterios.contacts/postalCodeList',
-                  {'filter_postal_code': ''}, False)
+        self.call('/lucterios.contacts/postalCodeList', {'filter_postal_code': ''}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'postalCodeList')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="nb_postalCode"]', "Nombre total de codes postaux: 334", (0, 3, 2, 1))
+        self.assert_attrib_equal('COMPONENTS/GRID[@name="postalCode"]', 'nb_lines', '334')
 
         self.factory.xfer = PostalCodeAdd()
         self.call('/lucterios.contacts/postalCodeAdd',
@@ -179,7 +148,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_count_equal('CONTEXT', 0)
         self.assert_count_equal('ACTIONS/ACTION', 1)
         self.assert_action_equal('ACTIONS/ACTION', ('Fermer', 'images/close.png'))
-        self.assert_count_equal('COMPONENTS/*', 15)
+        self.assert_count_equal('COMPONENTS/*', 12)
         self.assert_coordcomp_equal('COMPONENTS/GRID[@name="function"]', (0, 1, 2, 1, 1))
         self.assert_count_equal('COMPONENTS/GRID[@name="function"]/HEADER', 1)
         self.assert_xml_equal('COMPONENTS/GRID[@name="function"]/HEADER[@name="name"]', "nom")
