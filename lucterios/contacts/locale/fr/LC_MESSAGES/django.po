@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-13 17:04+0000\n"
+"POT-Creation-Date: 2017-11-25 11:24+0000\n"
 "PO-Revision-Date: 2016-01-11 23:12+0000\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgstr "Écrire à tous"
 msgid "model"
 msgstr "modèle"
 
-#: models.py:42 models.py:282 models.py:299 models.py:409
+#: models.py:42 models.py:282 models.py:299 models.py:412
 #: printmodel/LegalEntity_0001.py:38
 msgid "name"
 msgstr "nom"
@@ -125,7 +125,7 @@ msgstr "fonction de personne physique"
 msgid "individual functions"
 msgstr "fonctions de personne physique"
 
-#: models.py:310 models.py:410
+#: models.py:310 models.py:413
 msgid "structure type"
 msgstr "type de structure"
 
@@ -175,119 +175,119 @@ msgstr "courriel"
 msgid "comment"
 msgstr "commentaire"
 
-#: models.py:404
+#: models.py:407
 msgid "generic contact"
 msgstr "contact générique"
 
-#: models.py:405
+#: models.py:408
 msgid "generic contacts"
 msgstr "contacts génériques"
 
-#: models.py:411
+#: models.py:414
 msgid "identify number"
 msgstr "N° SIRET/SIREN"
 
-#: models.py:418 models.py:482 views.py:87 views.py:480
+#: models.py:421 models.py:485 views.py:87 views.py:480
 msgid "001@Identity"
 msgstr "001@Identité"
 
-#: models.py:418
+#: models.py:421
 msgid "002@Members"
 msgstr "002@Membres"
 
-#: models.py:461
+#: models.py:464
 msgid "You cannot delete this legal entity!"
 msgstr "Vous ne pouvez pas supprimer cette structure morale !"
 
-#: models.py:465 models.py:522
+#: models.py:468 models.py:525
 msgid "legal entity"
 msgstr "personne morale"
 
-#: models.py:466
+#: models.py:469
 msgid "legal entities"
 msgstr "personnes morales"
 
-#: models.py:472
+#: models.py:475
 msgid "Man"
 msgstr "Homme"
 
-#: models.py:472
+#: models.py:475
 msgid "Woman"
 msgstr "Femme"
 
-#: models.py:473 printmodel/Individual_0001.py:39
+#: models.py:476 printmodel/Individual_0001.py:39
 msgid "firstname"
 msgstr "prénom"
 
-#: models.py:474 printmodel/Individual_0001.py:39
+#: models.py:477 printmodel/Individual_0001.py:39
 msgid "lastname"
 msgstr "nom"
 
-#: models.py:475
+#: models.py:478
 msgid "user"
 msgstr "utilisateur"
 
-#: models.py:514 models.py:521 views_contacts.py:327
+#: models.py:517 models.py:524 views_contacts.py:327
 msgid "individual"
 msgstr "personne physique"
 
-#: models.py:515
+#: models.py:518
 msgid "individuals"
 msgstr "personnes physiques"
 
-#: models.py:523
+#: models.py:526
 msgid "functions"
 msgstr "fonctions"
 
-#: models.py:524
+#: models.py:527
 msgid "Available functions"
 msgstr "Fonctions disponibles"
 
-#: models.py:524
+#: models.py:527
 msgid "Chosen functions"
 msgstr "Fonctions choisies"
 
-#: models.py:543
+#: models.py:546
 msgid "associate"
 msgstr "associé"
 
-#: models.py:544 views.py:527
+#: models.py:547 views.py:527
 msgid "associates"
 msgstr "associés"
 
-#: models.py:550
+#: models.py:553
 msgid "our detail"
 msgstr "Nos coordonnées"
 
-#: models.py:569
+#: models.py:572
 msgid "contacts-mailtoconfig"
 msgstr "Type d'envoi de courriel"
 
-#: models.py:570
+#: models.py:573
 msgid "contacts-mailtoconfig.0"
 msgstr "A ..."
 
-#: models.py:570
+#: models.py:573
 msgid "contacts-mailtoconfig.1"
 msgstr "Copie à ..."
 
-#: models.py:570
+#: models.py:573
 msgid "contacts-mailtoconfig.2"
 msgstr "Copie caché à ..."
 
-#: models.py:571
+#: models.py:574
 msgid "contacts-createaccount"
 msgstr "Autorisation pour créer un nouveau compte"
 
-#: models.py:572
+#: models.py:575
 msgid "contacts-createaccount.0"
 msgstr "Refusé"
 
-#: models.py:572
+#: models.py:575
 msgid "contacts-createaccount.1"
 msgstr "Créer seulement une personne physique"
 
-#: models.py:572
+#: models.py:575
 msgid "contacts-createaccount.2"
 msgstr "Créer une personne physique & morale"
 

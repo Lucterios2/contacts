@@ -377,7 +377,7 @@ class AbstractContact(LucteriosModel, CustomizeObject):
             if new_item is not None:
                 new_item.set_custom_values(rowdata)
             return new_item
-        except:
+        except Exception:
             logging.getLogger('lucterios.contacts').exception("import_data")
             return None
 
@@ -399,6 +399,9 @@ class AbstractContact(LucteriosModel, CustomizeObject):
         else:
             img = readimage_to_base64(join(dirname(__file__), "static", 'lucterios.contacts', "images", "NoImage.png"))
         return img.decode('ascii')
+
+    def get_ref_contact(self):
+        return self
 
     class Meta(object):
         verbose_name = _('generic contact')
