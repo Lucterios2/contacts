@@ -429,42 +429,57 @@ class AbstractContactDel(XferDelete):
     caption = _("Delete contact")
 
 
+@signal_and_lock.Signal.decorate('situation')
+def situation_contacts(xfer):
+    if not hasattr(xfer, 'add_component'):
+        try:
+            Individual.objects.get(user=xfer.user)
+            return True
+        except Exception:
+            return False
+    else:
+        if not xfer.request.user.is_anonymous():
+            try:
+                current_individual = Individual.objects.get(user=xfer.request.user)
+                row = xfer.get_max_row() + 1
+                lab = XferCompLabelForm('contactsidentity')
+                lab.set_value_as_header(six.text_type(current_individual))
+                lab.set_location(0, row, 4)
+                xfer.add_component(lab)
+                lab = XferCompLabelForm('contactsend')
+                lab.set_value_center('{[hr/]}')
+                lab.set_location(0, row + 1, 4)
+                xfer.add_component(lab)
+                return True
+            except Exception:
+                return False
+
+
 @signal_and_lock.Signal.decorate('summary')
 def summary_contacts(xfer):
-    is_right = WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact')
-    current_individual = None
-    if not xfer.request.user.is_anonymous():
-        try:
-            current_individual = Individual.objects.get(user=xfer.request.user)
+    if not hasattr(xfer, 'add_component'):
+        return WrapAction.is_permission(xfer, 'contacts.change_abstractcontact')
+    else:
+        if WrapAction.is_permission(xfer.request, 'contacts.change_abstractcontact'):
             row = xfer.get_max_row() + 1
-            lab = XferCompLabelForm('contactsidentity')
-            lab.set_value_as_header(six.text_type(current_individual))
+            lab = XferCompLabelForm('contactstitle')
+            lab.set_value_as_infocenter(_("Addresses and contacts"))
             lab.set_location(0, row, 4)
             xfer.add_component(lab)
-        except:
-            current_individual = None
-    if is_right:
-        row = xfer.get_max_row() + 1
-        lab = XferCompLabelForm('contactstitle')
-        lab.set_value_as_infocenter(_("Addresses and contacts"))
-        lab.set_location(0, row, 4)
-        xfer.add_component(lab)
-        nb_legal_entities = len(
-            LegalEntity.objects.all())
-        lbl_doc = XferCompLabelForm('lbl_nblegalentities')
-        lbl_doc.set_location(0, row + 1, 4)
-        lbl_doc.set_value_center(_("Total number of legal entities: %d") % nb_legal_entities)
-        xfer.add_component(lbl_doc)
-        nb_individual = len(Individual.objects.all())
-        lbl_doc = XferCompLabelForm('lbl_nbindividuals')
-        lbl_doc.set_location(0, row + 2, 4)
-        lbl_doc.set_value_center(_("Total number of individuals: %d") % nb_individual)
-        xfer.add_component(lbl_doc)
-    if is_right or (current_individual is not None):
-        lab = XferCompLabelForm('contactsend')
-        lab.set_value_center('{[hr/]}')
-        lab.set_location(0, row + 3, 4)
-        xfer.add_component(lab)
-        return True
-    else:
-        return False
+            nb_legal_entities = len(LegalEntity.objects.all())
+            lbl_doc = XferCompLabelForm('lbl_nblegalentities')
+            lbl_doc.set_location(0, row + 1, 4)
+            lbl_doc.set_value_center(_("Total number of legal entities: %d") % nb_legal_entities)
+            xfer.add_component(lbl_doc)
+            nb_individual = len(Individual.objects.all())
+            lbl_doc = XferCompLabelForm('lbl_nbindividuals')
+            lbl_doc.set_location(0, row + 2, 4)
+            lbl_doc.set_value_center(_("Total number of individuals: %d") % nb_individual)
+            xfer.add_component(lbl_doc)
+            lab = XferCompLabelForm('contactsend')
+            lab.set_value_center('{[hr/]}')
+            lab.set_location(0, row + 3, 4)
+            xfer.add_component(lab)
+            return True
+        else:
+            return False
