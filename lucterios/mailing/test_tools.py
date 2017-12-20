@@ -29,11 +29,11 @@ from threading import Thread
 import asyncore
 import smtpd
 import logging
+import email
 
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.models import Parameter
 from django.test.testcases import TestCase
-import email
 
 
 def decode_b64(data):
