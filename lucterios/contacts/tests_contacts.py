@@ -98,53 +98,53 @@ class ContactsTest(LucteriosTest):
 
     def test_individual(self):
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {}, False)
+        self.calljson('/lucterios.contacts/individualList', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="filter"]', None, (0, 2, 1, 1))
-        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="individual"]', (0, 3, 2, 1))
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_comp_equal(('EDIT', 'filter'), '', (0, 2, 1, 1))
+        self.assert_coordcomp_equal('individual', (0, 3, 2, 1))
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {}, False)
+        self.calljson('/lucterios.contacts/individualAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualAddModify')
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('', 13)
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
-                                                              "comment": 'no comment', "firstname": 'Marie', "lastname": 'DUPOND',
-                                                              "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
-                                                              "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'marie.dupond@worldcompany.com',
-                                                              "genre": "2"}, False)
+        self.calljson('/lucterios.contacts/individualAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
+                                                                  "comment": 'no comment', "firstname": 'Marie', "lastname": 'DUPOND',
+                                                                  "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
+                                                                  "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'marie.dupond@worldcompany.com',
+                                                                  "genre": "2"}, False)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {}, False)
+        self.calljson('/lucterios.contacts/individualList', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {'filter': 'e'}, False)
+        self.calljson('/lucterios.contacts/individualList', {'filter': 'e'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {'filter': 'marie'}, False)
+        self.calljson('/lucterios.contacts/individualList', {'filter': 'marie'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {'filter': 'dupon'}, False)
+        self.calljson('/lucterios.contacts/individualList', {'filter': 'dupon'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {'filter': 'jack'}, False)
+        self.calljson('/lucterios.contacts/individualList', {'filter': 'jack'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {'filter': 'truc'}, False)
+        self.calljson('/lucterios.contacts/individualList', {'filter': 'truc'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+        self.assert_count_equal('individual', 0)
 
     def test_individual_image(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_2.jpg')))
@@ -153,169 +153,167 @@ class ContactsTest(LucteriosTest):
             readimage_to_base64(logo_path, False).decode("utf-8")
 
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "/static/lucterios.contacts/images/NoImage.png")
+        self.assert_json_equal('IMAGE', 'logoimg', "/static/lucterios.contacts/images/NoImage.png")
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify',
-                  {"SAVE": 'YES', 'individual': '2', "uploadlogo": logo_stream}, False)
+        self.calljson('/lucterios.contacts/individualAddModify',
+                      {"SAVE": 'YES', 'individual': '2', "uploadlogo": logo_stream}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'individualAddModify')
         self.assertTrue(exists(get_user_path('contacts', 'Image_2.jpg')))
 
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_xml_equal('COMPONENTS/IMAGE[@name="logoimg"]', "data:image/*;base64,", True)
+        self.assert_json_equal('IMAGE', 'logoimg', "data:image/*;base64,", True)
 
     def test_individual_user(self):
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_count_equal('COMPONENTS/*', 16)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER")
-        self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
+        self.assert_count_equal('', 16)
+        self.assert_json_equal('LABELFORM', 'genre', "Homme")
+        self.assert_json_equal('LABELFORM', 'firstname', "jack")
+        self.assert_json_equal('LABELFORM', 'lastname', "MISTER")
+        self.assert_json_equal('LINK', 'email', "jack@worldcompany.com")
 
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "---", (1, 8, 2, 1, 1))
-        self.assert_coordcomp_equal('COMPONENTS/BUTTON[@name="userbtn"]', (3, 8, 1, 1, 1))
-        self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (
-            None, 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
+        self.assert_comp_equal(('LABELFORM', 'user'), "---", (1, 8, 2, 1, 1))
+        self.assert_coordcomp_equal('userbtn', (3, 8, 1, 1, 1))
+        self.assert_action_equal('#userbtn/action', ('', 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
 
         self.factory.xfer = IndividualUserAdd()
-        self.call('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualUserAdd')
-        self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="username"]', None, (1, 0, 1, 1))
-        self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
-        self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
+        self.assert_count_equal('', 2)
+        self.assert_comp_equal(('EDIT', 'username'), '', (1, 0, 1, 1))
+        self.assertEqual(len(self.json_actions), 2)
+        self.assert_action_equal(self.json_actions[1 - 1], ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
+        self.assert_action_equal(self.json_actions[2 - 1], ('Annuler', 'images/cancel.png'))
 
         self.factory.xfer = IndividualUserValid()
-        self.call('/lucterios.contacts/individualUserValid',
-                  {'individual': '2', 'username': 'jacko'}, False)
+        self.calljson('/lucterios.contacts/individualUserValid',
+                      {'individual': '2', 'username': 'jacko'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'individualUserValid')
-        self.assert_count_equal('CONTEXT/PARAM', 2)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="individual"]', "2")
-        self.assert_xml_equal('CONTEXT/PARAM[@name="username"]', "jacko")
-        self.assert_count_equal('ACTION', 1)
-        self.assert_action_equal('ACTION', ('Ajouter', "images/add.png", "CORE", "usersEdit", 1, 1, 1,
-                                            {"user_actif": "2", "IDENT_READ": "YES"}))
+        self.assertEqual(len(self.json_context), 2)
+        self.assertEqual(self.json_context['individual'], "2")
+        self.assertEqual(self.json_context['username'], "jacko")
+        self.assert_action_equal(self.response_json['action'], ('Ajouter', "images/add.png", "CORE", "usersEdit", 1, 1, 1,
+                                                                {"user_actif": "2", "IDENT_READ": "YES"}))
         self.factory.xfer = UsersEdit()
-        self.call('/CORE/usersEdit', {'individual': '2', 'username':
-                                      'jacko', 'user_actif': '2', 'IDENT_READ': 'YES'}, False)
+        self.calljson('/CORE/usersEdit', {'individual': '2', 'username':
+                                          'jacko', 'user_actif': '2', 'IDENT_READ': 'YES'}, False)
         self.assert_observer('core.custom', 'CORE', 'usersEdit')
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="username"]', "jacko")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="first_name"]', "jack")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="last_name"]', "MISTER")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="email"]', "jack@worldcompany.com")
+        self.assert_json_equal('LABELFORM', 'username', "jacko")
+        self.assert_json_equal('LABELFORM', 'first_name', "jack")
+        self.assert_json_equal('LABELFORM', 'last_name', "MISTER")
+        self.assert_json_equal('LABELFORM', 'email', "jack@worldcompany.com")
 
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="user"]', "jacko", (1, 8, 2, 1, 1))
-        self.assert_action_equal('COMPONENTS/BUTTON[@name="userbtn"]/ACTIONS/ACTION', (None, 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
+        self.assert_comp_equal(('LABELFORM', 'user'), "jacko", (1, 8, 2, 1, 1))
+        self.assert_action_equal('#userbtn/action', ('', 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
 
     def test_individual_search(self):
         fieldnames = Individual.get_search_fields()
         self.assertEqual(14, len(fieldnames))
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
-                                                              "comment": 'no comment', "firstname": 'Marie', "lastname": 'DUPOND',
-                                                              "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
-                                                              "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'marie.dupond@worldcompany.com',
-                                                              "genre": "2"}, False)
+        self.calljson('/lucterios.contacts/individualAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
+                                                                  "comment": 'no comment', "firstname": 'Marie', "lastname": 'DUPOND',
+                                                                  "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
+                                                                  "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'marie.dupond@worldcompany.com',
+                                                                  "genre": "2"}, False)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch', {}, False)
+        self.calljson('/lucterios.contacts/individualSearch', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
-        self.assert_count_equal('COMPONENTS/*', 18)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], '')
+        self.assert_count_equal('', 18)
+        self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch',
-                  {'CRITERIA': 'genre||8||1;2'}, False)
+        self.calljson('/lucterios.contacts/individualSearch',
+                      {'CRITERIA': 'genre||8||1;2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1;2')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'genre||8||1;2')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch',
-                  {'CRITERIA': 'genre||8||1'}, False)
+        self.calljson('/lucterios.contacts/individualSearch',
+                      {'CRITERIA': 'genre||8||1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||1')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'genre||8||1')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch',
-                  {'CRITERIA': 'genre||8||2'}, False)
+        self.calljson('/lucterios.contacts/individualSearch',
+                      {'CRITERIA': 'genre||8||2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'genre||8||2')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'genre||8||2')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch',
-                  {'CRITERIA': 'responsability_set.functions||9||1'}, False)
+        self.calljson('/lucterios.contacts/individualSearch',
+                      {'CRITERIA': 'responsability_set.functions||9||1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'responsability_set.functions||9||1')
-        self.assert_count_equal('COMPONENTS/*', 20)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'responsability_set.functions||9||1')
+        self.assert_count_equal('', 20)
+        self.assert_count_equal('individual', 0)
 
         self.factory.xfer = IndividualSearch()
-        self.call('/lucterios.contacts/individualSearch',
-                  {'CRITERIA': 'user.username||5||empt'}, False)
+        self.calljson('/lucterios.contacts/individualSearch',
+                      {'CRITERIA': 'user.username||5||empt'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'user.username||5||empt')
-        self.assert_count_equal('COMPONENTS/*', 20)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'user.username||5||empt')
+        self.assert_count_equal('', 20)
+        self.assert_count_equal('individual', 0)
 
     def test_individual_listing(self):
         self.factory.xfer = IndividualListing()
-        self.call('/lucterios.contacts/individualListing', {}, False)
+        self.calljson('/lucterios.contacts/individualListing', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_count_equal('COMPONENTS/*', 4)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "3", (1, 1, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assert_count_equal('', 4)
+        self.assert_comp_equal(('LABELFORM', 'lblPrintMode'), "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (1, 0, 1, 1))
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
+        self.assert_comp_equal(('LABELFORM', 'lblMODEL'), "{[b]}modèle{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "3", (1, 1, 1, 1))
+        self.assert_select_equal('MODEL', {3: 'liste'})  # nb=1
+        self.assertEqual(len(self.json_actions), 2)
 
         self.factory.xfer = IndividualListing()
-        self.call('/lucterios.contacts/individualListing',
-                  {'PRINT_MODE': '4', 'MODEL': 3}, False)
+        self.calljson('/lucterios.contacts/individualListing',
+                      {'PRINT_MODE': '4', 'MODEL': 3}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
-        self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['mode'], 4)
+        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 8, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
         self.assertEqual(content_csv[3].strip(), '"prénom";"nom";"adresse";"ville";"tel";"courriel";')
 
         self.factory.xfer = IndividualListing()
-        self.call('/lucterios.contacts/individualListing',
-                  {'PRINT_MODE': '4', 'MODEL': 3, 'filter': 'marie'}, False)
+        self.calljson('/lucterios.contacts/individualListing',
+                      {'PRINT_MODE': '4', 'MODEL': 3, 'filter': 'marie'}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
-        self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['mode'], 4)
+        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
@@ -323,41 +321,41 @@ class ContactsTest(LucteriosTest):
 
     def test_individual_label(self):
         self.factory.xfer = IndividualLabel()
-        self.call('/lucterios.contacts/individualLabel', {}, False)
+        self.calljson('/lucterios.contacts/individualLabel', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_count_equal('COMPONENTS/*', 8)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 1)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblLABEL"]', "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="LABEL"]', "1", (1, 1, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="LABEL"]/CASE', 6)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblFIRSTLABEL"]', "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="FIRSTLABEL"]', "1", (1, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "4", (1, 3, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assert_count_equal('', 8)
+        self.assert_comp_equal(('LABELFORM', 'lblPrintMode'), "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (1, 0, 1, 1))
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
+        self.assert_comp_equal(('LABELFORM', 'lblLABEL'), "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (1, 1, 1, 1))
+        self.assert_select_equal('LABEL', 6)
+        self.assert_comp_equal(('LABELFORM', 'lblFIRSTLABEL'), "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
+        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (1, 2, 1, 1))
+        self.assert_comp_equal(('LABELFORM', 'lblMODEL'), "{[b]}modèle{[/b]}", (0, 3, 1, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "4", (1, 3, 1, 1))
+        self.assert_select_equal('MODEL', {4: 'label'})  # nb=1
+        self.assertEqual(len(self.json_actions), 2)
 
         self.factory.xfer = IndividualLabel()
-        self.call('/lucterios.contacts/individualLabel',
-                  {'PRINT_MODE': '3', 'LABEL': 3, 'FIRSTLABEL': 5, 'MODEL': 4, 'name_filter': 'marie'}, False)
+        self.calljson('/lucterios.contacts/individualLabel',
+                      {'PRINT_MODE': '3', 'LABEL': 3, 'FIRSTLABEL': 5, 'MODEL': 4, 'name_filter': 'marie'}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
-        self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['mode'], 3)
+        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
         self.factory.xfer = IndividualLabel()
-        self.call('/lucterios.contacts/individualLabel',
-                  {'PRINT_MODE': '3', 'LABEL': 2, 'FIRSTLABEL': 4, 'MODEL': 4}, False)
+        self.calljson('/lucterios.contacts/individualLabel',
+                      {'PRINT_MODE': '3', 'LABEL': 2, 'FIRSTLABEL': 4, 'MODEL': 4}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes physiques'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes physiques'))
-        self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['mode'], 3)
+        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_individual_fieldsprint(self):
@@ -392,205 +390,202 @@ class ContactsTest(LucteriosTest):
 
     def test_legalentity(self):
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {}, False)
+        self.calljson('/lucterios.contacts/legalEntityList', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityList')
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="structure_type"]', '0', (0, 2, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="structure_type"]/CASE', 4)
-        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="legal_entity"]', (0, 3, 2, 1))
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.assert_comp_equal(('SELECT', 'structure_type'), '0', (0, 2, 1, 1))
+        self.assert_select_equal('structure_type', {0: None, 1: 'Type A', 2: 'Type B', 3: 'Type C'})  # nb=4
+        self.assert_coordcomp_equal('legal_entity', (0, 3, 2, 1))
+        self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/lucterios.contacts/legalEntityAddModify', {}, False)
+        self.calljson('/lucterios.contacts/legalEntityAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityAddModify')
-        self.assert_count_equal('COMPONENTS/*', 13)
+        self.assert_count_equal('', 13)
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/lucterios.contacts/legalEntityAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
-                                                               "comment": 'no comment', "name": 'truc-muche',
-                                                               "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
-                                                               "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'contact@truc-muche.org',
-                                                               "structure_type": 2}, False)
+        self.calljson('/lucterios.contacts/legalEntityAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
+                                                                   "comment": 'no comment', "name": 'truc-muche',
+                                                                   "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
+                                                                   "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'contact@truc-muche.org',
+                                                                   "structure_type": 2}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'legalEntityAddModify')
 
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
+        self.calljson('/lucterios.contacts/legalEntityList', {}, False)
+        self.assert_count_equal('legal_entity', 2)
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {"structure_type": 1}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
+        self.calljson('/lucterios.contacts/legalEntityList', {"structure_type": 1}, False)
+        self.assert_count_equal('legal_entity', 0)
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {"structure_type": 2}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.calljson('/lucterios.contacts/legalEntityList', {"structure_type": 2}, False)
+        self.assert_count_equal('legal_entity', 1)
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {"structure_type": 3}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 0)
+        self.calljson('/lucterios.contacts/legalEntityList', {"structure_type": 3}, False)
+        self.assert_count_equal('legal_entity', 0)
 
     def test_legalentity_delete(self):
         self.factory.xfer = LegalEntityDel()
-        self.call('/lucterios.contacts/legalEntityDel', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityDel', {'legal_entity': '1'}, False)
         self.assert_observer('core.exception', 'lucterios.contacts', 'legalEntityDel')
-        self.assert_xml_equal("EXCEPTION/MESSAGE", "Vous ne pouvez pas supprimer cette structure morale !")
+        self.assert_json_equal('', 'message', "Vous ne pouvez pas supprimer cette structure morale !")
 
     def test_legalentity_responsability(self):
         self.factory.xfer = LegalEntityShow()
-        self.call(
+        self.calljson(
             '/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer(
             'core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_count_equal('COMPONENTS/*', 15)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/HEADER', 2)
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 0)
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/ACTIONS/ACTION', 4)
+        self.assert_count_equal('', 15)
+        self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
+        self.assert_grid_equal('responsability', {"individual": "personne physique", 'functions': 'fonctions'}, 0)  # nb=2
+        self.assert_count_equal('#responsability/actions', 4)
 
         self.factory.xfer = ResponsabilityAdd()
-        self.call('/lucterios.contacts/responsabilityAdd',
-                  {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/responsabilityAdd',
+                      {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'responsabilityAdd')
-        self.assert_count_equal('COMPONENTS/*', 4)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/HEADER', 5)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/ACTIONS/ACTION', 3)
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
+        self.assert_count_equal('', 4)
+        self.assert_json_equal('LABELFORM', 'legal_entity', "WoldCompany")
+        self.assert_grid_equal('individual', {'firstname': 'prénom', 'lastname': 'nom', 'tel1': 'tel1', 'tel2': 'tel2', 'email': 'courriel'}, 1)  # nb=5
+        self.assert_count_equal('#individual/actions', 3)
+        self.assert_json_equal('', 'individual/@0/id', '2')
 
         self.factory.xfer = ResponsabilityAdd()
-        self.call('/lucterios.contacts/responsabilityAdd',
-                  {'legal_entity': '1', 'name_filter': 'jack'}, False)
+        self.calljson('/lucterios.contacts/responsabilityAdd',
+                      {'legal_entity': '1', 'name_filter': 'jack'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'responsabilityAdd')
-        self.assert_count_equal('COMPONENTS/*', 4)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/HEADER', 5)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/ACTIONS/ACTION', 3)
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
+        self.assert_count_equal('', 4)
+        self.assert_json_equal('LABELFORM', 'legal_entity', "WoldCompany")
+        self.assert_grid_equal('individual', {'firstname': 'prénom', 'lastname': 'nom', 'tel1': 'tel1', 'tel2': 'tel2', 'email': 'courriel'}, 1)  # nb=5
+        self.assert_count_equal("#individual/actions", 3)
+        self.assert_json_equal('', 'individual/@0/id', '2')
 
         self.factory.xfer = ResponsabilityModify()
-        self.call('/lucterios.contacts/responsabilityModify', {'legal_entity': '1', 'individual': '2', "SAVE": "YES"}, False)
+        self.calljson('/lucterios.contacts/responsabilityModify', {'legal_entity': '1', 'individual': '2', "SAVE": "YES"}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'responsabilityModify')
 
         self.factory.xfer = LegalEntityShow()
-        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 1)
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]', 'id', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "MISTER jack")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="functions"]', None)
+        self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
+        self.assert_count_equal('responsability', 1)
+        self.assert_json_equal('', 'responsability/@0/id', '1')
+        self.assert_json_equal('', 'responsability/@0/individual', "MISTER jack")
+        self.assert_json_equal('', 'responsability/@0/functions', '')
 
         self.factory.xfer = ResponsabilityModify()
-        self.call('/lucterios.contacts/responsabilityModify', {'responsability': '1'}, False)
+        self.calljson('/lucterios.contacts/responsabilityModify', {'responsability': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'responsabilityModify')
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="legal_entity"]', "WoldCompany")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="individual"]', "MISTER jack")
-        self.assert_attrib_equal('COMPONENTS/CHECKLIST[@name="functions"]', 'description', "fonctions")
+        self.assert_json_equal('LABELFORM', 'legal_entity', "WoldCompany")
+        self.assert_json_equal('LABELFORM', 'individual', "MISTER jack")
+        self.assert_attrib_equal("functions", 'description', "fonctions")
 
         self.factory.xfer = LegalEntityShow()
-        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 1)
+        self.assert_count_equal('responsability', 1)
 
         self.factory.xfer = ResponsabilityModify()
-        self.call('/lucterios.contacts/responsabilityModify', {'responsability': '1', 'functions': '2;4', "SAVE": "YES"}, False)
+        self.calljson('/lucterios.contacts/responsabilityModify', {'responsability': '1', 'functions': '2;4', "SAVE": "YES"}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'responsabilityModify')
 
         self.factory.xfer = LegalEntityShow()
-        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
-        self.assert_count_equal('COMPONENTS/GRID[@name="responsability"]/RECORD', 1)
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]', 'id', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="individual"]', "MISTER jack")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="responsability"]/RECORD[1]/VALUE[@name="functions"]', "Secretaire{[br/]}Troufion")
+        self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
+        self.assert_count_equal('responsability', 1)
+        self.assert_json_equal('', 'responsability/@0/id', '1')
+        self.assert_json_equal('', 'responsability/@0/individual', "MISTER jack")
+        self.assert_json_equal('', 'responsability/@0/functions', "Secretaire{[br/]}Troufion")
 
     def test_legalentity_search(self):
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/lucterios.contacts/legalEntityAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
-                                                               "comment": 'no comment', "name": 'truc-muche',
-                                                               "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
-                                                               "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'contact@truc-muche.org',
-                                                               "structure_type": 2}, False)
+        self.calljson('/lucterios.contacts/legalEntityAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
+                                                                   "comment": 'no comment', "name": 'truc-muche',
+                                                                   "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-54-87-19-34', "SAVE": 'YES',
+                                                                   "tel1": '09-96-75-15-00', "postal_code": '97250', "email": 'contact@truc-muche.org',
+                                                                   "structure_type": 2}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'legalEntityAddModify')
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/lucterios.contacts/legalEntitySearch', {}, False)
+        self.calljson('/lucterios.contacts/legalEntitySearch', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', None)
-        self.assert_count_equal('COMPONENTS/*', 18)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], '')
+        self.assert_count_equal('', 18)
+        self.assert_count_equal('legal_entity', 2)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/lucterios.contacts/legalEntitySearch',
-                  {'searchSelector': 'name', 'searchOperator': '5', 'searchValueStr': 'truc', 'ACT': 'ADD'}, False)
+        self.calljson('/lucterios.contacts/legalEntitySearch',
+                      {'searchSelector': 'name', 'searchOperator': '5', 'searchValueStr': 'truc', 'ACT': 'ADD'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'name||5||truc')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/lucterios.contacts/legalEntitySearch',
-                  {'searchSelector': 'structure_type', 'searchOperator': '8', 'searchValueList': '2', 'ACT': 'ADD'}, False)
+        self.calljson('/lucterios.contacts/legalEntitySearch',
+                      {'searchSelector': 'structure_type', 'searchOperator': '8', 'searchValueList': '2', 'ACT': 'ADD'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'structure_type||8||2')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/lucterios.contacts/legalEntitySearch',
-                  {'CRITERIA': 'name||5||truc//structure_type||8||2'}, False)
+        self.calljson('/lucterios.contacts/legalEntitySearch',
+                      {'CRITERIA': 'name||5||truc//structure_type||8||2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'name||5||truc//structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 23)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'name||5||truc//structure_type||8||2')
+        self.assert_count_equal('', 23)
+        self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
-        self.call('/lucterios.contacts/legalEntitySearch',
-                  {'CRITERIA': 'name||5||truc//structure_type||8||2', 'ACT': '0'}, False)
+        self.calljson('/lucterios.contacts/legalEntitySearch',
+                      {'CRITERIA': 'name||5||truc//structure_type||8||2', 'ACT': '0'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assert_count_equal('CONTEXT/PARAM', 1)
-        self.assert_xml_equal('CONTEXT/PARAM[@name="CRITERIA"]', 'structure_type||8||2')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 1)
+        self.assertEqual(len(self.json_context), 1)
+        self.assertEqual(self.json_context['CRITERIA'], 'structure_type||8||2')
+        self.assert_count_equal('', 21)
+        self.assert_count_equal('legal_entity', 1)
 
     def test_legalentity_listing(self):
         self.factory.xfer = LegalEntityListing()
-        self.call('/lucterios.contacts/legalEntityListing', {}, False)
+        self.calljson('/lucterios.contacts/legalEntityListing', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_count_equal('COMPONENTS/*', 4)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 2)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "1", (1, 1, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assert_count_equal('', 4)
+        self.assert_comp_equal(('LABELFORM', 'lblPrintMode'), "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (1, 0, 1, 1))
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
+        self.assert_comp_equal(('LABELFORM', 'lblMODEL'), "{[b]}modèle{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "1", (1, 1, 1, 1))
+        self.assert_select_equal('MODEL', {1: 'liste'})  # nb=1
+        self.assertEqual(len(self.json_actions), 2)
 
         self.factory.xfer = LegalEntityListing()
-        self.call('/lucterios.contacts/legalEntityListing',
-                  {'PRINT_MODE': '4', 'MODEL': 1}, False)
+        self.calljson('/lucterios.contacts/legalEntityListing',
+                      {'PRINT_MODE': '4', 'MODEL': 1}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
-        self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['mode'], 4)
+        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 8, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
         self.assertEqual(content_csv[3].strip(), '"nom";"adresse";"ville";"tel";"courriel";')
 
         self.factory.xfer = LegalEntityListing()
-        self.call('/lucterios.contacts/legalEntityListing',
-                  {'PRINT_MODE': '4', 'MODEL': 1, 'structure_type': 2}, False)
+        self.calljson('/lucterios.contacts/legalEntityListing',
+                      {'PRINT_MODE': '4', 'MODEL': 1, 'structure_type': 2}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
-        self.assert_attrib_equal('PRINT', 'mode', '4')
-        csv_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text)).decode("utf-8")
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['mode'], 4)
+        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 7, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
@@ -598,117 +593,113 @@ class ContactsTest(LucteriosTest):
 
     def test_legalentity_label(self):
         self.factory.xfer = LegalEntityLabel()
-        self.call('/lucterios.contacts/legalEntityLabel', {}, False)
+        self.calljson('/lucterios.contacts/legalEntityLabel', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_count_equal('COMPONENTS/*', 8)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblPrintMode"]', "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]', "3", (1, 0, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="PRINT_MODE"]/CASE', 1)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblLABEL"]', "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="LABEL"]', "1", (1, 1, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="LABEL"]/CASE', 6)
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblFIRSTLABEL"]', "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="FIRSTLABEL"]', "1", (1, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/LABELFORM[@name="lblMODEL"]', "{[b]}modèle{[/b]}", (0, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="MODEL"]', "2", (1, 3, 1, 1))
-        self.assert_count_equal('COMPONENTS/SELECT[@name="MODEL"]/CASE', 1)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assert_count_equal('', 8)
+        self.assert_comp_equal(('LABELFORM', 'lblPrintMode'), "{[b]}Type de rapport{[/b]}", (0, 0, 1, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (1, 0, 1, 1))
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
+        self.assert_comp_equal(('LABELFORM', 'lblLABEL'), "{[b]}étiquette{[/b]}", (0, 1, 1, 1))
+        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (1, 1, 1, 1))
+        self.assert_select_equal('LABEL', 6)
+        self.assert_comp_equal(('LABELFORM', 'lblFIRSTLABEL'), "{[b]}N° première étiquette{[/b]}", (0, 2, 1, 1))
+        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (1, 2, 1, 1))
+        self.assert_comp_equal(('LABELFORM', 'lblMODEL'), "{[b]}modèle{[/b]}", (0, 3, 1, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "2", (1, 3, 1, 1))
+        self.assert_select_equal('MODEL', {2: 'label'})  # nb=1
+        self.assertEqual(len(self.json_actions), 2)
 
         self.factory.xfer = LegalEntityLabel()
-        self.call('/lucterios.contacts/legalEntityLabel',
-                  {'PRINT_MODE': '3', 'LABEL': 1, 'FIRSTLABEL': 3, 'MODEL': 2, 'structure_type': 2}, False)
+        self.calljson('/lucterios.contacts/legalEntityLabel',
+                      {'PRINT_MODE': '3', 'LABEL': 1, 'FIRSTLABEL': 3, 'MODEL': 2, 'structure_type': 2}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
-        self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['mode'], 3)
+        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
         self.factory.xfer = LegalEntityLabel()
-        self.call('/lucterios.contacts/legalEntityLabel',
-                  {'PRINT_MODE': '3', 'LABEL': 5, 'FIRSTLABEL': 2, 'MODEL': 2}, False)
+        self.calljson('/lucterios.contacts/legalEntityLabel',
+                      {'PRINT_MODE': '3', 'LABEL': 5, 'FIRSTLABEL': 2, 'MODEL': 2}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityLabel')
-        self.assert_xml_equal('TITLE', six.text_type('Personnes morales'))
-        self.assert_xml_equal('PRINT/TITLE', six.text_type('Personnes morales'))
-        self.assert_attrib_equal('PRINT', 'mode', '3')
-        pdf_value = b64decode(six.text_type(self.get_first_xpath('PRINT').text))
+        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.response_json['print']['mode'], 3)
+        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
         self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
 
     def test_custom_fields(self):
         self.factory.xfer = Configuration()
-        self.call('/lucterios.contacts/configuration', {}, False)
+        self.calljson('/lucterios.contacts/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
-        self.assert_count_equal('COMPONENTS/*', 12)
-        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER', 3)
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="name"]', "nom")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="model_title"]', "modèle")
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/HEADER[@name="kind_txt"]', "type")
-        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 0)
+        self.assert_count_equal('', 12)
+        self.assert_grid_equal('custom_field', {"name": "nom", "model_title": "modèle", "kind_txt": "type"}, 0)  # nb=3
 
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'customFieldAddModify')
-        self.assert_xml_equal('TITLE', 'Ajouter un champ personnalisé')
-        self.assert_count_equal('CONTEXT', 0)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal('ACTIONS/ACTION[1]', ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
-        self.assert_action_equal('ACTIONS/ACTION[2]', ('Annuler', 'images/cancel.png'))
-        self.assert_count_equal('COMPONENTS/*', 9)
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="modelname"]', 'contacts.AbstractContact', (1, 0, 1, 1))
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="name"]', None, (1, 1, 1, 1))
-        self.assert_comp_equal('COMPONENTS/SELECT[@name="kind"]', '0', (1, 2, 1, 1))
-        self.assert_comp_equal('COMPONENTS/CHECK[@name="args_multi"]', '0', (1, 3, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_min"]', '0', (1, 4, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_max"]', '0', (1, 5, 1, 1))
-        self.assert_comp_equal('COMPONENTS/FLOAT[@name="args_prec"]', '0', (1, 6, 1, 1))
-        self.assert_comp_equal('COMPONENTS/EDIT[@name="args_list"]', None, (1, 7, 1, 1))
+        self.assertEqual(self.json_meta['title'], 'Ajouter un champ personnalisé')
+        self.assertEqual(len(self.json_context), 0)
+        self.assertEqual(len(self.json_actions), 2)
+        self.assert_action_equal(self.json_actions[0], ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
+        self.assert_action_equal(self.json_actions[1], ('Annuler', 'images/cancel.png'))
+        self.assert_count_equal('', 9)
+        self.assert_comp_equal(('SELECT', 'modelname'), 'contacts.AbstractContact', (1, 0, 1, 1))
+        self.assert_comp_equal(('EDIT', 'name'), '', (1, 1, 1, 1))
+        self.assert_comp_equal(('SELECT', 'kind'), '0', (1, 2, 1, 1))
+        self.assert_comp_equal(('CHECK', 'args_multi'), '0', (1, 3, 1, 1))
+        self.assert_comp_equal(('FLOAT', 'args_min'), '0', (1, 4, 1, 1))
+        self.assert_comp_equal(('FLOAT', 'args_max'), '0', (1, 5, 1, 1))
+        self.assert_comp_equal(('FLOAT', 'args_prec'), '0', (1, 6, 1, 1))
+        self.assert_comp_equal(('EDIT', 'args_list'), '', (1, 7, 1, 1))
 
     def test_custom_fields_added(self):
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'aaa', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '0', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'aaa', 'modelname': 'contacts.AbstractContact',
+                                                                   'kind': '0', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'bbb', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '1', 'args_multi': 'n', 'args_min': '0', 'args_max': '100', 'args_prec': '0', 'args_list': ''}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'bbb', 'modelname': 'contacts.AbstractContact',
+                                                                   'kind': '1', 'args_multi': 'n', 'args_min': '0', 'args_max': '100', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ccc', 'modelname': 'contacts.AbstractContact',
-                                                               'kind': '2', 'args_multi': 'n', 'args_min': '-10.0', 'args_max': '10.0', 'args_prec': '1', 'args_list': ''}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ccc', 'modelname': 'contacts.AbstractContact',
+                                                                   'kind': '2', 'args_multi': 'n', 'args_min': '-10.0', 'args_max': '10.0', 'args_prec': '1', 'args_list': ''}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ddd', 'modelname': 'contacts.LegalEntity',
-                                                               'kind': '3', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'ddd', 'modelname': 'contacts.LegalEntity',
+                                                                   'kind': '3', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = CustomFieldAddModify()
-        self.call('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'eee', 'modelname': 'contacts.Individual',
-                                                               'kind': '4', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': 'U,V,W,X,Y,Z'}, False)
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'eee', 'modelname': 'contacts.Individual',
+                                                                   'kind': '4', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': 'U,V,W,X,Y,Z'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
 
         self.factory.xfer = Configuration()
-        self.call('/lucterios.contacts/configuration', {}, False)
+        self.calljson('/lucterios.contacts/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
-        self.assert_count_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD', 5)
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="name"]', 'aaa')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[1]/VALUE[@name="kind_txt"]', 'Chaîne')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="name"]', 'bbb')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[2]/VALUE[@name="kind_txt"]', 'Entier [0;100]')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="name"]', 'ccc')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="model_title"]', 'contact générique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[3]/VALUE[@name="kind_txt"]', 'Réel [-10.0;10.0]')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="name"]', 'ddd')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="model_title"]', 'personne morale')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[4]/VALUE[@name="kind_txt"]', 'Booléen')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="name"]', 'eee')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="model_title"]', 'personne physique')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="custom_field"]/RECORD[5]/VALUE[@name="kind_txt"]', 'Sélection (U,V,W,X,Y,Z)')
+        self.assert_count_equal('custom_field', 5)
+        self.assert_json_equal('', 'custom_field/@0/name', 'aaa')
+        self.assert_json_equal('', 'custom_field/@0/model_title', 'contact générique')
+        self.assert_json_equal('', 'custom_field/@0/kind_txt', 'Chaîne')
+        self.assert_json_equal('', 'custom_field/@1/name', 'bbb')
+        self.assert_json_equal('', 'custom_field/@1/model_title', 'contact générique')
+        self.assert_json_equal('', 'custom_field/@1/kind_txt', 'Entier [0;100]')
+        self.assert_json_equal('', 'custom_field/@2/name', 'ccc')
+        self.assert_json_equal('', 'custom_field/@2/model_title', 'contact générique')
+        self.assert_json_equal('', 'custom_field/@2/kind_txt', 'Réel [-10.0;10.0]')
+        self.assert_json_equal('', 'custom_field/@3/name', 'ddd')
+        self.assert_json_equal('', 'custom_field/@3/model_title', 'personne morale')
+        self.assert_json_equal('', 'custom_field/@3/kind_txt', 'Booléen')
+        self.assert_json_equal('', 'custom_field/@4/name', 'eee')
+        self.assert_json_equal('', 'custom_field/@4/model_title', 'personne physique')
+        self.assert_json_equal('', 'custom_field/@4/kind_txt', 'Sélection (U,V,W,X,Y,Z)')
 
     def _initial_custom_values(self):
         initial_values = [{'name': 'aaa', 'modelname': 'contacts.AbstractContact', 'kind': '0', 'args': "{'multi':False, 'min':0, 'max':0, 'prec':0, 'list':[]}"},
@@ -728,84 +719,84 @@ class ContactsTest(LucteriosTest):
         self._initial_custom_values()
 
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', None)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "0")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "0.0")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "U")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_6"]', None)
+        self.assert_count_equal('', 21)
+        self.assert_json_equal('LABELFORM', 'custom_1', '')
+        self.assert_json_equal('LABELFORM', 'custom_2', "0")
+        self.assert_json_equal('LABELFORM', 'custom_3', "0.0")
+        self.assert_json_equal('LABELFORM', 'custom_5', "U")
+        self.assert_json_equal('LABELFORM', 'custom_6', '')
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualAddModify', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualAddModify')
-        self.assert_count_equal('COMPONENTS/*', 18)
-        self.assert_xml_equal('COMPONENTS/EDIT[@name="custom_1"]', None)
-        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_2"]', "0")
-        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_3"]', "0.0")
-        self.assert_xml_equal('COMPONENTS/SELECT[@name="custom_5"]', "0")
-        self.assert_xml_equal('COMPONENTS/MEMO[@name="custom_6"]', None)
+        self.assert_count_equal('', 18)
+        self.assert_json_equal('EDIT', 'custom_1', '')
+        self.assert_json_equal('FLOAT', 'custom_2', "0")
+        self.assert_json_equal('FLOAT', 'custom_3', "0.0")
+        self.assert_json_equal('SELECT', 'custom_5', "0")
+        self.assert_json_equal('MEMO', 'custom_6', '')
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify', {'individual': '2', "SAVE": "YES", "custom_1": 'blabla', "custom_2": "15",
-                                                              "custom_3": "-5.4", "custom_5": "4", "custom_6": "azerty{[br/]}qwerty"}, False)
+        self.calljson('/lucterios.contacts/individualAddModify', {'individual': '2', "SAVE": "YES", "custom_1": 'blabla', "custom_2": "15",
+                                                                  "custom_3": "-5.4", "custom_5": "4", "custom_6": "azerty{[br/]}qwerty"}, False)
 
         self.factory.xfer = IndividualShow()
-        self.call('/lucterios.contacts/individualShow', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', 'blabla')
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "15")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "-5.4")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_5"]', "Y")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_6"]', "azerty{[br/]}qwerty")
+        self.assert_count_equal('', 21)
+        self.assert_json_equal('LABELFORM', 'custom_1', 'blabla')
+        self.assert_json_equal('LABELFORM', 'custom_2', "15")
+        self.assert_json_equal('LABELFORM', 'custom_3', "-5.4")
+        self.assert_json_equal('LABELFORM', 'custom_5', "Y")
+        self.assert_json_equal('LABELFORM', 'custom_6', "azerty{[br/]}qwerty")
 
     def test_custom_fields_legalentity(self):
         self._initial_custom_values()
 
         self.factory.xfer = LegalEntityShow()
-        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_count_equal('COMPONENTS/*', 19)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', None)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "0")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "0.0")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_4"]', "Non")
-        self.assert_count_equal('COMPONENTS/LABELFORM[@name="custom_5"]', 0)
-        self.assert_count_equal('COMPONENTS/LABELFORM[@name="custom_6"]', 0)
+        self.assert_count_equal('', 19)
+        self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
+        self.assert_json_equal('LABELFORM', 'custom_1', '')
+        self.assert_json_equal('LABELFORM', 'custom_2', "0")
+        self.assert_json_equal('LABELFORM', 'custom_3', "0.0")
+        self.assert_json_equal('LABELFORM', 'custom_4', "Non")
+        self.assertFalse("custom_5" in self.json_data.keys())
+        self.assertFalse("custom_6" in self.json_data.keys())
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/lucterios.contacts/legalEntityAddModify',
-                  {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityAddModify',
+                      {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityAddModify')
-        self.assert_count_equal('COMPONENTS/*', 16)
-        self.assert_xml_equal('COMPONENTS/EDIT[@name="custom_1"]', None)
-        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_2"]', "0")
-        self.assert_xml_equal('COMPONENTS/FLOAT[@name="custom_3"]', "0.0")
-        self.assert_xml_equal('COMPONENTS/CHECK[@name="custom_4"]', "0")
+        self.assert_count_equal('', 16)
+        self.assert_json_equal('EDIT', 'custom_1', '')
+        self.assert_json_equal('FLOAT', 'custom_2', "0")
+        self.assert_json_equal('FLOAT', 'custom_3', "0.0")
+        self.assert_json_equal('CHECK', 'custom_4', "0")
 
         self.factory.xfer = LegalEntityAddModify()
-        self.call('/lucterios.contacts/legalEntityAddModify', {'legal_entity': '1', "SAVE": "YES", "custom_1": "n'import quoi", "custom_2": "37",
-                                                               "custom_3": "9.1", "custom_4": "1"}, False)
+        self.calljson('/lucterios.contacts/legalEntityAddModify', {'legal_entity': '1', "SAVE": "YES", "custom_1": "n'import quoi", "custom_2": "37",
+                                                                   "custom_3": "9.1", "custom_4": "1"}, False)
 
         self.factory.xfer = LegalEntityShow()
-        self.call('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
-        self.assert_count_equal('COMPONENTS/*', 19)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="name"]', "WoldCompany")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_1"]', "n'import quoi")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_2"]', "37")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_3"]', "9.1")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="custom_4"]', "Oui")
+        self.assert_count_equal('', 19)
+        self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
+        self.assert_json_equal('LABELFORM', 'custom_1', "n'import quoi")
+        self.assert_json_equal('LABELFORM', 'custom_2', "37")
+        self.assert_json_equal('LABELFORM', 'custom_3', "9.1")
+        self.assert_json_equal('LABELFORM', 'custom_4', "Oui")
 
     def test_custom_fields_printing(self):
         self._initial_custom_values()
 
         self.factory.xfer = IndividualAddModify()
-        self.call('/lucterios.contacts/individualAddModify',
-                  {'individual': '2', "SAVE": "YES", "custom_1": 'boum!', "custom_2": "-67", "custom_3": "9.9", "custom_5": "2", "custom_6": "a{[br/]}z"}, False)
+        self.calljson('/lucterios.contacts/individualAddModify',
+                      {'individual': '2', "SAVE": "YES", "custom_1": 'boum!', "custom_2": "-67", "custom_3": "9.9", "custom_5": "2", "custom_6": "a{[br/]}z"}, False)
 
         print_field_list = Individual.get_all_print_fields()
         self.assertEqual(49, len(print_field_list))
@@ -856,75 +847,74 @@ class ContactsTest(LucteriosTest):
     def test_duplicate_merge(self):
         self._initial_custom_values()
         self.factory.xfer = AbstractContactFindDouble()
-        self.call('/lucterios.contacts/abstractContactFindDouble',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
+        self.calljson('/lucterios.contacts/abstractContactFindDouble',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'abstractContactFindDouble')
-        self.assert_count_equal('COMPONENTS/*', 3)
-        self.assert_coordcomp_equal('COMPONENTS/GRID[@name="individual"]', (0, 1, 2, 1))
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 0)
+        self.assert_count_equal('', 3)
+        self.assert_coordcomp_equal('individual', (0, 1, 2, 1))
+        self.assert_count_equal('individual', 0)
 
         create_jack()
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {}, False)
+        self.calljson('/lucterios.contacts/individualList', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
+        self.assert_count_equal('individual', 2)
 
         self.factory.xfer = AbstractContactFindDouble()
-        self.call('/lucterios.contacts/abstractContactFindDouble',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
+        self.calljson('/lucterios.contacts/abstractContactFindDouble',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'abstractContactFindDouble')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 2)
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[1]', 'id', '2')
-        self.assert_attrib_equal('COMPONENTS/GRID[@name="individual"]/RECORD[2]', 'id', '3')
+        self.assert_count_equal('individual', 2)
+        self.assert_json_equal('', 'individual/@0/id', '2')
+        self.assert_json_equal('', 'individual/@1/id', '3')
 
         self.factory.xfer = ObjectMerge()
-        self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3'}, False)
+        self.calljson('/lucterios.contacts/objectMerge',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
-        self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_count_equal('COMPONENTS/GRID[@name="mrg_object"]/HEADER', 2)
-        self.assert_count_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD', 2)
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="select"]', '1')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="select"]', '0')
+        self.assert_count_equal('', 2)
+        self.assert_grid_equal('mrg_object', {'value': 'désignation', 'select': 'principal?'}, 2)  # nb=2
+        self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
+        self.assert_json_equal('', 'mrg_object/@0/select', '1')
+        self.assert_json_equal('', 'mrg_object/@1/value', 'MISTER jack')
+        self.assert_json_equal('', 'mrg_object/@1/select', '0')
 
         self.factory.xfer = ObjectMerge()
-        self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN', 'mrg_object': '3'}, False)
+        self.calljson('/lucterios.contacts/objectMerge',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN', 'mrg_object': '3'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
-        self.assert_action_equal('ACTION', ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "3"}))
+        self.assert_action_equal(self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": 3}))
 
         self.factory.xfer = ObjectMerge()
-        self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'mrg_object': '3'}, False)
+        self.calljson('/lucterios.contacts/objectMerge',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'mrg_object': '3'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[1]/VALUE[@name="select"]', '0')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="value"]', 'MISTER jack')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="mrg_object"]/RECORD[2]/VALUE[@name="select"]', '1')
+        self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
+        self.assert_json_equal('', 'mrg_object/@0/select', '0')
+        self.assert_json_equal('', 'mrg_object/@1/value', 'MISTER jack')
+        self.assert_json_equal('', 'mrg_object/@1/select', '1')
 
         self.factory.xfer = ObjectMerge()
-        self.call('/lucterios.contacts/objectMerge',
-                  {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
+        self.calljson('/lucterios.contacts/objectMerge',
+                      {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
-        self.assert_action_equal('ACTION', ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
+        self.assert_action_equal(self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
 
         self.factory.xfer = IndividualList()
-        self.call('/lucterios.contacts/individualList', {}, False)
+        self.calljson('/lucterios.contacts/individualList', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualList')
-        self.assert_count_equal('COMPONENTS/GRID[@name="individual"]/RECORD', 1)
+        self.assert_count_equal('individual', 1)
 
         self.factory.xfer = AbstractContactShow()
-        self.call('/lucterios.contacts/abstractContactShow',
-                  {"abstractcontact": "2"}, False)
+        self.calljson('/lucterios.contacts/abstractContactShow',
+                      {"abstractcontact": "2"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'abstractContactShow')
-        self.assert_count_equal('COMPONENTS/*', 21)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="genre"]', "Homme")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="firstname"]', "jack")
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="lastname"]', "MISTER")
-        self.assert_xml_equal('COMPONENTS/LINK[@name="email"]', "jack@worldcompany.com")
+        self.assert_count_equal('', 21)
+        self.assert_json_equal('LABELFORM', 'genre', "Homme")
+        self.assert_json_equal('LABELFORM', 'firstname', "jack")
+        self.assert_json_equal('LABELFORM', 'lastname', "MISTER")
+        self.assert_json_equal('LINK', 'email', "jack@worldcompany.com")
 
     def test_import_contacts(self):
         csv_content = """value;nom;adresse;codePostal;ville;fixe;portable;mail;Num;Type
@@ -937,83 +927,80 @@ class ContactsTest(LucteriosTest):
         self._initial_custom_values()
 
         self.factory.xfer = ContactImport()
-        self.call('/lucterios.contacts/contactImport', {}, False)
+        self.calljson('/lucterios.contacts/contactImport', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('COMPONENTS/*', 7)
-        self.assert_count_equal('ACTIONS/ACTION', 2)
-        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type(
-            'Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '1'}))
+        self.assert_count_equal('', 7)
+        self.assertEqual(len(self.json_actions), 2)
+        self.assert_action_equal(self.json_actions[0], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
 
         self.factory.xfer = ContactImport()
-        self.call('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': '',
-                                                        'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
+        self.calljson('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': '',
+                                                            'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('COMPONENTS/*', 6 + 15)
-        self.assert_attrib_equal('COMPONENTS/SELECT[@name="fld_name"]', 'description', "nom")
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_name"]/CASE', 10)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_structure_type"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_address"]/CASE', 10)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_postal_code"]/CASE', 10)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_city"]/CASE', 10)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_country"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_tel1"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_tel2"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_email"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_comment"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_identify_number"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_custom_1"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_custom_2"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_custom_3"]/CASE', 11)
-        self.assert_count_equal('COMPONENTS/SELECT[@name="fld_custom_4"]/CASE', 11)
+        self.assert_count_equal('', 6 + 15)
+        self.assert_attrib_equal("fld_name", 'description', "nom")
+        self.assert_select_equal('fld_name', 10)  # nb=10
+        self.assert_select_equal('fld_structure_type', 11)  # nb=11
+        self.assert_select_equal('fld_address', 10)  # nb=10
+        self.assert_select_equal('fld_postal_code', 10)  # nb=10
+        self.assert_select_equal('fld_city', 10)  # nb=10
+        self.assert_select_equal('fld_country', 11)  # nb=11
+        self.assert_select_equal('fld_tel1', 11)  # nb=11
+        self.assert_select_equal('fld_tel2', 11)  # nb=11
+        self.assert_select_equal('fld_email', 11)  # nb=11
+        self.assert_select_equal('fld_comment', 11)  # nb=11
+        self.assert_select_equal('fld_identify_number', 11)  # nb=11
+        self.assert_select_equal('fld_custom_1', 11)  # nb=11
+        self.assert_select_equal('fld_custom_2', 11)  # nb=11
+        self.assert_select_equal('fld_custom_3', 11)  # nb=11
+        self.assert_select_equal('fld_custom_4', 11)  # nb=11
         cases_id = []
         cases_val = []
         for case_idx in range(1, 12):
-            xml_value = self.get_first_xpath(
-                'COMPONENTS/SELECT[@name="fld_custom_4"]/CASE[%d]' % case_idx)
-            cases_id.append(xml_value.get('id'))
-            cases_val.append(xml_value.text)
+            json_value = self.get_json_path("#fld_custom_4/case/@%d" % (case_idx - 1))
+            cases_id.append(six.text_type(json_value[0]))
+            cases_val.append(six.text_type(json_value[1]))
         self.assertEqual("|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_id))
-        self.assertEqual("---|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_val))
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/HEADER', 10)
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
-        self.assert_count_equal('ACTIONS/ACTION', 3)
-        self.assert_action_equal('ACTIONS/ACTION[1]', (six.text_type('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '0'}))
-        self.assert_action_equal('ACTIONS/ACTION[2]', (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '2'}))
-        self.assert_count_equal('CONTEXT/PARAM', 8)
+        self.assertEqual("None|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_val))
+        self.assert_grid_equal('CSV', {'value': 'value', 'nom': 'nom', 'adresse': 'adresse', 'codePostal': 'codePostal', 'ville': 'ville', 'fixe': 'fixe', 'portable': 'portable', 'mail': 'mail', 'Num': 'Num', 'Type': 'Type'}, 5)  # nb=10
+        self.assert_count_equal('CSV', 5)
+        self.assert_count_equal('#CSV/actions', 0)
+        self.assertEqual(len(self.json_actions), 3)
+        self.assert_action_equal(self.json_actions[0], (six.text_type('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
+        self.assert_action_equal(self.json_actions[1], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
+        self.assertEqual(len(self.json_context), 8)
 
         self.factory.xfer = ContactImport()
-        self.call('/lucterios.contacts/contactImport', {'step': 2, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
-                                                        'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
-                                                        "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
-                                                        "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
+        self.calljson('/lucterios.contacts/contactImport', {'step': 2, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
+                                                            'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                            "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
+                                                            "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('COMPONENTS/*', 4)
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/HEADER', 9)
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/RECORD', 5)
-        self.assert_count_equal('COMPONENTS/GRID[@name="CSV"]/ACTIONS', 0)
-        self.assert_count_equal('ACTIONS/ACTION', 3)
-        self.assert_action_equal('ACTIONS/ACTION[2]', (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
+        self.assert_count_equal('', 4)
+        self.assert_grid_equal('CSV', {"name": "nom", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "N° SIRET/SIREN", "custom_3": "ccc"}, 5)
+        self.assert_count_equal('#CSV/actions', 0)
+        self.assertEqual(len(self.json_actions), 3)
+        self.assert_action_equal(self.json_actions[2 - 1], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
 
         self.factory.xfer = ContactImport()
-        self.call('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
-                                                        'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
-                                                        "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
-                                                        "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
+        self.calljson('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',
+                                                            'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                            "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
+                                                            "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('COMPONENTS/*', 2)
-        self.assert_xml_equal('COMPONENTS/LABELFORM[@name="result"]', "{[center]}{[i]}4 éléments ont été importés{[/i]}{[/center]}")
-        self.assert_count_equal('ACTIONS/ACTION', 1)
+        self.assert_count_equal('', 2)
+        self.assert_json_equal('LABELFORM', 'result', "{[center]}{[i]}4 éléments ont été importés{[/i]}{[/center]}")
+        self.assertEqual(len(self.json_actions), 1)
 
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 5)
-        self.assert_xml_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD[1]/VALUE[@name="name"]', 'GOC')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD[2]/VALUE[@name="name"]', 'NOJAXU')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD[3]/VALUE[@name="name"]', 'UHADIK')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD[4]/VALUE[@name="name"]', 'USIF')
-        self.assert_xml_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD[5]/VALUE[@name="name"]', 'WoldCompany')
+        self.calljson('/lucterios.contacts/legalEntityList', {}, False)
+        self.assert_count_equal('legal_entity', 5)
+        self.assert_json_equal('', 'legal_entity/@0/name', 'GOC')
+        self.assert_json_equal('', 'legal_entity/@1/name', 'NOJAXU')
+        self.assert_json_equal('', 'legal_entity/@2/name', 'UHADIK')
+        self.assert_json_equal('', 'legal_entity/@3/name', 'USIF')
+        self.assert_json_equal('', 'legal_entity/@4/name', 'WoldCompany')
 
         self.factory.xfer = LegalEntityList()
-        self.call('/lucterios.contacts/legalEntityList', {"structure_type": 2}, False)
-        self.assert_count_equal('COMPONENTS/GRID[@name="legal_entity"]/RECORD', 2)
+        self.calljson('/lucterios.contacts/legalEntityList', {"structure_type": 2}, False)
+        self.assert_count_equal('legal_entity', 2)
