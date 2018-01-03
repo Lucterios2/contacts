@@ -50,7 +50,7 @@ class Configuration(XferContainerCustom):
     def fillresponse(self):
         XferContainerCustom.fillresponse(self)
         self.new_tab(_('EMail configuration'))
-        img = XferCompImage('img')
+        img = XferCompImage('img_conf')
         img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
@@ -69,7 +69,7 @@ class Configuration(XferContainerCustom):
             self.add_component(btn)
 
         self.new_tab(_('Default message'))
-        img = XferCompImage('img')
+        img = XferCompImage('img_msg')
         img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
