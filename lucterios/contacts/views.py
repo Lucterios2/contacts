@@ -434,6 +434,7 @@ class PostalCodeList(XferListEditor):
         self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
+        comp.is_default = True
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 1)
         self.add_component(comp)

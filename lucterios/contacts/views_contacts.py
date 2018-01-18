@@ -216,6 +216,7 @@ class IndividualList(XferListEditor):
         comp.set_value(name_filter)
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(0, 2)
+        comp.is_default = True
         comp.description = _('Filtrer by name')
         self.add_component(comp)
         if name_filter != "":
@@ -314,6 +315,7 @@ class ResponsabilityAdd(XferContainerCustom):
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 2)
         comp.description = _('Filtrer by name')
+        comp.is_default = True
         self.add_component(comp)
         identfilter = []
         if name_filter != "":
