@@ -54,6 +54,8 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         else:
             self.model = apps.get_model(model_current)
         self.field_id = self.model.__name__.lower()
+        if self.field_id == 'legalentity':
+            self.field_id = 'legal_entity'
         self.item = self.model()
         XferSearchEditor.fillresponse(self)
         self.remove_component('title')
