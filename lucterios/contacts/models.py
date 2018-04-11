@@ -336,6 +336,9 @@ class AbstractContact(LucteriosModel, CustomizeObject):
     email = models.EmailField(_('email'), blank=True)
     comment = models.TextField(_('comment'), blank=True)
 
+    def __str__(self):
+        return six.text_type(self.get_final_child())
+
     @classmethod
     def get_default_fields(cls):
         return [(_('contact'), 'str'), 'tel1', 'tel2', 'email']
