@@ -35,14 +35,15 @@ from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAc
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
     TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
     TITLE_LISTING
-from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid
+from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid,\
+    XferCompButton
 from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework import signal_and_lock
 
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, XferPrintLabel
-from lucterios.CORE.views import ObjectMerge
+from lucterios.CORE.views import ObjectMerge, ObjectPromote
 
 from lucterios.contacts.models import LegalEntity, Individual, Responsability, AbstractContact
 
@@ -419,7 +420,22 @@ class AbstractContactShow(XferShowEditor):
     def fillresponse(self, field_id):
         if field_id is not None:
             self.field_id = field_id
-        XferShowEditor.fillresponse(self)
+        if hasattr(self.item, 'abstractcontact_ptr_id'):
+            XferShowEditor.fillresponse(self)
+        else:
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0, 1, 3)
+            self.add_component(img)
+            lbl = XferCompLabelForm('title')
+            lbl.set_value_as_title(_('this contact is inconstitant, you must to be promote it !'))
+            lbl.set_location(1, 0)
+            self.add_component(lbl)
+            btn = XferCompButton('btn_promote')
+            btn.set_location(1, 1)
+            btn.set_action(self.request, ObjectPromote.get_action(_('Promote'), "images/config.png"), modal=FORMTYPE_MODAL,
+                           close=CLOSE_YES, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
+            self.add_component(btn)
 
 
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
