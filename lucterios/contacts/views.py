@@ -205,7 +205,7 @@ def right_create_account(request):
         return False
     if Params.getvalue("contacts-createaccount") == 0:
         return False
-    return not request.user.is_authenticated()
+    return not request.user.is_authenticated
 
 
 @MenuManage.describ(right_create_account, FORMTYPE_MODAL, 'core.general', _("To ask an account"))

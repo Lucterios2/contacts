@@ -362,10 +362,8 @@ class ContactsTest(LucteriosTest):
 
         ourdetails = LegalEntity.objects.get(id=1)
         indiv_jack = Individual.objects.get(id=2)
-        resp = Responsability.objects.create(
-            individual=indiv_jack, legal_entity=ourdetails)
-        resp.functions = Function.objects.filter(
-            id__in=[1, 2])
+        resp = Responsability.objects.create(individual=indiv_jack, legal_entity=ourdetails)
+        resp.functions.set(Function.objects.filter(id__in=[1, 2]))
         resp.save()
 
         print_field_list = Individual.get_all_print_fields()

@@ -456,7 +456,7 @@ def situation_contacts(xfer):
         except Exception:
             return False
     else:
-        if not xfer.request.user.is_anonymous():
+        if not xfer.request.user.is_anonymous:
             try:
                 current_individual = Individual.objects.get(user=xfer.request.user)
                 row = xfer.get_max_row() + 1
