@@ -44,7 +44,6 @@ from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 class PostalCodeTest(LucteriosTest):
 
     def setUp(self):
-        self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
         ourdetails = LegalEntity.objects.get(id=1)
         ourdetails.postal_code = "97400"
@@ -129,7 +128,6 @@ class PostalCodeTest(LucteriosTest):
 class ConfigurationTest(LucteriosTest):
 
     def setUp(self):
-        self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
         change_ourdetail()
         create_jack(add_empty_user())
@@ -177,8 +175,8 @@ class ConfigurationTest(LucteriosTest):
 
     def test_changedetails(self):
         self.factory.xfer = CurrentStructureAddModify()
-        self.calljson('/lucterios.contacts/currentAddModify', {}, False)
-        self.assert_observer('core.custom', 'lucterios.contacts', 'currentAddModify')
+        self.calljson('/lucterios.contacts/currentStructureAddModify', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'currentStructureAddModify')
         self.assertEqual(self.json_meta['title'], six.text_type('Nos coordonnées'))
         self.assert_count_equal('', 12)
         self.assert_comp_equal(('EDIT', 'name'), "WoldCompany", (1, 0, 2, 1))
@@ -194,13 +192,13 @@ class ConfigurationTest(LucteriosTest):
         self.assert_coordcomp_equal('uploadlogo', (1, 18, 2, 1))
 
         self.factory.xfer = CurrentStructureAddModify()
-        self.calljson('/lucterios.contacts/currentAddModify', {"address": 'Rue de la liberté{[newline]}BP 123',
-                                                               "comment": 'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....', "name": 'WorldCompany',
-                                                               "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-01-02-03-04', "SAVE": 'YES',
-                                                               "tel1": '09-87-65-43-21', "postal_code": '97250', "email": 'jack@worldcompany.com',
-                                                               "identify_number": 'AZERTY123DDSQ'}, False)
+        self.calljson('/lucterios.contacts/currentStructureAddModify', {"address": 'Rue de la liberté{[newline]}BP 123',
+                                                                        "comment": 'Big boss: Mr Sylvestre{[newline]}Beuaaaaa....', "name": 'WorldCompany',
+                                                                        "city": 'ST PIERRE', "country": 'MARTINIQUE', "tel2": '06-01-02-03-04', "SAVE": 'YES',
+                                                                        "tel1": '09-87-65-43-21', "postal_code": '97250', "email": 'jack@worldcompany.com',
+                                                                        "identify_number": 'AZERTY123DDSQ'}, False)
         self.assert_observer(
-            'core.acknowledge', 'lucterios.contacts', 'currentAddModify')
+            'core.acknowledge', 'lucterios.contacts', 'currentStructureAddModify')
         self.assertEqual(len(self.json_context), 10)
 
         self.factory.xfer = CurrentStructure()
@@ -234,9 +232,9 @@ class ConfigurationTest(LucteriosTest):
             readimage_to_base64(logo_path, False).decode("utf-8")
 
         self.factory.xfer = CurrentStructureAddModify()
-        self.calljson('/lucterios.contacts/currentAddModify',
+        self.calljson('/lucterios.contacts/currentStructureAddModify',
                       {"SAVE": 'YES', "uploadlogo": logo_stream}, False)
-        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'currentAddModify')
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'currentStructureAddModify')
         self.assertTrue(exists(get_user_path('contacts', 'Image_1.jpg')))
 
         self.factory.xfer = CurrentStructure()

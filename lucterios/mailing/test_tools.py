@@ -42,7 +42,7 @@ def decode_b64(data):
     return decoded.decode('utf-8')
 
 
-def configSMTP(server, port, security=0, user='', passwd=''):
+def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batchsize=20):
     param = Parameter.objects.get(name='mailing-smtpserver')
     param.value = server
     param.save()
@@ -57,6 +57,12 @@ def configSMTP(server, port, security=0, user='', passwd=''):
     param.save()
     param = Parameter.objects.get(name='mailing-smtppass')
     param.value = passwd
+    param.save()
+    param = Parameter.objects.get(name='mailing-delay-batch')
+    param.value = "%.1f" % batchtime
+    param.save()
+    param = Parameter.objects.get(name='mailing-nb-by-batch')
+    param.value = "%.d" % batchsize
     param.save()
     Params.clear()
 

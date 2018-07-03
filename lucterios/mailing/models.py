@@ -23,30 +23,36 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
+from datetime import date
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.apps import apps
 from django_fsm import FSMIntegerField, transition
 
-from lucterios.framework.models import LucteriosModel
+from lucterios.framework.models import LucteriosModel, LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.tools import toHtml
-from lucterios.mailing.functions import will_mail_send, send_email
-from datetime import date
-from lucterios.contacts.models import AbstractContact
-from lucterios.CORE.models import Parameter
 from lucterios.framework.signal_and_lock import Signal
+from lucterios.CORE.models import Parameter
+from lucterios.contacts.models import AbstractContact
+from lucterios.documents.models import Document
+from lucterios.mailing.functions import will_mail_send, send_email
+import json
+from lucterios.CORE.parameters import Params
+from django.utils import six
 
 
 class Message(LucteriosModel):
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
-    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close'))))
+    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close')), (2, _('sending'))))
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
-    contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_(
-        'contact'), null=True, on_delete=models.SET_NULL)
+    contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
+    email_to_send = models.TextField(_('email to send'), default="")
+    email_sent = models.TextField(_('email sent'), default="")
+    documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
 
     @classmethod
     def get_default_fields(cls):
@@ -101,22 +107,52 @@ class Message(LucteriosModel):
     def valid(self):
         self.date = date.today()
 
-    def send_email(self):
-        nb_sent, nb_failed = 0, 0
+    transitionname__sending = _("Emails")
+
+    @transition(field=status, source=1, target=2, conditions=[lambda item:will_mail_send()])
+    def sending(self):
         if will_mail_send():
+            email_list = [contact.email for contact in self.get_contacts() if contact.email != '']
+            self.email_to_send = "\n".join(email_list)
+            self.email_sent = "[]"
+            self.save()
+            add_mailing_in_scheduler(check_nb=False)
+        return
+
+    def sendemail(self, nb_to_send):
+        if will_mail_send() and (self.status == 2):
+            email_list = self.email_to_send.split("\n")
+            email_status = json.loads(self.email_sent)
             email_content = "<html><body>%s</body></html>" % toHtml(self.body)
-            for contact in self.get_contacts():
-                if contact.email != '':
-                    try:
-                        send_email(
-                            [contact.email], self.subject, email_content)
-                        nb_sent += 1
-                    except:
-                        nb_failed += 1
-        return nb_sent, nb_failed
+            for email in email_list[:nb_to_send]:
+                try:
+                    send_email([email], self.subject, email_content)
+                    email_status.append([email, True])
+                except Exception:
+                    email_status.append([email, False])
+            self.email_to_send = "\n".join(email_list[nb_to_send:])
+            self.email_sent = json.dumps(email_status)
+            if self.email_to_send == '':
+                self.status = 1
+            self.save()
+        return
 
     class Meta(object):
         pass
+
+
+def send_mailing_in_waiting():
+    msg_list = Message.objects.filter(status=2)
+    if len(msg_list) == 0:
+        LucteriosScheduler.remove(send_mailing_in_waiting)
+    else:
+        for msg_item in msg_list:
+            msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'))
+
+
+def add_mailing_in_scheduler(check_nb=True):
+    if not check_nb or (Message.objects.filter(status=2).count() > 0):
+        LucteriosScheduler.add_task(send_mailing_in_waiting, minutes=Params.getvalue('mailing-delay-batch'))
 
 
 @Signal.decorate('checkparam')
@@ -135,3 +171,5 @@ def mailing_checkparam():
 User:%(username)s
 Password:%(password)s
 '''))
+    Parameter.check_and_create(name='mailing-delay-batch', typeparam=2, title=_("mailing-delay-batch"), args="{'Min': 0.1, 'Max': 120, 'Prec': 1}", value='15')
+    Parameter.check_and_create(name='mailing-nb-by-batch', typeparam=1, title=_("mailing-nb-by-batch"), args="{'Min': 1, 'Max': 100}", value='10')

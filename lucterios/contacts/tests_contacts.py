@@ -80,7 +80,6 @@ def create_jack(empty_user=None):
 class ContactsTest(LucteriosTest):
 
     def setUp(self):
-        self.xfer_class = XferContainerAcknowledge
         LucteriosTest.setUp(self)
         change_ourdetail()
         rmtree(get_user_dir(), True)
@@ -868,9 +867,9 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('', 'individual/@1/id', '3')
 
         self.factory.xfer = ObjectMerge()
-        self.calljson('/lucterios.contacts/objectMerge',
+        self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3'}, False)
-        self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
+        self.assert_observer('core.custom', 'CORE', 'objectMerge')
         self.assert_count_equal('', 2)
         self.assert_grid_equal('mrg_object', {'value': 'désignation', 'select': 'principal?'}, 2)  # nb=2
         self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
@@ -879,24 +878,24 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('', 'mrg_object/@1/select', '0')
 
         self.factory.xfer = ObjectMerge()
-        self.calljson('/lucterios.contacts/objectMerge',
+        self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN', 'mrg_object': '3'}, False)
-        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
+        self.assert_observer('core.acknowledge', 'CORE', 'objectMerge')
         self.assert_action_equal(self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": 3}))
 
         self.factory.xfer = ObjectMerge()
-        self.calljson('/lucterios.contacts/objectMerge',
+        self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'mrg_object': '3'}, False)
-        self.assert_observer('core.custom', 'lucterios.contacts', 'objectMerge')
+        self.assert_observer('core.custom', 'CORE', 'objectMerge')
         self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
         self.assert_json_equal('', 'mrg_object/@0/select', '0')
         self.assert_json_equal('', 'mrg_object/@1/value', 'MISTER jack')
         self.assert_json_equal('', 'mrg_object/@1/select', '1')
 
         self.factory.xfer = ObjectMerge()
-        self.calljson('/lucterios.contacts/objectMerge',
+        self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
-        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'objectMerge')
+        self.assert_observer('core.acknowledge', 'CORE', 'objectMerge')
         self.assert_action_equal(self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
 
         self.factory.xfer = IndividualList()

@@ -91,21 +91,6 @@ class MessageLetter(XferPrintReporting):
         return items
 
 
-@ActionsManage.affect_show(_("Emails"), "lucterios.mailing/images/email.png", condition=lambda xfer: (xfer.item.status == 1) and will_mail_send())
-@MenuManage.describ('mailing.add_message')
-class MessageEmail(XferContainerAcknowledge):
-    icon = "mailing.png"
-    model = Message
-    field_id = 'message'
-    caption = _("Send message")
-
-    def fillresponse(self):
-        if self.confirme(_("Do you want to sent this message?")):
-            nb_sent, nb_failed = self.item.send_email()
-            self.message(
-                _("Message sent to %(nbsent)d contact.{[br/]}Failure to %(nbfailed)d contacts.") % {'nbsent': nb_sent, 'nbfailed': nb_failed})
-
-
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('mailing.delete_message')
 class MessageDel(XferDelete):

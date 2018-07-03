@@ -6,7 +6,7 @@
 	<property name="project.name" value="lucterios" />
 	<property name="project.packname" value="lucterios_contacts.egg-info" />
 	<property name="project.pythonpath" value="${standard.path}:${core.path}:${env.PYTHONPATH}" />
-	<property name="project.modules" value="lucterios.contacts,lucterios.mailing" />
+	<property name="project.modules" value="lucterios.contacts,lucterios.mailing,lucterios.documents" />
 	<property name="project.appli" value="lucterios.standard" />
 	<property name="project.test.source" value="lucterios,${core.path}/lucterios" />
 	<property name="project.test.omit" value="${core.path}/lucterios/install/*" />
