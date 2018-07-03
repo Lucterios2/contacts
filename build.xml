@@ -1,11 +1,12 @@
 <project name="Lucterios2.contacts" default="all" basedir=".">
 	<property name="standard.path" value="${basedir}/../lct-standard" />
 	<property name="core.path" value="${basedir}/../lct-core" />
+	<property name="document.path" value="${basedir}/../lct-documents" />
 	<property name="project.packagepath" value="lucterios/contacts,lucterios/mailing" />
 	<property name="project.packagename" value="lucterios.contacts lucterios.mailing" />
 	<property name="project.name" value="lucterios" />
 	<property name="project.packname" value="lucterios_contacts.egg-info" />
-	<property name="project.pythonpath" value="${standard.path}:${core.path}:${env.PYTHONPATH}" />
+	<property name="project.pythonpath" value="${standard.path}:${core.path}:${document.path}:${env.PYTHONPATH}" />
 	<property name="project.modules" value="lucterios.contacts,lucterios.mailing,lucterios.documents" />
 	<property name="project.appli" value="lucterios.standard" />
 	<property name="project.test.source" value="lucterios,${core.path}/lucterios" />
