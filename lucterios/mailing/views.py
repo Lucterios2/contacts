@@ -56,7 +56,8 @@ class Configuration(XferContainerCustom):
         self.add_component(img)
 
         conf_params = ['mailing-smtpserver', 'mailing-smtpport',
-                       'mailing-smtpsecurity', 'mailing-smtpuser', 'mailing-smtppass']
+                       'mailing-smtpsecurity', 'mailing-smtpuser', 'mailing-smtppass',
+                       'mailing-delay-batch', 'mailing-nb-by-batch']
         Params.fill(self, conf_params, 1, 1)
         btn = XferCompButton('editparam')
         btn.set_location(3, 1, 1, 5)

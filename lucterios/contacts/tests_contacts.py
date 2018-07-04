@@ -62,16 +62,17 @@ def change_ourdetail():
     ourdetails.save()
 
 
-def create_jack(empty_user=None):
+def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email=True):
     empty_contact = Individual()
-    empty_contact.firstname = "jack"
-    empty_contact.lastname = "MISTER"
+    empty_contact.firstname = firstname
+    empty_contact.lastname = lastname
     empty_contact.address = "rue de la liberté"
     empty_contact.postal_code = "97250"
     empty_contact.city = "LE PRECHEUR"
     empty_contact.country = "MARTINIQUE"
     empty_contact.tel2 = "02-78-45-12-95"
-    empty_contact.email = "jack@worldcompany.com"
+    if with_email:
+        empty_contact.email = "%s@worldcompany.com" % firstname
     empty_contact.user = empty_user
     empty_contact.save()
     return empty_contact

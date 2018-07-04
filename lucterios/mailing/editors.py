@@ -28,7 +28,13 @@ from django.utils.translation import ugettext as _
 
 from lucterios.framework.editors import LucteriosEditor
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompGrid
-from lucterios.framework.tools import ActionsManage, SELECT_NONE, FORMTYPE_MODAL, SELECT_SINGLE
+from lucterios.mailing.functions import will_mail_send
+from lucterios.documents.models import Document
+from lucterios.documents.views import DocumentShow
+from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE,\
+    SELECT_NONE, SELECT_MULTI
+from lucterios.framework.xferadvance import TITLE_EDIT
+from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc
 
 
 class MessageEditor(LucteriosEditor):
@@ -40,10 +46,11 @@ class MessageEditor(LucteriosEditor):
         return LucteriosEditor.edit(self, xfer)
 
     def show(self, xfer):
-        xfer.move_components('lbl_body', 0, 2)
+        xfer.move_components('subject', 0, 2)
         xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
+        new_recipients.description = obj_recipients.description
         new_recipients.set_location(obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
         new_recipients.add_header("model", _('model'))
         new_recipients.add_header("filter", _('filter'))
@@ -52,17 +59,32 @@ class MessageEditor(LucteriosEditor):
             new_recipients.set_value(compid, "model", model_title)
             new_recipients.set_value(compid, "filter", filter_desc)
             compid += 1
-        if compid > 0:
-            nb_contact = len(self.item.get_contacts())
-            contact_nb = XferCompLabelForm('contact_nb')
-            contact_nb.set_location(obj_recipients.col, obj_recipients.row + 1, obj_recipients.colspan)
-            contact_nb.set_value(_("Message defined for %d contacts") % nb_contact)
-            xfer.add_component(contact_nb)
-        lbl = XferCompLabelForm('sep_body')
-        lbl.set_location(obj_recipients.col - 1, obj_recipients.row + 2, 4)
-        lbl.set_value("{[hr/]}")
-        xfer.add_component(lbl)
+        if compid == 0:
+            xfer.remove_component('contact_nb')
+        if not will_mail_send() or (len(self.item.get_contacts(False)) == 0):
+            xfer.remove_component('contact_noemail')
         xfer.remove_component('recipients')
         new_recipients.add_action_notified(xfer, 'recipient_list')
         xfer.add_component(new_recipients)
+
+        old_documents = xfer.get_components('documents')
+        xfer.remove_component('documents')
+        new_documents = XferCompGrid('document')
+        new_documents.description = old_documents.description
+        new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
+        new_documents.set_model(self.item.documents.all(), ["name", "description", "date_modification"], xfer)
+        new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
+                                 modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
+        if self.item.status == 0:
+            new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png"),
+                                     modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_MULTI)
+            new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), "images/add.png"),
+                                     modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
+        xfer.add_component(new_documents)
+
+        lbl = XferCompLabelForm('sep_body')
+        lbl.set_location(old_documents.col, old_documents.row + 1, 2)
+        lbl.set_value("{[hr/]}")
+        xfer.add_component(lbl)
+
         return LucteriosEditor.show(self, xfer)

@@ -23,30 +23,30 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
-from datetime import date
+from datetime import date, datetime
+import json
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.apps import apps
 from django_fsm import FSMIntegerField, transition
+from django.utils import six, formats, timezone
 
 from lucterios.framework.models import LucteriosModel, LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.tools import toHtml
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
+from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import Document
 from lucterios.mailing.functions import will_mail_send, send_email
-import json
-from lucterios.CORE.parameters import Params
-from django.utils import six
 
 
 class Message(LucteriosModel):
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
-    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('close')), (2, _('sending'))))
+    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('valided')), (2, _('sending'))))
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
@@ -60,7 +60,18 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_show_fields(cls):
-        return [('status', 'date'), 'subject', 'recipients', 'body']
+        return [('status', 'date'), 'recipients',
+                ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
+                'documents', 'subject', 'body']
+
+    @property
+    def contact_nb(self):
+        return len(self.get_contacts())
+
+    @property
+    def contact_noemail(self):
+        no_emails = self.get_contacts(False)
+        return '{[br/]}'.join([six.text_type(no_email) for no_email in no_emails])
 
     @classmethod
     def get_edit_fields(cls):
@@ -76,10 +87,13 @@ class Message(LucteriosModel):
                 modelname, criteria = item.split(' ')
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
-    def get_contacts(self):
+    def get_contacts(self, email=None):
         id_list = []
         for modelname, item in self.get_recipients():
-            for contact in apps.get_model(modelname).objects.filter(item[0]):
+            contact_filter = item[0]
+            if email is not None:
+                contact_filter &= ~models.Q(email='') if email else models.Q(email='')
+            for contact in apps.get_model(modelname).objects.filter(contact_filter):
                 id_list.append(contact.id)
         return AbstractContact.objects.filter(id__in=id_list)
 
@@ -112,9 +126,9 @@ class Message(LucteriosModel):
     @transition(field=status, source=1, target=2, conditions=[lambda item:will_mail_send()])
     def sending(self):
         if will_mail_send():
-            email_list = [contact.email for contact in self.get_contacts() if contact.email != '']
+            email_list = [contact.email for contact in self.get_contacts(True)]
             self.email_to_send = "\n".join(email_list)
-            self.email_sent = "[]"
+            self.email_sent = json.dumps({'begin': timezone.now().strftime('%Y-%m-%d %H:%M:%S'), 'sent': []})
             self.save()
             add_mailing_in_scheduler(check_nb=False)
         return
@@ -124,24 +138,52 @@ class Message(LucteriosModel):
             email_list = self.email_to_send.split("\n")
             email_status = json.loads(self.email_sent)
             email_content = "<html><body>%s</body></html>" % toHtml(self.body)
+            files = []
+            for doc in self.documents.all():
+                files.append((doc.name, doc.content))
             for email in email_list[:nb_to_send]:
                 try:
-                    send_email([email], self.subject, email_content)
-                    email_status.append([email, True])
-                except Exception:
-                    email_status.append([email, False])
+                    send_email([email], self.subject, email_content, files=files if len(files) > 0 else None)
+                    email_status['sent'].append([email, True, ''])
+                except Exception as error:
+                    email_status['sent'].append([email, False, six.text_type(error)])
             self.email_to_send = "\n".join(email_list[nb_to_send:])
-            self.email_sent = json.dumps(email_status)
             if self.email_to_send == '':
                 self.status = 1
+                email_status['end'] = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.email_sent = json.dumps(email_status)
             self.save()
         return
+
+    def get_email_status(self):
+        if not hasattr(self, '_email_status'):
+            self._email_status = json.loads(self.email_sent)
+        return self._email_status
+
+    @property
+    def date_begin(self):
+        if 'begin' in self.get_email_status():
+            return formats.date_format(datetime.strptime(self.get_email_status()['begin'], '%Y-%m-%d %H:%M:%S'), "DATETIME_FORMAT")
+        return '---'
+
+    @property
+    def date_end(self):
+        if 'end' in self.get_email_status():
+            return formats.date_format(datetime.strptime(self.get_email_status()['end'], '%Y-%m-%d %H:%M:%S'), "DATETIME_FORMAT")
+        return '---'
+
+    @property
+    def sent_report(self):
+        if 'sent' in self.get_email_status():
+            return self.get_email_status()['sent']
+        return []
 
     class Meta(object):
         pass
 
 
 def send_mailing_in_waiting():
+    '''Mailing'''
     msg_list = Message.objects.filter(status=2)
     if len(msg_list) == 0:
         LucteriosScheduler.remove(send_mailing_in_waiting)
