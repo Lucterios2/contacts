@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-04 21:01+0000\n"
+"POT-Creation-Date: 2018-07-05 20:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,52 +109,51 @@ msgstr "Valid"
 msgid "Emails"
 msgstr "Emails"
 
-#: models.py:199
+#: models.py:202
 msgid "mailing-smtpserver"
 msgstr "SMTP Server"
 
-#: models.py:200
+#: models.py:203
 msgid "mailing-smtpport"
 msgstr "SMTP port"
 
-#: models.py:202
+#: models.py:205
 msgid "mailing-smtpsecurity"
 msgstr "SMTP security"
 
-#: models.py:203
+#: models.py:206
 msgid "mailing-smtpsecurity.0"
 msgstr "None"
 
-#: models.py:203
+#: models.py:206
 msgid "mailing-smtpsecurity.1"
 msgstr "StartTLS"
 
-#: models.py:203
+#: models.py:206
 msgid "mailing-smtpsecurity.2"
 msgstr "SSL/TLS"
 
-#: models.py:205
+#: models.py:208
 msgid "mailing-smtpuser"
 msgstr "SMTP user"
 
-#: models.py:207
+#: models.py:210
 msgid "mailing-smtppass"
 msgstr "SMTP pass"
 
-#: models.py:208
+#: models.py:211
 msgid "mailing-msg-connection"
 msgstr "Connection confirmation message"
 
-#: models.py:209
+#: models.py:212
 #, python-format
 msgid ""
-"Connection confirmation to your application:\n"
-"User:%(username)s\n"
-"Password:%(password)s\n"
+"Connection confirmation to your application:{[br/]} - User:"
+"%(username)s{[br/]} - Password:%(password)s{[br/]}"
 msgstr ""
-"Connection confirmation to your application:\n"
-"User:%(username)s\n"
-"Password:%(password)s\n"
+"Welcome{[br/]}{[br/]}Connection confirmation to your application:{[br/]} - "
+"User:%(username)s{[br/]} - Password:%(password)s{[br/]}{[br/]}Best "
+"regards{[br/]}"
 
 #: models.py:213
 msgid "mailing-delay-batch"

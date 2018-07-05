@@ -111,6 +111,8 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
 
 def send_connection_by_email(recipients, alias, passwd):
     subject = _("Connection password")
-    msg_connection = Params.getvalue(
-        'mailing-msg-connection').replace('{[newline]}', '\n') % {'username': alias, 'password': passwd}
+    message = Params.getvalue('mailing-msg-connection') % {'username': alias, 'password': passwd}
+    msg_connection = "<html>"
+    msg_connection += message.replace('{[newline]}', '<br/>').replace('{[', '<').replace(']}', '>')
+    msg_connection += "</html>"
     send_email(recipients, subject, msg_connection)
