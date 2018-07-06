@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext as _
 
 from lucterios.framework.editors import LucteriosEditor
-from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompGrid
+from lucterios.framework.xfercomponents import XferCompGrid
 from lucterios.mailing.functions import will_mail_send
 from lucterios.documents.models import Document
 from lucterios.documents.views import DocumentShow
@@ -46,11 +46,10 @@ class MessageEditor(LucteriosEditor):
         return LucteriosEditor.edit(self, xfer)
 
     def show(self, xfer):
-        xfer.move_components('subject', 0, 2)
         xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
-        new_recipients.description = obj_recipients.description
+        new_recipients.tab = obj_recipients.tab
         new_recipients.set_location(obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
         new_recipients.add_header("model", _('model'))
         new_recipients.add_header("filter", _('filter'))
@@ -65,12 +64,13 @@ class MessageEditor(LucteriosEditor):
             xfer.remove_component('contact_noemail')
         xfer.remove_component('recipients')
         new_recipients.add_action_notified(xfer, 'recipient_list')
+        xfer.tab = new_recipients.tab
         xfer.add_component(new_recipients)
 
         old_documents = xfer.get_components('documents')
         xfer.remove_component('documents')
         new_documents = XferCompGrid('document')
-        new_documents.description = old_documents.description
+        new_documents.tab = old_documents.tab
         new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
         new_documents.set_model(self.item.documents.all(), ["name", "description", "date_modification"], xfer)
         new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
@@ -80,11 +80,7 @@ class MessageEditor(LucteriosEditor):
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_MULTI)
             new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), "images/add.png"),
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
+        xfer.tab = new_documents.tab
         xfer.add_component(new_documents)
-
-        lbl = XferCompLabelForm('sep_body')
-        lbl.set_location(old_documents.col, old_documents.row + 1, 2)
-        lbl.set_value("{[hr/]}")
-        xfer.add_component(lbl)
 
         return LucteriosEditor.show(self, xfer)

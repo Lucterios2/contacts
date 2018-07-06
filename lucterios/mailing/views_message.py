@@ -18,8 +18,7 @@ from lucterios.CORE.xferprint import XferPrintReporting
 from lucterios.contacts.tools import ContactSelection
 
 from lucterios.mailing.models import Message, add_mailing_in_scheduler
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm,\
-    XferCompGrid, XferCompCheck
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck
 from lucterios.documents.models import Document
 from lucterios.documents.views import DocumentSearch
 
@@ -97,7 +96,7 @@ class MessageTransition(XferTransition):
             XferTransition.fill_confirm(self, transition, trans)
 
 
-@ActionsManage.affect_show(_("Info"), "images/info.png", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.email_sent != '')
+@ActionsManage.affect_show(_("Info"), "images/info.png", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.emailsent_set.count() > 0)
 @MenuManage.describ('mailing.change_message')
 class MessageSentInfo(XferContainerCustom):
     icon = "mailing.png"
@@ -105,7 +104,7 @@ class MessageSentInfo(XferContainerCustom):
     field_id = 'message'
     caption = _("Transmission report")
 
-    def fillresponse(self, show_error=False, show_only_failed=True):
+    def fillresponse(self, show_only_failed=False):
         img = XferCompImage('img')
         img.set_value(self.icon_path())
         img.set_location(0, 0, 1, 6)
@@ -115,45 +114,15 @@ class MessageSentInfo(XferContainerCustom):
         begin.set_value_as_title(_('Transmission report'))
         self.add_component(begin)
 
-        begin = XferCompLabelForm('begin')
-        begin.set_location(1, 1)
-        begin.set_value(self.item.date_begin)
-        begin.description = _('date begin of send')
-        self.add_component(begin)
-        begin = XferCompLabelForm('end')
-        begin.set_location(2, 1)
-        begin.set_value(self.item.date_end)
-        begin.description = _('date end of send')
-        self.add_component(begin)
-
-        grid = XferCompGrid('report')
-        grid.no_pager = True
-        grid.add_header('email', _('email'))
-        grid.add_header('sended', _('sended'), htype='bool')
-        if show_error:
-            grid.add_header('error', _('error'))
-        idreport = 0
-        for email, sended, error in self.item.sent_report:
-            if not show_only_failed or not sended:
-                idreport += 1
-                grid.set_value(idreport, 'email', email)
-                grid.set_value(idreport, 'sended', sended)
-                if show_error:
-                    grid.set_value(idreport, 'error', error)
-        grid.set_location(1, 2, 2)
-        grid.set_size(200, 500)
-        self.add_component(grid)
-        check = XferCompCheck('show_error')
-        check.set_value(show_error)
-        check.description = _('Show sent error')
-        check.set_location(1, 3)
-        check.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
-        self.add_component(check)
+        self.filltab_from_model(1, 1, True, [((_('date begin of send'), 'date_begin'), (_('date end of send'), 'date_end')), ('emailsent_set',)])
+        if not show_only_failed:
+            grid = self.get_components('emailsent')
+            grid.delete_header('error')
 
         check = XferCompCheck('show_only_failed')
         check.set_value(show_only_failed)
         check.description = _('Show only failed')
-        check.set_location(2, 3)
+        check.set_location(1, 3, 2)
         check.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(check)
 

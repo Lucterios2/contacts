@@ -51,18 +51,39 @@ class Message(LucteriosModel):
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
     email_to_send = models.TextField(_('email to send'), default="")
-    email_sent = models.TextField(_('email sent'), default="")
     documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
+
+    def __init__(self, *args, **kwargs):
+        LucteriosModel.__init__(self, *args, **kwargs)
+        self._show_only_failed = False
+
+    def set_context(self, xfer):
+        self._show_only_failed = xfer.getparam('show_only_failed', False)
+
+    @property
+    def emailsent_query(self):
+        if self._show_only_failed:
+            return models.Q(success=False)
+        else:
+            return models.Q()
 
     @classmethod
     def get_default_fields(cls):
-        return ['status', 'date', 'subject']
+        return ['status', 'date', 'subject', (_('number of contacts'), 'contact_nb')]
 
     @classmethod
     def get_show_fields(cls):
-        return [('status', 'date'), 'recipients',
-                ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
-                'documents', 'subject', 'body']
+        return {'': [('status', 'date'), 'subject', 'body'],
+                _('001@Recipients'): ['recipients', ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
+                _('002@Documents'): ['documents', (('', 'empty'),)]
+                }
+#         return [('status', 'date'), 'recipients',
+#                 ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
+#                 'documents', 'subject', 'body']
+
+    @property
+    def empty(self):
+        return ""
 
     @property
     def contact_nb(self):
@@ -126,32 +147,34 @@ class Message(LucteriosModel):
     @transition(field=status, source=1, target=2, conditions=[lambda item:will_mail_send()])
     def sending(self):
         if will_mail_send():
-            email_list = [contact.email for contact in self.get_contacts(True)]
+            email_list = ["%d:%s" % (contact.id, contact.email) for contact in self.get_contacts(True)]
             self.email_to_send = "\n".join(email_list)
-            self.email_sent = json.dumps({'begin': timezone.now().strftime('%Y-%m-%d %H:%M:%S'), 'sent': []})
             self.save()
+            self.emailsent_set.all().delete()
             add_mailing_in_scheduler(check_nb=False)
         return
 
     def sendemail(self, nb_to_send):
         if will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
-            email_status = json.loads(self.email_sent)
             email_content = "<html><body>%s</body></html>" % toHtml(self.body)
             files = []
             for doc in self.documents.all():
                 files.append((doc.name, doc.content))
-            for email in email_list[:nb_to_send]:
+            for contact_email in email_list[:nb_to_send]:
+                contact_id, email = contact_email.split(':')
+                try:
+                    contact = AbstractContact.objects.get(id=contact_id)
+                except AbstractContact.DoesNotExist:
+                    contact = None
                 try:
                     send_email([email], self.subject, email_content, files=files if len(files) > 0 else None)
-                    email_status['sent'].append([email, True, ''])
+                    EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now(), success=True)
                 except Exception as error:
-                    email_status['sent'].append([email, False, six.text_type(error)])
+                    EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now(), success=False, error=six.text_type(error))
             self.email_to_send = "\n".join(email_list[nb_to_send:])
             if self.email_to_send == '':
                 self.status = 1
-                email_status['end'] = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-            self.email_sent = json.dumps(email_status)
             self.save()
         return
 
@@ -162,24 +185,40 @@ class Message(LucteriosModel):
 
     @property
     def date_begin(self):
-        if 'begin' in self.get_email_status():
-            return formats.date_format(datetime.strptime(self.get_email_status()['begin'], '%Y-%m-%d %H:%M:%S'), "DATETIME_FORMAT")
+        emails_sent = self.emailsent_set.order_by('date')
+        if len(emails_sent) > 0:
+            return formats.date_format(emails_sent[0].date, "DATETIME_FORMAT")
         return '---'
 
     @property
     def date_end(self):
-        if 'end' in self.get_email_status():
-            return formats.date_format(datetime.strptime(self.get_email_status()['end'], '%Y-%m-%d %H:%M:%S'), "DATETIME_FORMAT")
+        emails_sent = self.emailsent_set.order_by('-date')
+        if len(emails_sent) > 0:
+            return formats.date_format(emails_sent[0].date, "DATETIME_FORMAT")
         return '---'
 
-    @property
-    def sent_report(self):
-        if 'sent' in self.get_email_status():
-            return self.get_email_status()['sent']
-        return []
+    class Meta(object):
+        verbose_name = _('message')
+        verbose_name_plural = _('messages')
+
+
+class EmailSent(LucteriosModel):
+    message = models.ForeignKey(Message, verbose_name=_('message'), null=False, on_delete=models.CASCADE)
+    contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
+    email = models.CharField(_('email'), max_length=50, blank=False)
+    date = models.DateTimeField(verbose_name=_('date'), null=True)
+    success = models.BooleanField(verbose_name=_('success'), default=False)
+    error = models.TextField(_('error'), default="")
+
+    @classmethod
+    def get_default_fields(cls):
+        return ['contact', 'email', 'date', 'success', 'error']
 
     class Meta(object):
-        pass
+        verbose_name = _('email sent info')
+        verbose_name_plural = _('email sent info')
+        default_permissions = []
+        ordering = ['date', 'email']
 
 
 def send_mailing_in_waiting():

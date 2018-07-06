@@ -17,19 +17,9 @@ class Migration(migrations.Migration):
             name='documents',
             field=models.ManyToManyField(blank=True, to='documents.Document', verbose_name='documents'),
         ),
-        migrations.AddField(
-            model_name='message',
-            name='email_sent',
-            field=models.TextField(default='', verbose_name='email sent'),
-        ),
-        migrations.AddField(
-            model_name='message',
-            name='email_to_send',
-            field=models.TextField(default='', verbose_name='email to send'),
-        ),
         migrations.AlterField(
             model_name='message',
             name='status',
-            field=django_fsm.FSMIntegerField(choices=[(0, 'open'), (1, 'close'), (2, 'sending')], default=0, verbose_name='status'),
+            field=django_fsm.FSMIntegerField(choices=[(0, 'open'), (1, 'valided'), (2, 'sending')], default=0, verbose_name='status'),
         ),
     ]
