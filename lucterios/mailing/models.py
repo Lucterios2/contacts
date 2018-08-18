@@ -147,7 +147,12 @@ class Message(LucteriosModel):
     @transition(field=status, source=1, target=2, conditions=[lambda item:will_mail_send()])
     def sending(self):
         if will_mail_send():
-            email_list = ["%d:%s" % (contact.id, contact.email) for contact in self.get_contacts(True)]
+            email_list = []
+            for contact in self.get_contacts(True):
+                for email1 in contact.email.split(';'):
+                    for email2 in email1.split(','):
+                        if (":%s|" % email2) not in ("|".join(email_list) + '|'):
+                            email_list.append("%d:%s" % (contact.id, email2))
             self.email_to_send = "\n".join(email_list)
             self.save()
             self.emailsent_set.all().delete()

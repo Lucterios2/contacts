@@ -44,6 +44,15 @@ def will_mail_send():
     return (sender_email != '') and (Params.getvalue('mailing-smtpserver') != '')
 
 
+def split_doubled_email(email_list):
+    if isinstance(email_list, list):
+        for email_sep in (";", ","):
+            email_list = email_sep.join(email_list).split(email_sep)
+        return email_list
+    else:
+        return None
+
+
 def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None, withcopy=False):
     smtp_server = Params.getvalue('mailing-smtpserver')
     sender_email = LegalEntity.objects.get(id=1).email
@@ -53,6 +62,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
         recipients = sender_email
     if not isinstance(recipients, list):
         recipients = [six.text_type(recipients)]
+    recipients = split_doubled_email(recipients)
     smtp_port = Params.getvalue('mailing-smtpport')
     smtp_user = Params.getvalue('mailing-smtpuser')
     smtp_pass = Params.getvalue('mailing-smtppass')
@@ -67,6 +77,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     msg['Subject'] = six.text_type(subject)
     msg['To'] = ", ".join(recipients)
     if isinstance(cclist, list):
+        cclist = split_doubled_email(cclist)
         for recipient in recipients:
             if recipient in cclist:
                 cclist.remove(recipient)
@@ -78,6 +89,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
         if sender_email not in bcclist:
             bcclist.append(sender_email)
     if isinstance(bcclist, list):
+        bcclist = split_doubled_email(bcclist)
         for recipient in recipients:
             if recipient in bcclist:
                 bcclist.remove(recipient)
