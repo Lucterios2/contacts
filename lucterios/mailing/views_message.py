@@ -35,7 +35,9 @@ class MessageList(XferListEditor):
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
-        add_mailing_in_scheduler(check_nb=True)
+        abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
+        root_url = '/'.join(abs_url[:-2])
+        add_mailing_in_scheduler(check_nb=True, http_root_address=root_url)
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
@@ -58,11 +60,19 @@ class MessageClone(XferContainerAcknowledge):
     caption = _("Add message")
 
     def fillresponse(self):
-        self.item.id = None
-        self.item.date = None
-        self.item.status = 0
-        self.item.save()
-        self.redirect_action(MessageShow.get_action('', ''), {'params': {self.field_id: self.item.id}})
+        new_item = Message()
+        new_item.date = None
+        new_item.status = 0
+        new_item.subject = self.item.subject
+        new_item.body = self.item.body
+        new_item.recipients = self.item.recipients
+        new_item.email_to_send = ""
+        new_item.doc_in_link = self.item.doc_in_link
+        new_item.save()
+        for doc in self.item.documents.all():
+            new_item.documents.add(doc)
+        self.params[self.field_id] = new_item.id
+        self.redirect_action(MessageShow.get_action('', ''))
 
 
 @ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)

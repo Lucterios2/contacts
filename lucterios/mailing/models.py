@@ -23,7 +23,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
-from datetime import date, datetime
+from datetime import date
 import json
 
 from django.utils.translation import ugettext_lazy as _
@@ -52,13 +52,16 @@ class Message(LucteriosModel):
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
     email_to_send = models.TextField(_('email to send'), default="")
     documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
+    doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
 
     def __init__(self, *args, **kwargs):
         LucteriosModel.__init__(self, *args, **kwargs)
         self._show_only_failed = False
+        self._last_xfer = None
 
     def set_context(self, xfer):
         self._show_only_failed = xfer.getparam('show_only_failed', False)
+        self._last_xfer = xfer
 
     @property
     def emailsent_query(self):
@@ -75,7 +78,7 @@ class Message(LucteriosModel):
     def get_show_fields(cls):
         return {'': [('status', 'date'), 'subject', 'body'],
                 _('001@Recipients'): ['recipients', ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
-                _('002@Documents'): ['documents', (('', 'empty'),)]
+                _('002@Documents'): ['documents', (('', 'empty'),), 'doc_in_link']
                 }
 #         return [('status', 'date'), 'recipients',
 #                 ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
@@ -96,7 +99,7 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_edit_fields(cls):
-        return ['subject', 'body']
+        return ['subject', 'body', 'doc_in_link']
 
     @classmethod
     def get_print_fields(cls):
@@ -156,16 +159,31 @@ class Message(LucteriosModel):
             self.email_to_send = "\n".join(email_list)
             self.save()
             self.emailsent_set.all().delete()
-            add_mailing_in_scheduler(check_nb=False)
+            if self._last_xfer is not None:
+                abs_url = self._last_xfer.request.META.get('HTTP_REFERER', self._last_xfer.request.build_absolute_uri()).split('/')
+                root_url = '/'.join(abs_url[:-2])
+            else:
+                root_url = ''
+            add_mailing_in_scheduler(check_nb=False, http_root_address=root_url)
         return
 
-    def sendemail(self, nb_to_send):
+    def sendemail(self, nb_to_send, http_root_address):
         if will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
-            email_content = "<html><body>%s</body></html>" % toHtml(self.body)
+            link_html = ""
             files = []
             for doc in self.documents.all():
-                files.append((doc.name, doc.content))
+                if self.doc_in_link:
+                    if doc.sharekey is None:
+                        doc.change_sharekey(False)
+                        doc.save()
+                    doc.set_context(http_root_address)
+                    link_html += "<li><a href='%s'>%s</a></li>" % (doc.shared_link, doc.name)
+                else:
+                    files.append((doc.name, doc.content))
+            if self.doc_in_link and (link_html != ''):
+                link_html = "<hr/><h3>%s</h3><ul>%s</ul>" % (_('Shared documents'), link_html)
+            email_content = "<html><body>%s%s</body></html>" % (toHtml(self.body), link_html)
             for contact_email in email_list[:nb_to_send]:
                 contact_id, email = contact_email.split(':')
                 try:
@@ -226,19 +244,19 @@ class EmailSent(LucteriosModel):
         ordering = ['date', 'email']
 
 
-def send_mailing_in_waiting():
+def send_mailing_in_waiting(http_root_address):
     '''Mailing'''
     msg_list = Message.objects.filter(status=2)
     if len(msg_list) == 0:
         LucteriosScheduler.remove(send_mailing_in_waiting)
     else:
         for msg_item in msg_list:
-            msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'))
+            msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'), http_root_address)
 
 
-def add_mailing_in_scheduler(check_nb=True):
+def add_mailing_in_scheduler(check_nb=True, http_root_address=""):
     if not check_nb or (Message.objects.filter(status=2).count() > 0):
-        LucteriosScheduler.add_task(send_mailing_in_waiting, minutes=Params.getvalue('mailing-delay-batch'))
+        LucteriosScheduler.add_task(send_mailing_in_waiting, minutes=Params.getvalue('mailing-delay-batch'), http_root_address=http_root_address)
 
 
 @Signal.decorate('checkparam')

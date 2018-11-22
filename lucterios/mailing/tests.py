@@ -31,12 +31,14 @@ from io import SEEK_END
 from time import sleep
 
 from django.utils import six
+from django.contrib.auth.models import AnonymousUser
 
 from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
 from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.error import LucteriosException
 from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
+from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter, LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct
@@ -50,8 +52,8 @@ from lucterios.mailing.functions import will_mail_send, send_email
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
     MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
     MessageValidInsertDoc, MessageRemoveDoc
-from django.contrib.auth.models import AnonymousUser
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
+
 from lucterios.documents.tests import create_doc
 
 
@@ -358,10 +360,10 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageAddModify()
         self.calljson('/lucterios.mailing/messageAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageAddModify')
-        self.assert_count_equal('', 3)
+        self.assert_count_equal('', 4)
 
         self.factory.xfer = MessageAddModify()
-        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body':
                                                               '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageAddModify')
 
@@ -392,7 +394,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 10)
+        self.assert_count_equal('', 11)
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal(self.json_actions[0], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal(self.json_actions[1], ('Fermer', 'images/close.png'))
@@ -414,7 +416,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[0], ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
         self.assert_action_equal(self.json_actions[1], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
@@ -435,7 +437,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_count_equal("recipient_list", 2)
 
     def test_validate_message(self):
@@ -456,7 +458,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'validé')
         self.assert_count_equal("#recipient_list/actions", 0)
         self.assert_count_equal("recipient_list", 2)
@@ -470,7 +472,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "contact_noemail", 'Valjean jean')
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[0], ('Courriels', 'lucterios.mailing/images/mailing.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
@@ -510,15 +512,16 @@ class MailingTest(LucteriosTest):
 
         create_doc(self.factory.user, with_folder=False)
         self.factory.xfer = MessageAddModify()
-        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body':
                                                               '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
 
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 10)
+        self.assert_count_equal('', 11)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_grid_equal('document', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
+        self.assert_json_equal('LABELFORM', "doc_in_link", 'Non')
         self.assert_count_equal("#document/actions", 3)
 
         self.factory.xfer = MessageInsertDoc()
@@ -538,7 +541,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 10)
+        self.assert_count_equal('', 11)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_count_equal("document", 2)
         self.assert_count_equal("#document/actions", 3)
@@ -556,7 +559,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_count_equal("document", 1)
         self.assert_count_equal("#document/actions", 3)
@@ -569,7 +572,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'validé')
         self.assert_count_equal("document", 1)
         self.assert_count_equal("#document/actions", 1)
@@ -578,7 +581,7 @@ class MailingTest(LucteriosTest):
 class SendMailingTest(AsychronousLucteriosTest):
 
     def setUp(self):
-        LucteriosTest.setUp(self)
+        AsychronousLucteriosTest.setUp(self)
         change_ourdetail()
         create_jack(firstname="jack", lastname='Dalton')
         create_jack(firstname="joe", lastname='Dalton')
@@ -598,7 +601,7 @@ class SendMailingTest(AsychronousLucteriosTest):
         self.assert_json_equal('', '', 'OK')
 
         configSMTP('localhost', 1025, batchtime=0.1, batchsize=4)
-        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body':
                                                               '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'})
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''})
@@ -665,6 +668,36 @@ class SendMailingTest(AsychronousLucteriosTest):
         self.assert_json_equal('', "emailsent/@0/email", "émilie@worldcompany.com")
         self.assert_json_equal('', "emailsent/@0/success", 0)
         self.assert_json_equal('', "emailsent/@0/error", "'ascii' codec can't encode character", True)
+
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'doc_in_link': 1, 'subject': 'new message', 'body':
+                                                              '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Other message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
+        self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '2', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''})
+        self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '1'})
+        self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '3'})
+        self.calljson('/lucterios.mailing/messageTransition', {'message': '2', 'TRANSITION': 'valid', 'CONFIRME': 'YES'})
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.assertEqual(0, server.count())
+            self.calljson('/lucterios.mailing/messageTransition', {'message': '2', 'TRANSITION': 'sending', 'CONFIRME': 'YES'})
+            self.assertEqual(0, server.count())
+            sleep(10)
+            self.assertEqual(1, len(LucteriosScheduler.get_list()))
+            sleep(10)
+            self.assertEqual(1, server.count())
+            self.assertEqual(0, len(LucteriosScheduler.get_list()))
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            msg, = server.check_first_message('new message', 1)
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            content = decode_b64(msg.get_payload())
+            self.assertEqual('<html><body><b><font color="blue">All</font></b><br/>Other message to give a big <u>kiss</u> ;)<br/><br/>Bye', content[:108])
+            self.assertEqual(content[108:].count('http://testserver/lucterios.documents/downloadFile?shared='), 2)
+            self.assertEqual(content[108:].count('filename=doc1.png'), 1)
+            self.assertEqual(content[108:].count('filename=doc3.png'), 1)
+        finally:
+            server.stop()
 
 
 class UserTest(LucteriosTest):
