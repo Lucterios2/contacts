@@ -151,7 +151,7 @@ class MessageLetter(XferPrintReporting):
     def items_callback(self):
         items = []
         for current_contact in self.item.get_contacts():
-            new_item = deepcopy(self.item)
+            new_item = Message.objects.get(id=self.item.id)
             new_item.contact = current_contact
             items.append(new_item)
         return items
