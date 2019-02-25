@@ -145,7 +145,7 @@ msgstr "erreur"
 
 #: models.py:241 models.py:242
 msgid "email sent info"
-msgstr "information des courriels evoyés"
+msgstr "information des courriels envoyés"
 
 #: models.py:264
 msgid "mailing-smtpserver"
@@ -199,7 +199,7 @@ msgstr "durée (en min) d'un lot de courriel"
 
 #: models.py:276
 msgid "mailing-nb-by-batch"
-msgstr "nombre de courriel par lot"
+msgstr "nombre de courriels par lot"
 
 #: views.py:45
 msgid "Change mailing parameters"
@@ -271,7 +271,7 @@ msgstr "Ajout de message"
 
 #: views_message.py:51
 msgid "Modify message"
-msgstr "Modification d'un messages"
+msgstr "Modification d'un message"
 
 #: views_message.py:76
 msgid "Show message"
@@ -336,7 +336,7 @@ msgstr "Voulez-vous supprimer ce destinataire ?"
 
 #: views_message.py:200 views_message.py:208
 msgid "Insert document to message"
-msgstr "Inserer un document"
+msgstr "Insérer un document"
 
 #: views_message.py:215
 msgid "Remove document to message"
