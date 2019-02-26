@@ -119,7 +119,7 @@ class Message(LucteriosModel):
                 contact_filter &= ~models.Q(email='') if email else models.Q(email='')
             for contact in apps.get_model(modelname).objects.filter(contact_filter):
                 id_list.append(contact.id)
-        return AbstractContact.objects.filter(id__in=id_list)
+        return AbstractContact.objects.filter(id__in=id_list).distinct()
 
     @property
     def recipients_description(self):

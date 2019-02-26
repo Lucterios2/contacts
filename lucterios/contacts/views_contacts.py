@@ -320,10 +320,8 @@ class ResponsabilityAdd(XferContainerCustom):
         self.add_component(comp)
         identfilter = []
         if name_filter != "":
-            identfilter = [
-                Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)]
-        items = Individual.objects.filter(
-            *identfilter)
+            identfilter = [Q(firstname__icontains=name_filter) | Q(lastname__icontains=name_filter)]
+        items = Individual.objects.filter(*identfilter).distinct()
         grid = XferCompGrid('individual')
         grid.set_model(items, None, self)
         grid.set_location(1, 3)

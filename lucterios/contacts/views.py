@@ -126,8 +126,7 @@ class Account(XferContainerCustom):
         lab.set_location(1, 0, 2)
         self.add_component(lab)
         try:
-            self.item = Individual.objects.get(
-                user=self.request.user)
+            self.item = Individual.objects.get(user=self.request.user)
             self.item = self.item.get_final_child()
             self.model = Individual
             self.field_id = 'individual'
@@ -135,15 +134,13 @@ class Account(XferContainerCustom):
             self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO)
             is_individual = True
         except ObjectDoesNotExist:
-            self.item = LucteriosUser.objects.get(
-                id=self.request.user.id)
+            self.item = LucteriosUser.objects.get(id=self.request.user.id)
             self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"),
                             close=CLOSE_NO, params={'user_actif': six.text_type(self.request.user.id)})
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
-            legal_entities = LegalEntity.objects.filter(
-                responsability__individual=self.item).exclude(id=1)
+            legal_entities = LegalEntity.objects.filter(responsability__individual=self.item).exclude(id=1)
             if len(legal_entities) == 1:
                 self.add_legalentity(legal_entities[0])
             elif len(legal_entities) > 1:
