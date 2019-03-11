@@ -104,10 +104,9 @@ class TestSMTPServer(smtpd.SMTPServer):
     with_authentificate = False
     auth_params = None
 
-    def process_message(self, peer, mailfrom, rcpttos, data):
+    def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
         self.emails.append((peer, mailfrom, rcpttos, data))
-        logging.getLogger("lucterios.mailing.test").info(
-            "email %s => %s", mailfrom, rcpttos)
+        logging.getLogger("lucterios.mailing.test").info("email %s => %s", mailfrom, rcpttos)
 
 
 class TestReceiver(TestCase):
@@ -134,7 +133,10 @@ class TestReceiver(TestCase):
         return self.smtp.emails[index]
 
     def check_first_message(self, subject, nb_multi, params=None):
-        msg = email.message_from_string(self.get(0)[3])
+        data = self.get(0)[3]
+        if hasattr(data, 'decode'):
+            data = data.decode()
+        msg = email.message_from_string(data)
         if params is None:
             params = {}
         if isinstance(params, dict):

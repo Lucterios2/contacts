@@ -280,7 +280,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send with ssl', 'not success!')
             self.assertTrue(False)
         except LucteriosException as error:
-            self.assertTrue('unknown protocol' in six.text_type(error), six.text_type(error))
+            self.assertTrue(('unknown protocol' in six.text_type(error)) or ('SSL: WRONG_VERSION_NUMBER' in six.text_type(error)), six.text_type(error))
         self.assertEqual(0, self.server.count())
 
     def test_send_with_files(self):

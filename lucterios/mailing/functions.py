@@ -55,7 +55,9 @@ def split_doubled_email(email_list):
 
 def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None, withcopy=False):
     smtp_server = Params.getvalue('mailing-smtpserver')
-    sender_email = LegalEntity.objects.get(id=1).email
+    sender_obj = LegalEntity.objects.get(id=1)
+    sender_name = sender_obj.name
+    sender_email = sender_obj.email
     if (sender_email == '') or (smtp_server == ''):
         raise LucteriosException(IMPORTANT, _('Email not configure!'))
     if recipients is None:
@@ -94,7 +96,9 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
             if recipient in bcclist:
                 bcclist.remove(recipient)
         recipients.extend(bcclist)
-    msg['From'] = sender_email
+    msg_from = "%s <%s>" % (sender_name, sender_email)
+    msg['From'] = msg_from
+    msg['Return-Path'] = sender_email
     msg.attach(MIMEText(body, subtype, 'utf-8'))
     if files:
         for filename, file in files:
@@ -113,7 +117,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
             server.starttls()
         if (smtp_pass != '') and (smtp_user != ''):
             server.login(smtp_user, smtp_pass)
-        server.sendmail(sender_email, recipients, msg.as_string())
+        server.sendmail(msg_from, recipients, msg.as_string())
     except Exception as error:
         raise LucteriosException(IMPORTANT, six.text_type(error))
     finally:
