@@ -231,7 +231,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], '')
-        self.assert_count_equal('', 18)
+        self.assert_count_equal('', 17)
         self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
@@ -240,7 +240,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'genre||8||1;2')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
@@ -249,7 +249,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'genre||8||1')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
@@ -258,7 +258,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'genre||8||2')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
@@ -267,7 +267,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'responsability_set.functions||9||1')
-        self.assert_count_equal('', 20)
+        self.assert_count_equal('', 19)
         self.assert_count_equal('individual', 0)
 
         self.factory.xfer = IndividualSearch()
@@ -276,7 +276,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'user.username||5||empt')
-        self.assert_count_equal('', 20)
+        self.assert_count_equal('', 19)
         self.assert_count_equal('individual', 0)
 
     def test_individual_listing(self):
@@ -510,7 +510,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], '')
-        self.assert_count_equal('', 18)
+        self.assert_count_equal('', 17)
         self.assert_count_equal('legal_entity', 2)
 
         self.factory.xfer = LegalEntitySearch()
@@ -519,7 +519,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'name||5||truc')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
@@ -528,7 +528,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'structure_type||8||2')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
@@ -537,7 +537,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'name||5||truc//structure_type||8||2')
-        self.assert_count_equal('', 23)
+        self.assert_count_equal('', 22)
         self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
@@ -546,7 +546,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(self.json_context['CRITERIA'], 'structure_type||8||2')
-        self.assert_count_equal('', 21)
+        self.assert_count_equal('', 20)
         self.assert_count_equal('legal_entity', 1)
 
     def test_legalentity_listing(self):

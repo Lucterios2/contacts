@@ -30,8 +30,7 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn,\
-    get_value_if_choices
+from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_value_if_choices
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
@@ -89,7 +88,7 @@ class CustomField(LucteriosModel):
         default_args = {'min': 0, 'max': 0, 'prec': 0, 'list': [], 'multi': False}
         try:
             args = eval(self.args)
-        except:
+        except Exception:
             args = {}
         for name, val in default_args.items():
             if name not in args.keys():
@@ -199,7 +198,7 @@ class CustomizeObject(object):
                             cf_value = args_list.index(cf_value)
                         else:
                             cf_value = int(cf_value)
-                except:
+                except Exception:
                     cf_value = ""
                 args = {self.FieldName: self, 'field': cf_model}
                 ccf_model = self.CustomFieldClass.objects.get_or_create(**args)
@@ -324,6 +323,7 @@ class ContactCustomField(LucteriosModel):
 
 
 class AbstractContact(LucteriosModel, CustomizeObject):
+
     CustomFieldClass = ContactCustomField
     FieldName = 'contact'
 
@@ -358,11 +358,11 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
     @classmethod
     def get_search_fields(cls):
-        fieldnames = ['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment']
+        fieldnames = []
+        fieldnames.extend(['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment'])
         from django.db.models import Q
         for cf_name, cf_model in CustomField.get_fields(cls):
-            fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(
-                contactcustomfield__field__id=cf_model.id)))
+            fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
         return fieldnames
 
     @classmethod
