@@ -56,8 +56,8 @@ value = """
 <text height="20.0" width="40.0" top="55.0" left="150.0" padding="1.0" spacing="0.0" border_color="black" border_style="" border_width="0.2">
 {[i]}#date{[/i]}
 </text>
-<text height="150.0" width="190.0" top="80.0" left="0.0" padding="1.0" spacing="0.0" border_color="black" border_style="" border_width="0.2">
-#body
+<text data="line_set" height="5.0" width="190.0" top="80.0" left="0.0" padding="1.0" spacing="0.1" border_color="black" border_style="" border_width="0.2">
+#line
 </text>
 </body>
 </model>

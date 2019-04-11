@@ -41,6 +41,42 @@ from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import Document
 from lucterios.mailing.functions import will_mail_send, send_email
+from django.db.models.query import QuerySet
+
+
+class MessageLine(LucteriosModel):
+    id = models.IntegerField(verbose_name=_('id'), null=False, default=0, db_index=True)
+    line = models.TextField(_('line'), null=False, default="")
+
+    @classmethod
+    def get_default_fields(cls, status=-1):
+        return ['line']
+
+    class Meta(object):
+        abstract = True
+        verbose_name = _('body')
+        verbose_name_plural = _('bodies')
+
+
+class MessageLineSet(QuerySet):
+
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        QuerySet.__init__(self, model=MessageLine, query=query, using=using, hints=hints)
+        self._result_cache = None
+        self.pt_id = 0
+        self.model._meta.pk = Message()._meta.pk
+        body = self._hints['body']
+        body = body.replace('\n', '{[br/]}')
+        body = body.replace('{[br]}', '{[br/]}')
+        self.lines = body.split('{[br/]}')
+
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = []
+            line_id = 1
+            for line in self.lines:
+                self._result_cache.append(MessageLine(id=line_id, line=line))
+                line_id += 1
 
 
 class Message(LucteriosModel):
@@ -93,6 +129,10 @@ class Message(LucteriosModel):
         return len(self.get_contacts())
 
     @property
+    def line_set(self):
+        return MessageLineSet(hints={'body': self.body})
+
+    @property
     def contact_noemail(self):
         no_emails = self.get_contacts(False)
         return '{[br/]}'.join([six.text_type(no_email) for no_email in no_emails])
@@ -103,7 +143,7 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_print_fields(cls):
-        return ['status', 'date', 'subject', 'body', 'contact', 'OUR_DETAIL']
+        return ['status', 'date', 'subject', 'body', 'line_set', 'line_set.line', 'contact', 'OUR_DETAIL']
 
     def get_recipients(self):
         for item in self.recipients.split('\n'):
