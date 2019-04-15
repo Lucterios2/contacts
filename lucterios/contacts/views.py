@@ -56,10 +56,9 @@ class CurrentLegalEntityModify(LegalEntityAddModify):
 
     def fillresponse(self):
         try:
-            Responsability.objects.get(
-                individual__user=self.request.user, legal_entity=self.item)
+            Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityAddModify.fillresponse(self)
-        except:
+        except Exception:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
 
@@ -71,7 +70,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
             Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityShow.fillresponse(self)
             self.add_action(CurrentLegalEntityModify.get_action(_("Modify"), "images/edit.png"), close=CLOSE_YES, pos_act=0)
-        except:
+        except Exception:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
 
@@ -219,7 +218,7 @@ class CreateAccount(XferContainerAcknowledge):
         img.set_location(0, 0, 1, 6)
         dlg.add_component(img)
         dlg.fill_from_model(1, 0, False, ['genre', 'lastname', 'firstname', 'email'])
-        dlg.get_components('email').mask = '^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-_])+\.)+([a-zA-Z0-9]{2,4})+$'
+        dlg.get_components('email').mask = r'^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-_])+\.)+([a-zA-Z0-9]{2,4})+$'
         row = dlg.get_max_row() + 1
         edt = XferCompEdit("username")
         edt.set_location(1, row)
