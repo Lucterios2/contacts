@@ -26,8 +26,9 @@ from __future__ import unicode_literals
 
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTP_SSL
+from os.path import isfile
 
-from email.utils import formatdate
+from email.utils import formatdate, make_msgid
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
@@ -69,6 +70,8 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     smtp_user = Params.getvalue('mailing-smtpuser')
     smtp_pass = Params.getvalue('mailing-smtppass')
     smtp_security = Params.getvalue('mailing-smtpsecurity')
+    dkim_private_path = Params.getvalue('mailing-dkim-private-path')
+    dkim_selector = Params.getvalue('mailing-dkim-selector')
     body = six.text_type(body).strip()
     if body[:6].lower() == '<html>':
         subtype = 'html'
@@ -96,9 +99,11 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
             if recipient in bcclist:
                 bcclist.remove(recipient)
         recipients.extend(bcclist)
+    domain = sender_email.split('@')[-1]
     msg_from = "%s <%s>" % (sender_name, sender_email)
     msg['From'] = msg_from
     msg['Return-Path'] = sender_email
+    msg['Message-ID'] = make_msgid(domain=domain)
     msg.attach(MIMEText(body, subtype, 'utf-8'))
     if files:
         for filename, file in files:
@@ -107,6 +112,14 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
                 Content_Disposition='attachment; filename="%s"' % filename,
                 Name=filename
             ))
+    if (dkim_private_path != '') and isfile(dkim_private_path) and (dkim_selector != ''):
+        import dkim
+        with open(dkim_private_path) as dkim_private_file:
+            privateKey = dkim_private_file.read()
+        headers = [b'from', b'to', b'subject']
+        sig = dkim.sign(msg.as_string().encode(), dkim_selector.encode(), domain.encode(), privateKey.encode(), include_headers=headers)
+        sig = sig.decode()
+        msg['DKIM-Signature'] = sig[len("DKIM-Signature: "):]
     server = None
     try:
         if smtp_security == 2:
