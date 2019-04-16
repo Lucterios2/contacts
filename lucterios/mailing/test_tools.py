@@ -42,7 +42,7 @@ def decode_b64(data):
     return decoded.decode('utf-8')
 
 
-def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batchsize=20):
+def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batchsize=20, dkim_private_file=''):
     param = Parameter.objects.get(name='mailing-smtpserver')
     param.value = server
     param.save()
@@ -57,6 +57,9 @@ def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batc
     param.save()
     param = Parameter.objects.get(name='mailing-smtppass')
     param.value = passwd
+    param.save()
+    param = Parameter.objects.get(name='mailing-dkim-private-path')
+    param.value = dkim_private_file
     param.save()
     param = Parameter.objects.get(name='mailing-delay-batch')
     param.value = "%.1f" % batchtime
@@ -132,11 +135,15 @@ class TestReceiver(TestCase):
     def get(self, index):
         return self.smtp.emails[index]
 
-    def check_first_message(self, subject, nb_multi, params=None):
+    def get_first_msg(self):
         data = self.get(0)[3]
         if hasattr(data, 'decode'):
             data = data.decode()
         msg = email.message_from_string(data)
+        return msg
+
+    def check_first_message(self, subject, nb_multi, params=None):
+        msg = self.get_first_msg()
         if params is None:
             params = {}
         if isinstance(params, dict):

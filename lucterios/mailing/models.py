@@ -28,6 +28,7 @@ import json
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.db.models.query import QuerySet
 from django.apps import apps
 from django_fsm import FSMIntegerField, transition
 from django.utils import six, formats, timezone
@@ -41,7 +42,6 @@ from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import Document
 from lucterios.mailing.functions import will_mail_send, send_email
-from django.db.models.query import QuerySet
 
 
 class MessageLine(LucteriosModel):
@@ -314,3 +314,6 @@ def mailing_checkparam():
                                value=_('''Connection confirmation to your application:{[br/]} - User:%(username)s{[br/]} - Password:%(password)s{[br/]}'''))
     Parameter.check_and_create(name='mailing-delay-batch', typeparam=2, title=_("mailing-delay-batch"), args="{'Min': 0.1, 'Max': 120, 'Prec': 1}", value='15')
     Parameter.check_and_create(name='mailing-nb-by-batch', typeparam=1, title=_("mailing-nb-by-batch"), args="{'Min': 1, 'Max': 100}", value='10')
+
+    Parameter.check_and_create(name='mailing-dkim-private-path', typeparam=0, title=_("mailing-dkim-private-path"), args="{'Multi': False}", value='')
+    Parameter.check_and_create(name='mailing-dkim-selector', typeparam=0, title=_("mailing-dkim-selector"), args="{'Multi': False}", value='default')

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-25 14:24+0000\n"
+"POT-Creation-Date: 2019-04-16 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: __init__.py:42 views.py:121
+#: __init__.py:42 views.py:141
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
@@ -37,151 +37,163 @@ msgstr "Remove"
 msgid "Insert"
 msgstr "Insert"
 
-#: functions.py:60
+#: functions.py:63
 msgid "Email not configure!"
 msgstr "Email not configure!"
 
-#: functions.py:125
+#: functions.py:142
 msgid "Connection password"
 msgstr "Connection password"
 
-#: models.py:47
-msgid "subject"
-msgstr "subject"
-
 #: models.py:48
+msgid "id"
+msgstr "id"
+
+#: models.py:49
+msgid "line"
+msgstr "line"
+
+#: models.py:57 models.py:84
 msgid "body"
 msgstr "body"
 
-#: models.py:49
+#: models.py:58
+msgid "bodies"
+msgstr "bodies"
+
+#: models.py:83
+msgid "subject"
+msgstr "subject"
+
+#: models.py:85
 msgid "status"
 msgstr "status"
 
-#: models.py:49
+#: models.py:85
 msgid "open"
 msgstr "open"
 
-#: models.py:49
+#: models.py:85
 msgid "valided"
 msgstr "valided"
 
-#: models.py:49
+#: models.py:85
 msgid "sending"
 msgstr "sending"
 
-#: models.py:50
+#: models.py:86
 msgid "recipients"
 msgstr "recipients"
 
-#: models.py:51 models.py:232
+#: models.py:87 models.py:272
 msgid "date"
 msgstr "date"
 
-#: models.py:52 models.py:230
+#: models.py:88 models.py:270
 msgid "contact"
 msgstr "contact"
 
-#: models.py:53
+#: models.py:89
 msgid "email to send"
 msgstr "email to send"
 
-#: models.py:54
+#: models.py:90
 msgid "documents"
 msgstr "documents"
 
-#: models.py:55
+#: models.py:91
 msgid "documents in link"
 msgstr "documents in link"
 
-#: models.py:75 models.py:80
+#: models.py:111 models.py:116
 msgid "number of contacts"
 msgstr "number of contacts"
 
-#: models.py:80
+#: models.py:116
 msgid "001@Recipients"
 msgstr "Recipients"
 
-#: models.py:80
+#: models.py:116
 msgid "without email address"
 msgstr "without email address"
 
-#: models.py:81
+#: models.py:117
 msgid "002@Documents"
 msgstr "Documents"
 
-#: models.py:142
+#: models.py:182
 msgid "Valid"
 msgstr "Valid"
 
-#: models.py:148
+#: models.py:188
 msgid "Emails"
 msgstr "Emails"
 
-#: models.py:185
+#: models.py:225
 msgid "Shared documents"
 msgstr "Shared documents"
 
-#: models.py:224 models.py:229
+#: models.py:264 models.py:269
 msgid "message"
 msgstr "message"
 
-#: models.py:225
+#: models.py:265
 msgid "messages"
 msgstr "messages"
 
-#: models.py:231
+#: models.py:271 views.py:109
 msgid "email"
 msgstr "email"
 
-#: models.py:233
+#: models.py:273
 msgid "success"
 msgstr "success"
 
-#: models.py:234
+#: models.py:274
 msgid "error"
 msgstr "error"
 
-#: models.py:241 models.py:242
+#: models.py:281 models.py:282
 msgid "email sent info"
 msgstr "email sent info"
 
-#: models.py:264
+#: models.py:304
 msgid "mailing-smtpserver"
 msgstr "SMTP Server"
 
-#: models.py:265
+#: models.py:305
 msgid "mailing-smtpport"
 msgstr "SMTP port"
 
-#: models.py:267
+#: models.py:307
 msgid "mailing-smtpsecurity"
 msgstr "SMTP security"
 
-#: models.py:268
+#: models.py:308
 msgid "mailing-smtpsecurity.0"
 msgstr "None"
 
-#: models.py:268
+#: models.py:308
 msgid "mailing-smtpsecurity.1"
 msgstr "StartTLS"
 
-#: models.py:268
+#: models.py:308
 msgid "mailing-smtpsecurity.2"
 msgstr "SSL/TLS"
 
-#: models.py:270
+#: models.py:310
 msgid "mailing-smtpuser"
 msgstr "SMTP user"
 
-#: models.py:272
+#: models.py:312
 msgid "mailing-smtppass"
 msgstr "SMTP pass"
 
-#: models.py:273
+#: models.py:313
 msgid "mailing-msg-connection"
 msgstr "Connection confirmation message"
 
-#: models.py:274
+#: models.py:314
 #, python-format
 msgid ""
 "Connection confirmation to your application:{[br/]} - User:"
@@ -191,23 +203,31 @@ msgstr ""
 "User:%(username)s{[br/]} - Password:%(password)s{[br/]}{[br/]}Best "
 "regards{[br/]}"
 
-#: models.py:275
+#: models.py:315
 msgid "mailing-delay-batch"
 msgstr "delay (min) of mailing batch"
 
-#: models.py:276
+#: models.py:316
 msgid "mailing-nb-by-batch"
 msgstr "number of email by batch"
 
-#: views.py:45
+#: models.py:318
+msgid "mailing-dkim-private-path"
+msgstr "DKIM private file path"
+
+#: models.py:319
+msgid "mailing-dkim-selector"
+msgstr "DKIM selector"
+
+#: views.py:44
 msgid "Change mailing parameters"
 msgstr "Change mailing parameters"
 
-#: views.py:48 views.py:121
+#: views.py:47 views.py:141
 msgid "Mailing parameters"
 msgstr "Mailing parameters"
 
-#: views.py:52
+#: views.py:51
 msgid "EMail configuration"
 msgstr "EMail configuration"
 
@@ -223,7 +243,7 @@ msgstr "Send"
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:89 views.py:101
+#: views.py:89 views.py:122
 msgid "EMail try"
 msgstr "EMail try"
 
@@ -231,19 +251,19 @@ msgstr "EMail try"
 msgid "Bad email parameter!"
 msgstr "Bad email parameter!"
 
-#: views.py:101
+#: views.py:120
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:103
+#: views.py:123
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 
-#: views.py:126
+#: views.py:146
 msgid "email properly configured"
 msgstr "email properly configured"
 
-#: views.py:128
+#: views.py:148
 msgid "email not configured"
 msgstr "email not configured"
 

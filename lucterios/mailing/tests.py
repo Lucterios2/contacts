@@ -29,6 +29,7 @@ from os.path import join, dirname
 from _io import BytesIO
 from io import SEEK_END
 from time import sleep
+from email.header import decode_header
 
 from django.utils import six
 from django.contrib.auth.models import AnonymousUser
@@ -38,7 +39,6 @@ from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.error import LucteriosException
 from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
-from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter, LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct
@@ -78,12 +78,14 @@ class ConfigurationTest(LucteriosTest):
         self.calljson('/lucterios.mailing/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
         self.assertEqual(len(self.json_context), 0)
-        self.assert_count_equal('', 2 + 8 + 2 + 2)
+        self.assert_count_equal('', 2 + 10 + 2 + 2)
         self.assert_json_equal('LABELFORM', "mailing-smtpserver", '')
         self.assert_json_equal('LABELFORM', "mailing-smtpport", '25')
         self.assert_json_equal('LABELFORM', "mailing-smtpsecurity", 'Aucune')
         self.assert_json_equal('LABELFORM', "mailing-smtpuser", '')
         self.assert_json_equal('LABELFORM', "mailing-smtppass", '')
+        self.assert_json_equal('LABELFORM', "mailing-dkim-private-path", '')
+        self.assert_json_equal('LABELFORM', "mailing-dkim-selector", 'default')
         self.assert_json_equal('LABELFORM', "mailing-msg-connection",
                                'Bienvenue{[br/]}{[br/]}Confirmation de connexion à votre application :{[br/]} - Alias : %(username)s{[br/]} - Mot de passe : %(password)s{[br/]}{[br/]}Salutations{[br/]}')
         self.assert_json_equal('LABELFORM', "mailing-delay-batch", '15.0')
@@ -99,19 +101,46 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(0, self.server.count())
 
     def test_tryemail_success(self):
-        configSMTP('localhost', 1025)
+        try:
+            from Crypto.PublicKey import RSA
+            dkim_private_file = join(get_user_dir(), "private.pem")
+            key = RSA.generate(1024)
+            pv_key_string = key.export_key()
+            with open(dkim_private_file, "wb") as prv_file:
+                prv_file.write(pv_key_string)
+        except Exception:
+            dkim_private_file = ""
+        configSMTP('localhost', 1025, dkim_private_file=dkim_private_file)
         self.assertEqual(0, self.server.count())
+
         self.factory.xfer = SendEmailTry()
         self.calljson('/lucterios.mailing/sendEmailTry', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'sendEmailTry')
+        self.assert_json_equal('EDIT', "recipient", 'mr-sylvestre@worldcompany.com')
+
+        self.factory.xfer = SendEmailTry()
+        self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com'}, False)
         self.assert_observer('core.dialogbox', 'lucterios.mailing', 'sendEmailTry')
         self.assert_json_equal('', 'text', 'Courriel envoyé, veuillez le vérifier.')
+
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
-        self.assertEqual(['mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
-        msg, = self.server.check_first_message('Essai de courriel', 1)
-        self.assertEqual('text/plain', msg.get_content_type())
-        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-        self.assertEqual('Courriel envoyé pour vérifier la configuration\n\nWoldCompany\n', decode_b64(msg.get_payload())[:60])
+        self.assertEqual(['behoa@worldcompany.com'], self.server.get(0)[2])
+        msg = self.server.get_first_msg()
+
+        msg_id = decode_header(msg.get('Message-ID'))[0][0]
+        self.assertEqual('@worldcompany.com>', msg_id[-18:], msg_id)
+
+        if dkim_private_file != "":
+            msg_dkim = decode_header(msg.get('DKIM-Signature'))[0][0]
+            self.assertEqual('v=1; a=rsa-sha256; c=relaxed/simple; d=worldcompany.com;', msg_dkim[:56], msg_dkim)
+        else:
+            six.print_("-- NO DKIM --")
+
+        message, = self.server.check_first_message('Essai de courriel', 1)
+        self.assertEqual('text/plain', message.get_content_type())
+        self.assertEqual('base64', message.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('Courriel envoyé pour vérifier la configuration\n\nWoldCompany\n', decode_b64(message.get_payload())[:60])
 
     def test_send_no_config(self):
         configSMTP('', 25)

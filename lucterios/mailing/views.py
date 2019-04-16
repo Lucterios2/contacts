@@ -25,11 +25,12 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
 
-from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO
+from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO, CLOSE_YES, WrapAction
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
-from lucterios.framework.xfercomponents import XferCompButton, XferCompImage,\
-    XferCompLabelForm
+from lucterios.framework.xfercomponents import XferCompButton, XferCompImage, XferCompLabelForm, XferCompEdit
+from lucterios.framework.xferadvance import TITLE_MODIFY, TITLE_OK, TITLE_CANCEL
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework import signal_and_lock
 
@@ -38,8 +39,6 @@ from lucterios.CORE.views import ParamEdit
 
 from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email
 from lucterios.contacts.models import LegalEntity
-from django.utils import six
-from lucterios.framework.xferadvance import TITLE_MODIFY
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing parameters'))
@@ -57,6 +56,7 @@ class Configuration(XferContainerCustom):
 
         conf_params = ['mailing-smtpserver', 'mailing-smtpport',
                        'mailing-smtpsecurity', 'mailing-smtpuser', 'mailing-smtppass',
+                       'mailing-dkim-private-path', 'mailing-dkim-selector',
                        'mailing-delay-batch', 'mailing-nb-by-batch']
         Params.fill(self, conf_params, 1, 1)
         btn = XferCompButton('editparam')
@@ -92,16 +92,35 @@ class SendEmailTry(XferContainerAcknowledge):
         if not will_mail_send():
             raise LucteriosException(IMPORTANT, _('Bad email parameter!'))
         legal = LegalEntity.objects.get(id=1)
-        address = []
-        address.append("")
-        address.append("")
-        address.append(six.text_type(legal))
-        address.append(legal.address)
-        address.append("%s %s" % (legal.postal_code, legal.city))
-        message = _('EMail sent to check configuration')
-        message += "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n")
-        send_email(None, _("EMail try"), message)
-        self.message(_("EMail send, check it."))
+        if self.getparam('CONFIRME') is None:
+            dlg = self.create_custom()
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0, 1, 3)
+            dlg.add_component(img)
+            lbl = XferCompLabelForm('lbl_title')
+            lbl.set_location(1, 0, 2)
+            lbl.set_value_as_header(self.caption)
+            dlg.add_component(lbl)
+            email = XferCompEdit('recipient')
+            email.set_location(1, 1)
+            email.set_value(legal.email)
+            email.mask = r"[^@]+@[^@]+\.[^@]+"
+            email.description = _("email")
+            dlg.add_component(email)
+            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+        else:
+            address = []
+            address.append("")
+            address.append("")
+            address.append(six.text_type(legal))
+            address.append(legal.address)
+            address.append("%s %s" % (legal.postal_code, legal.city))
+            message = _('EMail sent to check configuration')
+            message += "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n")
+            send_email(self.getparam('recipient'), _("EMail try"), message)
+            self.message(_("EMail send, check it."))
 
 
 @signal_and_lock.Signal.decorate('send_connection')
