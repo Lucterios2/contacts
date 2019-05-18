@@ -26,6 +26,7 @@ from __future__ import unicode_literals
 
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTP_SSL
+from html2text import HTML2Text
 from os.path import isfile
 
 from email.utils import formatdate, make_msgid
@@ -105,7 +106,11 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     msg['Return-Path'] = sender_email
     msg['Message-ID'] = make_msgid(domain=domain)
     msg.attach(MIMEText(body, subtype, 'utf-8'))
-    if files:
+    if subtype == 'html':
+        h2txt = HTML2Text()
+        h2txt.ignore_links = False
+        msg.attach(MIMEText(h2txt.handle(body), 'plain', 'utf-8'))
+    if (files is not None) and (len(files) > 0):
         for filename, file in files:
             msg.attach(MIMEApplication(
                 file.read(),
