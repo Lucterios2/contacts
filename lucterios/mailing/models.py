@@ -37,6 +37,7 @@ from lucterios.framework.models import LucteriosModel, LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.tools import toHtml
 from lucterios.framework.signal_and_lock import Signal
+from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.CORE.models import Parameter
 from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import AbstractContact
@@ -207,34 +208,48 @@ class Message(LucteriosModel):
             add_mailing_in_scheduler(check_nb=False, http_root_address=root_url)
         return
 
+    def define_email_message(self):
+        if not hasattr(self, 'http_root_address'):
+            raise LucteriosException(GRAVE, "No http_root_address")
+        link_html = ""
+        self._attache_files = []
+        for doc in self.documents.all():
+            if self.doc_in_link:
+                if doc.sharekey is None:
+                    doc.change_sharekey(False)
+                    doc.save()
+                doc.set_context(self.http_root_address)
+                link_html += "<li><a href='%s'>%s</a></li>" % (doc.shared_link, doc.name)
+            else:
+                self._attache_files.append((doc.name, doc.content))
+        if self.doc_in_link and (link_html != ''):
+            link_html = "<hr/><h3>%s</h3><ul>%s</ul>" % (_('Shared documents'), link_html)
+        self._email_content = "<html><body>%s%s</body></html>" % (toHtml(self.body), link_html)
+
+    @property
+    def email_content(self):
+        if not hasattr(self, '_email_content'):
+            self.define_email_message()
+        return self._email_content
+
+    @property
+    def attach_files(self):
+        if not hasattr(self, '_attache_files'):
+            self.define_email_message()
+        return self._attache_files
+
     def sendemail(self, nb_to_send, http_root_address):
+        self.http_root_address = http_root_address
         if will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
-            link_html = ""
-            files = []
-            for doc in self.documents.all():
-                if self.doc_in_link:
-                    if doc.sharekey is None:
-                        doc.change_sharekey(False)
-                        doc.save()
-                    doc.set_context(http_root_address)
-                    link_html += "<li><a href='%s'>%s</a></li>" % (doc.shared_link, doc.name)
-                else:
-                    files.append((doc.name, doc.content))
-            if self.doc_in_link and (link_html != ''):
-                link_html = "<hr/><h3>%s</h3><ul>%s</ul>" % (_('Shared documents'), link_html)
-            email_content = "<html><body>%s%s</body></html>" % (toHtml(self.body), link_html)
             for contact_email in email_list[:nb_to_send]:
                 contact_id, email = contact_email.split(':')
                 try:
                     contact = AbstractContact.objects.get(id=contact_id)
                 except AbstractContact.DoesNotExist:
                     contact = None
-                try:
-                    send_email([email], self.subject, email_content, files=files if len(files) > 0 else None)
-                    EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now(), success=True)
-                except Exception as error:
-                    EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now(), success=False, error=six.text_type(error))
+                email_sent = EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now())
+                email_sent.send_email()
             self.email_to_send = "\n".join(email_list[nb_to_send:])
             if self.email_to_send == '':
                 self.status = 1
@@ -260,6 +275,27 @@ class Message(LucteriosModel):
             return formats.date_format(emails_sent[0].date, "DATETIME_FORMAT")
         return '---'
 
+    @property
+    def nb_total(self):
+        return self.emailsent_set.all().count()
+
+    @property
+    def nb_errors(self):
+        return self.emailsent_set.filter(success=False).count()
+
+    @property
+    def nb_open(self):
+        return self.emailsent_set.filter(last_open_date__isnull=False).count()
+
+    @property
+    def statistic(self):
+        return _('Send = %(send)d - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
+            'send': self.nb_total,
+            'error': self.nb_errors,
+            'open': self.nb_open,
+            'ratio': (100.0 * self.nb_open) / self.nb_total
+        }
+
     class Meta(object):
         verbose_name = _('message')
         verbose_name_plural = _('messages')
@@ -272,10 +308,25 @@ class EmailSent(LucteriosModel):
     date = models.DateTimeField(verbose_name=_('date'), null=True)
     success = models.BooleanField(verbose_name=_('success'), default=False)
     error = models.TextField(_('error'), default="")
+    last_open_date = models.DateTimeField(verbose_name=_('last open date'), null=True, default=None)
+    nb_open = models.IntegerField(verbose_name=_('number open'), null=False, default=0)
 
     @classmethod
     def get_default_fields(cls):
-        return ['contact', 'email', 'date', 'success', 'error']
+        return ['contact', 'email', 'date', 'success', 'error', 'last_open_date', 'nb_open']
+
+    def send_email(self):
+        try:
+            body = self.message.email_content
+            if hasattr(self.message, 'http_root_address'):
+                img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (self.message.http_root_address, self.id)
+                body = body.replace('</body>', img_html + '</body>')
+            send_email([self.email], self.message.subject, body, files=self.message.attach_files)
+            self.success = True
+        except Exception as error:
+            self.success = False
+            self.error = six.text_type(error)
+        self.save()
 
     class Meta(object):
         verbose_name = _('email sent info')
