@@ -39,6 +39,7 @@ from django.utils.translation import ugettext_lazy as _
 from lucterios.CORE.parameters import Params
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.contacts.models import LegalEntity
+from logging import getLogger
 
 
 def will_mail_send():
@@ -55,7 +56,7 @@ def split_doubled_email(email_list):
         return None
 
 
-def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None, withcopy=False):
+def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None, withcopy=False, body_txt=None):
     smtp_server = Params.getvalue('mailing-smtpserver')
     sender_obj = LegalEntity.objects.get(id=1)
     sender_name = sender_obj.name
@@ -107,9 +108,11 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     msg['Message-ID'] = make_msgid(domain=domain)
     msg.attach(MIMEText(body, subtype, 'utf-8'))
     if subtype == 'html':
-        h2txt = HTML2Text()
-        h2txt.ignore_links = False
-        msg.attach(MIMEText(h2txt.handle(body), 'plain', 'utf-8'))
+        if body_txt is None:
+            h2txt = HTML2Text()
+            h2txt.ignore_links = False
+            body_txt = h2txt.handle(body)
+        msg.attach(MIMEText(body_txt, 'plain', 'utf-8'))
     if (files is not None) and (len(files) > 0):
         for filename, file in files:
             msg.attach(MIMEApplication(
