@@ -24,6 +24,8 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 from datetime import date
+from html2text import HTML2Text
+from _io import BytesIO
 import json
 
 from django.utils.translation import ugettext_lazy as _
@@ -35,14 +37,18 @@ from django.utils import six, formats, timezone
 
 from lucterios.framework.models import LucteriosModel, LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
+from lucterios.framework.printgenerators import ReportingGenerator
 from lucterios.framework.tools import toHtml
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
-from lucterios.CORE.models import Parameter
+from lucterios.CORE.models import Parameter, PrintModel
 from lucterios.CORE.parameters import Params
+
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import Document
 from lucterios.mailing.functions import will_mail_send, send_email
+from logging import getLogger, DEBUG
+from lucterios.framework.filetools import remove_accent
 
 
 class MessageLine(LucteriosModel):
@@ -109,13 +115,14 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_default_fields(cls):
-        return ['status', 'date', 'subject', (_('number of contacts'), 'contact_nb')]
+        return ['status', 'date', 'subject', (_('number of recipients'), 'contact_nb')]
 
     @classmethod
     def get_show_fields(cls):
-        return {'': [('status', 'date'), 'subject', 'body'],
-                _('001@Recipients'): ['recipients', ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
-                _('002@Documents'): ['documents', (('', 'empty'),), 'doc_in_link']
+        return {'': [('status', 'date')],
+                _('001@Message'): ['subject', 'body'],
+                _('002@Recipients'): ['recipients', ((_('number of recipients'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
+                _('003@Documents'): ['documents', (('', 'empty'),), 'doc_in_link']
                 }
 #         return [('status', 'date'), 'recipients',
 #                 ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
@@ -153,19 +160,30 @@ class Message(LucteriosModel):
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
     def get_contacts(self, email=None):
-        id_list = []
+        contact_list = []
         for modelname, item in self.get_recipients():
             contact_filter = item[0]
-            if email is not None:
+            model = apps.get_model(modelname)
+            if (email is not None) and (model.get_field_by_name('email') is not None):
                 contact_filter &= ~models.Q(email='') if email else models.Q(email='')
+            id_list = []
             for contact in apps.get_model(modelname).objects.filter(contact_filter):
                 id_list.append(contact.id)
-        return AbstractContact.objects.filter(id__in=id_list).distinct()
+            if (email is not None) and (model.get_field_by_name('email') is None):
+                for item in model.objects.filter(id__in=id_list):
+                    if (email is True) and hasattr(item, 'get_email') and (item.get_email() != []):
+                        contact_list.append(item)
+                    elif (email is False) and (not hasattr(item, 'get_email') or (item.get_email() == [])):
+                        contact_list.append(item)
+            else:
+                contact_list.extend(model.objects.filter(id__in=id_list))
+        return set(contact_list)
 
     @property
     def recipients_description(self):
         for modelname, item in self.get_recipients():
-            yield (apps.get_model(modelname)._meta.verbose_name.title(), " {[br/]}".join(item[1].values()))
+            model = apps.get_model(modelname)
+            yield (model._meta.verbose_name.title(), " {[br/]}".join(item[1].values()))
 
     def add_recipient(self, modelname, criteria):
         if self.status == 0:
@@ -186,20 +204,35 @@ class Message(LucteriosModel):
     def valid(self):
         self.date = date.today()
 
+    def _prep_sending(self):
+        email_list = []
+        printmodel_name = {}
+        for last_sending_item in self.email_to_send.split('\n'):
+            if len(last_sending_item.split(':')) == 3:
+                printmodel_name[last_sending_item.split(':')[0]] = last_sending_item.split(':')[2]
+        for old_emailsent in self.emailsent_set.all():
+            last_sending_item = old_emailsent.email
+            if len(last_sending_item.split(':')) == 3:
+                printmodel_name[last_sending_item.split(':')[0]] = last_sending_item.split(':')[2]
+        for contact in self.get_contacts(True):
+            if len(printmodel_name) == 0:
+                for email1 in contact.email.split(';'):
+                    for email2 in email1.split(','):
+                        if (":%s|" % email2) not in ("|".join(email_list) + '|'):
+                            email_list.append("%d:%s" % (contact.id, email2))
+            else:
+                model_name = contact.__class__.get_long_name()
+                email_list.append("%s:%d:%s" % (model_name, contact.id, printmodel_name[model_name] if model_name in printmodel_name.keys() else "0"))
+        self.email_to_send = "\n".join(email_list)
+        self.save()
+        self.emailsent_set.all().delete()
+
     transitionname__sending = _("Emails")
 
     @transition(field=status, source=1, target=2, conditions=[lambda item:will_mail_send()])
     def sending(self):
         if will_mail_send():
-            email_list = []
-            for contact in self.get_contacts(True):
-                for email1 in contact.email.split(';'):
-                    for email2 in email1.split(','):
-                        if (":%s|" % email2) not in ("|".join(email_list) + '|'):
-                            email_list.append("%d:%s" % (contact.id, email2))
-            self.email_to_send = "\n".join(email_list)
-            self.save()
-            self.emailsent_set.all().delete()
+            self._prep_sending()
             if self._last_xfer is not None:
                 abs_url = self._last_xfer.request.META.get('HTTP_REFERER', self._last_xfer.request.build_absolute_uri()).split('/')
                 root_url = '/'.join(abs_url[:-2])
@@ -243,11 +276,26 @@ class Message(LucteriosModel):
         if will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
             for contact_email in email_list[:nb_to_send]:
-                contact_id, email = contact_email.split(':')
-                try:
-                    contact = AbstractContact.objects.get(id=contact_id)
-                except AbstractContact.DoesNotExist:
-                    contact = None
+                contact_email_det = contact_email.split(':')
+                if len(contact_email_det) == 2:
+                    contact_id, email = contact_email_det
+                    try:
+                        contact = AbstractContact.objects.get(id=contact_id)
+                    except AbstractContact.DoesNotExist:
+                        contact = None
+                elif len(contact_email_det) == 3:
+                    modelname, object_id, _printmodel = contact_email_det
+                    model = apps.get_model(modelname)
+                    item = model.objects.get(id=object_id)
+                    if hasattr(item, 'contact'):
+                        contact = item.contact
+                    elif isinstance(item, AbstractContact):
+                        contact = item
+                    else:
+                        contact = None
+                    email = contact_email
+                else:
+                    continue
                 email_sent = EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now())
                 email_sent.send_email()
             self.email_to_send = "\n".join(email_list[nb_to_send:])
@@ -289,8 +337,9 @@ class Message(LucteriosModel):
 
     @property
     def statistic(self):
-        return _('Send = %(send)d - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
+        return _('Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
             'send': self.nb_total,
+            'date': self.date_end,
             'error': self.nb_errors,
             'open': self.nb_open,
             'ratio': (100.0 * self.nb_open) / self.nb_total
@@ -313,17 +362,96 @@ class EmailSent(LucteriosModel):
 
     @classmethod
     def get_default_fields(cls):
-        return ['contact', 'email', 'date', 'success', 'error', 'last_open_date', 'nb_open']
+        return ['contact', (_('sended item'), 'sended_item'), 'date', 'success', 'error', 'last_open_date', 'nb_open']
+
+    def get_send_email_objects(self):
+        return [self.item]
+
+    @property
+    def sended_item(self):
+        if len(self.email.split(':')) == 3:
+            modelname, object_id, _printmodel = self.email.split(':')
+            model = apps.get_model(modelname)
+            return six.text_type(model.objects.get(id=object_id))
+        else:
+            return self.email
+
+    def _extract_obj(self):
+        if len(self.email.split(':')) == 3:
+            modelname, object_id, printmodel = self.email.split(':')
+            printmodel_obj = PrintModel.objects.get(id=printmodel)
+            model = apps.get_model(modelname)
+            self.item = model.objects.get(id=object_id)
+            if hasattr(self.item, "get_document_filename"):
+                pdf_name = "%s.pdf" % self.item.get_document_filename()
+            else:
+                pdf_name = "%s.pdf" % remove_accent(printmodel_obj.name)
+            gen = ReportingGenerator()
+            gen.items = self.get_send_email_objects()
+            gen.model_text = printmodel_obj.value
+            pdf_file = BytesIO(gen.generate_report(None, False))
+            self.print_file = [(pdf_name, pdf_file)]
+        else:
+            self.print_file = None
+            self.item = None
+
+    def get_emails(self):
+        if not hasattr(self, 'item'):
+            self._extract_obj()
+        if self.item is not None:
+            cclist = self.item.get_email(False)
+            return self.item.get_email(True), cclist if len(cclist) > 0 else None
+        else:
+            return [self.email], None
+
+    def get_attach_files(self):
+        if not hasattr(self, 'print_file'):
+            self._extract_obj()
+        if self.print_file is not None:
+            return self.print_file
+        else:
+            return self.message.attach_files
+
+    def replace_tag(self, text):
+        if not hasattr(self, 'item'):
+            self._extract_obj()
+        contact = None
+        doc_reference = ''
+        if self.item is not None:
+            if hasattr(self.item, 'contact'):
+                contact = self.item.contact
+            elif isinstance(self.item, AbstractContact):
+                contact = self.item
+            if hasattr(self.item, 'reference'):
+                doc_reference = self.item.reference
+            else:
+                doc_reference = six.text_type(self.item.id)
+        first_doc_name = ''
+        if (first_doc_name == '') and (len(self.get_attach_files()) > 0):
+            first_doc_name = self.get_attach_files()[0][0]
+        if contact is None:
+            contact = self.contact
+        text = text.replace('#name', contact.get_final_child().get_presentation() if contact is not None else '???')
+        text = text.replace('#doc', first_doc_name)
+        text = text.replace('#reference', doc_reference)
+        return text
 
     def send_email(self):
         try:
-            body = self.message.email_content
+            body = self.replace_tag(self.message.email_content)
+            h2txt = HTML2Text()
+            h2txt.ignore_links = False
+            body_txt = h2txt.handle(body)
             if hasattr(self.message, 'http_root_address'):
                 img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (self.message.http_root_address, self.id)
                 body = body.replace('</body>', img_html + '</body>')
-            send_email([self.email], self.message.subject, body, files=self.message.attach_files)
+            email, ccemail = self.get_emails()
+            getLogger('lucterios.mailing').debug('send email %s : %s' % (self.message.subject, email))
+            send_email(email, self.replace_tag(self.message.subject), body, files=self.get_attach_files(), cclist=ccemail, withcopy=self.item is not None, body_txt=body_txt)
             self.success = True
         except Exception as error:
+            if getLogger('lucterios.mailing').isEnabledFor(DEBUG):
+                getLogger('lucterios.mailing').exception('send_email')
             self.success = False
             self.error = six.text_type(error)
         self.save()

@@ -46,6 +46,9 @@ class MessageEditor(LucteriosEditor):
         return LucteriosEditor.edit(self, xfer)
 
     def show(self, xfer):
+        obj_body = xfer.get_components('body')
+        obj_body.value = "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}%s{[div]}" % obj_body.value
+
         xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
