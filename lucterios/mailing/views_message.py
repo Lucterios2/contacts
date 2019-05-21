@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from copy import deepcopy
 
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
-    XferTransition
+    XferTransition, TITLE_OK, TITLE_CANCEL
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
@@ -13,14 +12,22 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManag
     get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO
 from lucterios.framework.xfergraphic import XferContainerAcknowledge,\
     XferContainerCustom
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck,\
+    XferCompEdit
 from lucterios.CORE.xferprint import XferPrintReporting
 
 from lucterios.contacts.tools import ContactSelection
-
-from lucterios.mailing.models import Message, add_mailing_in_scheduler
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck
+from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import Document
 from lucterios.documents.views import DocumentSearch
+from lucterios.mailing.models import Message, add_mailing_in_scheduler,\
+    EmailSent
+from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.framework.xferbasic import XferContainerAbstract
+from django.http.response import HttpResponse
+from base64 import b64decode
+from django.utils import timezone
+from logging import getLogger
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)
@@ -90,6 +97,42 @@ class MessageShow(XferShowEditor):
                 action.icon_path = get_icon_path("mailing.png", action.url_text)
 
 
+@ActionsManage.affect_show(_("EMail try"), "config_mail.png", condition=lambda xfer: will_mail_send() and (xfer.item.status == 0))
+@MenuManage.describ('mailing.change_message')
+class MessageSendEmailTry(XferContainerAcknowledge):
+    icon = "mailing.png"
+    model = Message
+    field_id = 'message'
+    caption = _("Show message")
+    caption = _("EMail try")
+
+    def fillresponse(self):
+        legal = LegalEntity.objects.get(id=1)
+        if self.getparam('CONFIRME') is None:
+            dlg = self.create_custom()
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0, 1, 3)
+            dlg.add_component(img)
+            lbl = XferCompLabelForm('lbl_title')
+            lbl.set_location(1, 0, 2)
+            lbl.set_value_as_header(self.caption)
+            dlg.add_component(lbl)
+            email = XferCompEdit('recipient')
+            email.set_location(1, 1)
+            email.set_value(legal.email)
+            email.mask = r"[^@]+@[^@]+\.[^@]+"
+            email.description = _("email")
+            dlg.add_component(email)
+            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+        else:
+            abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
+            self.item.http_root_address = '/'.join(abs_url[:-2])
+            send_email([self.getparam('recipient')], self.item.subject, self.item.email_content, files=self.item.attach_files)
+            self.message(_("EMail send, check it."))
+
+
 @ActionsManage.affect_transition("status")
 @MenuManage.describ('mailing.add_message')
 class MessageTransition(XferTransition):
@@ -124,19 +167,24 @@ class MessageSentInfo(XferContainerCustom):
         begin.set_value_as_title(_('Transmission report'))
         self.add_component(begin)
 
-        self.filltab_from_model(1, 1, True, [((_('date begin of send'), 'date_begin'), (_('date end of send'), 'date_end')), ('emailsent_set',)])
+        fields = [((_('date begin of send'), 'date_begin'), (_('date end of send'), 'date_end')),
+                  ((_('statistic'), 'statistic'), ),
+                  ('emailsent_set',)]
+        self.filltab_from_model(1, 1, True, fields)
+        grid = self.get_components('emailsent')
         if not show_only_failed:
-            grid = self.get_components('emailsent')
             grid.delete_header('error')
+        else:
+            grid.delete_header('last_open_date')
+            grid.delete_header('nb_open')
 
         check = XferCompCheck('show_only_failed')
         check.set_value(show_only_failed)
         check.description = _('Show only failed')
-        check.set_location(1, 3, 2)
+        check.set_location(1, 4, 2)
         check.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(check)
 
-        show_only_failed
         self.add_action(WrapAction(_('Close'), 'images/close.png'))
 
 
@@ -229,3 +277,24 @@ class MessageRemoveDoc(XferContainerAcknowledge):
         if self.confirme(_('Do you want to remove those documents ?')):
             for doc in Document.objects.filter(id__in=document):
                 self.item.documents.remove(doc)
+
+
+@MenuManage.describ('')
+class EmailSentAddForStatistic(XferContainerAbstract):
+    observer_name = 'Statistic'
+    caption = 'EmailSentAddForStatistic'
+    model = EmailSent
+    field_id = 'emailsent'
+
+    def fillresponse(self, emailsent=0):
+        try:
+            email_sent = EmailSent.objects.get(id=emailsent)
+            email_sent.last_open_date = timezone.now()
+            email_sent.nb_open += 1
+            email_sent.save()
+        except Exception as exp:
+            getLogger("lucterios.mailing").debug("EmailSentAddForStatistic - error=%s" % exp)
+
+    def get_response(self):
+        SMALL_IMAGE = "/9j/4AAQSkZJRgABAQEASABIAAD//gATQ3JlYXRlZCB3aXRoIEdJTVD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+        return HttpResponse(b64decode(SMALL_IMAGE), content_type='image/jpg')

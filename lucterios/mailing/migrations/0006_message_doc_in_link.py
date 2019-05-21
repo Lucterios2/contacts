@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='message',
             name='doc_in_link',
-            field=models.BooleanField(default=False, verbose_name='document in link'),
+            field=models.BooleanField(default=False, verbose_name='documents in link'),
         ),
     ]

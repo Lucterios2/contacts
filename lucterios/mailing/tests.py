@@ -39,7 +39,7 @@ from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.error import LucteriosException
 from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
-from lucterios.CORE.models import Parameter, LucteriosUser
+from lucterios.CORE.models import Parameter, LucteriosUser, PrintModel
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct
 
@@ -51,10 +51,12 @@ from lucterios.mailing.views import Configuration, SendEmailTry
 from lucterios.mailing.functions import will_mail_send, send_email
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
     MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
-    MessageValidInsertDoc, MessageRemoveDoc
+    MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
 
 from lucterios.documents.tests import create_doc
+from lucterios.mailing.models import Message
+from lucterios.documents.models import Document
 
 
 class ConfigurationTest(LucteriosTest):
@@ -274,10 +276,13 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg, = self.server.check_first_message('send html', 1)
-        self.assertEqual('text/html', msg.get_content_type())
-        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-        self.assertEqual('<html><body><h1>Yessss!!!</h1></body></html>', decode_b64(msg.get_payload()))
+        msg1, msg2, = self.server.check_first_message('send html', 2)
+        self.assertEqual('text/html', msg1.get_content_type())
+        self.assertEqual('base64', msg1.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('<html><body><h1>Yessss!!!</h1></body></html>', decode_b64(msg1.get_payload()))
+        self.assertEqual('text/plain', msg2.get_content_type())
+        self.assertEqual('base64', msg2.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('# Yessss!!!\n\n', decode_b64(msg2.get_payload()))
 
     def test_send_with_auth(self):
         self.server.smtp.with_authentificate = True
@@ -361,7 +366,7 @@ class ConfigurationTest(LucteriosTest):
                                           "password_generate": 'o', "email": 'admin@super.com'}, False)
         self.assert_observer('core.acknowledge', 'CORE', 'usersEdit')
         self.assertEqual(1, self.server.count())
-        msg, = self.server.check_first_message('Mot de passe de connexion', 1)
+        msg, _msg = self.server.check_first_message('Mot de passe de connexion', 2)
         self.assertEqual('text/html', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         content_msg = decode_b64(msg.get_payload())
@@ -423,7 +428,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal(self.json_actions[0], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
         self.assert_action_equal(self.json_actions[1], ('Fermer', 'images/close.png'))
@@ -445,7 +450,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[0], ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
         self.assert_action_equal(self.json_actions[1], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 1))
@@ -466,7 +471,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_count_equal("recipient_list", 2)
 
     def test_validate_message(self):
@@ -487,7 +492,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 'validé')
         self.assert_count_equal("#recipient_list/actions", 0)
         self.assert_count_equal("recipient_list", 2)
@@ -501,7 +506,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 13)
+        self.assert_count_equal('', 14)
         self.assert_json_equal('LABELFORM', "contact_noemail", 'Valjean jean')
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[0], ('Courriels', 'lucterios.mailing/images/mailing.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
@@ -547,7 +552,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_grid_equal('document', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
         self.assert_json_equal('LABELFORM', "doc_in_link", 'Non')
@@ -570,7 +575,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 11)
+        self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_count_equal("document", 2)
         self.assert_count_equal("#document/actions", 3)
@@ -588,7 +593,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
         self.assert_count_equal("document", 1)
         self.assert_count_equal("#document/actions", 3)
@@ -601,10 +606,151 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 'validé')
         self.assert_count_equal("document", 1)
         self.assert_count_equal("#document/actions", 1)
+
+    def test_trysend(self):
+        configSMTP('', 25)
+        self.factory.xfer = MessageAddModify()
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body':
+                                                              '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
+
+        self.factory.xfer = MessageShow()
+        self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
+        self.assertEqual(len(self.json_actions), 2)
+
+        configSMTP('localhost', 1025)
+        self.factory.xfer = MessageShow()
+        self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
+        self.assertEqual(len(self.json_actions), 3)
+
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.assertEqual(0, server.count())
+            self.factory.xfer = MessageSendEmailTry()
+            self.calljson('/lucterios.mailing/messageSendEmailTry', {'message': '1'}, False)
+            self.assert_observer('core.custom', 'lucterios.mailing', 'messageSendEmailTry')
+            self.assert_json_equal('EDIT', "recipient", 'mr-sylvestre@worldcompany.com')
+
+            self.factory.xfer = MessageSendEmailTry()
+            self.calljson('/lucterios.mailing/messageSendEmailTry', {'message': '1', 'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.mailing', 'messageSendEmailTry')
+            self.assert_json_equal('', 'text', 'Courriel envoyé, veuillez le vérifier.')
+
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['behoa@worldcompany.com'], server.get(0)[2])
+        finally:
+            server.stop()
+
+    def test_send_classic(self):
+        self.factory.user = LucteriosUser.objects.create(username='empty')
+        self.factory.user.is_superuser = True
+        self.factory.user.save()
+        create_doc(self.factory.user, with_folder=False)
+
+        configSMTP('localhost', 1025)
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye")
+            email_msg.add_recipient('contacts.Individual', 'genre||8||1')
+            email_msg.add_recipient('contacts.LegalEntity', '')
+            email_msg.save()
+            email_msg.documents.add(Document.objects.get(id=1))
+            email_msg.valid()
+            self.assertEqual(3, email_msg.contact_nb)
+            self.assertEqual('Valjean jean', email_msg.contact_noemail)
+            email_msg._prep_sending()
+            email_msg.status = 2
+            email_msg.save()
+            self.assertEqual(0, server.count())
+
+            email_msg.sendemail(10, "http://testserver")
+            self.assertEqual(2, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
+            self.assertEqual(['jack@worldcompany.com'], server.get(1)[2])
+
+            msg, msg_txt, msg_file1 = server.get_msg_index(1, "Sending ''")
+
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            self.assertEqual("<html><body><b>jack MISTER</b><br/><br/>With Document: <i>doc1.png</i><br/><br/>Bye<img src='http://testserver/lucterios.mailing/emailSentAddForStatistic?emailsent=2' alt=''/></body></html>",
+                             decode_b64(msg.get_payload()))
+
+            self.assertEqual('text/plain', msg_txt.get_content_type())
+            self.assertEqual('base64', msg_txt.get('Content-Transfer-Encoding', ''))
+            self.assertEqual('**jack MISTER**  \n  \nWith Document: _doc1.png_  \n  \nBye\n\n', decode_b64(msg_txt.get_payload()))
+
+            self.assertTrue('doc1.png' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
+        finally:
+            server.stop()
+
+    def test_send_dynamic(self):
+
+        print_model = PrintModel.objects.create(name="Report", kind="2", modelname="contacts.Individual")
+        print_model.value = """
+<model hmargin="10.0" vmargin="10.0" page_width="210.0" page_height="297.0">
+<header extent="0.0"/>
+<bottom extent="0.0"/>
+<body/>
+</model>
+"""
+        print_model.save()
+
+        create_jack(firstname="jack", lastname='Dalton')
+        create_jack(firstname="joe", lastname='Dalton')
+        create_jack(firstname="wiliam", lastname='Dalton')
+        create_jack(firstname="avrel", lastname='Dalton')
+
+        configSMTP('localhost', 1025)
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye",
+                                               email_to_send="contacts.Individual:0:%d" % print_model.id)
+            email_msg.add_recipient('contacts.Individual', 'id||8||4;5;6;7')
+            email_msg.save()
+            email_msg.valid()
+            self.assertEqual(4, email_msg.contact_nb)
+            self.assertEqual('', email_msg.contact_noemail)
+            email_msg._prep_sending()
+            email_msg.status = 2
+            email_msg.save()
+            self.assertEqual(0, server.count())
+
+            email_msg.sendemail(10, "http://testserver")
+            self.assertEqual(4, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['jack@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
+            self.assertEqual(['joe@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(1)[2])
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(2)[1])
+            self.assertEqual(['wiliam@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(2)[2])
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(3)[1])
+            self.assertEqual(['avrel@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(3)[2])
+
+            msg, msg_txt, msg_file1 = server.get_msg_index(2, "Sending '6'")
+
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            self.assertEqual("<html><body><b>wiliam Dalton</b><br/><br/>With Document: <i>Report.pdf</i><br/><br/>Bye<img src='http://testserver/lucterios.mailing/emailSentAddForStatistic?emailsent=3' alt=''/></body></html>",
+                             decode_b64(msg.get_payload()))
+
+            self.assertEqual('text/plain', msg_txt.get_content_type())
+            self.assertEqual('base64', msg_txt.get('Content-Transfer-Encoding', ''))
+            self.assertEqual('**wiliam Dalton**  \n  \nWith Document: _Report.pdf_  \n  \nBye\n\n', decode_b64(msg_txt.get_payload()))
+
+            self.assertTrue('Report.pdf' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
+        finally:
+            server.stop()
 
 
 class SendMailingTest(AsychronousLucteriosTest):
@@ -650,11 +796,14 @@ class SendMailingTest(AsychronousLucteriosTest):
             self.assertEqual(0, len(LucteriosScheduler.get_list()))
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
-            msg, msg_file1, msg_file3 = server.check_first_message('new message', 3)
+            msg, msg_txt, msg_file1, msg_file3 = server.check_first_message('new message', 4)
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             self.assertEqual(
-                '<html><body><b><font color="blue">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye</body></html>', decode_b64(msg.get_payload()))
+                "<html><body><b><font color=\"blue\">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye<img src='http://testserver/lucterios.mailing/emailSentAddForStatistic?emailsent=1' alt=''/></body></html>", decode_b64(msg.get_payload()))
+            self.assertEqual('text/plain', msg_txt.get_content_type())
+            self.assertEqual("**All**  \nSmall message to give a big _kiss_ ;)  \n  \nBye\n\n", decode_b64(msg_txt.get_payload()))
+
             self.assertTrue('doc1.png' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
             content_msg1 = b64decode(msg_file1.get_payload())
             self.assertEqual(b"\x89PNG", content_msg1[:4])
@@ -668,33 +817,91 @@ class SendMailingTest(AsychronousLucteriosTest):
 
         self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': False})
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
-        self.assert_count_equal('', 6)
-        self.assert_grid_equal('emailsent', {"contact": "contact", "email": "courriel", "date": "date", "success": "succès"}, 9)
-        self.assert_json_equal('', "emailsent/@0/email", "mr-sylvestre@worldcompany.com")
+        self.assert_count_equal('', 7)
+        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoie", "date": "date", "success": "succès",
+                                             "last_open_date": "date de dernière ouverture", "nb_open": "nombre de messages ouverts"}, 9)
+        self.assert_json_equal('', "emailsent/@0/sended_item", "mr-sylvestre@worldcompany.com")
         self.assert_json_equal('', "emailsent/@0/success", 1)
-        self.assert_json_equal('', "emailsent/@1/email", "jack@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@0/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@0/id", 1)
+        self.assert_json_equal('', "emailsent/@1/sended_item", "jack@worldcompany.com")
         self.assert_json_equal('', "emailsent/@1/success", 1)
-        self.assert_json_equal('', "emailsent/@2/email", "joe@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@1/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@1/id", 2)
+        self.assert_json_equal('', "emailsent/@2/sended_item", "joe@worldcompany.com")
         self.assert_json_equal('', "emailsent/@2/success", 1)
-        self.assert_json_equal('', "emailsent/@3/email", "wiliam@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@2/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@2/id", 3)
+        self.assert_json_equal('', "emailsent/@3/sended_item", "wiliam@worldcompany.com")
         self.assert_json_equal('', "emailsent/@3/success", 1)
-        self.assert_json_equal('', "emailsent/@4/email", "avrel@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@3/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@4/sended_item", "avrel@worldcompany.com")
         self.assert_json_equal('', "emailsent/@4/success", 1)
-        self.assert_json_equal('', "emailsent/@5/email", "lucky@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@4/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@5/sended_item", "lucky@worldcompany.com")
         self.assert_json_equal('', "emailsent/@5/success", 1)
-        self.assert_json_equal('', "emailsent/@6/email", "lucky@luke.org")
+        self.assert_json_equal('', "emailsent/@5/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@6/sended_item", "lucky@luke.org")
         self.assert_json_equal('', "emailsent/@6/success", 1)
-        self.assert_json_equal('', "emailsent/@7/email", "luke@usmarchal.gov")
+        self.assert_json_equal('', "emailsent/@6/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@7/sended_item", "luke@usmarchal.gov")
         self.assert_json_equal('', "emailsent/@7/success", 1)
-        self.assert_json_equal('', "emailsent/@8/email", "émilie@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@7/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@8/sended_item", "émilie@worldcompany.com")
         self.assert_json_equal('', "emailsent/@8/success", 0)
+        self.assert_json_equal('', "emailsent/@8/nb_open", 0)
         self.assertEqual(len(self.json_actions), 1)
+
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '1'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '2'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '3'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '2'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '2'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '20'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '3'}, True)
+
+        self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': False})
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
+        self.assert_json_equal('', "emailsent/@0/sended_item", "mr-sylvestre@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@0/success", 1)
+        self.assert_json_equal('', "emailsent/@0/nb_open", 1)
+        self.assert_json_equal('', "emailsent/@1/sended_item", "jack@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@1/success", 1)
+        self.assert_json_equal('', "emailsent/@1/nb_open", 3)
+        self.assert_json_equal('', "emailsent/@2/sended_item", "joe@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@2/success", 1)
+        self.assert_json_equal('', "emailsent/@2/nb_open", 2)
+        self.assert_json_equal('', "emailsent/@3/sended_item", "wiliam@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@3/success", 1)
+        self.assert_json_equal('', "emailsent/@3/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@4/sended_item", "avrel@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@4/success", 1)
+        self.assert_json_equal('', "emailsent/@4/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@5/sended_item", "lucky@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@5/success", 1)
+        self.assert_json_equal('', "emailsent/@5/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@6/sended_item", "lucky@luke.org")
+        self.assert_json_equal('', "emailsent/@6/success", 1)
+        self.assert_json_equal('', "emailsent/@6/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@7/sended_item", "luke@usmarchal.gov")
+        self.assert_json_equal('', "emailsent/@7/success", 1)
+        self.assert_json_equal('', "emailsent/@7/nb_open", 0)
+        self.assert_json_equal('', "emailsent/@8/sended_item", "émilie@worldcompany.com")
+        self.assert_json_equal('', "emailsent/@8/success", 0)
+        self.assert_json_equal('', "emailsent/@8/nb_open", 0)
+
+        val_stat = self.get_json_path("statistic")
+        self.assertIn("9 message(s) envoyé(s) le", val_stat)
+        self.assertIn("(dont 1 en erreur)", val_stat)
+        self.assertIn("Avec 3 message(s) ouvert(s)", val_stat)
+        self.assertIn("taux de 33.3 % d'ouverture.", val_stat)
 
         self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': True})
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
-        self.assert_count_equal('', 6)
-        self.assert_grid_equal('emailsent', {"contact": "contact", "email": "courriel", "date": "date", "success": "succès", "error": "erreur"}, 1)
-        self.assert_json_equal('', "emailsent/@0/email", "émilie@worldcompany.com")
+        self.assert_count_equal('', 7)
+        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoie", "date": "date", "success": "succès", "error": "erreur"}, 1)
+        self.assert_json_equal('', "emailsent/@0/sended_item", "émilie@worldcompany.com")
         self.assert_json_equal('', "emailsent/@0/success", 0)
         self.assert_json_equal('', "emailsent/@0/error", "'ascii' codec can't encode character", True)
 
@@ -704,6 +911,13 @@ class SendMailingTest(AsychronousLucteriosTest):
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '1'})
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '3'})
         self.calljson('/lucterios.mailing/messageTransition', {'message': '2', 'TRANSITION': 'valid', 'CONFIRME': 'YES'})
+
+        self.calljson('/lucterios.mailing/messageShow', {'message': '2'}, True)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
+        self.assert_json_equal('LABELFORM', "status", 'validé')
+        self.assert_count_equal("recipient_list", 1)
+        self.assert_json_equal('LABELFORM', "contact_nb", '1')
+
         server = TestReceiver()
         server.start(1025)
         try:
@@ -713,11 +927,12 @@ class SendMailingTest(AsychronousLucteriosTest):
             sleep(10)
             self.assertEqual(1, len(LucteriosScheduler.get_list()))
             sleep(10)
-            self.assertEqual(1, server.count())
             self.assertEqual(0, len(LucteriosScheduler.get_list()))
+            self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
-            msg, = server.check_first_message('new message', 1)
+            msg, msg_txt = server.check_first_message('new message', 2)
+            self.assertEqual('text/plain', msg_txt.get_content_type())
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             content = decode_b64(msg.get_payload())
@@ -763,7 +978,7 @@ class UserTest(LucteriosTest):
             self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['jack@worldcompany.com'], server.get(0)[2])
-            msg, = server.check_first_message('Mot de passe de connexion', 1)
+            msg, _msg = server.check_first_message('Mot de passe de connexion', 2)
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             message = decode_b64(msg.get_payload())
@@ -819,7 +1034,7 @@ class UserTest(LucteriosTest):
             self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['pierre@worldcompany.com'], server.get(0)[2])
-            msg, = server.check_first_message('Mot de passe de connexion', 1)
+            msg, _msg, = server.check_first_message('Mot de passe de connexion', 2)
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             message = decode_b64(msg.get_payload())
@@ -878,10 +1093,11 @@ class UserTest(LucteriosTest):
             self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['pierre@worldcompany.com'], server.get(0)[2])
-            msg, = server.check_first_message('Mot de passe de connexion', 1)
-            self.assertEqual('text/html', msg.get_content_type())
-            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-            message = decode_b64(msg.get_payload())
+            msg1, msg2, = server.check_first_message('Mot de passe de connexion', 2)
+            self.assertEqual('text/html', msg1.get_content_type())
+            self.assertEqual('text/plain', msg2.get_content_type())
+            self.assertEqual('base64', msg1.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg1.get_payload())
             self.assertEqual('<html>Bienvenue<br/><br/>Confirmation de connexion à votre application :'
                              '<br/> - Alias : pierre<br/> - Mot de passe : ', message[:117])
             password = message[117:].split('<br/>')[0]

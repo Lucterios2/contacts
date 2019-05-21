@@ -390,6 +390,15 @@ class AbstractContact(LucteriosModel, CustomizeObject):
     def get_presentation(self):
         return ""
 
+    def get_email(self, only_main=None):
+        email_list = []
+        contact = self.get_final_child()
+        if contact != self:
+            return contact.get_email(only_main)
+        if (only_main is not False) and (self.email != ''):
+            email_list.append(self.email)
+        return email_list
+
     @classmethod
     def get_all_print_fields(cls, with_plugin=True):
         fields = super(AbstractContact, cls).get_all_print_fields(with_plugin)
@@ -462,6 +471,14 @@ class LegalEntity(AbstractContact):
             return self.name
         else:
             return "%s (%s)" % (", ".join(sub_contact), self.name)
+
+    def get_email(self, only_main=None):
+        email_list = AbstractContact.get_email(self, only_main)
+        if only_main is not True:
+            for indiv in Individual.objects.filter(responsability__legal_entity=self).distinct():
+                if indiv.email != '':
+                    email_list.append(indiv.email)
+        return email_list
 
     def can_delete(self):
         msg = AbstractContact.can_delete(self)

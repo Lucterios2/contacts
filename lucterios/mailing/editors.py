@@ -45,6 +45,9 @@ class MessageEditor(LucteriosEditor):
         return LucteriosEditor.edit(self, xfer)
 
     def show(self, xfer):
+        obj_body = xfer.get_components('body')
+        obj_body.value = "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}%s{[div]}" % obj_body.value
+
         xfer.move_components('body', 0, 2)
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
@@ -81,5 +84,8 @@ class MessageEditor(LucteriosEditor):
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
         xfer.tab = new_documents.tab
         xfer.add_component(new_documents)
-
+        contact_nb = xfer.get_components('contact_nb')
+        if (contact_nb is not None) and (self.item.nb_total > 0):
+            xfer.tab = contact_nb.tab
+            xfer.fill_from_model(contact_nb.col, contact_nb.row + 1, True, [((_('statistic'), 'statistic'),)])
         return LucteriosEditor.show(self, xfer)
