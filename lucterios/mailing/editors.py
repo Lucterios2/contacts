@@ -29,7 +29,6 @@ from django.utils.translation import ugettext as _
 from lucterios.framework.editors import LucteriosEditor
 from lucterios.framework.xfercomponents import XferCompGrid
 from lucterios.mailing.functions import will_mail_send
-from lucterios.documents.models import Document
 from lucterios.documents.views import DocumentShow
 from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE,\
     SELECT_NONE, SELECT_MULTI
