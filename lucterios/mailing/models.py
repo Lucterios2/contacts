@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from datetime import date
 from html2text import HTML2Text
+from logging import getLogger, DEBUG
 from _io import BytesIO
 import json
 
@@ -41,14 +42,13 @@ from lucterios.framework.printgenerators import ReportingGenerator
 from lucterios.framework.tools import toHtml
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
+from lucterios.framework.filetools import remove_accent
 from lucterios.CORE.models import Parameter, PrintModel
 from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import Document
 from lucterios.mailing.functions import will_mail_send, send_email
-from logging import getLogger, DEBUG
-from lucterios.framework.filetools import remove_accent
 
 
 class MessageLine(LucteriosModel):
@@ -204,8 +204,7 @@ class Message(LucteriosModel):
     def valid(self):
         self.date = date.today()
 
-    def _prep_sending(self):
-        email_list = []
+    def get_printmodel_names(self):
         printmodel_name = {}
         for last_sending_item in self.email_to_send.split('\n'):
             if len(last_sending_item.split(':')) == 3:
@@ -214,6 +213,15 @@ class Message(LucteriosModel):
             last_sending_item = old_emailsent.email
             if len(last_sending_item.split(':')) == 3:
                 printmodel_name[last_sending_item.split(':')[0]] = last_sending_item.split(':')[2]
+        return printmodel_name
+
+    @property
+    def is_dynamic(self):
+        return len(self.get_printmodel_names()) > 0
+
+    def _prep_sending(self):
+        email_list = []
+        printmodel_name = self.get_printmodel_names()
         for contact in self.get_contacts(True):
             if len(printmodel_name) == 0:
                 for email1 in contact.email.split(';'):
