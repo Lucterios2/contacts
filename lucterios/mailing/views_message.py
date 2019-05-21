@@ -188,7 +188,7 @@ class MessageSentInfo(XferContainerCustom):
         self.add_action(WrapAction(_('Close'), 'images/close.png'))
 
 
-@ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: xfer.item.status == 1)
+@ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: (xfer.item.status == 1) and not xfer.item.is_dynamic)
 @MenuManage.describ('mailing.add_message')
 class MessageLetter(XferPrintReporting):
     icon = "mailing.png"

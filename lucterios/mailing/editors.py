@@ -71,19 +71,22 @@ class MessageEditor(LucteriosEditor):
 
         old_documents = xfer.get_components('documents')
         xfer.remove_component('documents')
-        new_documents = XferCompGrid('document')
-        new_documents.tab = old_documents.tab
-        new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
-        new_documents.set_model(self.item.documents.all(), ["name", "description", "date_modification"], xfer)
-        new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
-                                 modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
-        if self.item.status == 0:
-            new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png"),
-                                     modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_MULTI)
-            new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), "images/add.png"),
-                                     modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
-        xfer.tab = new_documents.tab
-        xfer.add_component(new_documents)
+        if xfer.item.is_dynamic:
+            xfer.remove_component('__tab_3')
+        else:
+            new_documents = XferCompGrid('document')
+            new_documents.tab = old_documents.tab
+            new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
+            new_documents.set_model(self.item.documents.all(), ["name", "description", "date_modification"], xfer)
+            new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
+                                     modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
+            if self.item.status == 0:
+                new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png"),
+                                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_MULTI)
+                new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), "images/add.png"),
+                                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
+            xfer.tab = new_documents.tab
+            xfer.add_component(new_documents)
         contact_nb = xfer.get_components('contact_nb')
         if (contact_nb is not None) and (self.item.nb_total > 0):
             xfer.tab = contact_nb.tab
