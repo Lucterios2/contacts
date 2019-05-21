@@ -142,6 +142,15 @@ class TestReceiver(TestCase):
         msg = email.message_from_string(data)
         return msg
 
+    def convert_message(self, msg_list):
+        msg_result = []
+        for msg_item in msg_list:
+            if (msg_item.get_content_type() == 'multipart/alternative'):
+                msg_result.extend(msg_item.get_payload())
+            else:
+                msg_result.append(msg_item)
+        return msg_result
+
     def get_msg_index(self, index, subject=None):
         data = self.get(index)[3]
         if hasattr(data, 'decode'):
@@ -149,7 +158,7 @@ class TestReceiver(TestCase):
         msg = email.message_from_string(data)
         if subject is not None:
             self.assertEqual(subject, msg.get('Subject', ''), msg.get('Subject', ''))
-        return msg.get_payload()
+        return self.convert_message(msg.get_payload())
 
     def check_first_message(self, subject, nb_multi, params=None):
         msg = self.get_first_msg()
@@ -159,5 +168,6 @@ class TestReceiver(TestCase):
             params['Subject'] = subject
             for key, val in params.items():
                 self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
-        self.assertEqual(nb_multi, len(msg.get_payload()))
-        return msg.get_payload()
+        msg_result = self.convert_message(msg.get_payload())
+        self.assertEqual(nb_multi, len(msg_result))
+        return msg_result

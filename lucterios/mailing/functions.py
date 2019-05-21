@@ -74,11 +74,6 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     smtp_security = Params.getvalue('mailing-smtpsecurity')
     dkim_private_path = Params.getvalue('mailing-dkim-private-path')
     dkim_selector = Params.getvalue('mailing-dkim-selector')
-    body = six.text_type(body).strip()
-    if body[:6].lower() == '<html>':
-        subtype = 'html'
-    else:
-        subtype = 'plain'
     msg = MIMEMultipart()
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = six.text_type(subject)
@@ -106,13 +101,18 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     msg['From'] = msg_from
     msg['Return-Path'] = sender_email
     msg['Message-ID'] = make_msgid(domain=domain)
-    msg.attach(MIMEText(body, subtype, 'utf-8'))
-    if subtype == 'html':
+    body = six.text_type(body).strip()
+    if body[:6].lower() == '<html>':
         if body_txt is None:
             h2txt = HTML2Text()
             h2txt.ignore_links = False
             body_txt = h2txt.handle(body)
-        msg.attach(MIMEText(body_txt, 'plain', 'utf-8'))
+        msg_alternative = MIMEMultipart('alternative')
+        msg_alternative.attach(MIMEText(body, 'html', 'utf-8'))
+        msg_alternative.attach(MIMEText(body_txt, 'plain', 'utf-8'))
+        msg.attach(msg_alternative)
+    else:
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
     if (files is not None) and (len(files) > 0):
         for filename, file in files:
             msg.attach(MIMEApplication(
