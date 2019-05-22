@@ -75,7 +75,9 @@ class MessageLineSet(QuerySet):
         body = self._hints['body']
         body = body.replace('\n', '{[br/]}')
         body = body.replace('{[br]}', '{[br/]}')
-        self.lines = body.split('{[br/]}')
+        body = body.replace('{[p]}', '')
+        body = body.replace('{[/p]}', '\n')
+        self.lines = body.split('\n')
 
     def _fetch_all(self):
         if self._result_cache is None:
