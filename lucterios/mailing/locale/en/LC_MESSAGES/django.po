@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-22 10:21+0000\n"
+"POT-Creation-Date: 2019-05-22 10:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,7 +37,7 @@ msgstr "Remove"
 msgid "Insert"
 msgstr "Insert"
 
-#: editors.py:93 views_message.py:174
+#: editors.py:93 views_message.py:172
 msgid "statistic"
 msgstr "statistic"
 
@@ -158,7 +158,7 @@ msgstr "message"
 msgid "messages"
 msgstr "messages"
 
-#: models.py:366 views.py:109 views_message.py:128
+#: models.py:366 views.py:109 views_message.py:126
 msgid "email"
 msgstr "email"
 
@@ -272,7 +272,7 @@ msgstr "Send"
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:89 views.py:122 views_message.py:103 views_message.py:110
+#: views.py:89 views.py:122 views_message.py:101 views_message.py:108
 msgid "EMail try"
 msgstr "EMail try"
 
@@ -284,7 +284,7 @@ msgstr "Bad email parameter!"
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:123 views_message.py:136
+#: views.py:123 views_message.py:134
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 
@@ -296,103 +296,103 @@ msgstr "email properly configured"
 msgid "email not configured"
 msgstr "email not configured"
 
-#: views_message.py:34
+#: views_message.py:32
 msgid "Mailing"
 msgstr "Mailing"
 
-#: views_message.py:34
+#: views_message.py:32
 msgid "Create and send mailing to contacts."
 msgstr "Create and send mailing to contacts."
 
-#: views_message.py:37
+#: views_message.py:35
 msgid "Manage list of message for mailing."
 msgstr "Manage list of message for mailing."
 
-#: views_message.py:42
+#: views_message.py:40
 msgid "Messages"
 msgstr "Messages"
 
-#: views_message.py:58 views_message.py:68
+#: views_message.py:56 views_message.py:66
 msgid "Add message"
 msgstr "Add message"
 
-#: views_message.py:59
+#: views_message.py:57
 msgid "Modify message"
 msgstr "Modify message"
 
-#: views_message.py:72
+#: views_message.py:70
 msgid "This message can not be clone!"
 msgstr "This message can not be clone!"
 
-#: views_message.py:94 views_message.py:109
+#: views_message.py:92 views_message.py:107
 msgid "Show message"
 msgstr "Show message"
 
-#: views_message.py:148
+#: views_message.py:146
 #, python-format
 msgid "Do you want to sent this message to %d contacts?"
 msgstr "Do you want to sent this message to %d contacts?"
 
-#: views_message.py:150
+#: views_message.py:148
 msgid "This message is being transmitted"
 msgstr "This message is being transmitted"
 
-#: views_message.py:155
+#: views_message.py:153
 msgid "Info"
 msgstr "Info"
 
-#: views_message.py:161 views_message.py:170
+#: views_message.py:159 views_message.py:168
 msgid "Transmission report"
 msgstr "Transmission report"
 
-#: views_message.py:173
+#: views_message.py:171
 msgid "date begin of send"
 msgstr "date begin of send"
 
-#: views_message.py:173
+#: views_message.py:171
 msgid "date end of send"
 msgstr "date end of send"
 
-#: views_message.py:186
+#: views_message.py:184
 msgid "Show only failed"
 msgstr "Show only failed"
 
-#: views_message.py:191
+#: views_message.py:189
 msgid "Close"
 msgstr "Close"
 
-#: views_message.py:194
+#: views_message.py:192
 msgid "Letters"
 msgstr "Letters"
 
-#: views_message.py:200
+#: views_message.py:198
 msgid "Write message"
 msgstr "Write message"
 
-#: views_message.py:217
+#: views_message.py:215
 msgid "Delete message"
 msgstr "Delete message"
 
-#: views_message.py:225 views_message.py:237
+#: views_message.py:223 views_message.py:235
 msgid "Add recipient to message"
 msgstr "Add recipient to message"
 
-#: views_message.py:247
+#: views_message.py:245
 msgid "Delete recipient"
 msgstr "Delete recipient"
 
-#: views_message.py:250
+#: views_message.py:248
 msgid "Do you want to delete this recipient?"
 msgstr "Do you want to delete this recipient?"
 
-#: views_message.py:259 views_message.py:267
+#: views_message.py:257 views_message.py:265
 msgid "Insert document to message"
 msgstr "Insert document to message"
 
-#: views_message.py:274
+#: views_message.py:272
 msgid "Remove document to message"
 msgstr "Remove document to message"
 
-#: views_message.py:280
+#: views_message.py:278
 msgid "Do you want to remove those documents ?"
 msgstr "Do you want to remove those documents ?"

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.http.response import HttpResponse
+from base64 import b64decode
+from logging import getLogger
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
     XferTransition, TITLE_OK, TITLE_CANCEL
@@ -10,25 +14,19 @@ from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
 from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI,\
     get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO
-from lucterios.framework.xfergraphic import XferContainerAcknowledge,\
-    XferContainerCustom
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck,\
-    XferCompEdit
+from lucterios.framework.xferbasic import XferContainerAbstract
+from lucterios.framework.error import LucteriosException, MINOR
+from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck, XferCompEdit
 from lucterios.CORE.xferprint import XferPrintReporting
 
 from lucterios.contacts.tools import ContactSelection
 from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import Document
 from lucterios.documents.views import DocumentSearch
-from lucterios.mailing.models import Message, add_mailing_in_scheduler,\
-    EmailSent
+from lucterios.mailing.models import Message, add_mailing_in_scheduler, EmailSent
 from lucterios.mailing.functions import will_mail_send, send_email
-from lucterios.framework.xferbasic import XferContainerAbstract
-from django.http.response import HttpResponse
-from base64 import b64decode
-from django.utils import timezone
-from logging import getLogger
-from lucterios.framework.error import LucteriosException, MINOR
+
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)
