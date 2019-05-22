@@ -28,6 +28,7 @@ from django.http.response import HttpResponse
 from base64 import b64decode
 from django.utils import timezone
 from logging import getLogger
+from lucterios.framework.error import LucteriosException, MINOR
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
                    _("Mailing"), _("Create and send mailing to contacts."), 60)
@@ -67,6 +68,8 @@ class MessageClone(XferContainerAcknowledge):
     caption = _("Add message")
 
     def fillresponse(self):
+        if self.item.is_dynamic:
+            raise LucteriosException(MINOR, _('This message can not be clone!'))
         new_item = Message()
         new_item.date = None
         new_item.status = 0

@@ -160,24 +160,25 @@ class Message(LucteriosModel):
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
     def get_contacts(self, email=None):
+        def append_contact(new_contact):
+            if new_contact not in contact_list:
+                contact_list.append(new_contact)
         contact_list = []
         for modelname, item in self.get_recipients():
-            contact_filter = item[0]
             model = apps.get_model(modelname)
-            if (email is not None) and (model.get_field_by_name('email') is not None):
-                contact_filter &= ~models.Q(email='') if email else models.Q(email='')
-            id_list = []
-            for contact in apps.get_model(modelname).objects.filter(contact_filter):
-                id_list.append(contact.id)
+            contact_filter = item[0]
             if (email is not None) and (model.get_field_by_name('email') is None):
-                for item in model.objects.filter(id__in=id_list):
-                    if (email is True) and hasattr(item, 'get_email') and (item.get_email() != []):
-                        contact_list.append(item)
-                    elif (email is False) and (not hasattr(item, 'get_email') or (item.get_email() == [])):
-                        contact_list.append(item)
+                for contact in model.objects.filter(contact_filter).distinct():
+                    if (email is True) and hasattr(contact, 'get_email') and (contact.get_email() != []):
+                        append_contact(contact)
+                    elif (email is False) and (not hasattr(contact, 'get_email') or (contact.get_email() == [])):
+                        append_contact(contact)
             else:
-                contact_list.extend(model.objects.filter(id__in=id_list))
-        return set(contact_list)
+                if (email is not None) and (model.get_field_by_name('email') is not None):
+                    contact_filter &= ~models.Q(email='') if email else models.Q(email='')
+                for contact in model.objects.filter(contact_filter).distinct():
+                    append_contact(contact)
+        return contact_list
 
     @property
     def recipients_description(self):
@@ -356,6 +357,7 @@ class Message(LucteriosModel):
     class Meta(object):
         verbose_name = _('message')
         verbose_name_plural = _('messages')
+        ordering = ['-date']
 
 
 class EmailSent(LucteriosModel):
@@ -468,7 +470,7 @@ class EmailSent(LucteriosModel):
         verbose_name = _('email sent info')
         verbose_name_plural = _('email sent info')
         default_permissions = []
-        ordering = ['date', 'email']
+        ordering = ['-last_open_date', 'contact', '-date', 'email']
 
 
 def send_mailing_in_waiting(http_root_address):

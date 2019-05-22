@@ -24,14 +24,14 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'email sent info',
-                'ordering': ['date', 'email'],
+                'ordering': ['-last_open_date', 'contact', '-date', 'email'],
                 'default_permissions': [],
                 'verbose_name_plural': 'email sent info',
             },
         ),
         migrations.AlterModelOptions(
             name='message',
-            options={'verbose_name': 'message', 'verbose_name_plural': 'messages'},
+            options={'verbose_name': 'message', 'verbose_name_plural': 'messages', 'ordering': ['-date']},
         ),
         migrations.AddField(
             model_name='message',

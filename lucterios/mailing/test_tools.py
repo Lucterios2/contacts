@@ -157,7 +157,7 @@ class TestReceiver(TestCase):
             data = data.decode()
         msg = email.message_from_string(data)
         if subject is not None:
-            self.assertEqual(subject, msg.get('Subject', ''), msg.get('Subject', ''))
+            self.assertEqual(subject, msg.get('Subject', ''))
         return self.convert_message(msg.get_payload())
 
     def check_first_message(self, subject, nb_multi, params=None):
