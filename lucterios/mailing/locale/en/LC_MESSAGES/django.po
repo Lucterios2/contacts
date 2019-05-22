@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-20 16:44+0000\n"
+"POT-Creation-Date: 2019-05-22 10:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,23 +21,23 @@ msgstr ""
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
-#: editors.py:57
+#: editors.py:56
 msgid "model"
 msgstr "model"
 
-#: editors.py:58
+#: editors.py:57
 msgid "filter"
 msgstr "filter"
 
-#: editors.py:82
+#: editors.py:84
 msgid "Remove"
 msgstr "Remove"
 
-#: editors.py:84
+#: editors.py:86
 msgid "Insert"
 msgstr "Insert"
 
-#: editors.py:91 views_message.py:171
+#: editors.py:93 views_message.py:174
 msgid "statistic"
 msgstr "statistic"
 
@@ -89,11 +89,11 @@ msgstr "sending"
 msgid "recipients"
 msgstr "recipients"
 
-#: models.py:94 models.py:357
+#: models.py:94 models.py:367
 msgid "date"
 msgstr "date"
 
-#: models.py:95 models.py:355
+#: models.py:95 models.py:365
 msgid "contact"
 msgstr "contact"
 
@@ -129,19 +129,19 @@ msgstr "without email address"
 msgid "003@Documents"
 msgstr "003@Documents"
 
-#: models.py:201
+#: models.py:202
 msgid "Valid"
 msgstr "Valid"
 
-#: models.py:230
+#: models.py:239
 msgid "Emails"
 msgstr "Emails"
 
-#: models.py:259
+#: models.py:268
 msgid "Shared documents"
 msgstr "Shared documents"
 
-#: models.py:340
+#: models.py:349
 #, python-format
 msgid ""
 "Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => "
@@ -150,79 +150,79 @@ msgstr ""
 "Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => "
 "%(ratio).1f %%"
 
-#: models.py:349 models.py:354
+#: models.py:358 models.py:364
 msgid "message"
 msgstr "message"
 
-#: models.py:350
+#: models.py:359
 msgid "messages"
 msgstr "messages"
 
-#: models.py:356 views.py:109 views_message.py:125
+#: models.py:366 views.py:109 views_message.py:128
 msgid "email"
 msgstr "email"
 
-#: models.py:358
+#: models.py:368
 msgid "success"
 msgstr "success"
 
-#: models.py:359
+#: models.py:369
 msgid "error"
 msgstr "error"
 
-#: models.py:360
+#: models.py:370
 msgid "last open date"
 msgstr "last open date"
 
-#: models.py:361
+#: models.py:371
 msgid "number open"
 msgstr "number open"
 
-#: models.py:365
+#: models.py:375
 msgid "sended item"
 msgstr "sended item"
 
-#: models.py:460 models.py:461
+#: models.py:470 models.py:471
 msgid "email sent info"
 msgstr "email sent info"
 
-#: models.py:483
+#: models.py:493
 msgid "mailing-smtpserver"
 msgstr "SMTP Server"
 
-#: models.py:484
+#: models.py:494
 msgid "mailing-smtpport"
 msgstr "SMTP port"
 
-#: models.py:486
+#: models.py:496
 msgid "mailing-smtpsecurity"
 msgstr "SMTP security"
 
-#: models.py:487
+#: models.py:497
 msgid "mailing-smtpsecurity.0"
 msgstr "None"
 
-#: models.py:487
+#: models.py:497
 msgid "mailing-smtpsecurity.1"
 msgstr "StartTLS"
 
-#: models.py:487
+#: models.py:497
 msgid "mailing-smtpsecurity.2"
 msgstr "SSL/TLS"
 
-#: models.py:489
+#: models.py:499
 msgid "mailing-smtpuser"
 msgstr "SMTP user"
 
-#: models.py:491
+#: models.py:501
 msgid "mailing-smtppass"
 msgstr "SMTP pass"
 
-#: models.py:492
+#: models.py:502
 msgid "mailing-msg-connection"
 msgstr "Connection confirmation message"
 
-#: models.py:493
+#: models.py:503
 #, python-format
 msgid ""
 "Connection confirmation to your application:{[br/]} - User:"
@@ -232,19 +232,19 @@ msgstr ""
 "User:%(username)s{[br/]} - Password:%(password)s{[br/]}{[br/]}Best "
 "regards{[br/]}"
 
-#: models.py:494
+#: models.py:504
 msgid "mailing-delay-batch"
 msgstr "delay (min) of mailing batch"
 
-#: models.py:495
+#: models.py:505
 msgid "mailing-nb-by-batch"
 msgstr "number of email by batch"
 
-#: models.py:497
+#: models.py:507
 msgid "mailing-dkim-private-path"
 msgstr "DKIM private file path"
 
-#: models.py:498
+#: models.py:508
 msgid "mailing-dkim-selector"
 msgstr "DKIM selector"
 
@@ -272,7 +272,7 @@ msgstr "Send"
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:89 views.py:122 views_message.py:100 views_message.py:107
+#: views.py:89 views.py:122 views_message.py:103 views_message.py:110
 msgid "EMail try"
 msgstr "EMail try"
 
@@ -284,7 +284,7 @@ msgstr "Bad email parameter!"
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:123 views_message.py:133
+#: views.py:123 views_message.py:136
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 
@@ -296,99 +296,103 @@ msgstr "email properly configured"
 msgid "email not configured"
 msgstr "email not configured"
 
-#: views_message.py:33
+#: views_message.py:34
 msgid "Mailing"
 msgstr "Mailing"
 
-#: views_message.py:33
+#: views_message.py:34
 msgid "Create and send mailing to contacts."
 msgstr "Create and send mailing to contacts."
 
-#: views_message.py:36
+#: views_message.py:37
 msgid "Manage list of message for mailing."
 msgstr "Manage list of message for mailing."
 
-#: views_message.py:41
+#: views_message.py:42
 msgid "Messages"
 msgstr "Messages"
 
-#: views_message.py:57 views_message.py:67
+#: views_message.py:58 views_message.py:68
 msgid "Add message"
 msgstr "Add message"
 
-#: views_message.py:58
+#: views_message.py:59
 msgid "Modify message"
 msgstr "Modify message"
 
-#: views_message.py:91 views_message.py:106
+#: views_message.py:72
+msgid "This message can not be clone!"
+msgstr "This message can not be clone!"
+
+#: views_message.py:94 views_message.py:109
 msgid "Show message"
 msgstr "Show message"
 
-#: views_message.py:145
+#: views_message.py:148
 #, python-format
 msgid "Do you want to sent this message to %d contacts?"
 msgstr "Do you want to sent this message to %d contacts?"
 
-#: views_message.py:147
+#: views_message.py:150
 msgid "This message is being transmitted"
 msgstr "This message is being transmitted"
 
-#: views_message.py:152
+#: views_message.py:155
 msgid "Info"
 msgstr "Info"
 
-#: views_message.py:158 views_message.py:167
+#: views_message.py:161 views_message.py:170
 msgid "Transmission report"
 msgstr "Transmission report"
 
-#: views_message.py:170
+#: views_message.py:173
 msgid "date begin of send"
 msgstr "date begin of send"
 
-#: views_message.py:170
+#: views_message.py:173
 msgid "date end of send"
 msgstr "date end of send"
 
-#: views_message.py:183
+#: views_message.py:186
 msgid "Show only failed"
 msgstr "Show only failed"
 
-#: views_message.py:188
+#: views_message.py:191
 msgid "Close"
 msgstr "Close"
 
-#: views_message.py:191
+#: views_message.py:194
 msgid "Letters"
 msgstr "Letters"
 
-#: views_message.py:197
+#: views_message.py:200
 msgid "Write message"
 msgstr "Write message"
 
-#: views_message.py:214
+#: views_message.py:217
 msgid "Delete message"
 msgstr "Delete message"
 
-#: views_message.py:222 views_message.py:234
+#: views_message.py:225 views_message.py:237
 msgid "Add recipient to message"
 msgstr "Add recipient to message"
 
-#: views_message.py:244
+#: views_message.py:247
 msgid "Delete recipient"
 msgstr "Delete recipient"
 
-#: views_message.py:247
+#: views_message.py:250
 msgid "Do you want to delete this recipient?"
 msgstr "Do you want to delete this recipient?"
 
-#: views_message.py:256 views_message.py:264
+#: views_message.py:259 views_message.py:267
 msgid "Insert document to message"
 msgstr "Insert document to message"
 
-#: views_message.py:271
+#: views_message.py:274
 msgid "Remove document to message"
 msgstr "Remove document to message"
 
-#: views_message.py:277
+#: views_message.py:280
 msgid "Do you want to remove those documents ?"
 msgstr "Do you want to remove those documents ?"
