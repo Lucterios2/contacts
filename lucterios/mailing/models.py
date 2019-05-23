@@ -73,7 +73,7 @@ class MessageLineSet(QuerySet):
         self.pt_id = 0
         self.model._meta.pk = Message()._meta.pk
         body = self._hints['body']
-        body = body.replace('\n', '{[br/]}')
+        body = body.replace('\n', '')
         body = body.replace('{[br]}', '{[br/]}')
         body = body.replace('{[p]}', '')
         body = body.replace('{[/p]}', '\n')

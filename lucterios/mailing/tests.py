@@ -538,6 +538,54 @@ class MailingTest(LucteriosTest):
         self.assert_observer('core.print', 'lucterios.mailing', 'messageLetter')
         self.save_pdf()
 
+    def test_letter_message_html(self):
+        html_content = """
+{[p]}{[u]}{[b]}{[span style="font-size:24px;"]}Titre{[/span]}{[/b]}{[/u]}{[/p]}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tu enim ista lenius, hic Stoicorum more nos vexat.{[br]}
+{[i]}Quando enim Socrates, qui parens philosophiae iure dici potest, quicquam tale fecit?{[/i]}{[br]}
+{[strike]}Quodsi ipsam honestatem undique pertectam atque absolutam. Duo Reges: constructio interrete.{[/strike]}{[br]}
+Quid ad utilitatem tantae pecuniae? Sed nimis multa.{[br]}
+{[br]}
+Choix:{[br]}
+{[ul]}{[li]}{[span style="color:rgb(0,0,255);"]}Bleu{[/span]}{[/li]}{[li]}{[span style="color:rgb(255,0,0);"]}Rouge{[/span]}{[/li]}{[li]}{[span style="color:rgb(255,255,0);"]}Jaune{[/span]}{[/li]}{[/ul]}
+{[blockquote]}Multoque hoc melius nos veriusque quam Stoici.{[br]}
+Ea possunt paria non esse.{[br]}
+Cui Tubuli nomen odio non est?{[br]}
+Quamquam tu hanc copiosiorem etiam soles dicere.{[br]}
+Ita redarguitur ipse a sese, convincunturque scripta eius probitate ipsius ac moribus.{[br]}
+Varietates autem iniurasque fortunae facile veteres philosophorum praeceptis instituta vita superabat.{[br]}
+Tum Quintus: Est plane, Piso, ut dicis, inquit. Id est enim, de quo quaerimus.{[br]}
+Nec mihi illud dixeris: Haec enim ipsa mihi sunt voluptati, et erant illa Torquatis.{[br]}
+Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.{[br]}
+{[/blockquote]}{[br]}
+{[hr]}
+{[p]}{[br]}
+{[/p]}
+{[p align="left"]}A Gauche{[/p]}
+{[p align="center"]}Au Centre{[br]}
+{[/p]}
+{[p align="right"]}A Droite{[br]}
+{[/p]}
+{[br]}
+{[blockquote]}{[blockquote]}{[b]}Adresse:{[/b]} {[a href="https://www.diacamma.org"]}diacamma.org{[/a]}{[br]}
+{[/blockquote]}{[/blockquote]}{[p]}{[br]}
+{[/p]}
+{[p]}{[i]}Grosses papouille{[/i]}{[/p]}
+{[p]}{[/p]}
+"""
+
+        self.factory.xfer = MessageAddModify()
+        self.calljson('/lucterios.mailing/messageAddModify', {'SAVE': 'YES', 'subject': 'new message', 'body': html_content}, False)
+        self.factory.xfer = MessageValidRecipient()
+        self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'}, False)
+        self.factory.xfer = MessageTransition()
+        self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'valid', 'CONFIRME': 'YES'}, False)
+
+        self.factory.xfer = MessageLetter()
+        self.calljson('/lucterios.mailing/messageLetter', {'message': '1', 'PRINT_MODE': '3', 'MODEL': 5}, False)
+        self.assert_observer('core.print', 'lucterios.mailing', 'messageLetter')
+        self.save_pdf()
+
     def test_manage_docs(self):
         self.factory.user = LucteriosUser.objects.create(username='empty')
         self.factory.user.is_superuser = True
@@ -699,7 +747,11 @@ class MailingTest(LucteriosTest):
 <model hmargin="10.0" vmargin="10.0" page_width="210.0" page_height="297.0">
 <header extent="0.0"/>
 <bottom extent="0.0"/>
-<body/>
+<body>
+<text height="8.0" width="190.0" top="0.0" left="0.0" padding="1.0" spacing="0.0" border_color="black" border_style="" border_width="0.2" text_align="center" line_height="15" font_family="sans-serif" font_weight="" font_size="15">
+{[b]}#firstname #lastname{[/b]}
+</text>
+</body>
 </model>
 """
         print_model.save()
