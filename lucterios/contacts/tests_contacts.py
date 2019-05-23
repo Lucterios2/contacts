@@ -339,8 +339,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf(ident=1)        
 
         self.factory.xfer = IndividualLabel()
         self.calljson('/lucterios.contacts/individualLabel',
@@ -349,8 +348,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf(ident=2)
 
     def test_individual_fieldsprint(self):
 
@@ -603,8 +601,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf(ident=1)
 
         self.factory.xfer = LegalEntityLabel()
         self.calljson('/lucterios.contacts/legalEntityLabel',
@@ -613,8 +610,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf(ident=2)
 
     def test_custom_fields(self):
         self.factory.xfer = Configuration()

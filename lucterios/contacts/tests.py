@@ -222,8 +222,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Nos coordonnées'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Nos coordonnées'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf()
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
@@ -245,8 +244,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructurePrint()
         self.calljson('/lucterios.contacts/currentStructurePrint', {}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'currentStructurePrint')
-        pdf_value = b64decode(six.text_type(self.response_json['print']['content']))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf()
 
     def test_account(self):
         self.factory.user = LucteriosUser.objects.get(username='empty')

@@ -536,8 +536,7 @@ class MailingTest(LucteriosTest):
         self.calljson('/lucterios.mailing/messageLetter',
                       {'message': '1', 'PRINT_MODE': '3', 'MODEL': 5}, False)
         self.assert_observer('core.print', 'lucterios.mailing', 'messageLetter')
-        pdf_value = b64decode(six.text_type(self.response_json['print']["content"]))
-        self.assertEqual(pdf_value[:4], "%PDF".encode('ascii', 'ignore'))
+        self.save_pdf()
 
     def test_manage_docs(self):
         self.factory.user = LucteriosUser.objects.create(username='empty')
@@ -749,6 +748,9 @@ class MailingTest(LucteriosTest):
             self.assertEqual('**joe Dalton**  \n  \nWith Document: _Report.pdf_  \n  \nBye\n\n', decode_b64(msg_txt.get_payload()))
 
             self.assertTrue('Report.pdf' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
+            for msg_index in range(4):
+                _msg, _msg_txt, msg_file = server.get_msg_index(msg_index)
+                self.save_pdf(base64_content=msg_file.get_payload(), ident=msg_index + 1)
         finally:
             server.stop()
 
