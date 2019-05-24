@@ -9,8 +9,8 @@ Vous pouvez également préciser un *Fichier privé DKIM* et *Sélecteur DKIM* a
 Les paramètres *durée (en min) d'un lot de courriel* et *nombre de courriels par lot* sont utilisés pour l'envoie des messages en publipostage.
 
 Un bouton *Envoyer* permet de tester vos règlages en envoyant un courriel de test à un destinataire choisi.
-Il existe des outils permettant de vérifier si vos messages respectent des règles afin d'éviter d'être considérer comme des _pourriel_.
+Il existe des outils permettant de vérifier si vos messages respectent des règles afin d'éviter d'être considérer comme des 'pourriel'.
 En autre, l'outil https://www.mail-tester.com (gratuit jusqu'à 3 fois par jour) vous permet, en envoyant un message à l'adresse précisée, de vous établir une note de confiance. 
 
-Vous pouvez, par exemple, envoyer d'un nouveau mot de passe de connexion.
+Vous pouvez, entre autre, envoyer d'un nouveau mot de passe de connexion.
 N'oubliez pas alors de préciser un petit message d'explication via le paramètres *Message de confirmation de connexion*.

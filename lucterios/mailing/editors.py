@@ -73,6 +73,8 @@ class MessageEditor(LucteriosEditor):
         xfer.remove_component('documents')
         if xfer.item.is_dynamic:
             xfer.remove_component('__tab_3')
+            xfer.remove_component('doc_in_link')
+            xfer.remove_component('empty')
         else:
             new_documents = XferCompGrid('document')
             new_documents.tab = old_documents.tab

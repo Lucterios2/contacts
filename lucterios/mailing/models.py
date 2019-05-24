@@ -249,6 +249,7 @@ class Message(LucteriosModel):
                 root_url = '/'.join(abs_url[:-2])
             else:
                 root_url = ''
+            getLogger('lucterios.mailing').debug('Message.sending() -> add_mailing_in_scheduler(http_root_address=%s)', root_url)
             add_mailing_in_scheduler(check_nb=False, http_root_address=root_url)
         return
 
@@ -283,6 +284,7 @@ class Message(LucteriosModel):
         return self._attache_files
 
     def sendemail(self, nb_to_send, http_root_address):
+        getLogger('lucterios.mailing').debug('Message.sendemail(nb_to_send=%s, http_root_address=%s)', nb_to_send, http_root_address)
         self.http_root_address = http_root_address
         if will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
@@ -308,7 +310,7 @@ class Message(LucteriosModel):
                 else:
                     continue
                 email_sent = EmailSent.objects.create(message=self, contact=contact, email=email, date=timezone.now())
-                email_sent.send_email()
+                email_sent.send_email(http_root_address)
             self.email_to_send = "\n".join(email_list[nb_to_send:])
             if self.email_to_send == '':
                 self.status = 1
@@ -448,14 +450,16 @@ class EmailSent(LucteriosModel):
         text = text.replace('#reference', doc_reference)
         return text
 
-    def send_email(self):
+    def send_email(self, http_root_address):
+        getLogger('lucterios.mailing').debug('EmailSent.send_email(http_root_address=%s)', http_root_address)
         try:
             body = self.replace_tag(self.message.email_content)
             h2txt = HTML2Text()
             h2txt.ignore_links = False
             body_txt = h2txt.handle(body)
-            if hasattr(self.message, 'http_root_address'):
-                img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (self.message.http_root_address, self.id)
+            if http_root_address != '':
+                self.message.http_root_address = http_root_address
+                img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (http_root_address, self.id)
                 body = body.replace('</body>', img_html + '</body>')
             email, ccemail = self.get_emails()
             getLogger('lucterios.mailing').debug('send email %s : %s' % (self.message.subject, email))
