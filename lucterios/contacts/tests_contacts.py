@@ -31,15 +31,12 @@ from base64 import b64decode
 from django.utils import six
 
 from lucterios.framework.test import LucteriosTest
-from lucterios.framework.xfergraphic import XferContainerAcknowledge
-from lucterios.framework.filetools import get_user_dir, readimage_to_base64, \
-    get_user_path
+from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import ObjectMerge
 
-from lucterios.contacts.views import Configuration, CustomFieldAddModify, \
-    ContactImport
+from lucterios.contacts.views import Configuration, CustomFieldAddModify, ContactImport
 from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
     Function, Responsability, CustomField, ContactCustomField
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
@@ -339,7 +336,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 3)
-        self.save_pdf(ident=1)        
+        self.save_pdf(ident=1)
 
         self.factory.xfer = IndividualLabel()
         self.calljson('/lucterios.contacts/individualLabel',
