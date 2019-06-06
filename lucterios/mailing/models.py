@@ -47,7 +47,7 @@ from lucterios.CORE.models import Parameter, PrintModel
 from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.models import AbstractContact
-from lucterios.documents.models import Document
+from lucterios.documents.models import DocumentContainer
 from lucterios.mailing.functions import will_mail_send, send_email
 
 
@@ -96,7 +96,7 @@ class Message(LucteriosModel):
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
     email_to_send = models.TextField(_('email to send'), default="")
-    documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
+    documents = models.ManyToManyField(DocumentContainer, verbose_name=_('documents'), blank=True)
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
 
     def __init__(self, *args, **kwargs):

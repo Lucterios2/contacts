@@ -22,7 +22,7 @@ from lucterios.CORE.xferprint import XferPrintReporting
 
 from lucterios.contacts.tools import ContactSelection
 from lucterios.contacts.models import LegalEntity
-from lucterios.documents.models import Document
+from lucterios.documents.models import DocumentContainer
 from lucterios.documents.views import DocumentSearch
 from lucterios.mailing.models import Message, add_mailing_in_scheduler, EmailSent
 from lucterios.mailing.functions import will_mail_send, send_email
@@ -257,7 +257,7 @@ class MessageValidInsertDoc(XferContainerAcknowledge):
     caption = _("Insert document to message")
 
     def fillresponse(self, document=0):
-        self.item.documents.add(Document.objects.get(id=document))
+        self.item.documents.add(DocumentContainer.objects.get(id=document))
 
 
 @MenuManage.describ('mailing.add_message')
@@ -276,7 +276,7 @@ class MessageRemoveDoc(XferContainerAcknowledge):
 
     def fillresponse(self, document=[]):
         if self.confirme(_('Do you want to remove those documents ?')):
-            for doc in Document.objects.filter(id__in=document):
+            for doc in DocumentContainer.objects.filter(id__in=document):
                 self.item.documents.remove(doc)
 
 

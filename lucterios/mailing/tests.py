@@ -55,8 +55,8 @@ from lucterios.mailing.views_message import MessageAddModify, MessageList, Messa
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
 
 from lucterios.documents.tests import create_doc
+from lucterios.documents.models import DocumentContainer
 from lucterios.mailing.models import Message
-from lucterios.documents.models import Document
 
 
 class ConfigurationTest(LucteriosTest):
@@ -609,7 +609,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.calljson('/lucterios.mailing/messageInsertDoc', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageInsertDoc')
         self.assert_count_equal("document", 3)
-        self.assert_count_equal("#document/actions", 4)
+        self.assert_count_equal("#document/actions", 3)
         self.assert_action_equal("#document/actions/@0", ('Sélection', 'images/ok.png', 'lucterios.mailing', 'messageValidInsertDoc', 1, 1, 0))
 
         self.factory.xfer = MessageValidInsertDoc()
@@ -709,7 +709,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.add_recipient('contacts.Individual', 'genre||8||1')
             email_msg.add_recipient('contacts.LegalEntity', '')
             email_msg.save()
-            email_msg.documents.add(Document.objects.get(id=1))
+            email_msg.documents.add(DocumentContainer.objects.get(id=1))
             email_msg.valid()
             self.assertEqual(3, email_msg.contact_nb)
             self.assertEqual('Valjean jean', email_msg.contact_noemail)
