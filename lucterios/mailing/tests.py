@@ -601,9 +601,9 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
-        self.assert_grid_equal('document', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
+        self.assert_grid_equal('attachments', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
         self.assert_json_equal('LABELFORM', "doc_in_link", 'Non')
-        self.assert_count_equal("#document/actions", 3)
+        self.assert_count_equal("#attachments/actions", 3)
 
         self.factory.xfer = MessageInsertDoc()
         self.calljson('/lucterios.mailing/messageInsertDoc', {'message': '1'}, False)
@@ -624,8 +624,8 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
-        self.assert_count_equal("document", 2)
-        self.assert_count_equal("#document/actions", 3)
+        self.assert_count_equal("attachments", 2)
+        self.assert_count_equal("#attachments/actions", 3)
         self.assertEqual(len(self.json_actions), 2)
 
         self.factory.xfer = MessageRemoveDoc()
@@ -642,8 +642,8 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 'ouvert')
-        self.assert_count_equal("document", 1)
-        self.assert_count_equal("#document/actions", 3)
+        self.assert_count_equal("attachments", 1)
+        self.assert_count_equal("#attachments/actions", 3)
         self.assertEqual(len(self.json_actions), 3)
 
         self.factory.xfer = MessageTransition()
@@ -655,8 +655,8 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 'validé')
-        self.assert_count_equal("document", 1)
-        self.assert_count_equal("#document/actions", 1)
+        self.assert_count_equal("attachments", 1)
+        self.assert_count_equal("#attachments/actions", 1)
 
     def test_trysend(self):
         configSMTP('', 25)
@@ -709,7 +709,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.add_recipient('contacts.Individual', 'genre||8||1')
             email_msg.add_recipient('contacts.LegalEntity', '')
             email_msg.save()
-            email_msg.documents.add(DocumentContainer.objects.get(id=1))
+            email_msg.attachments.add(DocumentContainer.objects.get(id=1))
             email_msg.valid()
             self.assertEqual(3, email_msg.contact_nb)
             self.assertEqual('Valjean jean', email_msg.contact_noemail)

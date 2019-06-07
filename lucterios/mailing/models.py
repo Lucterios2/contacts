@@ -48,6 +48,7 @@ from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import DocumentContainer
+from lucterios.documents.models_legacy import Document
 from lucterios.mailing.functions import will_mail_send, send_email
 
 
@@ -96,7 +97,8 @@ class Message(LucteriosModel):
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
     email_to_send = models.TextField(_('email to send'), default="")
-    documents = models.ManyToManyField(DocumentContainer, verbose_name=_('documents'), blank=True)
+    documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
+    attachments = models.ManyToManyField(DocumentContainer, verbose_name=_('documents'), blank=True)
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
 
     def __init__(self, *args, **kwargs):
@@ -124,11 +126,8 @@ class Message(LucteriosModel):
         return {'': [('status', 'date')],
                 _('001@Message'): ['subject', 'body'],
                 _('002@Recipients'): ['recipients', ((_('number of recipients'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
-                _('003@Documents'): ['documents', (('', 'empty'),), 'doc_in_link']
+                _('003@Documents'): ['attachments', (('', 'empty'),), 'doc_in_link']
                 }
-#         return [('status', 'date'), 'recipients',
-#                 ((_('number of contacts'), 'contact_nb'), (_('without email address'), 'contact_noemail')),
-#                 'documents', 'subject', 'body']
 
     @property
     def empty(self):
@@ -258,7 +257,7 @@ class Message(LucteriosModel):
             raise LucteriosException(GRAVE, "No http_root_address")
         link_html = ""
         self._attache_files = []
-        for doc in self.documents.all():
+        for doc in self.attachments.all():
             if self.doc_in_link:
                 if doc.sharekey is None:
                     doc.change_sharekey(False)

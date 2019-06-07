@@ -77,8 +77,8 @@ class MessageClone(XferContainerAcknowledge):
         new_item.email_to_send = ""
         new_item.doc_in_link = self.item.doc_in_link
         new_item.save()
-        for doc in self.item.documents.all():
-            new_item.documents.add(doc)
+        for doc in self.item.attachments.all():
+            new_item.attachments.add(doc)
         self.params[self.field_id] = new_item.id
         self.redirect_action(MessageShow.get_action('', ''))
 
@@ -257,7 +257,7 @@ class MessageValidInsertDoc(XferContainerAcknowledge):
     caption = _("Insert document to message")
 
     def fillresponse(self, document=0):
-        self.item.documents.add(DocumentContainer.objects.get(id=document))
+        self.item.attachments.add(DocumentContainer.objects.get(id=document))
 
 
 @MenuManage.describ('mailing.add_message')
@@ -277,7 +277,7 @@ class MessageRemoveDoc(XferContainerAcknowledge):
     def fillresponse(self, document=[]):
         if self.confirme(_('Do you want to remove those documents ?')):
             for doc in DocumentContainer.objects.filter(id__in=document):
-                self.item.documents.remove(doc)
+                self.item.attachments.remove(doc)
 
 
 @MenuManage.describ('')

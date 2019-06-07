@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='message',
-            name='documents',
+            name='attachments',
             field=models.ManyToManyField(blank=True, to='documents.DocumentContainer', verbose_name='documents'),
         ),
     ]

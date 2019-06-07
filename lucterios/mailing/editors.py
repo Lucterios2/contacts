@@ -69,17 +69,17 @@ class MessageEditor(LucteriosEditor):
         xfer.tab = new_recipients.tab
         xfer.add_component(new_recipients)
 
-        old_documents = xfer.get_components('documents')
-        xfer.remove_component('documents')
+        old_documents = xfer.get_components('attachments')
+        xfer.remove_component('attachments')
         if xfer.item.is_dynamic:
             xfer.remove_component('__tab_3')
             xfer.remove_component('doc_in_link')
             xfer.remove_component('empty')
         else:
-            new_documents = XferCompGrid('document')
+            new_documents = XferCompGrid('attachments')
             new_documents.tab = old_documents.tab
             new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
-            new_documents.set_model(self.item.documents.all(), ["name", "description", "date_modification"], xfer)
+            new_documents.set_model(self.item.attachments.all(), ["name", "description", "date_modification"], xfer)
             new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
             if self.item.status == 0:
