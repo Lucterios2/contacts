@@ -34,7 +34,7 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
     TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
-    TITLE_LISTING
+    TITLE_LISTING, TITLE_CREATE
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid,\
     XferCompButton
 from lucterios.framework.xfersearch import XferSearchEditor
@@ -54,7 +54,7 @@ MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/conta
                    _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class LegalEntityAddModify(XferAddEditor):
@@ -150,7 +150,7 @@ class LegalEntityLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class IndividualAddModify(XferAddEditor):
@@ -330,7 +330,7 @@ class ResponsabilityAdd(XferContainerCustom):
                         modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
         grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
-        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_ADD, "images/add.png"),
+        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png"),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO)
         self.add_component(grid)
 
