@@ -47,8 +47,7 @@ from lucterios.CORE.views import ObjectMerge, ObjectPromote
 
 from lucterios.contacts.models import LegalEntity, Individual, Responsability, AbstractContact
 
-MenuManage.add_sub(
-    "office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
+MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
 MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/contacts.png",
                    _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
