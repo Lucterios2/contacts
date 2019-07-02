@@ -170,12 +170,12 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
         self.assert_count_equal('', 16)
-        self.assert_json_equal('LABELFORM', 'genre', "Homme")
+        self.assert_json_equal('LABELFORM', 'genre', 1)
         self.assert_json_equal('LABELFORM', 'firstname', "jack")
         self.assert_json_equal('LABELFORM', 'lastname', "MISTER")
         self.assert_json_equal('LINK', 'email', "jack@worldcompany.com")
 
-        self.assert_comp_equal(('LABELFORM', 'user'), "---", (1, 8, 2, 1, 1))
+        self.assert_comp_equal(('LABELFORM', 'user'), None, (1, 8, 2, 1, 1))
         self.assert_coordcomp_equal('userbtn', (3, 8, 1, 1, 1))
         self.assert_action_equal('#userbtn/action', ('', 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
 
@@ -458,7 +458,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('responsability', 1)
         self.assert_json_equal('', 'responsability/@0/id', '1')
         self.assert_json_equal('', 'responsability/@0/individual', "MISTER jack")
-        self.assert_json_equal('', 'responsability/@0/functions', '')
+        self.assert_json_equal('', 'responsability/@0/functions', [])
 
         self.factory.xfer = ResponsabilityModify()
         self.calljson('/lucterios.contacts/responsabilityModify', {'responsability': '1'}, False)
@@ -483,7 +483,7 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('responsability', 1)
         self.assert_json_equal('', 'responsability/@0/id', '1')
         self.assert_json_equal('', 'responsability/@0/individual', "MISTER jack")
-        self.assert_json_equal('', 'responsability/@0/functions', "Secretaire{[br/]}Troufion")
+        self.assert_json_equal('', 'responsability/@0/functions', ["Secretaire", "Troufion"])
 
     def test_legalentity_search(self):
         self.factory.xfer = LegalEntityAddModify()
@@ -740,9 +740,9 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('', 19)
         self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
         self.assert_json_equal('LABELFORM', 'custom_1', '')
-        self.assert_json_equal('LABELFORM', 'custom_2', "0")
-        self.assert_json_equal('LABELFORM', 'custom_3', "0.0")
-        self.assert_json_equal('LABELFORM', 'custom_4', "Non")
+        self.assert_json_equal('LABELFORM', 'custom_2', 0)
+        self.assert_json_equal('LABELFORM', 'custom_3', 0.0)
+        self.assert_json_equal('LABELFORM', 'custom_4', False)
         self.assertFalse("custom_5" in self.json_data.keys())
         self.assertFalse("custom_6" in self.json_data.keys())
 
@@ -766,9 +766,9 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('', 19)
         self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
         self.assert_json_equal('LABELFORM', 'custom_1', "n'import quoi")
-        self.assert_json_equal('LABELFORM', 'custom_2', "37")
-        self.assert_json_equal('LABELFORM', 'custom_3', "9.1")
-        self.assert_json_equal('LABELFORM', 'custom_4', "Oui")
+        self.assert_json_equal('LABELFORM', 'custom_2', 37)
+        self.assert_json_equal('LABELFORM', 'custom_3', 9.1)
+        self.assert_json_equal('LABELFORM', 'custom_4', True)
 
     def test_custom_fields_printing(self):
         self._initial_custom_values()
@@ -855,9 +855,9 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('', 2)
         self.assert_grid_equal('mrg_object', {'value': 'désignation', 'select': 'principal?'}, 2)  # nb=2
         self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
-        self.assert_json_equal('', 'mrg_object/@0/select', '1')
+        self.assert_json_equal('', 'mrg_object/@0/select', True)
         self.assert_json_equal('', 'mrg_object/@1/value', 'MISTER jack')
-        self.assert_json_equal('', 'mrg_object/@1/select', '0')
+        self.assert_json_equal('', 'mrg_object/@1/select', False)
 
         self.factory.xfer = ObjectMerge()
         self.calljson('/CORE/objectMerge',
@@ -870,9 +870,9 @@ class ContactsTest(LucteriosTest):
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'mrg_object': '3'}, False)
         self.assert_observer('core.custom', 'CORE', 'objectMerge')
         self.assert_json_equal('', 'mrg_object/@0/value', 'MISTER jack')
-        self.assert_json_equal('', 'mrg_object/@0/select', '0')
+        self.assert_json_equal('', 'mrg_object/@0/select', False)
         self.assert_json_equal('', 'mrg_object/@1/value', 'MISTER jack')
-        self.assert_json_equal('', 'mrg_object/@1/select', '1')
+        self.assert_json_equal('', 'mrg_object/@1/select', True)
 
         self.factory.xfer = ObjectMerge()
         self.calljson('/CORE/objectMerge',
@@ -890,7 +890,7 @@ class ContactsTest(LucteriosTest):
                       {"abstractcontact": "2"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'abstractContactShow')
         self.assert_count_equal('', 21)
-        self.assert_json_equal('LABELFORM', 'genre', "Homme")
+        self.assert_json_equal('LABELFORM', 'genre', 1)
         self.assert_json_equal('LABELFORM', 'firstname', "jack")
         self.assert_json_equal('LABELFORM', 'lastname', "MISTER")
         self.assert_json_equal('LINK', 'email', "jack@worldcompany.com")
@@ -968,7 +968,7 @@ class ContactsTest(LucteriosTest):
                                                             "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 2)
-        self.assert_json_equal('LABELFORM', 'result', "{[center]}{[i]}4 éléments ont été importés{[/i]}{[/center]}")
+        self.assert_json_equal('LABELFORM', 'result', "4 éléments ont été importés")
         self.assertEqual(len(self.json_actions), 1)
 
         self.factory.xfer = LegalEntityList()
