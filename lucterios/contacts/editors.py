@@ -304,5 +304,5 @@ class IndividualEditor(AbstractContactEditor):
 class ResponsabilityEditor(LucteriosEditor):
 
     def edit(self, xfer):
-        xfer.change_to_readonly('legal_entity')
-        xfer.change_to_readonly('individual')
+        xfer.change_select_to_label('legal_entity')
+        xfer.change_select_to_label('individual')
