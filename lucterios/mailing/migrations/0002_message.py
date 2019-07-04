@@ -2,15 +2,15 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.utils import translation
 from django.db import models, migrations
+from django.db.models import deletion
 
 from lucterios.CORE.models import PrintModel
-from django.db.models import deletion
+from lucterios.framework.tools import set_locale_lang
 
 
 def addons_values(apps, schema_editor):
-    translation.activate(settings.LANGUAGE_CODE)
+    set_locale_lang(settings.LANGUAGE_CODE)
     PrintModel().load_model("lucterios.mailing", "Message_0001", is_default=True)
 
 

@@ -34,6 +34,7 @@ from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_va
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
+from lucterios.framework.tools import get_bool_textual
 
 
 class CustomField(LucteriosModel):
@@ -242,7 +243,7 @@ class CustomizeObject(object):
             if cf_model.kind == 2:
                 return float(ccf_value)
             if cf_model.kind == 3:
-                return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
+                return get_bool_textual((ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n'))
             if cf_model.kind == 4:
                 num = int(ccf_value)
                 args_list = cf_model.get_args()['list']

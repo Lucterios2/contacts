@@ -31,13 +31,14 @@ import sys
 from django.db import models, migrations, transaction
 from django.db.utils import IntegrityError
 from django.conf import settings
-from django.utils import six, translation
+from django.utils import six
 
 from lucterios.CORE.models import PrintModel
+from lucterios.framework.tools import set_locale_lang
 
 
 def initial_values(apps, schema_editor):
-    translation.activate(settings.LANGUAGE_CODE)
+    set_locale_lang(settings.LANGUAGE_CODE)
     legalentity = apps.get_model("contacts", "LegalEntity")
     current_entity = legalentity.objects.create(id=1, name="---", address='---',
                                                 postal_code='00000', city='---', country='---')

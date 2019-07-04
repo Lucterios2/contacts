@@ -742,7 +742,7 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', 'custom_1', '')
         self.assert_json_equal('LABELFORM', 'custom_2', 0)
         self.assert_json_equal('LABELFORM', 'custom_3', 0.0)
-        self.assert_json_equal('LABELFORM', 'custom_4', False)
+        self.assert_json_equal('LABELFORM', 'custom_4', 'Non')
         self.assertFalse("custom_5" in self.json_data.keys())
         self.assertFalse("custom_6" in self.json_data.keys())
 
@@ -754,7 +754,7 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('EDIT', 'custom_1', '')
         self.assert_json_equal('FLOAT', 'custom_2', "0")
         self.assert_json_equal('FLOAT', 'custom_3', "0.0")
-        self.assert_json_equal('CHECK', 'custom_4', "0")
+        self.assert_json_equal('CHECK', 'custom_4', "1")
 
         self.factory.xfer = LegalEntityAddModify()
         self.calljson('/lucterios.contacts/legalEntityAddModify', {'legal_entity': '1', "SAVE": "YES", "custom_1": "n'import quoi", "custom_2": "37",
@@ -768,7 +768,7 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', 'custom_1', "n'import quoi")
         self.assert_json_equal('LABELFORM', 'custom_2', 37)
         self.assert_json_equal('LABELFORM', 'custom_3', 9.1)
-        self.assert_json_equal('LABELFORM', 'custom_4', True)
+        self.assert_json_equal('LABELFORM', 'custom_4', 'Oui')
 
     def test_custom_fields_printing(self):
         self._initial_custom_values()
