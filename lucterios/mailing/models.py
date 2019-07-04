@@ -36,10 +36,11 @@ from django.apps import apps
 from django_fsm import FSMIntegerField, transition
 from django.utils import six, formats, timezone
 
-from lucterios.framework.models import LucteriosModel, LucteriosScheduler
+from lucterios.framework.models import LucteriosModel, LucteriosScheduler,\
+    LucteriosVirtualField
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.printgenerators import ReportingGenerator
-from lucterios.framework.tools import toHtml
+from lucterios.framework.tools import toHtml, get_date_formating
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.framework.filetools import remove_accent
@@ -50,6 +51,7 @@ from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.models_legacy import Document
 from lucterios.mailing.functions import will_mail_send, send_email
+from locale import format_string
 
 
 class MessageLine(LucteriosModel):
@@ -100,6 +102,8 @@ class Message(LucteriosModel):
     documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
     attachments = models.ManyToManyField(DocumentContainer, verbose_name=_('documents'), blank=True)
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
+    contact_nb = LucteriosVirtualField(verbose_name=_('number of recipients'), compute_from='get_contact_nb', format_string='N')
+    contact_noemail = LucteriosVirtualField(verbose_name=_('without email address'), compute_from='get_contact_noemail')
 
     def __init__(self, *args, **kwargs):
         LucteriosModel.__init__(self, *args, **kwargs)
@@ -119,13 +123,13 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_default_fields(cls):
-        return ['status', 'date', 'subject', (_('number of recipients'), 'contact_nb')]
+        return ['status', 'date', 'subject', 'contact_nb']
 
     @classmethod
     def get_show_fields(cls):
         return {'': [('status', 'date')],
                 _('001@Message'): ['subject', 'body'],
-                _('002@Recipients'): ['recipients', ((_('number of recipients'), 'contact_nb'), (_('without email address'), 'contact_noemail'))],
+                _('002@Recipients'): ['recipients', ('contact_nb', 'contact_noemail')],
                 _('003@Documents'): ['attachments', (('', 'empty'),), 'doc_in_link']
                 }
 
@@ -133,18 +137,16 @@ class Message(LucteriosModel):
     def empty(self):
         return ""
 
-    @property
-    def contact_nb(self):
+    def get_contact_nb(self):
         return len(self.get_contacts())
 
     @property
     def line_set(self):
         return MessageLineSet(hints={'body': self.body})
 
-    @property
-    def contact_noemail(self):
+    def get_contact_noemail(self):
         no_emails = self.get_contacts(False)
-        return '{[br/]}'.join([six.text_type(no_email) for no_email in no_emails])
+        return [six.text_type(no_email) for no_email in no_emails]
 
     @classmethod
     def get_edit_fields(cls):
@@ -325,14 +327,14 @@ class Message(LucteriosModel):
     def date_begin(self):
         emails_sent = self.emailsent_set.order_by('date')
         if len(emails_sent) > 0:
-            return formats.date_format(emails_sent[0].date, "DATETIME_FORMAT")
+            return get_date_formating(emails_sent[0].date)
         return '---'
 
     @property
     def date_end(self):
         emails_sent = self.emailsent_set.order_by('-date')
         if len(emails_sent) > 0:
-            return formats.date_format(emails_sent[0].date, "DATETIME_FORMAT")
+            return get_date_formating(emails_sent[0].date)
         return '---'
 
     @property
@@ -372,16 +374,16 @@ class EmailSent(LucteriosModel):
     error = models.TextField(_('error'), default="")
     last_open_date = models.DateTimeField(verbose_name=_('last open date'), null=True, default=None)
     nb_open = models.IntegerField(verbose_name=_('number open'), null=False, default=0)
+    sended_item = LucteriosVirtualField(verbose_name=_('sended item'), compute_from='get_sended_item')
 
     @classmethod
     def get_default_fields(cls):
-        return ['contact', (_('sended item'), 'sended_item'), 'date', 'success', 'error', 'last_open_date', 'nb_open']
+        return ['contact', 'sended_item', 'date', 'success', 'error', 'last_open_date', 'nb_open']
 
     def get_send_email_objects(self):
         return [self.item]
 
-    @property
-    def sended_item(self):
+    def get_sended_item(self):
         if len(self.email.split(':')) == 3:
             modelname, object_id, _printmodel = self.email.split(':')
             model = apps.get_model(modelname)

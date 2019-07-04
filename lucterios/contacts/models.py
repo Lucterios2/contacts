@@ -30,7 +30,8 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_value_if_choices
+from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_value_if_choices,\
+    LucteriosVirtualField
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
@@ -42,6 +43,8 @@ class CustomField(LucteriosModel):
     name = models.CharField(_('name'), max_length=200, unique=False)
     kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
+    model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
+    kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
 
     @classmethod
     def get_show_fields(cls):
@@ -53,7 +56,7 @@ class CustomField(LucteriosModel):
 
     @classmethod
     def get_default_fields(cls):
-        return ['name', (_('model'), 'model_title'), (_('kind'), 'kind_txt')]
+        return ['name', 'model_title', 'kind_txt']
 
     def model_associated(self):
         from django.apps import apps
@@ -62,12 +65,10 @@ class CustomField(LucteriosModel):
     def get_fieldname(self):
         return "custom_%d" % self.id
 
-    @property
-    def model_title(self):
-        return six.text_type(self.model_associated()._meta.verbose_name)
+    def get_model_title(self):
+        return self.model_associated()._meta.verbose_name
 
-    @property
-    def kind_txt(self):
+    def get_kind_txt(self):
         dep_field = self.get_field_by_name('kind')
         args = self.get_args()
         params_txt = ""
@@ -171,8 +172,8 @@ class CustomizeObject(object):
         cust_fields = CustomField.get_fields(cls)
         if len(cust_fields) > 0:
             cust_item = []
-            for cf_name, cf_model in cust_fields:
-                cust_item.append((cf_model.name, cf_name))
+            for cf_name, _model in cust_fields:
+                cust_item.append(cf_name)
                 if len(cust_item) == 2:
                     fields_desc.append(tuple(cust_item))
                     cust_item = []
@@ -213,13 +214,39 @@ class CustomizeObject(object):
         else:
             return None
 
+    @classmethod
+    def get_virtualfield(cls, name):
+        format_num = None
+        field_title = None
+        if name == "str":
+            field_title = ''
+        elif name[:7] == "custom_":
+            cf_id = int(name[7:])
+            cf_model = CustomField.objects.get(id=cf_id)
+            field_title = cf_model.name
+            if cf_model.kind == 0:
+                format_num = None
+            if cf_model.kind == 1:
+                format_num = 'N0'
+            if cf_model.kind == 2:
+                format_num = 'N%d' % cf_model.get_args()['prec']
+            if cf_model.kind == 3:
+                format_num = 'B'
+            if cf_model.kind == 4:
+                format_num = {}
+                args_list = cf_model.get_args()['list']
+                for list_index in range(len(args_list)):
+                    format_num[six.text_type(list_index)] = args_list[list_index]
+        if field_title is not None:
+            return LucteriosVirtualField(verbose_name=field_title, name=name, compute_from=name, format_string=lambda: format_num)
+        return None
+
     def __getattr__(self, name):
         if name == "str":
             return six.text_type(self.get_final_child())
         elif name[:7] == "custom_":
             cf_id = int(name[7:])
-            cf_model = CustomField.objects.get(
-                id=cf_id)
+            cf_model = CustomField.objects.get(id=cf_id)
             if self.id is None:
                 ccf_value = ""
             else:
@@ -243,14 +270,9 @@ class CustomizeObject(object):
             if cf_model.kind == 2:
                 return float(ccf_value)
             if cf_model.kind == 3:
-                return get_bool_textual((ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n'))
+                return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
             if cf_model.kind == 4:
-                num = int(ccf_value)
-                args_list = cf_model.get_args()['list']
-                if num < len(args_list):
-                    return args_list[num]
-                else:
-                    return "---"
+                return int(ccf_value)
         raise AttributeError(name)
 
 
@@ -342,6 +364,13 @@ class AbstractContact(LucteriosModel, CustomizeObject):
             return six.text_type(self.get_final_child())
         else:
             return "contact#%d" % self.id
+
+    @classmethod
+    def get_field_by_name(cls, fieldname):
+        dep_field = CustomizeObject.get_virtualfield(fieldname)
+        if dep_field is None:
+            dep_field = super(AbstractContact, cls).get_field_by_name(fieldname)
+        return dep_field
 
     @classmethod
     def get_default_fields(cls):

@@ -507,7 +507,7 @@ class MailingTest(LucteriosTest):
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 14)
-        self.assert_json_equal('LABELFORM', "contact_noemail", 'Valjean jean')
+        self.assert_json_equal('LABELFORM', "contact_noemail", ['Valjean jean'])
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[0], ('Courriels', 'lucterios.mailing/images/mailing.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
         self.assert_action_equal(self.json_actions[1], ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
@@ -712,7 +712,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.attachments.add(DocumentContainer.objects.get(id=1))
             email_msg.valid()
             self.assertEqual(3, email_msg.contact_nb)
-            self.assertEqual('Valjean jean', email_msg.contact_noemail)
+            self.assertEqual(['Valjean jean'], email_msg.contact_noemail)
             email_msg._prep_sending()
             email_msg.status = 2
             email_msg.save()
@@ -771,7 +771,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.save()
             email_msg.valid()
             self.assertEqual(4, email_msg.contact_nb)
-            self.assertEqual('', email_msg.contact_noemail)
+            self.assertEqual([], email_msg.contact_noemail)
             email_msg._prep_sending()
             email_msg.status = 2
             email_msg.save()
