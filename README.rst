@@ -1,3 +1,15 @@
+.. image:: https://img.shields.io/pypi/djversions/lucterios-contacts
+    :target: https://pypi.org/project/lucterios-contacts/
+    :alt: Django version
+
+.. image:: https://img.shields.io/pypi/v/lucterios-contacts
+    :target: https://pypi.org/project/lucterios-contacts/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/pyversions/lucterios-contacts
+    :target: https://pypi.org/project/lucterios-contacts/
+    :alt: Supported Python versions
+
 Contacts modules for Lucterios framework
 ========================================
 
