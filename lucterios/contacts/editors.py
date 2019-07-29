@@ -137,7 +137,10 @@ parent.get('args_list').setVisible(type==4);
             comp.set_value(value)
         elif self.item.kind == 4:
             val_selected = value
-            select_id = 0
+            try:
+                select_id = int(value)
+            except ValueError:
+                select_id = 0
             select_list = []
             for sel_item in args['list']:
                 if sel_item == val_selected:

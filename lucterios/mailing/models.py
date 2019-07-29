@@ -52,6 +52,7 @@ from lucterios.documents.models import DocumentContainer
 from lucterios.documents.models_legacy import Document
 from lucterios.mailing.functions import will_mail_send, send_email
 from locale import format_string
+from lucterios.framework.auditlog import auditlog
 
 
 class MessageLine(LucteriosModel):
@@ -513,3 +514,8 @@ def mailing_checkparam():
 
     Parameter.check_and_create(name='mailing-dkim-private-path', typeparam=0, title=_("mailing-dkim-private-path"), args="{'Multi': False}", value='')
     Parameter.check_and_create(name='mailing-dkim-selector', typeparam=0, title=_("mailing-dkim-selector"), args="{'Multi': False}", value='default')
+
+
+@Signal.decorate('auditlog_register')
+def mailing_auditlog_register():
+    auditlog.register(Message, include_fields=['status', 'date', 'subject', 'body', 'recipients', 'attachments'])

@@ -35,7 +35,8 @@ from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_va
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
-from lucterios.framework.tools import get_bool_textual
+from lucterios.framework.tools import get_bool_textual, get_format_value
+from lucterios.framework.auditlog import auditlog
 
 
 class CustomField(LucteriosModel):
@@ -45,6 +46,9 @@ class CustomField(LucteriosModel):
     args = models.CharField(_('arguments'), max_length=200, default="{}")
     model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
     kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
+
+    def __str__(self):
+        return self.name
 
     @classmethod
     def get_show_fields(cls):
@@ -66,7 +70,7 @@ class CustomField(LucteriosModel):
         return "custom_%d" % self.id
 
     def get_model_title(self):
-        return self.model_associated()._meta.verbose_name
+        return six.text_type(self.model_associated()._meta.verbose_name)
 
     def get_kind_txt(self):
         dep_field = self.get_field_by_name('kind')
@@ -339,6 +343,28 @@ class ContactCustomField(LucteriosModel):
     field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
     value = models.TextField(_('value'), default="")
 
+    data = LucteriosVirtualField(verbose_name=_('value'), compute_from='get_data')
+
+    def get_data(self):
+        data = None
+        if self.field.kind == 0:
+            data = six.text_type(self.value)
+        if self.value == '':
+            self.value = '0'
+        if self.field.kind == 1:
+            data = int(self.value)
+        if self.field.kind == 2:
+            data = float(self.value)
+        if self.field.kind == 3:
+            data = (self.value != 'False') and (self.value != '0') and (self.value != '') and (self.value != 'n')
+        if self.field.kind == 4:
+            data = int(self.value)
+        dep_field = CustomizeObject.get_virtualfield(self.field.get_fieldname())
+        return get_format_value(dep_field, data)
+
+    def get_auditlog_object(self):
+        return self.contact.get_final_child()
+
     class Meta(object):
         verbose_name = _('custom field value')
         verbose_name_plural = _('custom field values')
@@ -579,6 +605,12 @@ class Responsability(LucteriosModel):
     functions = models.ManyToManyField(Function, verbose_name=_('functions'), blank=True)
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
+    def __str__(self):
+        return six.text_type(self.individual)
+
+    def get_auditlog_object(self):
+        return self.legal_entity.get_final_child()
+
     @classmethod
     def get_edit_fields(cls):
         return ["legal_entity", "individual", "functions"]
@@ -626,3 +658,15 @@ def contacts_checkparam():
                                param_titles=(_("contacts-mailtoconfig.0"), _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2")))
     Parameter.check_and_create(name='contacts-createaccount', typeparam=4, title=_("contacts-createaccount"), args="{'Enum':3}", value='0',
                                param_titles=(_("contacts-createaccount.0"), _("contacts-createaccount.1"), _("contacts-createaccount.2")))
+
+
+@Signal.decorate('auditlog_register')
+def contacts_auditlog_register():
+    auditlog.register(LegalEntity)
+    auditlog.register(Individual)
+    auditlog.register(Responsability, include_fields=['individual', 'functions'])
+    auditlog.register(PostalCode)
+    auditlog.register(Function)
+    auditlog.register(StructureType)
+    auditlog.register(CustomField, include_fields=['name', 'model_title', 'kind_txt'])
+    auditlog.register(ContactCustomField, include_fields=['field', 'data'], mapping_fields=['field'])
