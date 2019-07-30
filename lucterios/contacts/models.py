@@ -349,16 +349,18 @@ class ContactCustomField(LucteriosModel):
         data = None
         if self.field.kind == 0:
             data = six.text_type(self.value)
-        if self.value == '':
-            self.value = '0'
+        else:
+            data = self.value
+        if data == '':
+            data = '0'
         if self.field.kind == 1:
-            data = int(self.value)
+            data = int(data)
         if self.field.kind == 2:
-            data = float(self.value)
+            data = float(data)
         if self.field.kind == 3:
-            data = (self.value != 'False') and (self.value != '0') and (self.value != '') and (self.value != 'n')
+            data = (data != 'False') and (data != '0') and (data != '') and (data != 'n')
         if self.field.kind == 4:
-            data = int(self.value)
+            data = int(data)
         dep_field = CustomizeObject.get_virtualfield(self.field.get_fieldname())
         return get_format_value(dep_field, data)
 
