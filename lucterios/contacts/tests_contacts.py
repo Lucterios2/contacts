@@ -81,12 +81,9 @@ class ContactsTest(LucteriosTest):
         LucteriosTest.setUp(self)
         change_ourdetail()
         rmtree(get_user_dir(), True)
-        StructureType.objects.create(
-            name="Type A")
-        StructureType.objects.create(
-            name="Type B")
-        StructureType.objects.create(
-            name="Type C")
+        StructureType.objects.create(name="Type A")
+        StructureType.objects.create(name="Type B")
+        StructureType.objects.create(name="Type C")
         Function.objects.create(name="President")
         Function.objects.create(name="Secretaire")
         Function.objects.create(name="Tresorier")
@@ -418,18 +415,15 @@ class ContactsTest(LucteriosTest):
 
     def test_legalentity_responsability(self):
         self.factory.xfer = LegalEntityShow()
-        self.calljson(
-            '/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
-        self.assert_observer(
-            'core.custom', 'lucterios.contacts', 'legalEntityShow')
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': '1'}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
         self.assert_count_equal('', 15)
         self.assert_json_equal('LABELFORM', 'name', "WoldCompany")
         self.assert_grid_equal('responsability', {"individual": "personne physique", 'functions': 'fonctions'}, 0)  # nb=2
         self.assert_count_equal('#responsability/actions', 4)
 
         self.factory.xfer = ResponsabilityAdd()
-        self.calljson('/lucterios.contacts/responsabilityAdd',
-                      {'legal_entity': '1'}, False)
+        self.calljson('/lucterios.contacts/responsabilityAdd', {'legal_entity': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'responsabilityAdd')
         self.assert_count_equal('', 4)
         self.assert_json_equal('LABELFORM', 'legal_entity', "WoldCompany")
@@ -900,6 +894,60 @@ class ContactsTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', 'firstname', "jack")
         self.assert_json_equal('LABELFORM', 'lastname', "MISTER")
         self.assert_json_equal('LINK', 'email', "jack@worldcompany.com")
+
+    def test_merge_legalentities(self):
+        entity1 = LegalEntity.objects.create(name='entity1')
+        entity2 = LegalEntity.objects.create(name='entity2')
+        indiv1 = Individual.objects.create(genre=1, firstname="Avrel", lastname="Dalton")
+        indiv2 = Individual.objects.create(genre=1, firstname="Lucky", lastname="Luke")
+        indiv3 = Individual.objects.create(genre=2, firstname="Ma'a", lastname="Dalton")
+
+        resp = Responsability.objects.create(legal_entity=entity1, individual=indiv1)
+        resp.functions.set(Function.objects.filter(id__in=[1, 2]))
+        resp = Responsability.objects.create(legal_entity=entity1, individual=indiv2)
+        resp.functions.set(Function.objects.filter(id__in=[3]))
+        resp = Responsability.objects.create(legal_entity=entity2, individual=indiv2)
+        resp.functions.set(Function.objects.filter(id__in=[1, 3]))
+        resp = Responsability.objects.create(legal_entity=entity2, individual=indiv3)
+        resp.functions.set(Function.objects.filter(id__in=[2]))
+
+        self.factory.xfer = LegalEntityShow()
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': entity1.id}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_json_equal('LABELFORM', 'name', "entity1")
+        self.assert_count_equal('responsability', 2)
+        self.assert_json_equal('', 'responsability/@0/individual', "Dalton Avrel")
+        self.assert_json_equal('', 'responsability/@0/functions', ['President', 'Secretaire'])
+        self.assert_json_equal('', 'responsability/@1/individual', "Luke Lucky")
+        self.assert_json_equal('', 'responsability/@1/functions', ['Tresorier'])
+
+        self.factory.xfer = LegalEntityShow()
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': entity2.id}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_json_equal('LABELFORM', 'name', "entity2")
+        self.assert_count_equal('responsability', 2)
+        self.assert_json_equal('', 'responsability/@0/individual', "Luke Lucky")
+        self.assert_json_equal('', 'responsability/@0/functions', ['President', 'Tresorier'])
+        self.assert_json_equal('', 'responsability/@1/individual', "Dalton Ma'a")
+        self.assert_json_equal('', 'responsability/@1/functions', ['Secretaire'])
+
+        self.factory.xfer = ObjectMerge()
+        self.calljson('/CORE/objectMerge', {'modelname': 'contacts.LegalEntity', 'field_id': 'legalentity',
+                                            'legalentity': '%d;%d' % (entity1.id, entity2.id), 'mrg_object': entity2.id, 'CONFIRME': 'YES'}, False)
+        self.assert_observer('core.acknowledge', 'CORE', 'objectMerge')
+
+        self.factory.xfer = LegalEntityShow()
+        self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': entity2.id}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
+        self.assert_json_equal('LABELFORM', 'name', "entity2")
+        self.print_json('responsability')
+        self.assert_count_equal('responsability', 3)
+        self.assert_json_equal('', 'responsability/@0/individual', "Dalton Avrel")
+        self.assert_json_equal('', 'responsability/@0/functions', ['President', 'Secretaire'])
+        self.assert_json_equal('', 'responsability/@1/individual', "Luke Lucky")
+        self.assert_json_equal('', 'responsability/@1/functions', ['President', 'Tresorier'])
+        self.assert_json_equal('', 'responsability/@2/individual', "Dalton Ma'a")
+        self.assert_json_equal('', 'responsability/@2/functions', ['Secretaire'])
 
     def test_import_contacts(self):
         csv_content = """value;nom;adresse;codePostal;ville;fixe;portable;mail;Num;Type

@@ -444,6 +444,20 @@ class AbstractContactDel(XferDelete):
     caption = _("Delete contact")
 
 
+@signal_and_lock.Signal.decorate('post_merge')
+def post_merge_contacts(item):
+    from django.db.models import Count
+    if isinstance(item, LegalEntity):
+        individual_list = []
+        for ident in item.responsability_set.values('individual').annotate(Count('id')).values('individual').order_by().filter(id__count__gt=1):
+            individual_list.append(ident['individual'])
+        for individual_id in individual_list:
+            resp_list = item.responsability_set.filter(individual_id=individual_id).order_by('id')
+            main_resp = resp_list.first()
+            if main_resp is not None:
+                main_resp.merge_objects(list(resp_list)[1:])
+
+
 @signal_and_lock.Signal.decorate('situation')
 def situation_contacts(xfer):
     if not hasattr(xfer, 'add_component'):
