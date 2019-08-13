@@ -101,12 +101,25 @@ class TestSMTPChannel(smtpd.SMTPChannel):
         else:
             smtpd.SMTPChannel.smtp_EHLO(self, arg)
 
+    def smtp_RCPT(self, arg):
+        if self.smtp_server.wrong_email is not None:
+            import re
+            address = re.findall(r"^TO:<(.*)>$", arg)
+            if len(address) == 0:
+                self.push('501 Syntax: RCPT TO: <address>')
+                return
+            if self.smtp_server.wrong_email in address:
+                self.push('550 Bad <address> : %s' % self.smtp_server.wrong_email)
+                return
+        smtpd.SMTPChannel.smtp_RCPT(self, arg)
+
 
 class TestSMTPServer(smtpd.SMTPServer):
     channel_class = TestSMTPChannel
     emails = []
     with_authentificate = False
     auth_params = None
+    wrong_email = None
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
         self.emails.append((peer, mailfrom, rcpttos, data))
@@ -123,6 +136,7 @@ class TestReceiver(TestCase):
         self.smtp.emails = []
         self.smtp.with_authentificate = False
         self.smtp.auth_params = None
+        self.smtp.wrong_email = None
         self.thread = Thread(target=asyncore.loop, kwargs={'timeout': 1})
         self.thread.start()
 
@@ -152,23 +166,21 @@ class TestReceiver(TestCase):
                 msg_result.append(msg_item)
         return msg_result
 
-    def get_msg_index(self, index, subject=None):
+    def get_msg_index(self, index, subject=None, params=None):
         data = self.get(index)[3]
         if hasattr(data, 'decode'):
             data = data.decode()
         msg = email.message_from_string(data)
-        if subject is not None:
-            self.assertEqual(subject, msg.get('Subject', ''))
-        return self.convert_message(msg.get_payload())
-
-    def check_first_message(self, subject, nb_multi, params=None):
-        msg = self.get_first_msg()
         if params is None:
             params = {}
         if isinstance(params, dict):
-            params['Subject'] = subject
+            if subject is not None:
+                params['Subject'] = subject
             for key, val in params.items():
                 self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
-        msg_result = self.convert_message(msg.get_payload())
+        return self.convert_message(msg.get_payload())
+
+    def check_first_message(self, subject, nb_multi, params=None):
+        msg_result = self.get_msg_index(0, subject, params)
         self.assertEqual(nb_multi, len(msg_result))
         return msg_result

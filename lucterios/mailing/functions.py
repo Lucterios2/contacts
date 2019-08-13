@@ -129,7 +129,7 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
         msg['DKIM-Signature'] = sig[len("DKIM-Signature: "):]
 
     try:
-        email_server.sendmail(msg_from, recipients, msg.as_string())
+        return email_server.sendmail(msg_from, recipients, msg.as_string())
     except Exception as error:
         raise EmailException(six.text_type(error))
     finally:
@@ -163,7 +163,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
         if sender_email not in bcclist:
             bcclist.append(sender_email)
     email_server = get_email_server(smtp_security, smtp_server, smtp_port, smtp_user, smtp_pass)
-    sending_email(recipients, sender_name, sender_email, subject, body, body_txt, files, cclist, bcclist, email_server, dkim_private_path, dkim_selector)
+    return sending_email(recipients, sender_name, sender_email, subject, body, body_txt, files, cclist, bcclist, email_server, dkim_private_path, dkim_selector)
 
 
 def send_connection_by_email(recipients, alias, passwd):
@@ -173,4 +173,4 @@ def send_connection_by_email(recipients, alias, passwd):
     msg_connection = "<html>"
     msg_connection += message.replace('{[newline]}', '<br/>').replace('{[', '<').replace(']}', '>')
     msg_connection += "</html>"
-    send_email(recipients, subject, msg_connection)
+    return send_email(recipients, subject, msg_connection)

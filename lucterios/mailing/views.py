@@ -37,7 +37,7 @@ from lucterios.framework import signal_and_lock
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
 
-from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email
+from lucterios.mailing.functions import will_mail_send, send_email, send_connection_by_email, EmailException
 from lucterios.contacts.models import LegalEntity
 
 
@@ -119,7 +119,9 @@ class SendEmailTry(XferContainerAcknowledge):
             address.append("%s %s" % (legal.postal_code, legal.city))
             message = _('EMail sent to check configuration')
             message += "{[br/]}".join(address).replace('{[newline]}', "{[br/]}").replace("\n", '{[br/]}')
-            send_email(self.getparam('recipient'), _("EMail try"), "<html><body>%s</body></html>" % message.replace('{[', '<').replace(']}', '>'))
+            bad_sended = send_email(self.getparam('recipient'), _("EMail try"), "<html><body>%s</body></html>" % message.replace('{[', '<').replace(']}', '>'))
+            if len(bad_sended) != 0:
+                raise EmailException(bad_sended)
             self.message(_("EMail send, check it."))
 
 

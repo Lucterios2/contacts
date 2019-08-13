@@ -116,6 +116,7 @@ class ConfigurationTest(LucteriosTest):
     def test_tryemail_success(self):
         dkim_private_file = self.create_dkim_file()
         configSMTP('localhost', 1025, dkim_private_file=dkim_private_file)
+        self.server.smtp.wrong_email = 'titi@machin.com'
         self.assertEqual(0, self.server.count())
 
         self.factory.xfer = SendEmailTry()
@@ -148,6 +149,11 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('base64', msg_text.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Courriel envoyé pour vérifier la configuration  \n  \nWoldCompany', decode_b64(msg_text.get_payload())[:63])
 
+        self.factory.xfer = SendEmailTry()
+        self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com;titi@machin.com'}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
+        self.assertEqual(2, self.server.count())
+
     def test_send_no_config(self):
         configSMTP('', 25)
         self.assertEqual(0, self.server.count())
@@ -174,7 +180,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send correct config', 'Yessss!!!')
+        ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!')
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
@@ -188,7 +195,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send correct config', 'Yessss!!!', withcopy=True)
+        ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', withcopy=True)
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
@@ -202,7 +210,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email(['toto@machin.com', 'titi@machin.com'], 'send correct config', 'Yessss!!!')
+        ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send correct config', 'Yessss!!!')
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com'], self.server.get(0)[2])
@@ -212,11 +221,28 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
         self.assertEqual(None, self.server.smtp.auth_params)
 
+    def test_send_multi_dest_with_refuse(self):
+        configSMTP('localhost', 1025)
+        self.server.smtp.wrong_email = 'titi@machin.com'
+        self.assertEqual(0, self.server.count())
+        self.assertEqual(True, will_mail_send())
+        ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send with refuse', 'Yessss!!!')
+        self.assertEqual(['titi@machin.com'], list(ret.keys()))
+        self.assertEqual(1, self.server.count())
+        self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
+        self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
+        msg, = self.server.check_first_message('send with refuse', 1, {'To': 'toto@machin.com, titi@machin.com', 'Cc': ''})
+        self.assertEqual('text/plain', msg.get_content_type())
+        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
+        self.assertEqual(None, self.server.smtp.auth_params)
+
     def test_send_multi_email(self):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email(['toto@machin.com;titi@machin.com,tutu@machin.com'], 'send correct config', 'Yessss!!!')
+        ret = send_email(['toto@machin.com;titi@machin.com,tutu@machin.com'], 'send correct config', 'Yessss!!!')
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
@@ -230,7 +256,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send correct config', 'Yessss!!!', cclist=['titi@machin.com', 'tutu@machin.com'])
+        ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', cclist=['titi@machin.com', 'tutu@machin.com'])
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
@@ -244,7 +271,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send correct config', 'Yessss!!!', bcclist=['titi@machin.com', 'tutu@machin.com'])
+        ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', bcclist=['titi@machin.com', 'tutu@machin.com'])
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
@@ -258,8 +286,9 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com'], 'send correct config', 'Yessss!!!',
-                   cclist=['titi@machin.com', 'tutu@machin.com', 'tata@machin.com'], bcclist=['toto@machin.com', 'tutu@machin.com', 'tete@machin.com'])
+        ret = send_email(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com'], 'send correct config', 'Yessss!!!',
+                         cclist=['titi@machin.com', 'tutu@machin.com', 'tata@machin.com'], bcclist=['toto@machin.com', 'tutu@machin.com', 'tete@machin.com'])
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com',
@@ -275,8 +304,9 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send html',
-                   '<html><body><h1>Yessss!!!</h1></body></html>')
+        ret = send_email('toto@machin.com', 'send html',
+                         '<html><body><h1>Yessss!!!</h1></body></html>')
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
@@ -293,7 +323,8 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025, 0, 'toto', 'abc123')
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        send_email('toto@machin.com', 'send with auth', 'OK!')
+        ret = send_email('toto@machin.com', 'send with auth', 'OK!')
+        self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         msg, = self.server.check_first_message('send with auth', 1)
         self.assertEqual('OK!', decode_b64(msg.get_payload()))
@@ -386,8 +417,8 @@ class MailingTest(LucteriosTest):
     def setUp(self):
         LucteriosTest.setUp(self)
         change_ourdetail()
-        create_jack(firstname="jack", lastname="MISTER", with_email=True)
-        create_jack(firstname="jean", lastname="Valjean", with_email=False)
+        self.jack = create_jack(firstname="jack", lastname="MISTER", with_email=True)
+        self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
 
     def test_messages(self):
         self.factory.xfer = MessageList()
@@ -744,21 +775,66 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         finally:
             server.stop()
 
-    def test_send_dynamic(self):
+    def test_send_classic_with_bad_email(self):
+        self.factory.user = LucteriosUser.objects.create(username='empty')
+        self.factory.user.is_superuser = True
+        self.factory.user.save()
 
+        self.jack.email = self.jack.email + ';titi@machin.com'
+        self.jack.save()
+
+        configSMTP('localhost', 1025)
+        server = TestReceiver()
+        server.start(1025)
+        server.smtp.wrong_email = 'titi@machin.com'
+        try:
+            email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye")
+            email_msg.add_recipient('contacts.Individual', 'genre||8||1')
+            email_msg.add_recipient('contacts.LegalEntity', '')
+            email_msg.save()
+            self.assertEqual(3, email_msg.contact_nb)
+            self.assertEqual(['Valjean jean'], email_msg.contact_noemail)
+            email_msg._prep_sending()
+            email_msg.status = 2
+            email_msg.save()
+            self.assertEqual(0, server.count())
+
+            email_msg.sendemail(10, "http://testserver")
+            self.assertEqual(2, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['jack@worldcompany.com'], server.get(0)[2])
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
+            self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(1)[2])
+
+            email_sent_list = email_msg.emailsent_set.all()
+            self.assertEqual(3, len(email_sent_list))
+            self.assertEqual('mr-sylvestre@worldcompany.com', email_sent_list[0].email)
+            self.assertEqual('', email_sent_list[0].error)
+            self.assertEqual('titi@machin.com', email_sent_list[1].email)
+            self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com')}", email_sent_list[1].error)
+            self.assertEqual('jack@worldcompany.com', email_sent_list[2].email)
+            self.assertEqual('', email_sent_list[2].error)
+        finally:
+            server.stop()
+
+    def get_print_model(self):
         print_model = PrintModel.objects.create(name="Report", kind="2", modelname="contacts.Individual")
         print_model.value = """
-<model hmargin="10.0" vmargin="10.0" page_width="210.0" page_height="297.0">
-<header extent="0.0"/>
-<bottom extent="0.0"/>
-<body>
-<text height="8.0" width="190.0" top="0.0" left="0.0" padding="1.0" spacing="0.0" border_color="black" border_style="" border_width="0.2" text_align="center" line_height="15" font_family="sans-serif" font_weight="" font_size="15">
-{[b]}#firstname #lastname{[/b]}
-</text>
-</body>
-</model>
-"""
+    <model hmargin="10.0" vmargin="10.0" page_width="210.0" page_height="297.0">
+    <header extent="0.0"/>
+    <bottom extent="0.0"/>
+    <body>
+    <text height="8.0" width="190.0" top="0.0" left="0.0" padding="1.0" spacing="0.0" border_color="black" border_style="" border_width="0.2" text_align="center" line_height="15" font_family="sans-serif" font_weight="" font_size="15">
+    {[b]}#firstname #lastname{[/b]}
+    </text>
+    </body>
+    </model>
+    """
         print_model.save()
+        return print_model
+
+    def test_send_dynamic(self):
+        print_model = self.get_print_model()
 
         create_jack(firstname="jack", lastname='Dalton')
         create_jack(firstname="joe", lastname='Dalton')
@@ -807,6 +883,57 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             for msg_index in range(4):
                 _msg, _msg_txt, msg_file = server.get_msg_index(msg_index)
                 self.save_pdf(base64_content=msg_file.get_payload(), ident=msg_index + 1)
+        finally:
+            server.stop()
+
+    def test_send_dynamic_with_bad_email(self):
+        print_model = self.get_print_model()
+
+        jack = create_jack(firstname="jack", lastname='Dalton')
+        create_jack(firstname="joe", lastname='Dalton')
+        create_jack(firstname="wiliam", lastname='Dalton')
+        create_jack(firstname="avrel", lastname='Dalton')
+        jack.email = self.jack.email + ';titi@machin.com'
+        jack.save()
+
+        configSMTP('localhost', 1025)
+        server = TestReceiver()
+        server.start(1025)
+        server.smtp.wrong_email = 'titi@machin.com'
+        try:
+            email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye",
+                                               email_to_send="contacts.Individual:0:%d" % print_model.id)
+            email_msg.add_recipient('contacts.Individual', 'id||8||4;5;6;7')
+            email_msg.save()
+            email_msg.valid()
+            self.assertEqual(4, email_msg.contact_nb)
+            self.assertEqual([], email_msg.contact_noemail)
+            email_msg._prep_sending()
+            email_msg.status = 2
+            email_msg.save()
+            self.assertEqual(0, server.count())
+
+            email_msg.sendemail(10, "http://testserver")
+            self.assertEqual(4, server.count())
+            self.assertEqual(['avrel@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            server.get_msg_index(0, params={'To': 'avrel@worldcompany.com', 'Cc': ''})
+            self.assertEqual(['jack@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(1)[2])
+            server.get_msg_index(1, params={'To': 'jack@worldcompany.com, titi@machin.com', 'Cc': ''})
+            self.assertEqual(['joe@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(2)[2])
+            server.get_msg_index(2, params={'To': 'joe@worldcompany.com', 'Cc': ''})
+            self.assertEqual(['wiliam@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(3)[2])
+            server.get_msg_index(3, params={'To': 'wiliam@worldcompany.com', 'Cc': ''})
+
+            email_sent_list = email_msg.emailsent_set.all()
+            self.assertEqual(4, len(email_sent_list))
+            self.assertEqual(['jack@worldcompany.com;titi@machin.com'], email_sent_list[0].get_emails()[0])
+            self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com'), 'jack@worldcompany.com': 'OK'}", email_sent_list[0].error)
+            self.assertEqual(['joe@worldcompany.com'], email_sent_list[1].get_emails()[0])
+            self.assertEqual('', email_sent_list[1].error)
+            self.assertEqual(['wiliam@worldcompany.com'], email_sent_list[2].get_emails()[0])
+            self.assertEqual('', email_sent_list[2].error)
+            self.assertEqual(['avrel@worldcompany.com'], email_sent_list[3].get_emails()[0])
+            self.assertEqual('', email_sent_list[3].error)
         finally:
             server.stop()
 

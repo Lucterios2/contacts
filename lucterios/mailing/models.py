@@ -44,15 +44,14 @@ from lucterios.framework.tools import toHtml, get_date_formating
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.framework.filetools import remove_accent
+from lucterios.framework.auditlog import auditlog
 from lucterios.CORE.models import Parameter, PrintModel
 from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.models_legacy import Document
-from lucterios.mailing.functions import will_mail_send, send_email
-from locale import format_string
-from lucterios.framework.auditlog import auditlog
+from lucterios.mailing.functions import will_mail_send, send_email, split_doubled_email
 
 
 class MessageLine(LucteriosModel):
@@ -465,8 +464,16 @@ class EmailSent(LucteriosModel):
                 body = body.replace('</body>', img_html + '</body>')
             email, ccemail = self.get_emails()
             getLogger('lucterios.mailing').debug('send email %s : %s' % (self.message.subject, email))
-            send_email(email, self.replace_tag(self.message.subject), body, files=self.get_attach_files(), cclist=ccemail, withcopy=self.item is not None, body_txt=body_txt)
+            no_send_list = send_email(split_doubled_email(email), self.replace_tag(self.message.subject), body, files=self.get_attach_files(), cclist=split_doubled_email(ccemail), withcopy=self.item is not None, body_txt=body_txt)
             self.success = True
+            if len(no_send_list) > 0:
+                email_list = email
+                if ccemail is not None:
+                    email_list.extend(ccemail)
+                for email_item in split_doubled_email(email_list):
+                    if email_item not in no_send_list:
+                        no_send_list[email_item] = 'OK'
+                self.error = six.text_type(no_send_list)
         except Exception as error:
             if getLogger('lucterios.mailing').isEnabledFor(DEBUG):
                 getLogger('lucterios.mailing').exception('send_email')
