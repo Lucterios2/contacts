@@ -117,7 +117,7 @@ class Message(LucteriosModel):
     @property
     def emailsent_query(self):
         if self._show_only_failed:
-            return models.Q(success=False)
+            return ~models.Q(error='')
         else:
             return models.Q()
 
