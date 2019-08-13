@@ -36,7 +36,6 @@ from django.contrib.auth.models import AnonymousUser
 
 from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
 from lucterios.framework.filetools import get_user_dir
-from lucterios.framework.error import LucteriosException
 from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
 from lucterios.CORE.models import Parameter, LucteriosUser, PrintModel
@@ -47,16 +46,16 @@ from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 from lucterios.contacts.views import CreateAccount
 from lucterios.contacts.models import Individual, LegalEntity
 
+from lucterios.documents.tests import create_doc
+from lucterios.documents.models import DocumentContainer
+
+from lucterios.mailing.models import Message
 from lucterios.mailing.views import Configuration, SendEmailTry
-from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.mailing.functions import will_mail_send, send_email, EmailException
 from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
     MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
     MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
-
-from lucterios.documents.tests import create_doc
-from lucterios.documents.models import DocumentContainer
-from lucterios.mailing.models import Message
 
 
 class ConfigurationTest(LucteriosTest):
@@ -102,7 +101,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_json_equal('', "message", "Mauvais paramètrage du courriel")
         self.assertEqual(0, self.server.count())
 
-    def test_tryemail_success(self):
+    def create_dkim_file(self):
         try:
             from Crypto.PublicKey import RSA
             dkim_private_file = join(get_user_dir(), "private.pem")
@@ -112,6 +111,10 @@ class ConfigurationTest(LucteriosTest):
                 prv_file.write(pv_key_string)
         except Exception:
             dkim_private_file = ""
+        return dkim_private_file
+
+    def test_tryemail_success(self):
+        dkim_private_file = self.create_dkim_file()
         configSMTP('localhost', 1025, dkim_private_file=dkim_private_file)
         self.assertEqual(0, self.server.count())
 
@@ -139,10 +142,11 @@ class ConfigurationTest(LucteriosTest):
         else:
             six.print_("-- NO DKIM --")
 
-        message, = self.server.check_first_message('Essai de courriel', 1)
-        self.assertEqual('text/plain', message.get_content_type())
-        self.assertEqual('base64', message.get('Content-Transfer-Encoding', ''))
-        self.assertEqual('Courriel envoyé pour vérifier la configuration\n\nWoldCompany\n', decode_b64(message.get_payload())[:60])
+        msg_html, msg_text = self.server.check_first_message('Essai de courriel', 2)
+        self.assertEqual('text/html', msg_html.get_content_type())
+        self.assertEqual('text/plain', msg_text.get_content_type())
+        self.assertEqual('base64', msg_text.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('Courriel envoyé pour vérifier la configuration  \n  \nWoldCompany', decode_b64(msg_text.get_payload())[:63])
 
     def test_send_no_config(self):
         configSMTP('', 25)
@@ -151,7 +155,7 @@ class ConfigurationTest(LucteriosTest):
         try:
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
-        except LucteriosException as error:
+        except EmailException as error:
             self.assertEqual(six.text_type(error), 'Courriel non configuré !')
         self.assertEqual(0, self.server.count())
 
@@ -162,7 +166,7 @@ class ConfigurationTest(LucteriosTest):
         try:
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
-        except LucteriosException as error:
+        except EmailException as error:
             self.assertEqual(six.text_type(error), '[Errno 111] Connection refused')
         self.assertEqual(0, self.server.count())
 
@@ -302,7 +306,7 @@ class ConfigurationTest(LucteriosTest):
         try:
             send_email('toto@machin.com', 'send with starttls', 'failed!')
             self.assertTrue(False)
-        except LucteriosException as error:
+        except EmailException as error:
             self.assertEqual(six.text_type(error), 'STARTTLS extension not supported by server.')
         self.assertEqual(0, self.server.count())
 
@@ -313,7 +317,7 @@ class ConfigurationTest(LucteriosTest):
         try:
             send_email('toto@machin.com', 'send with ssl', 'not success!')
             self.assertTrue(False)
-        except LucteriosException as error:
+        except EmailException as error:
             self.assertTrue(('unknown protocol' in six.text_type(error)) or ('SSL: WRONG_VERSION_NUMBER' in six.text_type(error)), six.text_type(error))
         self.assertEqual(0, self.server.count())
 

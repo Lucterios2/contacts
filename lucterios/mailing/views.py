@@ -118,8 +118,8 @@ class SendEmailTry(XferContainerAcknowledge):
             address.append(legal.address)
             address.append("%s %s" % (legal.postal_code, legal.city))
             message = _('EMail sent to check configuration')
-            message += "\n".join(address).replace('{[newline]}', "\n").replace('{[br/]}', "\n")
-            send_email(self.getparam('recipient'), _("EMail try"), message)
+            message += "{[br/]}".join(address).replace('{[newline]}', "{[br/]}").replace("\n", '{[br/]}')
+            send_email(self.getparam('recipient'), _("EMail try"), "<html><body>%s</body></html>" % message.replace('{[', '<').replace(']}', '>'))
             self.message(_("EMail send, check it."))
 
 

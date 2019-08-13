@@ -940,7 +940,6 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/legalEntityShow', {'legal_entity': entity2.id}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityShow')
         self.assert_json_equal('LABELFORM', 'name', "entity2")
-        self.print_json('responsability')
         self.assert_count_equal('responsability', 3)
         self.assert_json_equal('', 'responsability/@0/individual', "Dalton Avrel")
         self.assert_json_equal('', 'responsability/@0/functions', ['President', 'Secretaire'])

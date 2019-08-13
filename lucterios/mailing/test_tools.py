@@ -31,9 +31,10 @@ import smtpd
 import logging
 import email
 
+from django.test.testcases import TestCase
+
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.models import Parameter
-from django.test.testcases import TestCase
 
 
 def decode_b64(data):
