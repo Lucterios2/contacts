@@ -108,6 +108,7 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
         if body_txt is None:
             h2txt = HTML2Text()
             h2txt.ignore_links = False
+            h2txt.wrap_links = False
             body_txt = h2txt.handle(body)
         msg_alternative = MIMEMultipart('alternative')
         msg_alternative.attach(MIMEText(body, 'html', 'utf-8'))

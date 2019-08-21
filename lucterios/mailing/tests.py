@@ -304,8 +304,13 @@ class ConfigurationTest(LucteriosTest):
         configSMTP('localhost', 1025)
         self.assertEqual(0, self.server.count())
         self.assertEqual(True, will_mail_send())
-        ret = send_email('toto@machin.com', 'send html',
-                         '<html><body><h1>Yessss!!!</h1></body></html>')
+        html_content = """<html>
+<body>
+    <h1>Yessss!!!</h1>
+    En here, there are a nice <a href='https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb/cccc.cccc/dddd%20dddd/bidule.pdf'>link</a>.
+</body>
+</html>"""
+        ret = send_email('toto@machin.com', 'send html', html_content)
         self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
@@ -313,10 +318,12 @@ class ConfigurationTest(LucteriosTest):
         msg1, msg2, = self.server.check_first_message('send html', 2)
         self.assertEqual('text/html', msg1.get_content_type())
         self.assertEqual('base64', msg1.get('Content-Transfer-Encoding', ''))
-        self.assertEqual('<html><body><h1>Yessss!!!</h1></body></html>', decode_b64(msg1.get_payload()))
+        self.assertEqual(html_content, decode_b64(msg1.get_payload()))
         self.assertEqual('text/plain', msg2.get_content_type())
         self.assertEqual('base64', msg2.get('Content-Transfer-Encoding', ''))
-        self.assertEqual('# Yessss!!!\n\n', decode_b64(msg2.get_payload()))
+        self.assertEqual("""# Yessss!!!
+
+En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb/cccc.cccc/dddd%20dddd/bidule.pdf).""", decode_b64(msg2.get_payload()).strip())
 
     def test_send_with_auth(self):
         self.server.smtp.with_authentificate = True
