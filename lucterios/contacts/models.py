@@ -35,7 +35,7 @@ from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_va
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.CORE.models import Parameter
-from lucterios.framework.tools import get_bool_textual, get_format_value
+from lucterios.framework.tools import get_format_value
 from lucterios.framework.auditlog import auditlog
 
 
@@ -660,6 +660,9 @@ def contacts_checkparam():
                                param_titles=(_("contacts-mailtoconfig.0"), _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2")))
     Parameter.check_and_create(name='contacts-createaccount', typeparam=4, title=_("contacts-createaccount"), args="{'Enum':3}", value='0',
                                param_titles=(_("contacts-createaccount.0"), _("contacts-createaccount.1"), _("contacts-createaccount.2")))
+    Parameter.check_and_create(name="contacts-defaultgroup", typeparam=0, title=_("contacts-defaultgroup"),
+                               args="{'Multi':False}", value='',
+                               meta='("CORE","LucteriosGroup","django.db.models.Q()", "id", False)')
 
 
 @Signal.decorate('auditlog_register')

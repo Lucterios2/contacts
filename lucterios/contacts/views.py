@@ -256,12 +256,15 @@ class CreateAccount(XferContainerAcknowledge):
 
     @transaction.atomic
     def create_account_atomic(self, username, legalentity):
+        defaultgroup = Params.getobject("contacts-defaultgroup")
         user = LucteriosUser()
         user.username = username
         user.first_name = self.item.firstname
         user.last_name = self.item.lastname
         user.email = self.item.email
         user.save()
+        if defaultgroup is not None:
+            user.groups.add(defaultgroup)
         self.item.address = '---'
         self.item.postal_code = '---'
         self.item.city = '---'
@@ -458,7 +461,7 @@ class ContactImport(ObjectImport):
 
 @signal_and_lock.Signal.decorate('config')
 def config_contacts(xfer):
-    new_params = ['contacts-mailtoconfig', 'contacts-createaccount']
+    new_params = ['contacts-mailtoconfig', 'contacts-createaccount', 'contacts-defaultgroup']
     Params.fill(xfer, new_params, 1, 10)
     xfer.params['params'].extend(new_params)
     return True
@@ -483,7 +486,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_params"):
         xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"), _('configure your contacts'))
-        param_lists = ['contacts-mailtoconfig', 'contacts-createaccount']
+        param_lists = ['contacts-mailtoconfig', 'contacts-createaccount', 'contacts-defaultgroup']
         Params.fill(xfer, param_lists, 1, xfer.get_max_row() + 1)
         btn = XferCompButton('editparam')
         btn.set_location(4, xfer.get_max_row())

@@ -38,7 +38,7 @@ from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
 from lucterios.framework.filetools import get_user_dir
 from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
-from lucterios.CORE.models import Parameter, LucteriosUser, PrintModel
+from lucterios.CORE.models import Parameter, LucteriosUser, PrintModel, LucteriosGroup
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct
 
@@ -1204,6 +1204,10 @@ class UserTest(LucteriosTest):
         self.assert_observer('core.exception', 'lucterios.contacts', 'createAccount')
 
     def test_new_account(self):
+        new_groupe = LucteriosGroup.objects.create(name='new_groupe')
+        param = Parameter.objects.get(name='contacts-defaultgroup')
+        param.value = '%d' % new_groupe.id
+        param.save()
         param = Parameter.objects.get(name='contacts-createaccount')
         param.value = '1'
         param.save()
@@ -1256,6 +1260,7 @@ class UserTest(LucteriosTest):
         self.assertEqual('DUPONT', user.last_name)
         self.assertEqual('pierre', user.username)
         self.assertEqual('pierre@worldcompany.com', user.email)
+        self.assertEqual([new_groupe], list(user.groups.all()))
         self.assertTrue(user.check_password(password), 'success after change')
         cont = Individual.objects.filter(user=user)
         self.assertEqual(1, len(cont))
@@ -1313,6 +1318,7 @@ class UserTest(LucteriosTest):
             server.stop()
         user = LucteriosUser.objects.get(id=3)
         self.assertEqual('pierre', user.username)
+        self.assertEqual([], list(user.groups.all()))
         self.assertTrue(user.check_password(password), 'success after change')
         cont = Individual.objects.filter(user=user)
         self.assertEqual(1, len(cont))
