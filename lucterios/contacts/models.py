@@ -663,6 +663,7 @@ def contacts_checkparam():
     Parameter.check_and_create(name="contacts-defaultgroup", typeparam=0, title=_("contacts-defaultgroup"),
                                args="{'Multi':False}", value='',
                                meta='("CORE","LucteriosGroup","django.db.models.Q()", "id", False)')
+    Parameter.check_and_create(name="contacts-size-page", typeparam=1, title=_("contacts-size-page"), args="{}", value='25', meta='("","", "[(25,\'25\'),(50,\'50\'),(100,\'100\'),(250,\'250\'),(500,\'500\'),]", "", True)')
 
 
 @Signal.decorate('auditlog_register')

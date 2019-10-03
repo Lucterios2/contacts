@@ -46,6 +46,7 @@ from lucterios.CORE.xferprint import XferPrintAction, XferPrintListing, XferPrin
 from lucterios.CORE.views import ObjectMerge, ObjectPromote
 
 from lucterios.contacts.models import LegalEntity, Individual, Responsability, AbstractContact
+from lucterios.CORE.parameters import Params
 
 MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
@@ -103,6 +104,10 @@ class LegalEntityList(XferListEditor):
     icon = "legalEntity.png"
     model = LegalEntity
     field_id = 'legal_entity'
+
+    def __init__(self, **kwargs):
+        XferListEditor.__init__(self, **kwargs)
+        self.size_by_page = Params.getvalue("contacts-size-page")
 
     def fillresponse_header(self):
         self.fill_from_model(0, 2, False, ['structure_type'])
@@ -207,6 +212,10 @@ class IndividualList(XferListEditor):
     icon = "individual.png"
     model = Individual
     field_id = 'individual'
+
+    def __init__(self, **kwargs):
+        XferListEditor.__init__(self, **kwargs)
+        self.size_by_page = Params.getvalue("contacts-size-page")
 
     def fillresponse_header(self):
         name_filter = self.getparam('filter')
@@ -359,6 +368,10 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
     model = Individual
     field_id = 'individual'
 
+    def __init__(self, **kwargs):
+        XferSavedCriteriaSearchEditor.__init__(self, **kwargs)
+        self.size_by_page = Params.getvalue("contacts-size-page")
+
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
@@ -375,6 +388,10 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     icon = "legalEntityFind.png"
     model = LegalEntity
     field_id = 'legal_entity'
+
+    def __init__(self, **kwargs):
+        XferSavedCriteriaSearchEditor.__init__(self, **kwargs)
+        self.size_by_page = Params.getvalue("contacts-size-page")
 
     def fillresponse(self):
         XferSearchEditor.fillresponse(self)
