@@ -279,9 +279,9 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualListing')
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
         self.assert_count_equal('', 5)
-        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 0, 2, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
-        self.assert_comp_equal(('SELECT', 'MODEL'), "3", (0, 1, 2, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "3", (0, 3, 2, 1))
         self.assert_select_equal('MODEL', {3: 'liste'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
 
@@ -317,12 +317,12 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualLabel')
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
         self.assert_count_equal('', 4)
-        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 0, 2, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
-        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (0, 1, 2, 1))
+        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (0, 3, 2, 1))
         self.assert_select_equal('LABEL', 6)
-        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (0, 2, 2, 1))
-        self.assert_comp_equal(('SELECT', 'MODEL'), "4", (0, 3, 2, 1))
+        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (0, 4, 2, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "4", (0, 5, 2, 1))
         self.assert_select_equal('MODEL', {4: 'label'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
 
@@ -538,9 +538,9 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityListing')
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
         self.assert_count_equal('', 5)
-        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 0, 2, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
-        self.assert_comp_equal(('SELECT', 'MODEL'), "1", (0, 1, 2, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "1", (0, 3, 2, 1))
         self.assert_select_equal('MODEL', {1: 'liste'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
 
@@ -576,12 +576,12 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityLabel')
         self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
         self.assert_count_equal('', 4)
-        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 0, 2, 1))
+        self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
-        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (0, 1, 2, 1))
+        self.assert_comp_equal(('SELECT', 'LABEL'), "1", (0, 3, 2, 1))
         self.assert_select_equal('LABEL', 6)
-        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (0, 2, 2, 1))
-        self.assert_comp_equal(('SELECT', 'MODEL'), "2", (0, 3, 2, 1))
+        self.assert_comp_equal(('FLOAT', 'FIRSTLABEL'), "1", (0, 4, 2, 1))
+        self.assert_comp_equal(('SELECT', 'MODEL'), "2", (0, 5, 2, 1))
         self.assert_select_equal('MODEL', {2: 'label'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
 

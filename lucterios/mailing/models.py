@@ -394,18 +394,21 @@ class EmailSent(LucteriosModel):
     def _extract_obj(self):
         if len(self.email.split(':')) == 3:
             modelname, object_id, printmodel = self.email.split(':')
-            printmodel_obj = PrintModel.objects.get(id=printmodel)
             model = apps.get_model(modelname)
             self.item = model.objects.get(id=object_id)
-            if hasattr(self.item, "get_document_filename"):
-                pdf_name = "%s.pdf" % self.item.get_document_filename()
+            if hasattr(self.item, "get_pdfreport"):
+                self.print_file = [self.item.get_pdfreport(printmodel)]
             else:
-                pdf_name = "%s.pdf" % remove_accent(printmodel_obj.name)
-            gen = ReportingGenerator()
-            gen.items = self.get_send_email_objects()
-            gen.model_text = printmodel_obj.value
-            pdf_file = BytesIO(gen.generate_report(None, False))
-            self.print_file = [(pdf_name, pdf_file)]
+                printmodel_obj = PrintModel.objects.get(id=printmodel)
+                if hasattr(self.item, "get_document_filename"):
+                    pdf_name = "%s.pdf" % self.item.get_document_filename()
+                else:
+                    pdf_name = "%s.pdf" % remove_accent(printmodel_obj.name)
+                gen = ReportingGenerator()
+                gen.items = self.get_send_email_objects()
+                gen.model_text = printmodel_obj.value
+                pdf_file = BytesIO(gen.generate_report(None, False))
+                self.print_file = [(pdf_name, pdf_file)]
         else:
             self.print_file = None
             self.item = None
