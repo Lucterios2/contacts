@@ -397,7 +397,7 @@ class EmailSent(LucteriosModel):
             model = apps.get_model(modelname)
             self.item = model.objects.get(id=object_id)
             if hasattr(self.item, "get_pdfreport"):
-                self.print_file = [self.item.get_pdfreport(printmodel)]
+                self.print_file = [self.item.get_pdfreport(int(printmodel))]
             else:
                 printmodel_obj = PrintModel.objects.get(id=printmodel)
                 if hasattr(self.item, "get_document_filename"):
