@@ -60,8 +60,8 @@ class PostalCodeTest(LucteriosTest):
         self.assert_action_equal(self.json_actions[0], ('Fermer', 'images/close.png'))
         self.assert_count_equal('', 4)
         self.assert_comp_equal(('IMAGE', "img"), '/static/lucterios.contacts/images/postalCode.png', (0, 0, 1, 1))
-        self.assert_comp_equal(('LABELFORM', "filtre"), 'Filtrer par code postal', (1, 0, 1, 1))
         self.assert_comp_equal(('EDIT', "filter_postal_code"), '', (1, 1, 1, 1))
+        self.assert_attrib_equal("filter_postal_code", 'description', 'Filtrer par code postal')
         self.assert_coordcomp_equal("postalCode", (0, 2, 2, 1))
         self.assert_attrib_equal("postalCode", 'nb_lines', '333')
 

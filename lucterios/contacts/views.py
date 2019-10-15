@@ -427,15 +427,12 @@ class PostalCodeList(XferListEditor):
         if filter_postal_code is None:
             local_struct = LegalEntity.objects.get(id=1)
             filter_postal_code = six.text_type(local_struct.postal_code)
-        lbl = XferCompLabelForm('filtre')
-        lbl.set_value_as_name(_('Filtrer by postal code'))
-        lbl.set_location(1, 0)
-        self.add_component(lbl)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
         comp.is_default = True
         comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 1)
+        comp.description = _('Filtrer by postal code')
         self.add_component(comp)
         self.filter = Q(postal_code__startswith=filter_postal_code)
 
