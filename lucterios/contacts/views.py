@@ -457,10 +457,9 @@ class ContactImport(ObjectImport):
 
 
 @signal_and_lock.Signal.decorate('config')
-def config_contacts(xfer):
+def config_contacts(setting_list):
     new_params = ['contacts-mailtoconfig', 'contacts-createaccount', 'contacts-defaultgroup', 'contacts-size-page']
-    Params.fill(xfer, new_params, 1, 10)
-    xfer.params['params'].extend(new_params)
+    setting_list['05@%s' % _("Addresses and contacts")] = new_params
     return True
 
 
