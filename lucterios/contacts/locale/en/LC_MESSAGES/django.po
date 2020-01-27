@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-22 09:50+0000\n"
+"POT-Creation-Date: 2020-01-25 16:35+0000\n"
 "PO-Revision-Date: 2019-10-22 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -257,45 +257,57 @@ msgstr "associates"
 msgid "our detail"
 msgstr "our detail"
 
-#: models.py:659
+#: models.py:661
 msgid "contacts-mailtoconfig"
 msgstr "Email type sending"
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.0"
 msgstr "To"
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.1"
 msgstr "CC"
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.2"
 msgstr "BCC"
 
-#: models.py:661
+#: models.py:663
 msgid "contacts-createaccount"
 msgstr "Allow to create an account"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.0"
 msgstr "Deny"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.1"
 msgstr "Create only individual"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.2"
 msgstr "Create individual & legal entity"
 
-#: models.py:663
+#: models.py:665
 msgid "contacts-defaultgroup"
 msgstr "Default group"
 
-#: models.py:666
+#: models.py:668
 msgid "contacts-size-page"
 msgstr "Default result by page"
+
+#: models.py:674 models.py:681
+msgid "# contacts (administrator)"
+msgstr "# contacts (administrator)"
+
+#: models.py:676 models.py:682
+msgid "# contacts (editor)"
+msgstr "# contacts (editor)"
+
+#: models.py:678 models.py:683
+msgid "# contacts (shower)"
+msgstr "# contacts (shower)"
 
 #: printmodel/Individual_0001.py:28 printmodel/LegalEntity_0001.py:28
 msgid "listing"

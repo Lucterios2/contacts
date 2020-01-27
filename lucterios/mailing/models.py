@@ -34,7 +34,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.apps import apps
 from django_fsm import FSMIntegerField, transition
-from django.utils import six, formats, timezone
+from django.utils import six, timezone
 
 from lucterios.framework.models import LucteriosModel, LucteriosScheduler,\
     LucteriosVirtualField
@@ -45,7 +45,7 @@ from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.framework.filetools import remove_accent
 from lucterios.framework.auditlog import auditlog
-from lucterios.CORE.models import Parameter, PrintModel
+from lucterios.CORE.models import Parameter, PrintModel, LucteriosGroup
 from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.models import AbstractContact
@@ -524,6 +524,9 @@ def mailing_checkparam():
 
     Parameter.check_and_create(name='mailing-dkim-private-path', typeparam=0, title=_("mailing-dkim-private-path"), args="{'Multi': False}", value='')
     Parameter.check_and_create(name='mailing-dkim-selector', typeparam=0, title=_("mailing-dkim-selector"), args="{'Multi': False}", value='default')
+
+    LucteriosGroup.redefine_generic(_("# mailing (editor)"), Message.get_permission(True, True, True))
+    LucteriosGroup.redefine_generic(_("# mailing (shower)"), Message.get_permission(True, False, False))
 
 
 @Signal.decorate('auditlog_register')

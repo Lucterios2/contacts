@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-22 09:50+0000\n"
+"POT-Creation-Date: 2020-01-25 16:35+0000\n"
 "PO-Revision-Date: 2019-10-22 11:45+0200\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: \n"
@@ -259,45 +259,57 @@ msgstr "associés"
 msgid "our detail"
 msgstr "Nos coordonnées"
 
-#: models.py:659
+#: models.py:661
 msgid "contacts-mailtoconfig"
 msgstr "Type d'envoi de courriel"
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.0"
 msgstr "A ..."
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.1"
 msgstr "Copie à ..."
 
-#: models.py:660
+#: models.py:662
 msgid "contacts-mailtoconfig.2"
 msgstr "Copie caché à ..."
 
-#: models.py:661
+#: models.py:663
 msgid "contacts-createaccount"
 msgstr "Autorisation pour créer un nouveau compte"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.0"
 msgstr "Refusé"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.1"
 msgstr "Créer seulement une personne physique"
 
-#: models.py:662
+#: models.py:664
 msgid "contacts-createaccount.2"
 msgstr "Créer une personne physique & morale"
 
-#: models.py:663
+#: models.py:665
 msgid "contacts-defaultgroup"
 msgstr "Groupe par défaut"
 
-#: models.py:666
+#: models.py:668
 msgid "contacts-size-page"
 msgstr "Résultats par page"
+
+#: models.py:674 models.py:681
+msgid "# contacts (administrator)"
+msgstr "# contacts (administrateur)"
+
+#: models.py:676 models.py:682
+msgid "# contacts (editor)"
+msgstr "# contacts (éditeur)"
+
+#: models.py:678 models.py:683
+msgid "# contacts (shower)"
+msgstr "# contacts (observateur)"
 
 #: printmodel/Individual_0001.py:28 printmodel/LegalEntity_0001.py:28
 msgid "listing"

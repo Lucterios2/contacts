@@ -34,9 +34,9 @@ from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_va
     LucteriosVirtualField
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
-from lucterios.CORE.models import Parameter
 from lucterios.framework.tools import get_format_value
 from lucterios.framework.auditlog import auditlog
+from lucterios.CORE.models import Parameter, LucteriosGroup
 
 
 class CustomField(LucteriosModel):
@@ -656,6 +656,8 @@ PrintFieldsPlugIn.add_plugin(OurDetailPrintPlugin)
 
 @Signal.decorate('checkparam')
 def contacts_checkparam():
+    from django.apps import apps
+    from django.conf import settings
     Parameter.check_and_create(name='contacts-mailtoconfig', typeparam=4, title=_("contacts-mailtoconfig"), args="{'Enum':3}", value='0',
                                param_titles=(_("contacts-mailtoconfig.0"), _("contacts-mailtoconfig.1"), _("contacts-mailtoconfig.2")))
     Parameter.check_and_create(name='contacts-createaccount', typeparam=4, title=_("contacts-createaccount"), args="{'Enum':3}", value='0',
@@ -664,6 +666,21 @@ def contacts_checkparam():
                                args="{'Multi':False}", value='',
                                meta='("CORE","LucteriosGroup","django.db.models.Q()", "id", False)')
     Parameter.check_and_create(name="contacts-size-page", typeparam=1, title=_("contacts-size-page"), args="{}", value='25', meta='("","", "[(25,\'25\'),(50,\'50\'),(100,\'100\'),(250,\'250\'),(500,\'500\'),]", "", True)')
+
+    if 'diacamma.event' in settings.INSTALLED_APPS:
+        DegreeType = apps.get_model('event', "DegreeType")
+        Event = apps.get_model('event', "Event")
+        Degree = apps.get_model('event', "Degree")
+        LucteriosGroup.redefine_generic(_("# contacts (administrator)"), PostalCode.get_permission(True, True, True), AbstractContact.get_permission(True, True, True), Responsability.get_permission(True, True, True),
+                                        DegreeType.get_permission(True, True, True), Event.get_permission(True, True, True), Degree.get_permission(True, True, True))
+        LucteriosGroup.redefine_generic(_("# contacts (editor)"), AbstractContact.get_permission(True, True, False), Responsability.get_permission(True, True, False),
+                                        Event.get_permission(True, True, False), Degree.get_permission(True, True, False))
+        LucteriosGroup.redefine_generic(_("# contacts (shower)"), AbstractContact.get_permission(True, False, False), Responsability.get_permission(True, False, False),
+                                        Event.get_permission(True, False, False), Degree.get_permission(True, False, False))
+    else:
+        LucteriosGroup.redefine_generic(_("# contacts (administrator)"), PostalCode.get_permission(True, True, True), AbstractContact.get_permission(True, True, True), Responsability.get_permission(True, True, True))
+        LucteriosGroup.redefine_generic(_("# contacts (editor)"), AbstractContact.get_permission(True, True, False), Responsability.get_permission(True, True, False))
+        LucteriosGroup.redefine_generic(_("# contacts (shower)"), AbstractContact.get_permission(True, False, False), Responsability.get_permission(True, False, False))
 
 
 @Signal.decorate('auditlog_register')
