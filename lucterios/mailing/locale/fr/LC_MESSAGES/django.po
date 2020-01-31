@@ -73,7 +73,7 @@ msgstr "sujet"
 
 #: models.py:95
 msgid "status"
-msgstr "status"
+msgstr "statut"
 
 #: models.py:95
 msgid "open"
@@ -183,7 +183,7 @@ msgstr "nombre de messages ouverts"
 
 #: models.py:378
 msgid "sended item"
-msgstr "ref. d'envoie"
+msgstr "ref. d'envoi"
 
 #: models.py:475 models.py:476
 msgid "email sent info"
@@ -325,7 +325,7 @@ msgstr "Modification d'un message"
 
 #: views_message.py:70
 msgid "This message can not be clone!"
-msgstr "Ce message ne peux pas être cloné !"
+msgstr "Ce message ne peut pas être cloné !"
 
 #: views_message.py:92 views_message.py:107
 msgid "Show message"
