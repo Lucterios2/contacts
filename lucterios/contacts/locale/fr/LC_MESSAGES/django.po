@@ -25,7 +25,7 @@ msgstr "Contacts Lucterios"
 
 #: editors.py:52 models.py:81
 msgid "multi-line"
-msgstr "multi-lignes"
+msgstr "multiligne"
 
 #: editors.py:57
 msgid "min"
@@ -119,11 +119,11 @@ msgstr "codes postaux"
 
 #: models.py:319
 msgid "individual function"
-msgstr "fonction de personne physique"
+msgstr "fonction de la personne physique"
 
 #: models.py:320
 msgid "individual functions"
-msgstr "fonctions de personne physique"
+msgstr "fonctions de la personne physique"
 
 #: models.py:336 models.py:486
 msgid "structure type"
@@ -197,7 +197,7 @@ msgstr "002@Membres"
 
 #: models.py:545
 msgid "You cannot delete this legal entity!"
-msgstr "Vous ne pouvez pas supprimer cette structure morale !"
+msgstr "Vous ne pouvez pas supprimer cette personne morale !"
 
 #: models.py:549 models.py:606
 msgid "legal entity"
@@ -289,7 +289,7 @@ msgstr "Créer seulement une personne physique"
 
 #: models.py:662
 msgid "contacts-createaccount.2"
-msgstr "Créer une personne physique & morale"
+msgstr "Créer une personne physique ou morale"
 
 #: models.py:663
 msgid "contacts-defaultgroup"
@@ -487,7 +487,7 @@ msgstr "Code postal"
 
 #: views.py:435
 msgid "Filtrer by postal code"
-msgstr "Filtrer par code postal"
+msgstr "Filtrer sur le code postal"
 
 #: views.py:444
 msgid "Add postal code"
@@ -529,12 +529,12 @@ msgstr "Ensemble d'outils de gestion génériques"
 msgid "Management of men or women and organizations saved."
 msgstr ""
 "Ensemble d'actions permettant la gestion de vos contacts:{[br/]}{[ul]}{[li]}"
-"Les personnes morales sont des stuctures de personnes comme des associations "
-"ou des entreprises.{[li]}Les personnes physiques sont des contacts de "
-"personne de chair et d'os, comprenant un nom et un prénom.{[l/i]}{[/ul]}Vous "
-"pouvez alors créer, consulter, modifier ou faire des recherches parmis ces "
-"fiches de contacts.{[br/]}Notez que d'autres modules de l'application "
-"peuvent les utiliser ou les associés à d'autres données."
+"Les personnes morales sont des groupements de personnes comme des associations "
+"ou des entreprises.{[li]}Les personnes physiques sont les êtres humains"
+" identifiés chacun par un nom et un prénom.{[l/i]}{[/ul]}Vous "
+"pouvez alors créer, consulter, modifier ou faire des recherches parmi ces "
+"fiches de contact.{[br/]}Notez que d'autres modules de l'application "
+"peuvent les utiliser ou les associer à d'autres données."
 
 #: views_contacts.py:64
 msgid "Add legal entity"
@@ -557,7 +557,7 @@ msgid ""
 "Management of a structure or organization of people (company, association, "
 "administration, ...)"
 msgstr ""
-"Gestion d'une structure ou d'une organisation de personnes (entreprise, "
+"Gestion d'une personne morale (entreprise, "
 "association, administration, ...)"
 
 #: views_contacts.py:164
