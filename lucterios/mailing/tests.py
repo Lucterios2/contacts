@@ -1010,7 +1010,7 @@ class SendMailingTest(AsychronousLucteriosTest):
         self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': False})
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
         self.assert_count_equal('', 7)
-        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoie", "date": "date", "success": "succès",
+        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoi", "date": "date", "success": "succès",
                                              "last_open_date": "date de dernière ouverture", "nb_open": "nombre de messages ouverts"}, 9)
         self.assert_json_equal('', "emailsent/@0/sended_item", "mr-sylvestre@worldcompany.com")
         self.assert_json_equal('', "emailsent/@0/success", 1)
@@ -1108,7 +1108,7 @@ class SendMailingTest(AsychronousLucteriosTest):
         self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': True})
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
         self.assert_count_equal('', 7)
-        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoie", "date": "date", "success": "succès", "error": "erreur"}, 1)
+        self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoi", "date": "date", "success": "succès", "error": "erreur"}, 1)
         self.assert_json_equal('', "emailsent/@0/sended_item", "émilie@worldcompany.com")
         self.assert_json_equal('', "emailsent/@0/success", 0)
         self.assert_json_equal('', "emailsent/@0/error", "'ascii' codec can't encode character", True)
