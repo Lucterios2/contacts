@@ -1,34 +1,34 @@
 Publipostage
 ============
 
-Depuis le menu *Bureatique/Publipostage/Message* vous avez la possibilité de créer un courier de publipostage.
+     Menu *Bureautique/Publipostage/Messages*
 
 Création d'un message
 ---------------------
 
-Une fois votre message rédigé, vous pouvez lui associé des requetes de destinataires.
-C'est requetes de recherches, similaire à celle des outils de recherche de contacts, ne seront évaluées qu'au moment de la génération du courier.
-Ainsi, même un contact dernièrement ajouté ou modifié pourra être impacté par ce message.
+Bouton "+ Ajouter"
 
-Il est également possible d'ajouter à votre message un ou plusieurs documents, sauvés dans le *gestionnaire de documentation*.
-Ces documents seront transmis en pièces-jointes dans l'envoie par courriel.
+Une fois votre message rédigé, validez-le en cliquant sur "Ok". En ouvrant l'onglet "Destinataires", vous allez pouvoir saisir le ou les critères permettant de filtrer vos contacts. Le résultat de la requête est affichée à l'écran. Vous pouvez l'affiner et sauvegarder vos critères pour une utilisation ultérieure.
 
-L'option *document(s) ajouté(s) via liens dans le message* permet d'ajouter un ensemble de liens partagés vers vos documents (et non plus des pièces jointes).
-Cela permet de gérer des documents de taille importante ou qui risqueraient d'être supprimer par certain gestionnaire de courriel.
+Votre requête prête, cliquez sur "validée". D'autres requêtes peuvent être ajoutées à la première, leurs résultats se cumulant.
+Au moment où votre courrier sera généré, vos requêtes seront de nouveau exécutées, grâce à quoi votre base peut être mise à jour avant *Validation et transmission* des courriers si vous constatez qu'un contact est absent du résultat des requêtes.
+
+Il est également possible de joindre à votre message un ou plusieurs documents sauvegardés dans le *Gestionnaire de documents*. Pour cela, ouvrez l'onglet "Documents".
+
+L'option *document(s) ajouté(s) via liens dans le message* permet d'ajouter un ensemble de liens de partage vers vos documents (et non plus comme pièces jointes). Cela permet la transmission de documents de taille importante ou qui risqueraient d'être supprimés par certains gestionnaires de courriel.
 
 .. image:: mailing.png
 
 Validation & transmission
 -------------------------
 
-Une fois le message validé vous pouvez:
- - Soit généré une sortie PDF de l'ensemble des lettres à envoyer personnalisé avec l'entête de chaque contact
- - Soit envoyé par courriel si votre configuration est valide. Bien sur, dans ce cas, seul les contacts possédant une adresse seront impacté par cet envoie.
+Une fois le message validé vous pouvez :
+ - Soit générer une sortie PDF de l'ensemble des lettres à envoyer, personnalisées avec l'en-tête de chaque contact
+ - Soit envoyer votre message par courriel, si celui-ci est correctement configuré. Bien sur, dans ce cas, seuls les contacts possédant une adresse électronique seront impactés par cet envoi.
 
-De plus, dans le cas d'un envoie par courriel, vous pouvez consulter un rapport de transmission.
-Celui-ci vous indique les courriels envoyés, leur éventuel erreur d'acheminement.
+De plus, dans le cas d'un envoi par courriel, vous pouvez consulter le rapport de transmission. Celui-ci vous indique les courriels envoyés et les éventuelles erreurs d'acheminement.
 
-Si votre logiciel est accessible depuis internet, vous pouvez également consulter le nombre de fois que le destinataire à consulter ce message.
+Si votre logiciel est accessible depuis internet, vous pouvez également consulter le nombre de fois que le destinataire a consulté ce message.
 Ce mécanisme se base sur l'acceptation, par votre destinataire des images distantes présentent dans le message.
 
 .. image:: transmission.png
