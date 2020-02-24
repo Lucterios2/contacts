@@ -8,7 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2020-02-22 17:52+0000\n"
+=======
+"POT-Creation-Date: 2020-02-03 11:52+0000\n"
+>>>>>>> 4f413db30eee39a9b7ee1655173d226521f3d831
 "PO-Revision-Date: 2016-01-14 22:03+0000\n"
 "Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,7 +187,7 @@ msgstr "nombre de messages ouverts"
 
 #: models.py:377
 msgid "sended item"
-msgstr "ref. d'envoie"
+msgstr "ref. d'envoi"
 
 #: models.py:488 models.py:489
 msgid "email sent info"
@@ -333,7 +337,7 @@ msgstr "Modification d'un message"
 
 #: views_message.py:70
 msgid "This message can not be clone!"
-msgstr "Ce message ne peux pas être cloné !"
+msgstr "Ce message ne peut pas être cloné !"
 
 #: views_message.py:92 views_message.py:107
 msgid "Show message"

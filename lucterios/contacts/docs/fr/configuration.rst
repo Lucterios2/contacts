@@ -6,22 +6,23 @@ Dans le menu *Administration/Modules (conf.)* vous avez à votre disposition des
 Configuration des contacts
 --------------------------
 
-Dans cet écran, vous avez la possibilité de créer ou de modifier une définition de fonction, ou responsabilité, pour associer une personne physique à une structure morale. Vous pouvez créer ou modifier une catégorie de structure morale pour vous aider dans la classification de vos contacts moraux.
+Dans cet écran, vous avez la possibilité de créer ou de modifier la liste des fonctions et des responsabilités que peuvent avoir les contacts  associés aux personnes physiques et morales avec lesquelles vous êtes en relation. Vous pouvez aussi créer ou modifier les types de structures pour vous aider à classer vos personnes morales.
 
-Il se peut que vous ayez besoin de préciser des informations supplémentaires pour vos différents contacts. Vous avez ici la possibilité d'ajouter des champs personnels pour chaque type de contacts. Pour ajouter un champ, vous devez simplement donner son titre ainsi que définir son type et éventuellement les compléments nécessaires.
-5 types are possibles:
+Il se peut que vous ayez besoin de préciser des informations supplémentaires pour vos différents contacts. Vous avez ici la possibilité d'ajouter des champs personnalisés pour chaque type de contacts. Pour ajouter un champ, vous devez simplement préciser le modèle de contact auquel il s'applique, indiquer son titre ainsi que définir son type et préciser si le champ est multiligne ou non.
+
+Cinq types sont possibles :
 
  - chaîne de texte
  - nombre entier
  - nombre à virgule (réel)
  - valeur Oui/Non (booléen)
- - choix dans une liste (énumération)
+ - sélection dans une liste (énumération)
 
 Dans le cas de l'énumération, vous devez définir la liste des valeurs possibles (mots) séparées par un point-virgule.
 
 Codes postaux/villes
 --------------------
 
-Cela peux vous aider dans votre saisi de contact, l'outil va automatiquement rechercher la ville (ou les villes) associée(s) avec le code postal que vous entrerez.
-Dans cet écran, vous pouvez ajouter des codes postaux manquants.
+En saisie, l'outil va automatiquement rechercher la ville (ou les villes) associée(s) au code postal que vous entrerez afin de vous faciliter la saisie de vos contacts. 
+Dans cet écran, vous pouvez ajouter les codes postaux manquants.
 Par défaut, les codes postaux français et suisses sont insérés. 

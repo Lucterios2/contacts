@@ -1,45 +1,49 @@
-Les contacts moraux
-===================
+Les contacts moraux (personnes morales)
+=======================================
 
-Un contact moral est une structure ou d'une organisation de personne (entreprise, association, administration, ...), à mémoriser.
+Entreprises, associations, établissements publics, ..., les personnes morales sont des groupements de personnes dotées de la personnalité juridique. Elles peuvent être composées d'une ou de plusieurs personnes, individus ou personnes morales.
+Pour chacune des personnes morales avec qui votre structure est en contact, une fiche peut être tenue sous *Diacamma*.
+
+     Menu *Bureautique/Adresses et Contacts/Personnes morales* 
 
 Liste de vos contacts moraux
 ----------------------------
-
-Le menu *Bureautique/Adresses et Contacts/Personnes morales* vous permet de consulter la liste des structures que vous avez déjà enregistrées. Chaque contact moral est associé à une catégorie. Dans cette liste, vous consultez vos structures filtrées par ces catégories.
-
-Depuis cet écran, vous avez aussi la possibilité d'imprimer la liste des structures.
+Vous pouvez consulter la liste des structures pour lesquelles une fiche a déjà été enregistrée.
+Chaque contact moral est associé à une catégorie grâce à quoi vous pouvez filtrer la liste des contacts sur le type de structures.
 
 .. image:: ListLegalEntity.png
 
-Edition d'un contact moral
---------------------------
+Depuis cet écran, vous avez aussi la possibilité d'imprimer la liste des structures avec le bouton "Liste" et pouvez imprimer les étiquettes pour le courrier.
 
-Depuis la liste précédente, vous avez la possibilité de créer une nouvelle structure. Vous pouvez ré-éditer cette fiche depuis sa visualisation.
-
-.. image:: EditLegalEntity.png
+Une nouvelle fiche est ouverte à l'aide du bouton "+ Créer" et toute fiche peut être supprimée, à la condition de ne pas être associée à un autre enregistrement de votre base (exemple une facture saisie).
 
 Visualisation d'un contact moral
 --------------------------------
 
-Depuis la liste des personnes morales, vous avez la possibilité de visualiser une structure.
-
-Cela vous permettra de consulter la fiche d'une structure précédemment entrée dans votre base. Vous pouvez modifier cette fiche ou l'imprimer. Si cette personne n'est pas référencée dans d'autre enregistrement de l'application, vous avez la possibilité de la supprimer.
+Depuis la liste précédente, la fiche d'une structure peut être visualisée à l'aide du bouton "Editer" ou d'un double-clic sur la ligne correspondante au contact.
 
 .. image:: ShowLegalEntity.png
+
+Cette fiche peut ensuite être imprimée avec le bouton du même nom.
+
+Modifier un contact moral
+--------------------------
+La fiche étant toujours à l'écran, utilisez le bouton "Modifier" pour y apporter toute correction.
+
+.. image:: EditLegalEntity.png
 
 Responsables d'un contact moral
 -------------------------------
 
-Vous avez la possibilité d'associer une personne physique à votre structure.
-
-Choisissez le nouveau responsable: si la personne n'existe pas dans votre base, vous aurez la possibilité de la créer. Vous pourrez également ajouter une fonction à un responsable défini.
+Vous avez la possibilité d'associer une personne physique à un contact moral : onglet "Membres" et bouton "+ Ajouter".
+Sélectionnez la personne physique. Si elle n'est pas répertorié dans votre base, vous avez la possibilité d'y pourvoir.
+Tout nouveau membre peut être assorti d'une fonction.
 
 .. image:: ResponsabilityLegalEntity.png
 
 Recherche d'un contact moral
 ----------------------------
 
-Le menu *Bureautique/Adresses et Contacts/Recherche de personne morale* vous permet de définir un critère de recherche sur une structure morale.
+Le menu *Bureautique/Adresses et Contacts/Recherche de personne morale* vous permet d'extraire de votre base les personnes morales satisfaisant aux critères saisis. Ces critères peuvent être sauvegardés pour une utilisation ultérieure.
 
 .. image:: FindLegalEntity.png
