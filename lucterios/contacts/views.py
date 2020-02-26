@@ -309,7 +309,7 @@ class CurrentStructureAddModify(XferAddEditor):
 MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
 
 
-@MenuManage.describ('CORE.change_parameter', FORMTYPE_NOMODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
+@MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
 class Configuration(XferListEditor):
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
@@ -415,7 +415,7 @@ class StructureTypeDel(XferDelete):
     field_id = 'structure_type'
 
 
-@MenuManage.describ('contacts.change_postalcode', FORMTYPE_NOMODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
+@MenuManage.describ('contacts.change_postalcode', FORMTYPE_MODAL, 'contact.conf', _('Management of postal codes associated with their communes.'))
 class PostalCodeList(XferListEditor):
     caption = _("Postal code")
     icon = "postalCode.png"
