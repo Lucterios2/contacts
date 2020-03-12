@@ -32,10 +32,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db import IntegrityError, transaction
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage, \
-    FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI
+from lucterios.framework.tools import MenuManage, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage
+from lucterios.framework.tools import FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
-from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor, TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, TEXT_TOTAL_NUMBER
+from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor, TEXT_TOTAL_NUMBER
+from lucterios.framework.xferadvance import TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, TITLE_CLOSE, TITLE_EDIT, TITLE_PRINT, TITLE_CANCEL, TITLE_OK
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, XferCompButton, XferCompCaptcha
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
@@ -69,7 +70,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
         try:
             Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityShow.fillresponse(self)
-            self.add_action(CurrentLegalEntityModify.get_action(_("Modify"), "images/edit.png"), close=CLOSE_YES, pos_act=0)
+            self.add_action(CurrentLegalEntityModify.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_YES, pos_act=0)
         except Exception:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
@@ -79,38 +80,40 @@ class Account(XferContainerCustom):
     caption = _("Your account")
     icon = "account.png"
 
-    def add_legalentity(self, legal_entity):
-        self.new_tab(_("Legal entity"))
-        self.item = legal_entity
-        fields = LegalEntity.get_show_fields()
-        self.fill_from_model(1, 1, True, fields[_('001@Identity')])
-        self.get_components('name').colspan = 2
-        self.get_components('structure_type').colspan = 2
-        img_path = get_user_path(
-            "contacts", "Image_%s.jpg" % legal_entity.abstractcontact_ptr_id)
-        img = XferCompImage('logoimg')
-        if exists(img_path):
-            img.type = 'jpg'
-            img.set_value(readimage_to_base64(img_path))
-        else:
-            img.set_value(
-                get_icon_path("lucterios.contacts/images/NoImage.png"))
-        img.set_location(0, 2, 1, 6)
-        self.add_component(img)
+    def add_legalentity(self, legal_entity, tabname=_("Legal entity"), tabnum=-1):
+        self.new_tab(tabname, tabnum)
+        old_item = self.item
+        try:
+            self.item = legal_entity
+            fields = LegalEntity.get_show_fields()
+            self.fill_from_model(1, 1, True, fields[_('001@Identity')])
+            self.get_components('name').colspan = 2
+            self.get_components('structure_type').colspan = 2
+            img_path = get_user_path("contacts", "Image_%s.jpg" % legal_entity.abstractcontact_ptr_id)
+            img = XferCompImage('logoimg')
+            if exists(img_path):
+                img.type = 'jpg'
+                img.set_value(readimage_to_base64(img_path))
+            else:
+                img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
+            img.set_location(0, 2, 1, 6)
+            self.add_component(img)
 
-        btn = XferCompButton('btn_edit')
-        btn.set_is_mini(True)
-        btn.set_location(4, 1, 1, 2)
-        btn.set_action(self.request, CurrentLegalEntityModify.get_action(
-            _('Edit'), "images/edit.png"), modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'legal_entity': legal_entity.id})
-        self.add_component(btn)
+            btn = XferCompButton('btn_edit')
+            btn.set_is_mini(True)
+            btn.set_location(4, 1, 1, 2)
+            btn.set_action(self.request, CurrentLegalEntityModify.get_action(TITLE_EDIT, "images/edit.png"),
+                           modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'legal_entity': legal_entity.id})
+            self.add_component(btn)
+        finally:
+            self.item = old_item
 
     def add_legalentities(self, legal_entities):
         self.new_tab(_("Legal entities"))
         grid = XferCompGrid('legal_entity')
         grid.set_model(legal_entities, LegalEntity.get_default_fields())
-        grid.add_action(self.request, CurrentLegalEntityShow.get_action(
-            _("Edit"), "images/show.png"), modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
+        grid.add_action(self.request, CurrentLegalEntityShow.get_action(TITLE_EDIT, "images/show.png"),
+                        modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.set_location(1, 1, 2)
         grid.set_size(200, 500)
         self.add_component(grid)
@@ -145,7 +148,7 @@ class Account(XferContainerCustom):
             elif len(legal_entities) > 1:
                 self.add_legalentities(legal_entities)
             signal_and_lock.Signal.call_signal("add_account", self.item, self)
-        self.add_action(WrapAction(_("Close"), "images/close.png"))
+        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
 
 
 @MenuManage.describ(None)
@@ -176,11 +179,9 @@ class CurrentStructure(XferContainerCustom):
         lab.set_location(1, 0, 4)
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
-        self.add_action(CurrentStructureAddModify.get_action(
-            _("Edit"), "images/edit.png"), close=CLOSE_NO)
-        self.add_action(CurrentStructurePrint.get_action(
-            _("Print"), "images/print.png"), close=CLOSE_NO)
-        self.add_action(WrapAction(_("Close"), "images/close.png"))
+        self.add_action(CurrentStructureAddModify.get_action(TITLE_EDIT, "images/edit.png"), close=CLOSE_NO)
+        self.add_action(CurrentStructurePrint.get_action(TITLE_PRINT, "images/print.png"), close=CLOSE_NO)
+        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
 
 
 @MenuManage.describ('')
@@ -245,8 +246,8 @@ class CreateAccount(XferContainerAcknowledge):
         lbl.set_color('red')
         lbl.set_value(self.getparam('error', ''))
         dlg.add_component(lbl)
-        dlg.add_action(self.get_action(_('Ok'), 'images/ok.png'), params={"SAVE": "YES"})
-        dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
+        dlg.add_action(self.get_action(TITLE_OK, 'images/ok.png'), params={"SAVE": "YES"})
+        dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
 
     def fillresponse(self, username='', legalentity=''):
         if self.getparam("SAVE") != 'YES':
@@ -354,7 +355,7 @@ class Configuration(XferListEditor):
         self._fill_functions()
         self._fill_structuretype()
         self._fill_customfield()
-        self.add_action(WrapAction(_("Close"), "images/close.png"))
+        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
