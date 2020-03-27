@@ -86,11 +86,11 @@ class Account(XferContainerCustom):
         try:
             self.item = legal_entity
             fields = LegalEntity.get_show_fields()
-            self.fill_from_model(1, 1, True, fields[_('001@Identity')])
-            self.get_components('name').colspan = 2
-            self.get_components('structure_type').colspan = 2
+            self.fill_from_model(1, 1, True, fields[_('001@Identity')], prefix='legalentity_')
+            self.get_components('legalentity_name').colspan = 2
+            self.get_components('legalentity_structure_type').colspan = 2
             img_path = get_user_path("contacts", "Image_%s.jpg" % legal_entity.abstractcontact_ptr_id)
-            img = XferCompImage('logoimg')
+            img = XferCompImage('legalentity_logoimg')
             if exists(img_path):
                 img.type = 'jpg'
                 img.set_value(readimage_to_base64(img_path))
