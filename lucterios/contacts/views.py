@@ -59,6 +59,7 @@ class CurrentLegalEntityModify(LegalEntityAddModify):
         try:
             Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityAddModify.fillresponse(self)
+            self.remove_component('structure_type')
         except Exception:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
