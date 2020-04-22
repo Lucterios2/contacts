@@ -441,7 +441,8 @@ class AbstractContact(LucteriosModel, CustomizeObject):
             if new_item is not None:
                 new_item.set_custom_values(rowdata)
             return new_item
-        except Exception:
+        except Exception as import_error:
+            cls.import_logs.append(str(import_error))
             logging.getLogger('lucterios.contacts').exception("import_data")
             return None
 

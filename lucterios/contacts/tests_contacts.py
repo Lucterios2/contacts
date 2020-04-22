@@ -1020,8 +1020,9 @@ class ContactsTest(LucteriosTest):
                                                             "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
                                                             "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('', 2)
+        self.assert_count_equal('', 3)
         self.assert_json_equal('LABELFORM', 'result', "4 éléments ont été importés")
+        self.assert_json_equal('LABELFORM', 'import_error', [])
         self.assertEqual(len(self.json_actions), 1)
 
         self.factory.xfer = LegalEntityList()
