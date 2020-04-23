@@ -51,7 +51,8 @@ from lucterios.CORE.parameters import Params
 from lucterios.contacts.models import AbstractContact
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.models_legacy import Document
-from lucterios.mailing.functions import will_mail_send, send_email, split_doubled_email
+from lucterios.mailing.email_functions import will_mail_send, send_email, split_doubled_email
+from lucterios.mailing.sms_functions import AbstractProvider
 
 
 class MessageLine(LucteriosModel):
@@ -94,16 +95,22 @@ class MessageLineSet(QuerySet):
 class Message(LucteriosModel):
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
+    message_type = FSMIntegerField(verbose_name=_('type'), default=0, choices=((0, _('email')), (1, _('sms'))))
     status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('valided')), (2, _('sending'))))
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
     email_to_send = models.TextField(_('email to send'), default="")
+
     documents = models.ManyToManyField(Document, verbose_name=_('documents'), blank=True)
     attachments = models.ManyToManyField(DocumentContainer, verbose_name=_('documents'), blank=True)
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
+
+    size_sms = LucteriosVirtualField(verbose_name=_('sms size'), compute_from='get_size_sms')
+    sms_fields = LucteriosVirtualField(verbose_name=_('sms phone fields'), compute_from='get_sms_phone_fields')
     contact_nb = LucteriosVirtualField(verbose_name=_('number of recipients'), compute_from='get_contact_nb', format_string='N')
     contact_noemail = LucteriosVirtualField(verbose_name=_('without email address'), compute_from='get_contact_noemail')
+    contact_nosms = LucteriosVirtualField(verbose_name=_('without sms/phone'), compute_from='get_contact_nosms')
 
     def __init__(self, *args, **kwargs):
         LucteriosModel.__init__(self, *args, **kwargs)
@@ -128,25 +135,10 @@ class Message(LucteriosModel):
     @classmethod
     def get_show_fields(cls):
         return {'': [('status', 'date')],
-                _('001@Message'): ['subject', 'body'],
-                _('002@Recipients'): ['recipients', ('contact_nb', 'contact_noemail')],
+                _('001@Message'): ['subject', 'body', 'size_sms'],
+                _('002@Recipients'): ['recipients', ('contact_nb', 'contact_noemail', 'contact_nosms')],
                 _('003@Documents'): ['attachments', (('', 'empty'),), 'doc_in_link']
                 }
-
-    @property
-    def empty(self):
-        return ""
-
-    def get_contact_nb(self):
-        return len(self.get_contacts())
-
-    @property
-    def line_set(self):
-        return MessageLineSet(hints={'body': self.body})
-
-    def get_contact_noemail(self):
-        no_emails = self.get_contacts(False)
-        return [six.text_type(no_email) for no_email in no_emails]
 
     @classmethod
     def get_edit_fields(cls):
@@ -156,13 +148,44 @@ class Message(LucteriosModel):
     def get_print_fields(cls):
         return ['status', 'date', 'subject', 'body', 'line_set', 'line_set.line', 'contact', 'OUR_DETAIL']
 
+    @property
+    def empty(self):
+        return ""
+
+    def get_sms_phone_fields(self):
+        return []
+
+    def get_contact_nb(self):
+        return len(self.get_email_contacts())
+
+    @property
+    def line_set(self):
+        return MessageLineSet(hints={'body': self.body})
+
+    def get_contact_noemail(self):
+        no_emails = self.get_email_contacts(False)
+        return [six.text_type(no_email) for no_email in no_emails]
+
+    def get_size_sms(self):
+        return len(self.body.replace('{[br/]}', '\n'))
+
+    @property
+    def sms_field_names(self):
+        return ('tel1', 'tel2')
+
+    def get_contact_nosms(self):
+        def show_phones(contact):
+            return " ".join([getattr(contact, field_name, '') for field_name in self.sms_field_names])
+        no_sms_list = self.get_sms_contacts(False)
+        return ["%s : %s" % (no_sms, show_phones(no_sms)) for no_sms in no_sms_list]
+
     def get_recipients(self):
         for item in self.recipients.split('\n'):
             if item != '':
                 modelname, criteria = item.split(' ')
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
-    def get_contacts(self, email=None):
+    def get_email_contacts(self, email=None):
         def append_contact(new_contact):
             if new_contact not in contact_list:
                 contact_list.append(new_contact)
@@ -181,6 +204,19 @@ class Message(LucteriosModel):
                     contact_filter &= ~models.Q(email='') if email else models.Q(email='')
                 for contact in model.objects.filter(contact_filter).distinct():
                     append_contact(contact)
+        return contact_list
+
+    def get_sms_contacts(self, sms=None):
+        contact_list = []
+        provider = AbstractProvider.get_current_instance()
+        if provider is not None:
+            for modelname, item in self.get_recipients():
+                model = apps.get_model(modelname)
+                contact_filter = item[0]
+                for contact in model.objects.filter(contact_filter).distinct():
+                    if (sms is None) or ((sms is True) and provider.has_valid_phone(contact, self.sms_field_names)) or ((sms is False) and not provider.has_valid_phone(contact, self.sms_field_names)):
+                        if contact not in contact_list:
+                            contact_list.append(contact)
         return contact_list
 
     @property
@@ -226,7 +262,7 @@ class Message(LucteriosModel):
     def _prep_sending(self):
         email_list = []
         printmodel_name = self.get_printmodel_names()
-        for contact in self.get_contacts(True):
+        for contact in self.get_email_contacts(True):
             if len(printmodel_name) == 0:
                 for email1 in contact.email.split(';'):
                     for email2 in email1.split(','):
@@ -524,6 +560,11 @@ def mailing_checkparam():
 
     Parameter.check_and_create(name='mailing-dkim-private-path', typeparam=0, title=_("mailing-dkim-private-path"), args="{'Multi': False}", value='')
     Parameter.check_and_create(name='mailing-dkim-selector', typeparam=0, title=_("mailing-dkim-selector"), args="{'Multi': False}", value='default')
+
+    Parameter.check_and_create(name='mailing-sms-phone-parse', typeparam=0, title=_("mailing-sms-phone-parse"), args="{'Multi': False}", value='^0([67][0-9]{8})$|+33{0}')
+    Parameter.check_and_create(name='mailing-sms-provider', typeparam=4, title=_("mailing-sms-option"), args="{}", value='',
+                               meta='("","","lucterios.mailing.sms_functions.AbstractProvider.get_provider_list()", "", False)')
+    Parameter.check_and_create(name='mailing-sms-option', typeparam=0, title=_("mailing-sms-provider"), args="{'Multi': True}", value='')
 
     LucteriosGroup.redefine_generic(_("# mailing (editor)"), Message.get_permission(True, True, True))
     LucteriosGroup.redefine_generic(_("# mailing (shower)"), Message.get_permission(True, False, False))

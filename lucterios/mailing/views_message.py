@@ -6,6 +6,7 @@ from logging import getLogger
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.db.models import Q
 
 from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
     XferTransition, TITLE_OK, TITLE_CANCEL, TITLE_CREATE
@@ -25,25 +26,53 @@ from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.views import DocumentSearch
 from lucterios.mailing.models import Message, add_mailing_in_scheduler, EmailSent
-from lucterios.mailing.functions import will_mail_send, send_email
+from lucterios.mailing.email_functions import will_mail_send, send_email
+from lucterios.mailing.sms_functions import AbstractProvider
+from lucterios.CORE.parameters import Params
 
 
 MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
-                   _("Mailing"), _("Create and send mailing to contacts."), 60)
+                   _("Messaging"), _("Create and send mailing to contacts."), 60)
 
 
-@MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for mailing.'))
 class MessageList(XferListEditor):
-    icon = "mailing.png"
     model = Message
     field_id = 'message'
-    caption = _("Messages")
+
+    def fillresponse_header(self):
+        message_type = self.getparam('message_type', 0)
+        self.filter = Q(message_type=message_type)
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
         abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
         root_url = '/'.join(abs_url[:-2])
         add_mailing_in_scheduler(check_nb=True, http_root_address=root_url)
+
+
+@MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for mailing.'))
+class MessageEmailList(MessageList):
+    icon = "email.png"
+    caption = _("Messages EMail")
+
+    def fillresponse_header(self):
+        self.params['message_type'] = 0
+        MessageList.fillresponse_header(self)
+
+
+@MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for SMS.'))
+class MessageSMSList(MessageList):
+    icon = "sms.png"
+    caption = _("Messages SMS")
+
+    def fillresponse_header(self):
+        self.params['message_type'] = 1
+        MessageList.fillresponse_header(self)
+
+    def fillresponse(self):
+        MessageList.fillresponse(self)
+        grid = self.get_components(self.field_id)
+        grid.get_header('subject').descript = _('title')
 
 
 @ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")
@@ -55,6 +84,14 @@ class MessageAddModify(XferAddEditor):
     field_id = 'message'
     caption_add = _("Add message")
     caption_modify = _("Modify message")
+
+    def icon_path(self):
+        if self.getparam('message_type', self.item.message_type) == 0:
+            icon_path = "email.png"
+        else:
+            icon_path = "sms.png"
+        res_icon_path = get_icon_path(icon_path, self.url_text, self.extension)
+        return res_icon_path
 
 
 @ActionsManage.affect_grid(TITLE_CLONE, "images/clone.png", unique=SELECT_SINGLE)
@@ -71,6 +108,7 @@ class MessageClone(XferContainerAcknowledge):
         new_item = Message()
         new_item.date = None
         new_item.status = 0
+        new_item.message_type = self.item.message_type
         new_item.subject = self.item.subject
         new_item.body = self.item.body
         new_item.recipients = self.item.recipients
@@ -91,17 +129,28 @@ class MessageShow(XferShowEditor):
     field_id = 'message'
     caption = _("Show message")
 
+    def icon_path(self):
+        if self.item.message_type == 0:
+            icon_path = "email.png"
+        else:
+            icon_path = "sms.png"
+        res_icon_path = get_icon_path(icon_path, self.url_text, self.extension)
+        return res_icon_path
+
     def fillresponse(self):
         XferShowEditor.fillresponse(self)
         for action, _modal, _close, _select, params in self.actions:
             if (action.url_text == 'lucterios.mailing/messageTransition') and ('TRANSITION' in params) and (params['TRANSITION'] == 'sending'):
-                action.icon_path = get_icon_path("mailing.png", action.url_text)
+                if self.item.message_type == 0:
+                    action.icon_path = get_icon_path("email.png", action.url_text)
+                else:
+                    action.icon_path = get_icon_path("sms.png", action.url_text)
 
 
-@ActionsManage.affect_show(_("EMail try"), "config_mail.png", condition=lambda xfer: will_mail_send() and (xfer.item.status == 0))
+@ActionsManage.affect_show(_("EMail try"), "email.png", condition=lambda xfer: (xfer.item.message_type == 0) and will_mail_send() and (xfer.item.status == 0))
 @MenuManage.describ('mailing.change_message')
 class MessageSendEmailTry(XferContainerAcknowledge):
-    icon = "mailing.png"
+    icon = "email.png"
     model = Message
     field_id = 'message'
     caption = _("Show message")
@@ -134,6 +183,41 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             self.message(_("EMail send, check it."))
 
 
+@ActionsManage.affect_show(_("SMS try"), "sms.png", condition=lambda xfer: (xfer.item.message_type == 1) and AbstractProvider.is_current_active() and (xfer.item.status == 0))
+@MenuManage.describ('mailing.change_message')
+class MessageSendSMSTry(XferContainerAcknowledge):
+    icon = "sms.png"
+    model = Message
+    field_id = 'message'
+    caption = _("Show message")
+    caption = _("SMS try")
+
+    def fillresponse(self):
+        legal = LegalEntity.objects.get(id=1)
+        if self.getparam('CONFIRME') is None:
+            dlg = self.create_custom()
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0, 1, 3)
+            dlg.add_component(img)
+            lbl = XferCompLabelForm('lbl_title')
+            lbl.set_location(1, 0, 2)
+            lbl.set_value_as_header(self.caption)
+            dlg.add_component(lbl)
+            phone = XferCompEdit('phone')
+            phone.set_location(1, 1)
+            phone.set_value(legal.tel1)
+            phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
+            phone.description = _("phone")
+            dlg.add_component(phone)
+            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+        else:
+            provider = AbstractProvider.get_current_instance()
+            provider.send_sms(self.getparam('phone'), self.item.body.replace('{[br/]}', '\n'))
+            self.message(_("SMS send, check it."))
+
+
 @ActionsManage.affect_transition("status")
 @MenuManage.describ('mailing.add_message')
 class MessageTransition(XferTransition):
@@ -143,7 +227,7 @@ class MessageTransition(XferTransition):
 
     def fill_confirm(self, transition, trans):
         if transition == 'sending':
-            if self.confirme(_("Do you want to sent this message to %d contacts?") % len(self.item.get_contacts(True))):
+            if self.confirme(_("Do you want to sent this message to %d contacts?") % self.item.contact_nb):
                 self._confirmed(transition)
                 self.message(_("This message is being transmitted"))
         else:
@@ -189,7 +273,7 @@ class MessageSentInfo(XferContainerCustom):
         self.add_action(WrapAction(_('Close'), 'images/close.png'))
 
 
-@ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: (xfer.item.status == 1) and not xfer.item.is_dynamic)
+@ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: (xfer.item.message_type == 0) and (xfer.item.status == 1) and not xfer.item.is_dynamic)
 @MenuManage.describ('mailing.add_message')
 class MessageLetter(XferPrintReporting):
     icon = "mailing.png"
@@ -199,7 +283,7 @@ class MessageLetter(XferPrintReporting):
 
     def items_callback(self):
         items = []
-        for current_contact in self.item.get_contacts():
+        for current_contact in self.item.get_email_contacts():
             new_item = Message.objects.get(id=self.item.id)
             new_item.contact = current_contact
             items.append(new_item)

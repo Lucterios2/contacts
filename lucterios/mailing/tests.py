@@ -25,7 +25,8 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from shutil import rmtree
 from base64 import b64decode
-from os.path import join, dirname
+from os.path import join, dirname, isfile
+from os import remove
 from _io import BytesIO
 from io import SEEK_END
 from time import sleep
@@ -40,7 +41,8 @@ from lucterios.framework.tools import get_binay
 from lucterios.framework.models import LucteriosScheduler
 from lucterios.CORE.models import Parameter, LucteriosUser, PrintModel, LucteriosGroup
 from lucterios.CORE.views_usergroup import UsersEdit
-from lucterios.CORE.views import AskPassword, AskPasswordAct
+from lucterios.CORE.views import AskPassword, AskPasswordAct, ParamEdit,\
+    ParamSave
 
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 from lucterios.contacts.views import CreateAccount
@@ -50,12 +52,14 @@ from lucterios.documents.tests import create_doc
 from lucterios.documents.models import DocumentContainer
 
 from lucterios.mailing.models import Message
-from lucterios.mailing.views import Configuration, SendEmailTry
-from lucterios.mailing.functions import will_mail_send, send_email, EmailException
-from lucterios.mailing.views_message import MessageAddModify, MessageList, MessageDel, MessageShow, MessageValidRecipient,\
+from lucterios.mailing.views import Configuration, SendEmailTry, SendSmsTry
+from lucterios.mailing.email_functions import will_mail_send, send_email, EmailException
+from lucterios.mailing.views_message import MessageAddModify, MessageEmailList, MessageDel, MessageShow, MessageValidRecipient,\
     MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
-    MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry
+    MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry,\
+    MessageEmailList
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver
+from lucterios.CORE.parameters import Params
 
 
 class ConfigurationTest(LucteriosTest):
@@ -69,17 +73,23 @@ class ConfigurationTest(LucteriosTest):
         LucteriosTest.setUp(self)
         rmtree(get_user_dir(), True)
         self.server.start(1025)
+        if isfile('/tmp/sms.txt'):
+            remove('/tmp/sms.txt')
 
     def tearDown(self):
         self.server.stop()
         LucteriosTest.tearDown(self)
+
+    def init_sms_file(self):
+        with open('/tmp/sms.txt', "w"):
+            pass
 
     def test_config(self):
         self.factory.xfer = Configuration()
         self.calljson('/lucterios.mailing/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
         self.assertEqual(len(self.json_context), 0)
-        self.assert_count_equal('', 2 + 10 + 2 + 2)
+        self.assert_count_equal('', 3 + 11 + 3 + 3)  # Nb tab + params email + message + params sms
         self.assert_json_equal('LABELFORM', "mailing-smtpserver", '')
         self.assert_json_equal('LABELFORM', "mailing-smtpport", '25')
         self.assert_json_equal('LABELFORM', "mailing-smtpsecurity", 'Aucune')
@@ -91,6 +101,7 @@ class ConfigurationTest(LucteriosTest):
                                'Bienvenue{[br/]}{[br/]}Confirmation de connexion à votre application :{[br/]} - Alias : %(username)s{[br/]} - Mot de passe : %(password)s{[br/]}{[br/]}Salutations{[br/]}')
         self.assert_json_equal('LABELFORM', "mailing-delay-batch", '15.0')
         self.assert_json_equal('LABELFORM', "mailing-nb-by-batch", '10')
+        self.assert_json_equal('LABELFORM', 'mailing-sms-provider', None)
 
     def test_tryemail_noconfig(self):
         configSMTP('', 25)
@@ -153,6 +164,88 @@ class ConfigurationTest(LucteriosTest):
         self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com;titi@machin.com'}, False)
         self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
         self.assertEqual(2, self.server.count())
+
+    def test_sms_config(self):
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.mailing/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
+        self.assert_count_equal('', 3 + 11 + 3 + 3)  # Nb tab + params email + message + params sms
+        self.assert_json_equal('LABELFORM', 'mailing-sms-provider', None)
+
+        self.factory.xfer = ParamEdit()
+        self.calljson('/CORE/paramEdit', {'params': 'mailing-sms-provider'}, False)
+        self.assert_observer('core.custom', 'CORE', 'paramEdit')
+        self.assert_select_equal('mailing-sms-provider', {'': None, 'TestProvider': 'Test provider'})
+
+        self.factory.xfer = ParamSave()
+        self.calljson('/CORE/paramSave', {'params': 'mailing-sms-provider', 'mailing-sms-provider': 'TestProvider'}, False)
+        self.assert_observer('core.acknowledge', 'CORE', 'paramSave')
+
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.mailing/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
+        self.assert_count_equal('', 3 + 11 + 3 + 7)  # Nb tab + params email + message + params sms
+        self.assert_json_equal('LABELFORM', 'mailing-sms-provider', 'Test provider')
+        self.assert_json_equal('LABELFORM', 'mailing-sms-phone-parse', '^0([67][0-9]{8})$|+33{0}')
+        self.assert_json_equal('LABELFORM', 'mailing-sms-option', 'file name = /tmp/sms.txt{[br/]}max = 10')
+
+        self.init_sms_file()
+
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.mailing/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
+        self.assert_count_equal('', 3 + 11 + 3 + 8)  # Nb tab + params email + message + params sms
+
+    def test_trysms(self):
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('', "message", "Mauvais paramètrage du SMS")
+
+        Params.setvalue('mailing-sms-provider', 'TestProvider')
+        Params.setvalue('mailing-sms-option', 'file name = /tmp/sms.txt{[br/]}max = 3')
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('', "message", "Mauvais paramètrage du SMS")
+
+        self.init_sms_file()
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('EDIT', "phone", '01-23-45-67-89')
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {'CONFIRME': 'YES', "phone": '01-23-45-67-89'}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('', "message", "Mauvais numéro de téléphone '01-23-45-67-89' !")
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {'CONFIRME': 'YES', "phone": '06-23-45-67-89'}, False)
+        self.assert_observer('core.dialogbox', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('', 'text', 'SMS envoyé, veuillez le vérifier.')
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {'CONFIRME': 'YES', "phone": '07 23.45.6789'}, False)
+        self.assert_observer('core.dialogbox', 'lucterios.mailing', 'sendSmsTry')
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {'CONFIRME': 'YES', "phone": '0623456789'}, False)
+        self.assert_observer('core.dialogbox', 'lucterios.mailing', 'sendSmsTry')
+
+        with open('/tmp/sms.txt', 'r') as sms_file:
+            sms_content = sms_file.readlines()
+
+        self.assertEqual(sms_content, ["WoldCompany : +33623456789 => 'SMS envoyé pour vérifier la configuration'\n",
+                                       "WoldCompany : +33723456789 => 'SMS envoyé pour vérifier la configuration'\n",
+                                       "WoldCompany : +33623456789 => 'SMS envoyé pour vérifier la configuration'\n"])
+
+        self.factory.xfer = SendSmsTry()
+        self.calljson('/lucterios.mailing/sendSmsTry', {'CONFIRME': 'YES', "phone": '0623456789'}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendSmsTry')
+        self.assert_json_equal('', "message", "File '/tmp/sms.txt' too long !")
 
     def test_send_no_config(self):
         configSMTP('', 25)
@@ -428,9 +521,9 @@ class MailingTest(LucteriosTest):
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
 
     def test_messages(self):
-        self.factory.xfer = MessageList()
-        self.calljson('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
+        self.factory.xfer = MessageEmailList()
+        self.calljson('/lucterios.mailing/messageEmailList', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageEmailList')
         self.assert_count_equal("message", 0)
 
         self.factory.xfer = MessageAddModify()
@@ -443,9 +536,9 @@ class MailingTest(LucteriosTest):
                                                               '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageAddModify')
 
-        self.factory.xfer = MessageList()
-        self.calljson('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
+        self.factory.xfer = MessageEmailList()
+        self.calljson('/lucterios.mailing/messageEmailList', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageEmailList')
         self.assert_count_equal("message", 1)
         self.assert_json_equal('', "message/@0/status", 0)
         self.assert_json_equal('', "message/@0/date", None)
@@ -456,9 +549,9 @@ class MailingTest(LucteriosTest):
                       {'message': '1', 'CONFIRME': 'YES'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageDel')
 
-        self.factory.xfer = MessageList()
-        self.calljson('/lucterios.mailing/messageList', {}, False)
-        self.assert_observer('core.custom', 'lucterios.mailing', 'messageList')
+        self.factory.xfer = MessageEmailList()
+        self.calljson('/lucterios.mailing/messageEmailList', {}, False)
+        self.assert_observer('core.custom', 'lucterios.mailing', 'messageEmailList')
         self.assert_count_equal("message", 0)
 
     def test_show_message(self):
@@ -551,7 +644,7 @@ class MailingTest(LucteriosTest):
         self.assert_count_equal('', 14)
         self.assert_json_equal('LABELFORM', "contact_noemail", ['Valjean jean'])
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal(self.json_actions[0], ('Courriels', 'lucterios.mailing/images/mailing.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
+        self.assert_action_equal(self.json_actions[0], ('Courriels', 'lucterios.mailing/images/email.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
         self.assert_action_equal(self.json_actions[1], ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 1))
         self.assert_action_equal(self.json_actions[2], ('Fermer', 'images/close.png'))
 

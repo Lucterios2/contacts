@@ -2,148 +2,177 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Laurent Gay <l.gay@sd-libre.fr>, 2020.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-26 11:49+0000\n"
-"PO-Revision-Date: 2016-01-14 22:03+0000\n"
-"Last-Translator: b'Paul ARULATEDA <paul531@orange.fr>'\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2020-04-23 17:36+0000\n"
+"PO-Revision-Date: 2020-04-23 19:36+0200\n"
+"Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
+"Language-Team: français <>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Translated-Using: django-rosetta 0.7.8\n"
+"X-Generator: Gtranslator 2.91.7\n"
 
-#: __init__.py:42 views.py:143
+#: __init__.py:42 views.py:215
 msgid "Lucterios mailing"
 msgstr "Courrier Lucterios"
 
-#: editors.py:56
-msgid "model"
-msgstr "modèle"
+#: editors.py:48 views_message.py:75
+msgid "title"
+msgstr "titre"
 
-#: editors.py:57
-msgid "filter"
-msgstr "filtre"
-
-#: editors.py:86
+#: editors.py:66
 msgid "Remove"
 msgstr "Retirer"
 
-#: editors.py:88
+#: editors.py:68
 msgid "Insert"
 msgstr "Insérer"
 
-#: editors.py:95 views_message.py:172
+#: editors.py:78
+msgid "model"
+msgstr "modèle"
+
+#: editors.py:79
+msgid "filter"
+msgstr "filtre"
+
+#: editors.py:98 views_message.py:256
 msgid "statistic"
 msgstr "statistique"
 
-#: functions.py:153
+#: email_functions.py:153
 msgid "Email not configure!"
 msgstr "Courriel non configuré !"
 
-#: functions.py:172
+#: email_functions.py:172
 msgid "Connection password"
 msgstr "Mot de passe de connexion"
 
-#: models.py:58
+#: models.py:59
 msgid "id"
 msgstr "id"
 
-#: models.py:59
+#: models.py:60
 msgid "line"
 msgstr "ligne"
 
-#: models.py:67 models.py:96
+#: models.py:68 models.py:97
 msgid "body"
 msgstr "corps"
 
-#: models.py:68
+#: models.py:69
 msgid "bodies"
 msgstr "corps"
 
-#: models.py:95
+#: models.py:96
 msgid "subject"
 msgstr "sujet"
 
-#: models.py:97
+#: models.py:98
+msgid "type"
+msgstr "type"
+
+#: models.py:98 models.py:409 views.py:148 views_message.py:175
+msgid "email"
+msgstr "courriel"
+
+#: models.py:98
+msgid "sms"
+msgstr "sms"
+
+#: models.py:99
 msgid "status"
 msgstr "statut"
 
-#: models.py:97
+#: models.py:99
 msgid "open"
 msgstr "ouvert"
 
-#: models.py:97
+#: models.py:99
 msgid "valided"
 msgstr "validé"
 
-#: models.py:97
+#: models.py:99
 msgid "sending"
 msgstr "envoi en cours"
 
-#: models.py:98
+#: models.py:100
 msgid "recipients"
 msgstr "destinataires"
 
-#: models.py:99 models.py:372
+#: models.py:101 models.py:410
 msgid "date"
 msgstr "date"
 
-#: models.py:100 models.py:370
+#: models.py:102 models.py:408
 msgid "contact"
 msgstr "contact"
 
-#: models.py:101
+#: models.py:103
 msgid "email to send"
 msgstr "courriel à envoyer"
 
-#: models.py:102 models.py:103
+#: models.py:105 models.py:106
 msgid "documents"
 msgstr "documents"
 
-#: models.py:104
+#: models.py:107
 msgid "documents in link"
 msgstr "document(s) ajouté(s) via liens dans le message"
 
-#: models.py:105
+#: models.py:109
+msgid "sms size"
+msgstr "taille du sms"
+
+#: models.py:110
+msgid "sms phone fields"
+msgstr "champs téléphone/sms"
+
+#: models.py:111
 msgid "number of recipients"
 msgstr "nombre de destinataires"
 
-#: models.py:106
+#: models.py:112
 msgid "without email address"
 msgstr "sans adresse courriel"
 
-#: models.py:131
+#: models.py:113
+msgid "without sms/phone"
+msgstr "sans sms/téléphone"
+
+#: models.py:138
 msgid "001@Message"
 msgstr "001@Messages"
 
-#: models.py:132
+#: models.py:139
 msgid "002@Recipients"
 msgstr "002@Destinataires"
 
-#: models.py:133
+#: models.py:140
 msgid "003@Documents"
 msgstr "003@Documents"
 
-#: models.py:205
+#: models.py:243
 msgid "Valid"
 msgstr "Valider"
 
-#: models.py:242
+#: models.py:280
 msgid "Emails"
 msgstr "Courriels"
 
-#: models.py:272
+#: models.py:310
 msgid "Shared documents"
 msgstr "Document(s) partagé(s)"
 
-#: models.py:354
+#: models.py:392
 #, python-format
 msgid ""
 "Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => "
@@ -153,79 +182,75 @@ msgstr ""
 "Avec %(open)d message(s) ouvert(s) cela donne un taux de %(ratio).1f %% "
 "d'ouverture."
 
-#: models.py:363 models.py:369
+#: models.py:401 models.py:407
 msgid "message"
 msgstr "message"
 
-#: models.py:364
+#: models.py:402
 msgid "messages"
 msgstr "messages"
 
-#: models.py:371 views.py:109 views_message.py:126
-msgid "email"
-msgstr "courriel"
-
-#: models.py:373
+#: models.py:411
 msgid "success"
 msgstr "succès"
 
-#: models.py:374
+#: models.py:412
 msgid "error"
 msgstr "erreur"
 
-#: models.py:375
+#: models.py:413
 msgid "last open date"
 msgstr "date de dernière ouverture"
 
-#: models.py:376
+#: models.py:414
 msgid "number open"
 msgstr "nombre de messages ouverts"
 
-#: models.py:377
+#: models.py:415
 msgid "sended item"
 msgstr "ref. d'envoi"
 
-#: models.py:488 models.py:489
+#: models.py:526 models.py:527
 msgid "email sent info"
 msgstr "information des courriels envoyés"
 
-#: models.py:511
+#: models.py:549
 msgid "mailing-smtpserver"
 msgstr "Serveur SMTP"
 
-#: models.py:512
+#: models.py:550
 msgid "mailing-smtpport"
 msgstr "Port SMTP"
 
-#: models.py:514
+#: models.py:552
 msgid "mailing-smtpsecurity"
 msgstr "Sécurité SMTP"
 
-#: models.py:515
+#: models.py:553
 msgid "mailing-smtpsecurity.0"
 msgstr "Aucune"
 
-#: models.py:515
+#: models.py:553
 msgid "mailing-smtpsecurity.1"
 msgstr "StartTLS"
 
-#: models.py:515
+#: models.py:553
 msgid "mailing-smtpsecurity.2"
 msgstr "SSL/TLS"
 
-#: models.py:517
+#: models.py:555
 msgid "mailing-smtpuser"
 msgstr "Utilisateur SMTP"
 
-#: models.py:519
+#: models.py:557
 msgid "mailing-smtppass"
 msgstr "Mot de passe SMTP"
 
-#: models.py:520
+#: models.py:558
 msgid "mailing-msg-connection"
 msgstr "Message de confirmation de connexion"
 
-#: models.py:521
+#: models.py:559
 #, python-format
 msgid ""
 "Connection confirmation to your application:{[br/]} - User:"
@@ -235,175 +260,231 @@ msgstr ""
 "{[br/]} - Alias : %(username)s{[br/]} - Mot de passe : %(password)s{[br/]}"
 "{[br/]}Salutations{[br/]}"
 
-#: models.py:522
+#: models.py:560
 msgid "mailing-delay-batch"
 msgstr "durée (en min) d'un lot de courriel"
 
-#: models.py:523
+#: models.py:561
 msgid "mailing-nb-by-batch"
 msgstr "nombre de courriels par lot"
 
-#: models.py:525
+#: models.py:563
 msgid "mailing-dkim-private-path"
 msgstr "Fichier privé DKIM"
 
-#: models.py:526
+#: models.py:564
 msgid "mailing-dkim-selector"
 msgstr "Sélecteur DKIM"
 
-#: models.py:528
+#: models.py:566
+msgid "mailing-sms-phone-parse"
+msgstr "Expression d'analyse de numéro (SMS)"
+
+#: models.py:567
+msgid "mailing-sms-option"
+msgstr "Options pour fournisseur SMS"
+
+#: models.py:569
+msgid "mailing-sms-provider"
+msgstr "Fournisseur SMS"
+
+#: models.py:571
 msgid "# mailing (editor)"
 msgstr "# Courrier (éditeur)"
 
-#: models.py:529
+#: models.py:572
 msgid "# mailing (shower)"
 msgstr "# Courrier (observateur)"
 
-#: views.py:44
-msgid "Change mailing parameters"
-msgstr "Modifier les paramétrages du courrier"
+#: sms_functions.py:82
+#, python-format
+msgid "Bad phone number '%s' !"
+msgstr "Mauvais numéro de téléphone '%s' !"
 
-#: views.py:47 views.py:143
-msgid "Mailing parameters"
-msgstr "Paramètres de courrier"
+#: views.py:46
+msgid "Change mailing and SMS parameters"
+msgstr "Modifier les paramétrages du courrier et du SMS"
 
-#: views.py:51
+#: views.py:49
+msgid "Mailing & SMS parameters"
+msgstr "Paramètres de courrier & SMS"
+
+#: views.py:52
 msgid "EMail configuration"
 msgstr "Configuration du courriel"
 
-#: views.py:64 views.py:82
+#: views.py:65 views.py:83 views.py:97 views.py:110
 msgid "Modify"
 msgstr "Modifier"
 
-#: views.py:69
+#: views.py:70 views.py:115
 msgid "Send"
 msgstr "Envoyer"
 
-#: views.py:72
+#: views.py:74
 msgid "Default message"
 msgstr "Message par défaut"
 
-#: views.py:89 views.py:122 views_message.py:101 views_message.py:108
+#: views.py:87
+msgid "SMS configuration"
+msgstr "Configuration du SMS"
+
+#: views.py:128 views.py:161 views_message.py:150 views_message.py:157
 msgid "EMail try"
 msgstr "Essai de courriel"
 
-#: views.py:93
+#: views.py:132
 msgid "Bad email parameter!"
 msgstr "Mauvais paramètrage du courriel"
 
-#: views.py:120
+#: views.py:159
 msgid "EMail sent to check configuration"
 msgstr "Courriel envoyé pour vérifier la configuration"
 
-#: views.py:125 views_message.py:134
+#: views.py:164 views_message.py:183
 msgid "EMail send, check it."
 msgstr "Courriel envoyé, veuillez le vérifier."
 
-#: views.py:148
+#: views.py:170 views_message.py:186 views_message.py:193
+msgid "SMS try"
+msgstr "Essai de SMS"
+
+#: views.py:175
+msgid "Bad SMS parameter!"
+msgstr "Mauvais paramètrage du SMS"
+
+#: views.py:191 views_message.py:211
+msgid "phone"
+msgstr "téléphone"
+
+#: views.py:196
+msgid "SMS sent to check configuration"
+msgstr "SMS envoyé pour vérifier la configuration"
+
+#: views.py:197 views_message.py:218
+msgid "SMS send, check it."
+msgstr "SMS envoyé, veuillez le vérifier."
+
+#: views.py:215
+msgid "Mailing parameters"
+msgstr "Paramètres de courrier"
+
+#: views.py:220
 msgid "email properly configured"
 msgstr "Courriel correctement configuré"
 
-#: views.py:150
+#: views.py:222
 msgid "email not configured"
 msgstr "Courriel mal configuré"
 
-#: views_message.py:32
-msgid "Mailing"
-msgstr "Publipostage"
+#: views_message.py:35
+msgid "Messaging"
+msgstr "Messagerie"
 
-#: views_message.py:32
+#: views_message.py:35
 msgid "Create and send mailing to contacts."
 msgstr "Ensemble pour créer et envoyer un publipostage à des contacts."
 
-#: views_message.py:35
+#: views_message.py:53
 msgid "Manage list of message for mailing."
 msgstr "Gestion de liste de messages pour publipostage"
 
-#: views_message.py:40
-msgid "Messages"
-msgstr "Messages"
+#: views_message.py:56
+msgid "Messages EMail"
+msgstr "Messages courriel"
 
-#: views_message.py:56 views_message.py:66
+#: views_message.py:63
+msgid "Manage list of message for SMS."
+msgstr "Gestion de liste de messages via SMS"
+
+#: views_message.py:66
+msgid "Messages SMS"
+msgstr "Messages SMS"
+
+#: views_message.py:85 views_message.py:103
 msgid "Add message"
 msgstr "Ajout de message"
 
-#: views_message.py:57
+#: views_message.py:86
 msgid "Modify message"
 msgstr "Modification d'un message"
 
-#: views_message.py:70
+#: views_message.py:107
 msgid "This message can not be clone!"
 msgstr "Ce message ne peut pas être cloné !"
 
-#: views_message.py:92 views_message.py:107
+#: views_message.py:130 views_message.py:156 views_message.py:192
 msgid "Show message"
 msgstr "Voir un message"
 
-#: views_message.py:146
+#: views_message.py:230
 #, python-format
 msgid "Do you want to sent this message to %d contacts?"
 msgstr "Voulez-vous envoyer ce message à %d contacts ?"
 
-#: views_message.py:148
+#: views_message.py:232
 msgid "This message is being transmitted"
 msgstr "Ce message est en cours de transmission"
 
-#: views_message.py:153
+#: views_message.py:237
 msgid "Info"
 msgstr "Info"
 
-#: views_message.py:159 views_message.py:168
+#: views_message.py:243 views_message.py:252
 msgid "Transmission report"
 msgstr "Rapport de transmission"
 
-#: views_message.py:171
+#: views_message.py:255
 msgid "date begin of send"
 msgstr "début de l'envoi"
 
-#: views_message.py:171
+#: views_message.py:255
 msgid "date end of send"
 msgstr "fin de l'envoi"
 
-#: views_message.py:184
+#: views_message.py:268
 msgid "Show only failed"
 msgstr "Voir seulement les échecs"
 
-#: views_message.py:189
+#: views_message.py:273
 msgid "Close"
 msgstr "Fermé"
 
-#: views_message.py:192
+#: views_message.py:276
 msgid "Letters"
 msgstr "Lettres"
 
-#: views_message.py:198
+#: views_message.py:282
 msgid "Write message"
 msgstr "Impression d'un message"
 
-#: views_message.py:215
+#: views_message.py:299
 msgid "Delete message"
 msgstr "Suppression d'un message"
 
-#: views_message.py:223 views_message.py:235
+#: views_message.py:307 views_message.py:319
 msgid "Add recipient to message"
 msgstr "Ajout d'un destinataire"
 
-#: views_message.py:245
+#: views_message.py:329
 msgid "Delete recipient"
 msgstr "Supprimer un destinataire"
 
-#: views_message.py:248
+#: views_message.py:332
 msgid "Do you want to delete this recipient?"
 msgstr "Voulez-vous supprimer ce destinataire ?"
 
-#: views_message.py:257 views_message.py:265
+#: views_message.py:341 views_message.py:349
 msgid "Insert document to message"
 msgstr "Insérer un document"
 
-#: views_message.py:272
+#: views_message.py:356
 msgid "Remove document to message"
 msgstr "Retirer un document"
 
-#: views_message.py:278
+#: views_message.py:362
 msgid "Do you want to remove those documents ?"
 msgstr "Voulez-vous retirer ces documents ?"
+
+#~ msgid "Mailing"
+#~ msgstr "Publipostage"

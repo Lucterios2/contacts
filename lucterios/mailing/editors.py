@@ -28,50 +28,30 @@ from django.utils.translation import ugettext as _
 
 from lucterios.framework.editors import LucteriosEditor
 from lucterios.framework.xfercomponents import XferCompGrid
-from lucterios.mailing.functions import will_mail_send
+from lucterios.mailing.email_functions import will_mail_send
 from lucterios.documents.views import DocumentShow
 from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE,\
     SELECT_NONE, SELECT_MULTI
 from lucterios.framework.xferadvance import TITLE_EDIT
 from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc
+from lucterios.mailing.sms_functions import AbstractProvider
 
 
 class MessageEditor(LucteriosEditor):
 
     def edit(self, xfer):
         obj_body = xfer.get_components('body')
-        obj_body.with_hypertext = True
-        obj_body.set_size(500, 600)
+        if xfer.getparam('message_type', xfer.item.message_type) == 0:
+            obj_body.with_hypertext = True
+        else:
+            xfer.remove_component('doc_in_link')
+            xfer.get_components('subject').description = _('title')
         return LucteriosEditor.edit(self, xfer)
 
-    def show(self, xfer):
-        obj_body = xfer.get_components('body')
-        obj_body.value = "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}%s{[div]}" % obj_body.value
-
-        xfer.move_components('body', 0, 2)
-        obj_recipients = xfer.get_components('recipients')
-        new_recipients = XferCompGrid('recipient_list')
-        new_recipients.tab = obj_recipients.tab
-        new_recipients.set_location(obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
-        new_recipients.add_header("model", _('model'))
-        new_recipients.add_header("filter", _('filter'))
-        compid = 0
-        for model_title, filter_desc in self.item.recipients_description:
-            new_recipients.set_value(compid, "model", model_title)
-            new_recipients.set_value(compid, "filter", filter_desc)
-            compid += 1
-        if compid == 0:
-            xfer.remove_component('contact_nb')
-        if not will_mail_send() or (len(self.item.get_contacts(False)) == 0):
-            xfer.remove_component('contact_noemail')
-        xfer.remove_component('recipients')
-        new_recipients.add_action_notified(xfer, 'recipient_list')
-        xfer.tab = new_recipients.tab
-        xfer.add_component(new_recipients)
-
+    def _manage_documents(self, xfer):
         old_documents = xfer.get_components('attachments')
         xfer.remove_component('attachments')
-        if xfer.item.is_dynamic:
+        if (xfer.item.message_type == 1) or xfer.item.is_dynamic:
             xfer.remove_component('__tab_3')
             xfer.remove_component('doc_in_link')
             xfer.remove_component('empty')
@@ -89,8 +69,41 @@ class MessageEditor(LucteriosEditor):
                                          modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
             xfer.tab = new_documents.tab
             xfer.add_component(new_documents)
+
+    def _manage_recipients(self, xfer):
+        obj_recipients = xfer.get_components('recipients')
+        new_recipients = XferCompGrid('recipient_list')
+        new_recipients.tab = obj_recipients.tab
+        new_recipients.set_location(obj_recipients.col, obj_recipients.row, obj_recipients.colspan)
+        new_recipients.add_header("model", _('model'))
+        new_recipients.add_header("filter", _('filter'))
+        compid = 0
+        for model_title, filter_desc in self.item.recipients_description:
+            new_recipients.set_value(compid, "model", model_title)
+            new_recipients.set_value(compid, "filter", filter_desc)
+            compid += 1
+        if compid == 0:
+            xfer.remove_component('contact_nb')
+        if (xfer.item.message_type == 1) or (len(self.item.get_email_contacts(False)) == 0) or not will_mail_send():
+            xfer.remove_component('contact_noemail')
+        if (xfer.item.message_type == 0) or (len(self.item.get_sms_contacts(False)) == 0) or not AbstractProvider.is_current_active():
+            xfer.remove_component('contact_nosms')
+        xfer.remove_component('recipients')
+        new_recipients.add_action_notified(xfer, 'recipient_list')
+        xfer.tab = new_recipients.tab
+        xfer.add_component(new_recipients)
         contact_nb = xfer.get_components('contact_nb')
         if (contact_nb is not None) and (self.item.nb_total > 0):
             xfer.tab = contact_nb.tab
-            xfer.fill_from_model(contact_nb.col, contact_nb.row + 1, True, [((_('statistic'), 'statistic'),)])
+            xfer.fill_from_model(contact_nb.col, contact_nb.row + 1, True, [((_('statistic'), 'statistic'), )])
+
+    def show(self, xfer):
+        if xfer.item.message_type == 0:
+            xfer.remove_component('size_sms')
+            obj_body = xfer.get_components('body')
+            obj_body.value = "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}%s{[div]}" % obj_body.value
+            xfer.move_components('body', 0, 2)
+
+        self._manage_recipients(xfer)
+        self._manage_documents(xfer)
         return LucteriosEditor.show(self, xfer)
