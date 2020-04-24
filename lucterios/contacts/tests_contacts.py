@@ -47,7 +47,7 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     AbstractContactFindDouble, AbstractContactShow
 
 
-def change_ourdetail():
+def change_ourdetail(**field_values):
     ourdetails = LegalEntity.objects.get(id=1)
     ourdetails.name = "WoldCompany"
     ourdetails.address = "Place des cocotiers"
@@ -56,10 +56,13 @@ def change_ourdetail():
     ourdetails.country = "MARTINIQUE"
     ourdetails.tel1 = "01-23-45-67-89"
     ourdetails.email = "mr-sylvestre@worldcompany.com"
+    for field_name, field_value in field_values.items():
+        if hasattr(ourdetails, field_name):
+            setattr(ourdetails, field_name, field_value)
     ourdetails.save()
 
 
-def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email=True):
+def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email=True, **field_values):
     empty_contact = Individual()
     empty_contact.firstname = firstname
     empty_contact.lastname = lastname
@@ -71,6 +74,9 @@ def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email
     if with_email:
         empty_contact.email = "%s@worldcompany.com" % firstname
     empty_contact.user = empty_user
+    for field_name, field_value in field_values.items():
+        if hasattr(empty_contact, field_name):
+            setattr(empty_contact, field_name, field_value)
     empty_contact.save()
     return empty_contact
 

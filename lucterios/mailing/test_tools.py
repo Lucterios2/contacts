@@ -26,6 +26,8 @@ from __future__ import unicode_literals
 from asyncore import ExitNow
 from base64 import b64decode
 from threading import Thread
+from os.path import isfile
+from os import remove
 import asyncore
 import smtpd
 import logging
@@ -69,6 +71,28 @@ def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batc
     param.value = "%.d" % batchsize
     param.save()
     Params.clear()
+
+
+def configSMS(file_name='/tmp/sms.txt', max_sms=3):
+    Params.setvalue('mailing-sms-provider', 'TestProvider')
+    Params.setvalue('mailing-sms-option', 'file name = %s{[br/]}max = %d' % (file_name, max_sms))
+
+
+def clean_sms_testfile(create_new, file_name='/tmp/sms.txt'):
+    if isfile(file_name):
+        remove(file_name)
+    if create_new:
+        with open(file_name, "w"):
+            pass
+
+
+def read_sms(file_name='/tmp/sms.txt'):
+    if isfile(file_name):
+        with open(file_name, 'r') as sms_file:
+            sms_content = sms_file.readlines()
+        return sms_content
+    else:
+        return None
 
 
 class TestSMTPChannel(smtpd.SMTPChannel):

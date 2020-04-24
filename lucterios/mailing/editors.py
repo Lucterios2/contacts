@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext as _
 
 from lucterios.framework.editors import LucteriosEditor
-from lucterios.framework.xfercomponents import XferCompGrid
+from lucterios.framework.xfercomponents import XferCompGrid, XferCompCheckList
 from lucterios.mailing.email_functions import will_mail_send
 from lucterios.documents.views import DocumentShow
 from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE,\
@@ -39,13 +39,26 @@ from lucterios.mailing.sms_functions import AbstractProvider
 
 class MessageEditor(LucteriosEditor):
 
+    def before_save(self, xfer):
+        field_names = xfer.getparam('sms_field_names')
+        if field_names is not None:
+            xfer.item.set_sms_field_names(field_names)
+        return
+
     def edit(self, xfer):
         obj_body = xfer.get_components('body')
-        if xfer.getparam('message_type', xfer.item.message_type) == 0:
+        if xfer.getparam('message_type', int(xfer.item.message_type)) == 0:
             obj_body.with_hypertext = True
         else:
             xfer.remove_component('doc_in_link')
             xfer.get_components('subject').description = _('title')
+            chk = XferCompCheckList('sms_field_names')
+            chk.set_location(1, xfer.get_max_row() + 1)
+            chk.description = _('phone fields')
+            chk.set_select(xfer.item.get_all_phone_field_names())
+            chk.set_value(xfer.item.get_sms_field_names(translate=False))
+            chk.simple = 2
+            xfer.add_component(chk)
         return LucteriosEditor.edit(self, xfer)
 
     def _manage_documents(self, xfer):
@@ -100,9 +113,12 @@ class MessageEditor(LucteriosEditor):
     def show(self, xfer):
         if xfer.item.message_type == 0:
             xfer.remove_component('size_sms')
+            xfer.remove_component('sms_field_names')
             obj_body = xfer.get_components('body')
             obj_body.value = "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}%s{[div]}" % obj_body.value
             xfer.move_components('body', 0, 2)
+        else:
+            xfer.get_components('subject').description = _('title')
 
         self._manage_recipients(xfer)
         self._manage_documents(xfer)

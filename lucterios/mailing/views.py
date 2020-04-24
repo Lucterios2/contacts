@@ -186,7 +186,7 @@ class SendSmsTry(XferContainerAcknowledge):
             dlg.add_component(lbl)
             phone = XferCompEdit('phone')
             phone.set_location(1, 1)
-            phone.set_value(legal.tel1)
+            phone.set_value(AbstractProvider.simple_phone(legal.tel1))
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)

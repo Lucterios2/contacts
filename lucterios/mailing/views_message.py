@@ -86,7 +86,7 @@ class MessageAddModify(XferAddEditor):
     caption_modify = _("Modify message")
 
     def icon_path(self):
-        if self.getparam('message_type', self.item.message_type) == 0:
+        if self.getparam('message_type', int(self.item.message_type)) == 0:
             icon_path = "email.png"
         else:
             icon_path = "sms.png"
@@ -143,8 +143,10 @@ class MessageShow(XferShowEditor):
             if (action.url_text == 'lucterios.mailing/messageTransition') and ('TRANSITION' in params) and (params['TRANSITION'] == 'sending'):
                 if self.item.message_type == 0:
                     action.icon_path = get_icon_path("email.png", action.url_text)
+                    action.caption = _("Emails")
                 else:
                     action.icon_path = get_icon_path("sms.png", action.url_text)
+                    action.caption = _("SMS")
 
 
 @ActionsManage.affect_show(_("EMail try"), "email.png", condition=lambda xfer: (xfer.item.message_type == 0) and will_mail_send() and (xfer.item.status == 0))
@@ -206,7 +208,7 @@ class MessageSendSMSTry(XferContainerAcknowledge):
             dlg.add_component(lbl)
             phone = XferCompEdit('phone')
             phone.set_location(1, 1)
-            phone.set_value(legal.tel1)
+            phone.set_value(AbstractProvider.simple_phone(legal.tel1))
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)
