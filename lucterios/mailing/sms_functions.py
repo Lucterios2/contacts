@@ -62,12 +62,17 @@ class AbstractProvider(object):
     def simple_phone(cls, phone):
         return "".join([digit for digit in phone if digit in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')])
 
-    def convert_sms_phone(self, phone):
+    def convert_sms_phone(self, phone, return_simple=False):
         new_phone = None
-        regex_phone = self.phone_check.match(self.simple_phone(phone))
+        simple_phone = self.simple_phone(phone)
+        regex_phone = self.phone_check.match(simple_phone)
         if regex_phone:
             new_phone = self.phone_replace.format(*regex_phone.groups())
-        return new_phone
+            if return_simple:
+                return simple_phone
+            else:
+                return new_phone
+        return None
 
     def has_valid_phone(self, contact, fields):
         valid = False

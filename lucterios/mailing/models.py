@@ -107,7 +107,6 @@ class Message(LucteriosModel):
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
 
     size_sms = LucteriosVirtualField(verbose_name=_('sms size'), compute_from='get_size_sms')
-    sms_fields = LucteriosVirtualField(verbose_name=_('sms phone fields'), compute_from='get_sms_phone_fields')
     contact_nb = LucteriosVirtualField(verbose_name=_('number of recipients'), compute_from='get_contact_nb', format_string='N')
     contact_noemail = LucteriosVirtualField(verbose_name=_('without email address'), compute_from='get_contact_noemail')
     contact_nosms = LucteriosVirtualField(verbose_name=_('without sms/phone'), compute_from='get_contact_nosms')
@@ -153,9 +152,6 @@ class Message(LucteriosModel):
     def empty(self):
         return ""
 
-    def get_sms_phone_fields(self):
-        return []
-
     def get_contact_nb(self):
         if self.message_type == 0:
             return len(self.get_email_contacts())
@@ -167,54 +163,56 @@ class Message(LucteriosModel):
     def line_set(self):
         return MessageLineSet(hints={'body': self.body})
 
+    def get_size_sms(self):
+        return len(self.body.replace('{[br/]}', '\n'))
+
     def get_contact_noemail(self):
         no_emails = self.get_email_contacts(False)
         return [six.text_type(no_email) for no_email in no_emails]
-
-    def get_size_sms(self):
-        return len(self.body.replace('{[br/]}', '\n'))
 
     def get_contact_nosms(self):
         def show_phones(contact):
             return " ".join([getattr(contact, field_name, '') for field_name in self.get_sms_field_names(translate=False)])
         no_sms_list = self.get_sms_contacts(False)
-        return ["%s : %s" % (no_sms, show_phones(no_sms)) for no_sms in no_sms_list]
+        return ["%s : %s" % (no_sms, show_phones(no_sms).strip()) for no_sms in no_sms_list]
 
     def get_email_contacts(self, email=None):
         def append_contact(new_contact):
             if new_contact not in contact_list:
                 contact_list.append(new_contact)
         contact_list = []
-        for modelname, item in self.get_recipients():
-            model = apps.get_model(modelname)
-            contact_filter = item[0]
-            if (email is not None) and (model.get_field_by_name('email') is None):
-                for contact in model.objects.filter(contact_filter).distinct():
-                    if (email is True) and hasattr(contact, 'get_email') and (contact.get_email() != []):
+        if self.message_type == 0:
+            for modelname, item in self.get_recipients():
+                model = apps.get_model(modelname)
+                contact_filter = item[0]
+                if (email is not None) and (model.get_field_by_name('email') is None):
+                    for contact in model.objects.filter(contact_filter).distinct():
+                        if (email is True) and hasattr(contact, 'get_email') and (contact.get_email() != []):
+                            append_contact(contact)
+                        elif (email is False) and (not hasattr(contact, 'get_email') or (contact.get_email() == [])):
+                            append_contact(contact)
+                else:
+                    if (email is not None) and (model.get_field_by_name('email') is not None):
+                        contact_filter &= ~models.Q(email='') if email else models.Q(email='')
+                    for contact in model.objects.filter(contact_filter).distinct():
                         append_contact(contact)
-                    elif (email is False) and (not hasattr(contact, 'get_email') or (contact.get_email() == [])):
-                        append_contact(contact)
-            else:
-                if (email is not None) and (model.get_field_by_name('email') is not None):
-                    contact_filter &= ~models.Q(email='') if email else models.Q(email='')
-                for contact in model.objects.filter(contact_filter).distinct():
-                    append_contact(contact)
         return contact_list
 
     def get_sms_contacts(self, sms=None):
         contact_list = []
-        provider = AbstractProvider.get_current_instance()
-        if (sms is None) or (provider is not None):
-            field_names = list(self.get_sms_field_names(translate=False))
-            for modelname, item in self.get_recipients():
-                model = apps.get_model(modelname)
-                contact_filter = item[0]
-                for contact in model.objects.filter(contact_filter).distinct():
-                    if (sms is None) or \
-                        ((sms is True) and provider.has_valid_phone(contact, field_names)) or \
-                            ((sms is False) and not provider.has_valid_phone(contact, field_names)):
-                        if contact not in contact_list:
-                            contact_list.append(contact)
+        if self.message_type == 1:
+            provider = AbstractProvider.get_current_instance()
+            if (sms is None) or (provider is not None):
+                field_names = list(self.get_sms_field_names(translate=False))
+                for modelname, item in self.get_recipients():
+                    model = apps.get_model(modelname)
+                    contact_filter = item[0]
+                    for contact in model.objects.filter(contact_filter).distinct():
+                        if (sms is None) or \
+                            ((sms is True) and provider.has_valid_phone(contact, field_names)) or \
+                                ((sms is False) and not provider.has_valid_phone(contact, field_names)):
+                            if contact not in contact_list:
+                                contact_list.append(contact)
         return contact_list
 
     @property
@@ -306,27 +304,40 @@ class Message(LucteriosModel):
             item_list = self._prep_sending_sms()
         else:
             item_list = []
+        item_list.sort()
         self.email_to_send = "\n".join(item_list)
         self.save()
         self.emailsent_set.all().delete()
+        return len(item_list)
 
     def _prep_sending_email(self):
-        email_list = []
         printmodel_name = self.get_printmodel_names()
-        for contact in self.get_email_contacts(True):
-            if len(printmodel_name) == 0:
+        if len(printmodel_name) == 0:
+            email_list = {}
+            for contact in self.get_email_contacts(True):
                 for email1 in contact.email.split(';'):
                     for email2 in email1.split(','):
-                        if (":%s|" % email2) not in ("|".join(email_list) + '|'):
-                            email_list.append("%d:%s" % (contact.id, email2))
-            else:
+                        if email2 not in email_list:
+                            email_list[email2] = contact.id
+            return ["%d:%s" % (contact_id, email) for email, contact_id in email_list.items()]
+        else:
+            email_list = []
+            for contact in self.get_email_contacts(True):
                 model_name = contact.__class__.get_long_name()
                 email_list.append("%s:%d:%s" % (model_name, contact.id, printmodel_name[model_name] if model_name in printmodel_name.keys() else "0"))
-        return email_list
+            return email_list
 
     def _prep_sending_sms(self):
-        sms_list = []
-        return sms_list
+        sms_list = {}
+        provider = AbstractProvider.get_current_instance()
+        if (provider is not None) and provider.is_active:
+            field_names = list(self.get_sms_field_names(translate=False))
+            for contact in self.get_sms_contacts(True):
+                for field_name in field_names:
+                    new_phone = provider.convert_sms_phone(getattr(contact, field_name, ''), return_simple=True)
+                    if (new_phone is not None) and (new_phone not in sms_list):
+                        sms_list[new_phone] = contact.id
+        return ["%d:%s" % (contact_id, new_phone) for new_phone, contact_id in sms_list.items()]
 
     transitionname__sending = _("Emails")
 
@@ -342,27 +353,31 @@ class Message(LucteriosModel):
                 root_url = '/'.join(abs_url[:-2])
             else:
                 root_url = ''
-            getLogger('lucterios.mailing').debug('Message.sending() -> add_mailing_in_scheduler(http_root_address=%s)', root_url)
-            add_mailing_in_scheduler(check_nb=False, http_root_address=root_url)
+            getLogger('lucterios.mailing').debug('Message.sending() -> add_messaging_in_scheduler(http_root_address=%s)', root_url)
+            add_messaging_in_scheduler(check_nb=False, http_root_address=root_url)
         return
 
     def define_email_message(self):
-        if not hasattr(self, 'http_root_address'):
-            raise LucteriosException(GRAVE, "No http_root_address")
-        link_html = ""
         self._attache_files = []
-        for doc in self.attachments.all():
-            if self.doc_in_link:
-                if doc.sharekey is None:
-                    doc.change_sharekey(False)
-                    doc.save()
-                doc.set_context(self.http_root_address)
-                link_html += "<li><a href='%s'>%s</a></li>" % (doc.shared_link, doc.name)
-            else:
-                self._attache_files.append((doc.name, doc.content))
-        if self.doc_in_link and (link_html != ''):
-            link_html = "<hr/><h3>%s</h3><ul>%s</ul>" % (_('Shared documents'), link_html)
-        self._email_content = "<html><body>%s%s</body></html>" % (toHtml(self.body), link_html)
+        self._email_content = ""
+        if self.message_type == 0:
+            if not hasattr(self, 'http_root_address'):
+                raise LucteriosException(GRAVE, "No http_root_address")
+            link_html = ""
+            for doc in self.attachments.all():
+                if self.doc_in_link:
+                    if doc.sharekey is None:
+                        doc.change_sharekey(False)
+                        doc.save()
+                    doc.set_context(self.http_root_address)
+                    link_html += "<li><a href='%s'>%s</a></li>" % (doc.shared_link, doc.name)
+                else:
+                    self._attache_files.append((doc.name, doc.content))
+            if self.doc_in_link and (link_html != ''):
+                link_html = "<hr/><h3>%s</h3><ul>%s</ul>" % (_('Shared documents'), link_html)
+            self._email_content = "<html><body>%s%s</body></html>" % (toHtml(self.body), link_html)
+        elif self.message_type == 1:
+            self._email_content = self.body.replace('{[br/]}', '\n')
 
     @property
     def email_content(self):
@@ -378,12 +393,28 @@ class Message(LucteriosModel):
 
     def sendSMS(self):
         getLogger('lucterios.mailing').debug('Message.sendsms()')
-        pass
+        provider = AbstractProvider.get_current_instance()
+        if (self.message_type == 1) and (provider is not None) and provider.is_active and (self.status == 2):
+            sms_list = self.email_to_send.split("\n")
+            for contact_sms in sms_list:
+                contact_sms_det = contact_sms.split(':')
+                if len(contact_sms_det) == 2:
+                    contact_id, sms = contact_sms_det
+                    try:
+                        contact = AbstractContact.objects.get(id=contact_id)
+                    except AbstractContact.DoesNotExist:
+                        contact = None
+                email_sent = EmailSent.objects.create(message=self, contact=contact, email=sms, date=timezone.now())
+                email_sent.send_sms(provider)
+            self.email_to_send = ""
+            self.status = 1
+            self.save()
+        return
 
     def sendemail(self, nb_to_send, http_root_address):
         getLogger('lucterios.mailing').debug('Message.sendemail(nb_to_send=%s, http_root_address=%s)', nb_to_send, http_root_address)
         self.http_root_address = http_root_address
-        if will_mail_send() and (self.status == 2):
+        if (self.message_type == 0) and will_mail_send() and (self.status == 2):
             email_list = self.email_to_send.split("\n")
             for contact_email in email_list[:nb_to_send]:
                 contact_email_det = contact_email.split(':')
@@ -447,13 +478,22 @@ class Message(LucteriosModel):
 
     @property
     def statistic(self):
-        return _('Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
-            'send': self.nb_total,
-            'date': self.date_end,
-            'error': self.nb_errors,
-            'open': self.nb_open,
-            'ratio': (100.0 * self.nb_open) / self.nb_total
-        }
+        if self.message_type == 0:
+            return _('Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
+                'send': self.nb_total,
+                'date': self.date_end,
+                'error': self.nb_errors,
+                'open': self.nb_open,
+                'ratio': (100.0 * self.nb_open) / self.nb_total
+            }
+        elif self.message_type == 1:
+            return _('Send = %(send)d at %(date)s - Error = %(error)d') % {
+                'send': self.nb_total,
+                'date': self.date_end,
+                'error': self.nb_errors
+            }
+        else:
+            return ""
 
     class Meta(object):
         verbose_name = _('message')
@@ -580,6 +620,20 @@ class EmailSent(LucteriosModel):
             self.error = six.text_type(error)
         self.save()
 
+    def send_sms(self, provider):
+        getLogger('lucterios.mailing').debug('EmailSent.send_sms()')
+        try:
+            body = self.replace_tag(self.message.email_content)
+            getLogger('lucterios.mailing').debug('send sms %s : %s' % (self.message.subject, self.email))
+            provider.send_sms(self.email, body)
+            self.success = True
+        except Exception as error:
+            if getLogger('lucterios.mailing').isEnabledFor(DEBUG):
+                getLogger('lucterios.mailing').exception('send_email')
+            self.success = False
+            self.error = six.text_type(error)
+        self.save()
+
     class Meta(object):
         verbose_name = _('email sent info')
         verbose_name_plural = _('email sent info')
@@ -587,19 +641,22 @@ class EmailSent(LucteriosModel):
         ordering = ['-last_open_date', 'contact', '-date', 'email']
 
 
-def send_mailing_in_waiting(http_root_address):
+def send_messaging_in_waiting(http_root_address):
     '''Mailing'''
     msg_list = Message.objects.filter(status=2)
     if len(msg_list) == 0:
-        LucteriosScheduler.remove(send_mailing_in_waiting)
+        LucteriosScheduler.remove(send_messaging_in_waiting)
     else:
         for msg_item in msg_list:
-            msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'), http_root_address)
+            if msg_item.message_type == 0:
+                msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'), http_root_address)
+            elif msg_item.message_type == 1:
+                msg_item.sendSMS()
 
 
-def add_mailing_in_scheduler(check_nb=True, http_root_address=""):
+def add_messaging_in_scheduler(check_nb=True, http_root_address=""):
     if not check_nb or (Message.objects.filter(status=2).count() > 0):
-        LucteriosScheduler.add_task(send_mailing_in_waiting, minutes=Params.getvalue('mailing-delay-batch'), http_root_address=http_root_address)
+        LucteriosScheduler.add_task(send_messaging_in_waiting, minutes=Params.getvalue('mailing-delay-batch'), http_root_address=http_root_address)
 
 
 @Signal.decorate('checkparam')

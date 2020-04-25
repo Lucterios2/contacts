@@ -25,7 +25,7 @@ from lucterios.contacts.tools import ContactSelection
 from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.views import DocumentSearch
-from lucterios.mailing.models import Message, add_mailing_in_scheduler, EmailSent
+from lucterios.mailing.models import Message, add_messaging_in_scheduler, EmailSent
 from lucterios.mailing.email_functions import will_mail_send, send_email
 from lucterios.mailing.sms_functions import AbstractProvider
 from lucterios.CORE.parameters import Params
@@ -47,7 +47,7 @@ class MessageList(XferListEditor):
         XferListEditor.fillresponse(self)
         abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
         root_url = '/'.join(abs_url[:-2])
-        add_mailing_in_scheduler(check_nb=True, http_root_address=root_url)
+        add_messaging_in_scheduler(check_nb=True, http_root_address=root_url)
 
 
 @MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for mailing.'))
@@ -229,7 +229,8 @@ class MessageTransition(XferTransition):
 
     def fill_confirm(self, transition, trans):
         if transition == 'sending':
-            if self.confirme(_("Do you want to sent this message to %d contacts?") % self.item.contact_nb):
+            if self.confirme(_("Do you want to sent this message %(nb_msg)d times to %(nb_contact)d contacts?") % {'nb_msg': self.item.prep_sending(),
+                                                                                                                   'nb_contact': self.item.contact_nb - len(self.item.contact_noemail) - len(self.item.contact_nosms)}):
                 self._confirmed(transition)
                 self.message(_("This message is being transmitted"))
         else:
@@ -261,7 +262,7 @@ class MessageSentInfo(XferContainerCustom):
         grid = self.get_components('emailsent')
         if not show_only_failed:
             grid.delete_header('error')
-        else:
+        if show_only_failed or (self.item.message_type != 0):
             grid.delete_header('last_open_date')
             grid.delete_header('nb_open')
 

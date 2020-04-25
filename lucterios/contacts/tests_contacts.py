@@ -47,37 +47,33 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     AbstractContactFindDouble, AbstractContactShow
 
 
+def change_contact(contact, **field_values):
+    for field_name, field_value in field_values.items():
+        if hasattr(contact, field_name):
+            if field_name[:7] == "custom_":
+                contact.set_custom_values({field_name: field_value})
+            else:
+                setattr(contact, field_name, field_value)
+    contact.save()
+
+
 def change_ourdetail(**field_values):
     ourdetails = LegalEntity.objects.get(id=1)
     ourdetails.name = "WoldCompany"
-    ourdetails.address = "Place des cocotiers"
-    ourdetails.postal_code = "97200"
-    ourdetails.city = "FORT DE FRANCE"
-    ourdetails.country = "MARTINIQUE"
-    ourdetails.tel1 = "01-23-45-67-89"
-    ourdetails.email = "mr-sylvestre@worldcompany.com"
-    for field_name, field_value in field_values.items():
-        if hasattr(ourdetails, field_name):
-            setattr(ourdetails, field_name, field_value)
-    ourdetails.save()
+    change_contact(ourdetails, address="Place des cocotiers", postal_code="97200", city="FORT DE FRANCE",
+                   country="MARTINIQUE", tel1="01-23-45-67-89", email="mr-sylvestre@worldcompany.com", **field_values)
 
 
 def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email=True, **field_values):
     empty_contact = Individual()
     empty_contact.firstname = firstname
     empty_contact.lastname = lastname
-    empty_contact.address = "rue de la liberté"
-    empty_contact.postal_code = "97250"
-    empty_contact.city = "LE PRECHEUR"
-    empty_contact.country = "MARTINIQUE"
-    empty_contact.tel2 = "02-78-45-12-95"
+    empty_contact.user = empty_user
     if with_email:
         empty_contact.email = "%s@worldcompany.com" % firstname
-    empty_contact.user = empty_user
-    for field_name, field_value in field_values.items():
-        if hasattr(empty_contact, field_name):
-            setattr(empty_contact, field_name, field_value)
     empty_contact.save()
+    change_contact(empty_contact, address="rue de la liberté", postal_code="97250", city="LE PRECHEUR",
+                   country="MARTINIQUE", tel2="02-78-45-12-95", **field_values)
     return empty_contact
 
 
