@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-25 17:46+0000\n"
-"PO-Revision-Date: 2020-04-25 19:45+0200\n"
+"POT-Creation-Date: 2020-04-27 15:29+0000\n"
+"PO-Revision-Date: 2020-04-27 17:26+0200\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
 "Language: \n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Translated-Using: django-rosetta 0.7.8\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: __init__.py:42 views.py:215
+#: __init__.py:42 views.py:220
 msgid "Lucterios mailing"
 msgstr "Courrier Lucterios"
 
@@ -84,7 +84,7 @@ msgstr "sujet"
 msgid "type"
 msgstr "type"
 
-#: models.py:98 models.py:507 views.py:148 views_message.py:177
+#: models.py:98 models.py:507 views.py:153 views_message.py:177
 msgid "email"
 msgstr "courriel"
 
@@ -219,43 +219,43 @@ msgstr "ref. d'envoi"
 msgid "email sent info"
 msgstr "information des courriels envoyés"
 
-#: models.py:661
+#: models.py:664
 msgid "mailing-smtpserver"
 msgstr "Serveur SMTP"
 
-#: models.py:662
+#: models.py:665
 msgid "mailing-smtpport"
 msgstr "Port SMTP"
 
-#: models.py:664
+#: models.py:667
 msgid "mailing-smtpsecurity"
 msgstr "Sécurité SMTP"
 
-#: models.py:665
+#: models.py:668
 msgid "mailing-smtpsecurity.0"
 msgstr "Aucune"
 
-#: models.py:665
+#: models.py:668
 msgid "mailing-smtpsecurity.1"
 msgstr "StartTLS"
 
-#: models.py:665
+#: models.py:668
 msgid "mailing-smtpsecurity.2"
 msgstr "SSL/TLS"
 
-#: models.py:667
+#: models.py:670
 msgid "mailing-smtpuser"
 msgstr "Utilisateur SMTP"
 
-#: models.py:669
+#: models.py:672
 msgid "mailing-smtppass"
 msgstr "Mot de passe SMTP"
 
-#: models.py:670
+#: models.py:673
 msgid "mailing-msg-connection"
 msgstr "Message de confirmation de connexion"
 
-#: models.py:671
+#: models.py:674
 #, python-format
 msgid ""
 "Connection confirmation to your application:{[br/]} - User:"
@@ -265,120 +265,190 @@ msgstr ""
 "{[br/]} - Alias : %(username)s{[br/]} - Mot de passe : %(password)s{[br/]}"
 "{[br/]}Salutations{[br/]}"
 
-#: models.py:672
+#: models.py:675
 msgid "mailing-delay-batch"
 msgstr "durée (en min) d'un lot de courriel"
 
-#: models.py:673
+#: models.py:676
 msgid "mailing-nb-by-batch"
 msgstr "nombre de courriels par lot"
 
-#: models.py:675
+#: models.py:678
 msgid "mailing-dkim-private-path"
 msgstr "Fichier privé DKIM"
 
-#: models.py:676
+#: models.py:679
 msgid "mailing-dkim-selector"
 msgstr "Sélecteur DKIM"
 
-#: models.py:678
+#: models.py:681
 msgid "mailing-sms-phone-parse"
 msgstr "Expression d'analyse de numéro (SMS)"
 
-#: models.py:679
+#: models.py:682
 msgid "mailing-sms-option"
 msgstr "Options pour fournisseur SMS"
 
-#: models.py:681
+#: models.py:684
 msgid "mailing-sms-provider"
 msgstr "Fournisseur SMS"
 
-#: models.py:683
+#: models.py:686
 msgid "# mailing (editor)"
 msgstr "# Courrier (éditeur)"
 
-#: models.py:684
+#: models.py:687
 msgid "# mailing (shower)"
 msgstr "# Courrier (observateur)"
 
-#: sms_functions.py:93
+#: sms_functions.py:61 sms_functions.py:103
+msgid "No implemented"
+msgstr "Non implémenté"
+
+#: sms_functions.py:97
 #, python-format
 msgid "Bad phone number '%s' !"
 msgstr "Mauvais numéro de téléphone '%s' !"
 
-#: views.py:46
+#: sms_functions.py:166
+msgid "Malformed JSON, please review the syntax and properties types."
+msgstr ""
+"JSON mal formé, veuillez consulter la syntaxe et les types de propriétés."
+
+#: sms_functions.py:167
+msgid "Missing mandatory property."
+msgstr "Propriété obligatoire manquante."
+
+#: sms_functions.py:168
+msgid "Type mismatch. Expected type \"[t]\"."
+msgstr "Incompatibilité de type."
+
+#: sms_functions.py:169
+msgid "Value \"[value]\" is invalid. Allowed values are: [allowedValues]."
+msgstr "Une valeur n'est pas valide."
+
+#: sms_functions.py:170
+msgid "Characters limit exceeded for the property. Max allowed - [number]."
+msgstr "Limite de caractères dépassée pour la propriété."
+
+#: sms_functions.py:171
+msgid "The datetime value \"[date]\" is not a valid RFC3339 datetime format."
+msgstr "La valeur date-heure n'est pas au bon format."
+
+#: sms_functions.py:172
+msgid "Input payload must be less than [size]MB."
+msgstr "La charge utile en entrée doit être inférieure."
+
+#: sms_functions.py:173
+msgid ""
+"Characters limit below the minimum for the property. Min allowed - [number]."
+msgstr "Limite de caractères inférieure au minimum pour la propriété."
+
+#: sms_functions.py:174
+msgid "Value limit exceeded. Max allowed - [number]."
+msgstr "Limite de valeur dépassée."
+
+#: sms_functions.py:175
+msgid "Insufficient funds."
+msgstr "Fonds insuffisants."
+
+#: sms_functions.py:176
+msgid "Unsupported country code."
+msgstr "Code de pays non pris en charge."
+
+#: sms_functions.py:177
+msgid "SMS per day limit reached."
+msgstr "SMS par jour limite atteinte."
+
+#: sms_functions.py:178
+msgid "No account."
+msgstr "Pas de compte."
+
+#: sms_functions.py:206
+msgid "Not authorised."
+msgstr "Non autorisé."
+
+#: sms_functions.py:208
+msgid "You do not have access to this resource."
+msgstr "Vous n'avez pas accès à cette ressource."
+
+#: sms_functions.py:218
+msgid "API token empty"
+msgstr "Token d'API vide."
+
+#: views.py:45
 msgid "Change mailing and SMS parameters"
 msgstr "Modifier les paramétrages du courrier et du SMS"
 
-#: views.py:49
+#: views.py:48
 msgid "Mailing & SMS parameters"
 msgstr "Paramètres de courrier & SMS"
 
-#: views.py:52
+#: views.py:51
 msgid "EMail configuration"
 msgstr "Configuration du courriel"
 
-#: views.py:65 views.py:83 views.py:97 views.py:110
+#: views.py:64 views.py:82 views.py:96 views.py:109
 msgid "Modify"
 msgstr "Modifier"
 
-#: views.py:70 views.py:115
+#: views.py:69 views.py:114
 msgid "Send"
 msgstr "Envoyer"
 
-#: views.py:74
+#: views.py:73
 msgid "Default message"
 msgstr "Message par défaut"
 
-#: views.py:87
+#: views.py:86
 msgid "SMS configuration"
 msgstr "Configuration du SMS"
 
-#: views.py:128 views.py:161 views_message.py:152 views_message.py:159
+#: views.py:133 views.py:166 views_message.py:152 views_message.py:159
 msgid "EMail try"
 msgstr "Essai de courriel"
 
-#: views.py:132
+#: views.py:137
 msgid "Bad email parameter!"
 msgstr "Mauvais paramètrage du courriel"
 
-#: views.py:159
+#: views.py:164
 msgid "EMail sent to check configuration"
 msgstr "Courriel envoyé pour vérifier la configuration"
 
-#: views.py:164 views_message.py:185
+#: views.py:169 views_message.py:185
 msgid "EMail send, check it."
 msgstr "Courriel envoyé, veuillez le vérifier."
 
-#: views.py:170 views_message.py:188 views_message.py:195
+#: views.py:175 views_message.py:188 views_message.py:195
 msgid "SMS try"
 msgstr "Essai de SMS"
 
-#: views.py:175
+#: views.py:180
 msgid "Bad SMS parameter!"
 msgstr "Mauvais paramètrage du SMS"
 
-#: views.py:191 views_message.py:213
+#: views.py:196 views_message.py:213
 msgid "phone"
 msgstr "téléphone"
 
-#: views.py:196
+#: views.py:201
 msgid "SMS sent to check configuration"
 msgstr "SMS envoyé pour vérifier la configuration"
 
-#: views.py:197 views_message.py:220
+#: views.py:202 views_message.py:220
 msgid "SMS send, check it."
 msgstr "SMS envoyé, veuillez le vérifier."
 
-#: views.py:215
+#: views.py:220
 msgid "Mailing parameters"
 msgstr "Paramètres de courrier"
 
-#: views.py:220
+#: views.py:225
 msgid "email properly configured"
 msgstr "Courriel correctement configuré"
 
-#: views.py:222
+#: views.py:227
 msgid "email not configured"
 msgstr "Courriel mal configuré"
 
