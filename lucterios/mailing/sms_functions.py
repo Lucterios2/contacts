@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from os.path import isfile
 from re import compile
+from logging import getLogger
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -47,6 +48,7 @@ class AbstractProvider(object):
         self.set_options(options)
         self.phone_check = compile(phone_parse[0])
         self.phone_replace = phone_parse[1] if len(phone_parse) > 0 else ""
+        self.last_error = None
 
     def set_options(self, options):
         self.options = {opt_line.split('=')[0].strip(): opt_line.split('=')[1].strip() for opt_line in options.split('{[br/]}') if opt_line.count('=') == 1}
@@ -56,6 +58,7 @@ class AbstractProvider(object):
 
     @property
     def is_active(self):
+        self.last_error = _('No implemented')
         return False
 
     @classmethod
@@ -88,18 +91,23 @@ class AbstractProvider(object):
         return "{[br/]}".join(["%s = %s" % (opt_key, opt_val) for opt_key, opt_val in self.options.items() if opt_key in self.default_options])
 
     def send_sms(self, phone, text):
+        self.last_error = None
         new_phone = self.convert_sms_phone(phone)
         if new_phone is None:
-            raise SMSException(_("Bad phone number '%s' !") % phone)
+            self.last_error = _("Bad phone number '%s' !") % phone
+            raise SMSException(self.last_error)
         else:
             self.send_sms_ex(new_phone, text)
 
     def send_sms_ex(self, phone, text):
+        self.last_error = _('No implemented')
         return
 
     @classmethod
     def get_provider_list(cls):
-        return [('', None)] + [(sub_provider.__name__, sub_provider.title) for sub_provider in cls.__subclasses__()]
+        from django.conf import settings
+        return [('', None)] + [(sub_provider.__name__, sub_provider.title) for sub_provider in cls.__subclasses__()
+                               if hasattr(settings, "MAILING_TESTSMS") or (sub_provider is not TestProvider)]
 
     @classmethod
     def get_current_instance(cls):
@@ -131,16 +139,91 @@ class TestProvider(AbstractProvider):
 
     @property
     def is_active(self):
-        return isfile(self.options['file name'])
+        if not isfile(self.options['file name']):
+            self.last_error = "File '%s' not found !" % self.options['file name']
+        else:
+            self.last_error = None
+        return (self.last_error is None)
 
     def send_sms_ex(self, phone, text):
         sms_file_name = self.options['file name']
         if not isfile(sms_file_name):
-            raise SMSException("File '%s' not found !" % sms_file_name)
+            self.last_error = "File '%s' not found !" % sms_file_name
+            raise SMSException(self.last_error)
         with open(sms_file_name, 'r') as sms_file:
             nb_line = len(sms_file.readlines())
         if nb_line >= self.options['max']:
-            raise SMSException("File '%s' too long !" % sms_file_name)
+            self.last_error = "File '%s' too long !" % sms_file_name
+            raise SMSException(self.last_error)
         with open(sms_file_name, 'a') as sms_file:
             sms_file.write("%s : %s => '%s'\n" % (self.sender, phone, text.replace('\n', '|')))
         return
+
+
+class MailjetProvider(AbstractProvider):
+
+    ERROR_CODE = {
+        'mj-0002': _('Malformed JSON, please review the syntax and properties types.'),
+        'mj-0003': _('Missing mandatory property.'),
+        'mj-0004': _('Type mismatch. Expected type "[t]".'),
+        'mj-0005': _('Value "[value]" is invalid. Allowed values are: [allowedValues].'),
+        'mj-0006': _('Characters limit exceeded for the property. Max allowed - [number].'),
+        'mj-0009': _('The datetime value "[date]" is not a valid RFC3339 datetime format.'),
+        'mj-0011': _('Input payload must be less than [size]MB.'),
+        'mj-0020': _('Characters limit below the minimum for the property. Min allowed - [number].'),
+        'mj-0025': _('Value limit exceeded. Max allowed - [number].'),
+        'sms-0001': _('Insufficient funds.'),
+        'sms-0002': _('Unsupported country code.'),
+        'sms-0003': _('SMS per day limit reached.'),
+        'sms-0004': _('No account.'),
+    }
+
+    title = 'Mailjet SMS'
+    default_options = {'api token': ''}
+
+    def _mailjet_requet(self, service, method_post, data=None):
+        import requests
+        from json import loads
+        url = "https://api.mailjet.com/v4/%s" % service
+        headers = {"Authorization": "Bearer %s" % self.options['api token'], "Content-Type": "application/json"}
+        if method_post is True:
+            response = requests.post(url, data=data, headers=headers, verify=True)
+        else:
+            response = requests.get(url, data=data, headers=headers, verify=True)
+        if 400 < response.status_code < 600:
+            try:
+                json_res = loads(response.content.decode())
+            except Exception:
+                json_res = {'StatusCode': response.status_code, 'ErrorMessage': response.content.decode()}
+        else:
+            json_res = response.json()
+        if ('StatusCode' in json_res) and (json_res['StatusCode'] != 400):
+            getLogger('lucterios.mailing').error("_mailjet_requet(self, '%s', %s, data=%s) [%s, %s] => %s", service, method_post, data, url, headers, json_res)
+        return json_res
+
+    def _check_error(self, json_res):
+        if ('StatusCode' in json_res) and (json_res['StatusCode'] == 401):
+            return _('Not authorised.')
+        if ('StatusCode' in json_res) and (json_res['StatusCode'] == 403):
+            return _('You do not have access to this resource.')
+        if ('ErrorCode' in json_res) and (json_res['ErrorCode'] in self.ERROR_CODE):
+            return self.ERROR_CODE[json_res['ErrorCode']]
+        if ('ErrorMessage' in json_res):
+            return json_res['ErrorMessage']
+        return None
+
+    @property
+    def is_active(self):
+        if self.options['api token'].strip() == '':
+            self.last_error = _('API token empty')
+        else:
+            json_res = self._mailjet_requet("sms", method_post=False)
+            self.last_error = self._check_error(json_res)
+        return (self.last_error is None)
+
+    def send_sms_ex(self, phone, text):
+        json_res = self._mailjet_requet("sms-send", method_post=True,
+                                        data={"From": self.sender, "To": phone, "Text": text})
+        self.last_error = self._check_error(json_res)
+        if self.last_error is not None:
+            raise SMSException(self.last_error)

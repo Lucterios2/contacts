@@ -151,6 +151,9 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(2, self.server.count())
 
     def test_sms_config(self):
+        from django.conf import settings
+        setattr(settings, "MAILING_TESTSMS", True)
+
         self.factory.xfer = Configuration()
         self.calljson('/lucterios.mailing/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
@@ -160,7 +163,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = ParamEdit()
         self.calljson('/CORE/paramEdit', {'params': 'mailing-sms-provider'}, False)
         self.assert_observer('core.custom', 'CORE', 'paramEdit')
-        self.assert_select_equal('mailing-sms-provider', {'': None, 'TestProvider': 'Test provider'})
+        self.assert_select_equal('mailing-sms-provider', {'': None, 'TestProvider': 'Test provider', 'MailjetProvider': 'Mailjet SMS'})
 
         self.factory.xfer = ParamSave()
         self.calljson('/CORE/paramSave', {'params': 'mailing-sms-provider', 'mailing-sms-provider': 'TestProvider'}, False)
@@ -169,10 +172,11 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Configuration()
         self.calljson('/lucterios.mailing/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
-        self.assert_count_equal('', 3 + 11 + 3 + 7)  # Nb tab + params email + message + params sms
+        self.assert_count_equal('', 3 + 11 + 3 + 8)  # Nb tab + params email + message + params sms
         self.assert_json_equal('LABELFORM', 'mailing-sms-provider', 'Test provider')
         self.assert_json_equal('LABELFORM', 'mailing-sms-phone-parse', '^0([67][0-9]{8})$|+33{0}')
         self.assert_json_equal('LABELFORM', 'mailing-sms-option', 'file name = /tmp/sms.txt{[br/]}max = 10')
+        self.assert_json_equal('LABELFORM', 'error_sms', "File '/tmp/sms.txt' not found !")
 
         clean_sms_testfile(create_new=True)
 
@@ -180,6 +184,7 @@ class ConfigurationTest(LucteriosTest):
         self.calljson('/lucterios.mailing/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'configuration')
         self.assert_count_equal('', 3 + 11 + 3 + 8)  # Nb tab + params email + message + params sms
+        self.assert_json_equal('BUTTON', 'trysms', '')
 
     def test_trysms(self):
         self.factory.xfer = SendSmsTry()

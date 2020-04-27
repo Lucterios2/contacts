@@ -37,10 +37,9 @@ from lucterios.framework import signal_and_lock
 from lucterios.CORE.parameters import Params
 from lucterios.CORE.views import ParamEdit
 
-from lucterios.mailing.email_functions import will_mail_send, send_email, send_connection_by_email, EmailException
 from lucterios.contacts.models import LegalEntity
+from lucterios.mailing.email_functions import will_mail_send, send_email, send_connection_by_email, EmailException
 from lucterios.mailing.sms_functions import AbstractProvider
-from lucterios.CORE.models import Parameter
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing and SMS parameters'))
@@ -114,6 +113,12 @@ class Configuration(XferContainerCustom):
                 btn.set_location(1, 7, 2)
                 btn.set_action(self.request, SendSmsTry.get_action(_('Send'), ''), close=CLOSE_NO)
                 self.add_component(btn)
+            else:
+                lbl_err = XferCompLabelForm('error_sms')
+                lbl_err.set_color('red')
+                lbl_err.set_value_center(provider.last_error)
+                lbl_err.set_location(1, 7, 2)
+                self.add_component(lbl_err)
 
     def fillresponse(self):
         XferContainerCustom.fillresponse(self)
