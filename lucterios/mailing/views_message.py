@@ -59,6 +59,15 @@ class MessageEmailList(MessageList):
         self.params['message_type'] = 0
         MessageList.fillresponse_header(self)
 
+    def fillresponse(self):
+        MessageList.fillresponse(self)
+        if not will_mail_send():
+            lbl_err = XferCompLabelForm('error_email')
+            lbl_err.set_color('red')
+            lbl_err.set_value_center(_('Email not configure!'))
+            lbl_err.set_location(0, self.get_max_row() + 1, 5)
+            self.add_component(lbl_err)
+
 
 @MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for SMS.'))
 class MessageSMSList(MessageList):
@@ -73,6 +82,15 @@ class MessageSMSList(MessageList):
         MessageList.fillresponse(self)
         grid = self.get_components(self.field_id)
         grid.get_header('subject').descript = _('title')
+
+        provider = AbstractProvider.get_current_instance()
+        if (provider is None) or not provider.is_active:
+            last_error = _("SMS bad configured : %s") % provider.last_error if (provider is not None) else _('SMS not configure!')
+            lbl_err = XferCompLabelForm('error_sms')
+            lbl_err.set_color('red')
+            lbl_err.set_value_center(last_error)
+            lbl_err.set_location(0, self.get_max_row() + 1, 5)
+            self.add_component(lbl_err)
 
 
 @ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")

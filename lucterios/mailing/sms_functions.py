@@ -179,15 +179,22 @@ class MailjetProvider(AbstractProvider):
     }
 
     title = 'Mailjet SMS'
-    default_options = {'api token': ''}
+    default_options = {'api token': '', 'alias': ''}
+
+    def set_options(self, options):
+        AbstractProvider.set_options(self, options)
+        if self.options['alias'] == '':
+            self.options['alias'] = self.sender
+        self.options['alias'] = self.options['alias'][:11]
 
     def _mailjet_requet(self, service, method_post, data=None):
         import requests
         from json import loads
         url = "https://api.mailjet.com/v4/%s" % service
-        headers = {"Authorization": "Bearer %s" % self.options['api token'], "Content-Type": "application/json"}
+        headers = {"Authorization": "Bearer %s" % self.options['api token']}
         if method_post is True:
-            response = requests.post(url, data=data, headers=headers, verify=True)
+            headers["Content-Type"] = "application/json"
+            response = requests.post(url, json=data, headers=headers, verify=True)
         else:
             response = requests.get(url, data=data, headers=headers, verify=True)
         if 400 < response.status_code < 600:
@@ -198,7 +205,7 @@ class MailjetProvider(AbstractProvider):
         else:
             json_res = response.json()
         if ('StatusCode' in json_res) and (json_res['StatusCode'] != 400):
-            getLogger('lucterios.mailing').error("_mailjet_requet(self, '%s', %s, data=%s) [%s, %s] => %s", service, method_post, data, url, headers, json_res)
+            getLogger('lucterios.mailing').error("_mailjet_requet(self, '%s', %s, %s) [%s, %s] => %s", service, method_post, data, url, headers, json_res)
         return json_res
 
     def _check_error(self, json_res):
@@ -217,13 +224,14 @@ class MailjetProvider(AbstractProvider):
         if self.options['api token'].strip() == '':
             self.last_error = _('API token empty')
         else:
-            json_res = self._mailjet_requet("sms", method_post=False)
+            json_res = self._mailjet_requet("sms/count", method_post=False)
             self.last_error = self._check_error(json_res)
         return (self.last_error is None)
 
     def send_sms_ex(self, phone, text):
-        json_res = self._mailjet_requet("sms-send", method_post=True,
-                                        data={"From": self.sender, "To": phone, "Text": text})
+        data_sms = {"From": self.options['alias'], "To": str(phone), "Text": str(text)}
+        json_res = self._mailjet_requet("sms-send", method_post=True, data=data_sms)
         self.last_error = self._check_error(json_res)
         if self.last_error is not None:
+            getLogger('lucterios.mailing').error("send_sms_ex(%s)", data_sms)
             raise SMSException(self.last_error)

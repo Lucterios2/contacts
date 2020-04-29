@@ -1,7 +1,7 @@
 Publipostage
 ============
 
-     Menu *Bureautique/Publipostage/Messages*
+     Menu *Bureautique/Publipostage/Messages courriel*
 
 Création d'un message
 ---------------------

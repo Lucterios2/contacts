@@ -25,8 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from shutil import rmtree
 from base64 import b64decode
-from os.path import join, dirname, isfile
-from os import remove
+from os.path import join, dirname
 from _io import BytesIO
 from io import SEEK_END
 from email.header import decode_header
