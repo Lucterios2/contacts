@@ -30,8 +30,8 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from lucterios.framework.models import LucteriosModel, PrintFieldsPlugIn, get_value_if_choices,\
-    LucteriosVirtualField
+from lucterios.framework.models import LucteriosModel
+from lucterios.framework.model_fields import PrintFieldsPlugIn, get_value_if_choices, LucteriosVirtualField
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.tools import get_format_value

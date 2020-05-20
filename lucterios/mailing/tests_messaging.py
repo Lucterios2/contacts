@@ -28,7 +28,7 @@ from time import sleep
 
 
 from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
-from lucterios.framework.models import LucteriosScheduler
+from lucterios.framework.model_fields import LucteriosScheduler
 from lucterios.CORE.models import LucteriosUser, PrintModel
 
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack

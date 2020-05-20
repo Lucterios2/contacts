@@ -36,8 +36,9 @@ from django.apps import apps
 from django_fsm import FSMIntegerField, transition
 from django.utils import six, timezone
 
-from lucterios.framework.models import LucteriosModel, LucteriosScheduler,\
-    LucteriosVirtualField
+from lucterios.framework.models import LucteriosModel
+from lucterios.framework.model_fields import LucteriosVirtualField,\
+    LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.printgenerators import ReportingGenerator
 from lucterios.framework.tools import toHtml, get_date_formating
