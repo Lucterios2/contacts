@@ -1011,7 +1011,7 @@ class ContactsTest(LucteriosTest):
                                                             "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value"}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 4)
-        self.assert_grid_equal('CSV', {"name": "nom", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "N° SIRET/SIREN", "custom_3": "ccc"}, 5)
+        self.assert_grid_equal('CSV', {"name": "dénomination", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "N° SIRET/SIREN", "custom_3": "ccc"}, 5)
         self.assert_count_equal('#CSV/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal(self.json_actions[2 - 1], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
