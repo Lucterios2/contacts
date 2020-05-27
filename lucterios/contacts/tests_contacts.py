@@ -972,7 +972,7 @@ class ContactsTest(LucteriosTest):
                                                             'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 6 + 15)
-        self.assert_attrib_equal("fld_name", 'description', "nom")
+        self.assert_attrib_equal("fld_name", 'description', "dénomination")
         self.assert_select_equal('fld_name', 10)  # nb=10
         self.assert_select_equal('fld_structure_type', 11)  # nb=11
         self.assert_select_equal('fld_address', 10)  # nb=10

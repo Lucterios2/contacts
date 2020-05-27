@@ -483,7 +483,7 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
 
 class LegalEntity(AbstractContact):
-    name = models.CharField(_('name'), max_length=100, blank=False)
+    name = models.CharField(_('denomination'), max_length=100, blank=False)
     structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
     identify_number = models.TextField(_('identify number'), blank=True)
 
