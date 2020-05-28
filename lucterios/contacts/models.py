@@ -415,12 +415,14 @@ class AbstractContact(LucteriosModel, CustomizeObject):
         return ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
 
     @classmethod
-    def get_search_fields(cls):
+    def get_search_fields(cls, with_addon=True):
         fieldnames = []
         fieldnames.extend(['address', 'postal_code', 'city', 'country', 'tel1', 'tel2', 'email', 'comment'])
         from django.db.models import Q
         for cf_name, cf_model in CustomField.get_fields(cls):
             fieldnames.append((cf_name, cf_model.get_field(), 'contactcustomfield__value', Q(contactcustomfield__field__id=cf_model.id)))
+        if with_addon:
+            Signal.call_signal("addon_search", cls, fieldnames)
         return fieldnames
 
     @classmethod
@@ -503,11 +505,13 @@ class LegalEntity(AbstractContact):
         return res_fields
 
     @classmethod
-    def get_search_fields(cls):
+    def get_search_fields(cls, with_addon=True):
         res_fields = ['name', 'structure_type']
-        res_fields.extend(super(LegalEntity, cls).get_search_fields())
+        res_fields.extend(super(LegalEntity, cls).get_search_fields(with_addon=False))
         res_fields.extend(['identify_number', 'responsability_set.individual.firstname',
                            'responsability_set.individual.lastname', 'responsability_set.functions'])
+        if with_addon:
+            Signal.call_signal("addon_search", cls, res_fields)
         return res_fields
 
     @classmethod
@@ -574,10 +578,12 @@ class Individual(AbstractContact):
         return ident_field
 
     @classmethod
-    def get_search_fields(cls):
+    def get_search_fields(cls, with_addon=True):
         ident_field = ['lastname', 'firstname', 'genre']
-        ident_field.extend(super(Individual, cls).get_search_fields())
+        ident_field.extend(super(Individual, cls).get_search_fields(with_addon=False))
         ident_field.extend(['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
+        if with_addon:
+            Signal.call_signal("addon_search", cls, ident_field)
         return ident_field
 
     @classmethod
