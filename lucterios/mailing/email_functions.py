@@ -76,7 +76,7 @@ def get_email_server(smtp_security, smtp_server, smtp_port, smtp_user, smtp_pass
     return server
 
 
-def sending_email(recipients, sender_name, sender_email, subject, body, body_txt, files, cclist, bcclist, email_server, dkim_private_path, dkim_selector):
+def _create_msg(recipients, subject, cclist, bcclist):
     msg = MIMEMultipart()
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = six.text_type(subject)
@@ -86,7 +86,6 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
         for recipient in recipients:
             if recipient in cclist:
                 cclist.remove(recipient)
-
         msg['Cc'] = ", ".join(cclist)
         recipients.extend(cclist)
     if isinstance(bcclist, list):
@@ -95,7 +94,27 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
             if recipient in bcclist:
                 bcclist.remove(recipient)
         recipients.extend(bcclist)
+    return msg
 
+
+def _append_dkim_signature(msg, domain, dkim_private_path, dkim_selector):
+    import dkim
+    with open(dkim_private_path) as dkim_private_file:
+        privateKey = dkim_private_file.read()
+    headers = [b'from', b'to', b'subject']
+    sig = dkim.sign(msg.as_string().encode(), dkim_selector.encode(), domain.encode(), privateKey.encode(), include_headers=headers)
+    sig = sig.decode()
+    msg['DKIM-Signature'] = sig[len("DKIM-Signature: "):]
+
+
+def _append_files(msg, files):
+    if (files is not None) and (len(files) > 0):
+        for filename, file in files:
+            msg.attach(MIMEApplication(file.read(), Content_Disposition='attachment; filename="%s"' % filename, Name=filename))
+
+
+def sending_email(recipients, sender_name, sender_email, subject, body, body_txt, files, cclist, bcclist, email_server, dkim_private_path, dkim_selector):
+    msg = _create_msg(recipients, subject, cclist, bcclist)
     domain = sender_email.split('@')[-1]
     msg_from = "%s <%s>" % (sender_name, sender_email)
     msg['From'] = msg_from
@@ -116,19 +135,9 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
         msg.attach(msg_alternative)
     else:
         msg.attach(MIMEText(body, 'plain', 'utf-8'))
-    if (files is not None) and (len(files) > 0):
-        for filename, file in files:
-            msg.attach(MIMEApplication(file.read(), Content_Disposition='attachment; filename="%s"' % filename, Name=filename))
-
+    _append_files(msg, files)
     if (dkim_private_path != '') and isfile(dkim_private_path) and (dkim_selector != ''):
-        import dkim
-        with open(dkim_private_path) as dkim_private_file:
-            privateKey = dkim_private_file.read()
-        headers = [b'from', b'to', b'subject']
-        sig = dkim.sign(msg.as_string().encode(), dkim_selector.encode(), domain.encode(), privateKey.encode(), include_headers=headers)
-        sig = sig.decode()
-        msg['DKIM-Signature'] = sig[len("DKIM-Signature: "):]
-
+        _append_dkim_signature(msg, domain, dkim_private_path, dkim_selector)
     try:
         return email_server.sendmail(msg_from, recipients, msg.as_string())
     except Exception as error:

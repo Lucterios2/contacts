@@ -185,6 +185,22 @@ class CustomizeObject(object):
                 fields_desc.append(tuple(cust_item))
         return fields_desc
 
+    def _convert_value_for_attr(self, cf_model, ccf_value, args_list=[]):
+        if ccf_value == '':
+            ccf_value = '0'
+        if cf_model.kind == 1:
+            ccf_value = int(ccf_value)
+        if cf_model.kind == 2:
+            ccf_value = float(ccf_value)
+        if cf_model.kind == 3:
+            ccf_value = ccf_value != 'False' and ccf_value != '0' and ccf_value != '' and ccf_value != 'n'
+        if cf_model.kind == 4:
+            if args_list.count(ccf_value) > 0:
+                ccf_value = args_list.index(ccf_value)
+            else:
+                ccf_value = int(ccf_value)
+        return ccf_value
+
     def set_custom_values(self, params):
         for cf_name, cf_model in CustomField.get_fields(self.__class__):
             if cf_name in params.keys():
@@ -192,18 +208,7 @@ class CustomizeObject(object):
                 cf_id = int(cf_name[7:])
                 cf_model = CustomField.objects.get(id=cf_id)
                 try:
-                    if cf_model.kind == 1:
-                        cf_value = int(cf_value)
-                    if cf_model.kind == 2:
-                        cf_value = float(cf_value)
-                    if cf_model.kind == 3:
-                        cf_value = (cf_value != 'False') and (cf_value != '0') and (cf_value != '') and (cf_value != 'n')
-                    if cf_model.kind == 4:
-                        args_list = cf_model.get_args()['list']
-                        if args_list.count(cf_value) > 0:
-                            cf_value = args_list.index(cf_value)
-                        else:
-                            cf_value = int(cf_value)
+                    cf_value = self._convert_value_for_attr(cf_model, cf_value, cf_model.get_args()['list'])
                 except Exception:
                     cf_value = ""
                 args = {self.FieldName: self, 'field': cf_model}
@@ -245,6 +250,20 @@ class CustomizeObject(object):
             return LucteriosVirtualField(verbose_name=field_title, name=name, compute_from=name, format_string=lambda: format_num)
         return None
 
+    def _get_value_for_attr(self, cf_model):
+        args = {self.FieldName: self, 'field': cf_model}
+        ccf_models = self.CustomFieldClass.objects.filter(**args)
+        if len(ccf_models) == 0:
+            ccf_model = self.CustomFieldClass.objects.create(**args)
+        elif len(ccf_models) == 1:
+            ccf_model = ccf_models[0]
+        else:
+            ccf_model = ccf_models[0]
+            for old_model in ccf_models[1:]:
+                old_model.delete()
+        ccf_value = ccf_model.value
+        return ccf_value
+
     def __getattr__(self, name):
         if name == "str":
             return six.text_type(self.get_final_child())
@@ -254,29 +273,12 @@ class CustomizeObject(object):
             if self.id is None:
                 ccf_value = ""
             else:
-                args = {self.FieldName: self, 'field': cf_model}
-                ccf_models = self.CustomFieldClass.objects.filter(**args)
-                if len(ccf_models) == 0:
-                    ccf_model = self.CustomFieldClass.objects.create(**args)
-                elif len(ccf_models) == 1:
-                    ccf_model = ccf_models[0]
-                else:
-                    ccf_model = ccf_models[0]
-                    for old_model in ccf_models[1:]:
-                        old_model.delete()
-                ccf_value = ccf_model.value
+                ccf_value = self._get_value_for_attr(cf_model)
             if cf_model.kind == 0:
-                return six.text_type(ccf_value)
-            if ccf_value == '':
-                ccf_value = '0'
-            if cf_model.kind == 1:
-                return int(ccf_value)
-            if cf_model.kind == 2:
-                return float(ccf_value)
-            if cf_model.kind == 3:
-                return (ccf_value != 'False') and (ccf_value != '0') and (ccf_value != '') and (ccf_value != 'n')
-            if cf_model.kind == 4:
-                return int(ccf_value)
+                ccf_value = six.text_type(ccf_value)
+            else:
+                ccf_value = self._convert_value_for_attr(cf_model, ccf_value)
+            return ccf_value
         raise AttributeError(name)
 
 

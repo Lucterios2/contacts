@@ -83,6 +83,15 @@ class MessageEditor(LucteriosEditor):
             xfer.tab = new_documents.tab
             xfer.add_component(new_documents)
 
+    def _remove_cmp(self, xfer, compid):
+        if compid == 0:
+            xfer.remove_component('contact_nb')
+        if (xfer.item.message_type == 1) or (len(self.item.get_email_contacts(False)) == 0) or not will_mail_send():
+            xfer.remove_component('contact_noemail')
+        if (xfer.item.message_type == 0) or (len(self.item.get_sms_contacts(False)) == 0) or not AbstractProvider.is_current_active():
+            xfer.remove_component('contact_nosms')
+        xfer.remove_component('recipients')
+
     def _manage_recipients(self, xfer):
         obj_recipients = xfer.get_components('recipients')
         new_recipients = XferCompGrid('recipient_list')
@@ -95,13 +104,7 @@ class MessageEditor(LucteriosEditor):
             new_recipients.set_value(compid, "model", model_title)
             new_recipients.set_value(compid, "filter", filter_desc)
             compid += 1
-        if compid == 0:
-            xfer.remove_component('contact_nb')
-        if (xfer.item.message_type == 1) or (len(self.item.get_email_contacts(False)) == 0) or not will_mail_send():
-            xfer.remove_component('contact_noemail')
-        if (xfer.item.message_type == 0) or (len(self.item.get_sms_contacts(False)) == 0) or not AbstractProvider.is_current_active():
-            xfer.remove_component('contact_nosms')
-        xfer.remove_component('recipients')
+        self._remove_cmp(xfer, compid)
         new_recipients.add_action_notified(xfer, 'recipient_list')
         xfer.tab = new_recipients.tab
         xfer.add_component(new_recipients)
