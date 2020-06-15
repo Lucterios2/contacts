@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-27 08:27+0000\n"
+"POT-Creation-Date: 2020-06-15 14:27+0000\n"
 "PO-Revision-Date: 2020-04-27 17:21+0200\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
-#: editors.py:54 editors.py:121 views_message.py:84
+#: editors.py:54 editors.py:124 views_message.py:84
 msgid "title"
 msgstr "title"
 
@@ -39,23 +39,23 @@ msgstr "Remove"
 msgid "Insert"
 msgstr "Insert"
 
-#: editors.py:91
+#: editors.py:100
 msgid "model"
 msgstr "model"
 
-#: editors.py:92
+#: editors.py:101
 msgid "filter"
 msgstr "filter"
 
-#: editors.py:111 views_message.py:277
+#: editors.py:114 views_message.py:277
 msgid "statistic"
 msgstr "statistic"
 
-#: email_functions.py:153 views_message.py:67
+#: email_functions.py:162 views_message.py:67
 msgid "Email not configure!"
 msgstr "Email not configure!"
 
-#: email_functions.py:172
+#: email_functions.py:181
 msgid "Connection password"
 msgstr "Connection password"
 
