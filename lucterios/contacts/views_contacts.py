@@ -112,7 +112,7 @@ class LegalEntityList(XferListEditor):
     def fillresponse_header(self):
         self.fill_from_model(0, 2, False, ['structure_type'])
         obj_strtype = self.get_components('structure_type')
-        obj_strtype.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        obj_strtype.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         structure_type = self.getparam('structure_type')
         if (structure_type is not None) and (structure_type != '0'):
             self.filter = Q(structure_type=int(structure_type))
@@ -223,7 +223,7 @@ class IndividualList(XferListEditor):
             name_filter = ""
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        comp.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(0, 2)
         comp.is_default = True
         comp.description = _('Filtrer by name')
@@ -321,7 +321,7 @@ class ResponsabilityAdd(XferContainerCustom):
         self.fill_from_model(1, 0, True, ['legal_entity'])
         comp = XferCompEdit('filter')
         comp.set_value(name_filter)
-        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        comp.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 2)
         comp.description = _('Filtrer by name')
         comp.is_default = True

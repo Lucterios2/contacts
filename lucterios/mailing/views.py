@@ -152,7 +152,7 @@ class SendEmailTry(XferContainerAcknowledge):
             email.mask = r"[^@]+@[^@]+\.[^@]+"
             email.description = _("email")
             dlg.add_component(email)
-            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
             address = []
@@ -195,7 +195,7 @@ class SendSmsTry(XferContainerAcknowledge):
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)
-            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
             provider.send_sms(self.getparam('phone'), _('SMS sent to check configuration'))

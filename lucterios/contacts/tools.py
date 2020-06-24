@@ -63,7 +63,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         selected_model.set_value(model_current)
         selected_model.set_select(self.inital_model.get_select_contact_type())
         selected_model.set_location(1, 0, 4)
-        selected_model.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        selected_model.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         selected_model.description = _('model')
         self.add_component(selected_model)
         if self.select_class is not None:

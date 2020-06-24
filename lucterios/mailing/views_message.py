@@ -194,7 +194,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             email.mask = r"[^@]+@[^@]+\.[^@]+"
             email.description = _("email")
             dlg.add_component(email)
-            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
             abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
@@ -230,7 +230,7 @@ class MessageSendSMSTry(XferContainerAcknowledge):
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)
-            dlg.add_action(self.get_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
             provider = AbstractProvider.get_current_instance()
@@ -288,7 +288,7 @@ class MessageSentInfo(XferContainerCustom):
         check.set_value(show_only_failed)
         check.description = _('Show only failed')
         check.set_location(1, 4, 2)
-        check.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        check.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(check)
 
         self.add_action(WrapAction(_('Close'), 'images/close.png'))

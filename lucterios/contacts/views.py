@@ -247,7 +247,7 @@ class CreateAccount(XferContainerAcknowledge):
         lbl.set_color('red')
         lbl.set_value(self.getparam('error', ''))
         dlg.add_component(lbl)
-        dlg.add_action(self.get_action(TITLE_OK, 'images/ok.png'), params={"SAVE": "YES"})
+        dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'), params={"SAVE": "YES"})
         dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
 
     def fillresponse(self, username='', legalentity=''):
@@ -289,7 +289,7 @@ class CreateAccount(XferContainerAcknowledge):
             self.item.user.generate_password()
             self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
         except IntegrityError:
-            self.redirect_act = (self.get_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': _("This account exists yet!")})
+            self.redirect_act = (self.return_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': _("This account exists yet!")})
 
 
 @signal_and_lock.Signal.decorate('auth_action')
@@ -432,7 +432,7 @@ class PostalCodeList(XferListEditor):
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
         comp.is_default = True
-        comp.set_action(self.request, self.get_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
+        comp.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         comp.set_location(1, 1)
         comp.description = _('Filtrer by postal code')
         self.add_component(comp)
