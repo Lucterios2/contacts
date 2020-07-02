@@ -26,8 +26,6 @@ from __future__ import unicode_literals
 from shutil import rmtree
 from os.path import join, dirname, exists
 
-from django.utils import six
-
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
 from lucterios.CORE.models import LucteriosUser
@@ -119,7 +117,7 @@ class PostalCodeTest(LucteriosTest):
                       {'SAVE': 'YES', 'postal_code': '96999', 'city': 'Trifouilly', 'country': 'LOIN'}, False)
         self.assert_observer('core.dialogbox', 'lucterios.contacts', 'postalCodeAdd')
         self.assert_json_equal('', 'type', '3')
-        self.assert_json_equal('', 'text', six.text_type('Cet enregistrement existe déjà!'))
+        self.assert_json_equal('', 'text', str('Cet enregistrement existe déjà!'))
 
 
 class ConfigurationTest(LucteriosTest):
@@ -153,7 +151,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], 'Nos coordonnées')
         self.assertEqual(len(self.json_context), 1)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal(self.json_actions[0], (six.text_type('Editer'), 'images/edit.png', 'lucterios.contacts', 'currentStructureAddModify', 0, 1, 1))
+        self.assert_action_equal(self.json_actions[0], (str('Editer'), 'images/edit.png', 'lucterios.contacts', 'currentStructureAddModify', 0, 1, 1))
         self.assert_action_equal(self.json_actions[1], ('Imprimer', 'images/print.png', 'lucterios.contacts', 'currentStructurePrint', 0, 1, 1))
         self.assert_action_equal(self.json_actions[2], ('Fermer', 'images/close.png'))
         self.assert_count_equal('', 16)
@@ -174,7 +172,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructureAddModify()
         self.calljson('/lucterios.contacts/currentStructureAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'currentStructureAddModify')
-        self.assertEqual(self.json_meta['title'], six.text_type('Nos coordonnées'))
+        self.assertEqual(self.json_meta['title'], str('Nos coordonnées'))
         self.assert_count_equal('', 12)
         self.assert_comp_equal(('EDIT', 'name'), "WoldCompany", (1, 0, 2, 1))
         self.assert_comp_equal(('MEMO', 'address'), "Place des cocotiers", (1, 2, 2, 1))
@@ -216,8 +214,8 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructurePrint()
         self.calljson('/lucterios.contacts/currentStructurePrint', {}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'currentStructurePrint')
-        self.assertEqual(self.json_meta['title'], six.text_type('Nos coordonnées'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Nos coordonnées'))
+        self.assertEqual(self.json_meta['title'], str('Nos coordonnées'))
+        self.assertEqual(self.response_json['print']['title'], str('Nos coordonnées'))
         self.assertEqual(self.response_json['print']['mode'], 3)
         self.save_pdf()
 
@@ -248,9 +246,9 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Account()
         self.calljson('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
-        self.assertEqual(self.json_meta['title'], six.text_type('Votre compte'))
+        self.assertEqual(self.json_meta['title'], str('Votre compte'))
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal(self.json_actions[1 - 1], (six.text_type('Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1))
+        self.assert_action_equal(self.json_actions[1 - 1], (str('Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1))
         self.assert_action_equal(self.json_actions[2 - 1], ('Fermer', 'images/close.png'))
         self.assert_count_equal('', 17)
         self.assert_comp_equal(('LABELFORM', 'genre'), 1, (1, 0, 2, 1, 1))
@@ -271,7 +269,7 @@ class ConfigurationTest(LucteriosTest):
         self.calljson(
             '/lucterios.contacts/accountAddModify', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'accountAddModify')
-        self.assertEqual(self.json_meta['title'], six.text_type('Mon compte'))
+        self.assertEqual(self.json_meta['title'], str('Mon compte'))
         self.assert_count_equal('', 13)
         self.assert_comp_equal(('SELECT', 'genre'), "1", (1, 0, 2, 1))
         self.assert_select_equal('genre', {1: 'Homme', 2: 'Femme'})  # nb=2
@@ -282,7 +280,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = Account()
         self.calljson('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
-        self.assertEqual(self.json_meta['title'], six.text_type('Votre compte'))
+        self.assertEqual(self.json_meta['title'], str('Votre compte'))
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal(self.json_actions[1 - 1], (six.text_type('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif': '1'}))
+        self.assert_action_equal(self.json_actions[1 - 1], (str('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif': '1'}))
         self.assert_action_equal(self.json_actions[2 - 1], ('Fermer', 'images/close.png'))

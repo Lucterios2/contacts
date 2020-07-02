@@ -28,8 +28,6 @@ from os.path import join, dirname, exists
 from _io import StringIO
 from base64 import b64decode
 
-from django.utils import six
-
 from lucterios.framework.test import LucteriosTest
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
 from lucterios.framework.xfersearch import get_search_query_from_criteria
@@ -279,7 +277,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualListing()
         self.calljson('/lucterios.contacts/individualListing', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
         self.assert_count_equal('', 5)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
@@ -291,10 +289,10 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualListing',
                       {'PRINT_MODE': '4', 'MODEL': 3, 'WITHNUM': True}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 4)
-        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
+        csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 11, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
@@ -304,10 +302,10 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualListing',
                       {'PRINT_MODE': '4', 'MODEL': 3, 'filter': 'marie', 'WITHNUM': True}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 4)
-        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
+        csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 10, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
@@ -317,7 +315,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualLabel()
         self.calljson('/lucterios.contacts/individualLabel', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
         self.assert_count_equal('', 4)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
@@ -332,8 +330,8 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualLabel',
                       {'PRINT_MODE': '3', 'LABEL': 3, 'FIRSTLABEL': 5, 'MODEL': 4, 'name_filter': 'marie'}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 3)
         self.save_pdf(ident=1)
 
@@ -341,8 +339,8 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualLabel',
                       {'PRINT_MODE': '3', 'LABEL': 2, 'FIRSTLABEL': 4, 'MODEL': 4}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'individualLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes physiques'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes physiques'))
+        self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes physiques'))
         self.assertEqual(self.response_json['print']['mode'], 3)
         self.save_pdf(ident=2)
 
@@ -538,7 +536,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntityListing()
         self.calljson('/lucterios.contacts/legalEntityListing', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
         self.assert_count_equal('', 5)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
@@ -550,10 +548,10 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/legalEntityListing',
                       {'PRINT_MODE': '4', 'MODEL': 1, 'WITHNUM': True}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 4)
-        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
+        csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 11, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
@@ -563,10 +561,10 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/legalEntityListing',
                       {'PRINT_MODE': '4', 'MODEL': 1, 'structure_type': 2, 'WITHNUM': True}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 4)
-        csv_value = b64decode(six.text_type(self.response_json['print']['content'])).decode("utf-8")
+        csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
         self.assertEqual(len(content_csv), 10, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
@@ -576,7 +574,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntityLabel()
         self.calljson('/lucterios.contacts/legalEntityLabel', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntityLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
         self.assert_count_equal('', 4)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
         self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF'})  # nb=1
@@ -591,8 +589,8 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/legalEntityLabel',
                       {'PRINT_MODE': '3', 'LABEL': 1, 'FIRSTLABEL': 3, 'MODEL': 2, 'structure_type': 2}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 3)
         self.save_pdf(ident=1)
 
@@ -600,8 +598,8 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/legalEntityLabel',
                       {'PRINT_MODE': '3', 'LABEL': 5, 'FIRSTLABEL': 2, 'MODEL': 2}, False)
         self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityLabel')
-        self.assertEqual(self.json_meta['title'], six.text_type('Personnes morales'))
-        self.assertEqual(self.response_json['print']['title'], six.text_type('Personnes morales'))
+        self.assertEqual(self.json_meta['title'], str('Personnes morales'))
+        self.assertEqual(self.response_json['print']['title'], str('Personnes morales'))
         self.assertEqual(self.response_json['print']['mode'], 3)
         self.save_pdf(ident=2)
 
@@ -813,14 +811,14 @@ class ContactsTest(LucteriosTest):
         filter_result, desc_result = get_search_query_from_criteria(
             "", Individual)
         self.assertEqual({}, desc_result)
-        self.assertEqual(six.text_type(Q()), six.text_type(filter_result))
+        self.assertEqual(str(Q()), str(filter_result))
 
         filter_result, desc_result = get_search_query_from_criteria(
             "custom_1||5||beau", Individual)
         self.assertEqual({'0': '{[b]}aaa{[/b]} contient {[i]}"beau"{[/i]}'}, desc_result)
         q_res = Q(contactcustomfield__field__id=1) & Q(
             **{'contactcustomfield__value__icontains': 'beau'})
-        self.assertEqual(six.text_type(q_res), six.text_type(filter_result))
+        self.assertEqual(str(q_res), str(filter_result))
 
         find_indiv = list(Individual.objects.filter(q_res))
         self.assertEqual(1, len(find_indiv), find_indiv)
@@ -965,7 +963,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 7)
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal(self.json_actions[0], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
+        self.assert_action_equal(self.json_actions[0], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': '',
@@ -992,16 +990,16 @@ class ContactsTest(LucteriosTest):
         cases_val = []
         for case_idx in range(1, 12):
             json_value = self.get_json_path("#fld_custom_4/case/@%d" % (case_idx - 1))
-            cases_id.append(six.text_type(json_value[0]))
-            cases_val.append(six.text_type(json_value[1]))
+            cases_id.append(str(json_value[0]))
+            cases_val.append(str(json_value[1]))
         self.assertEqual("|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_id))
         self.assertEqual("None|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type", "|".join(cases_val))
         self.assert_grid_equal('CSV', {'value': 'value', 'nom': 'nom', 'adresse': 'adresse', 'codePostal': 'codePostal', 'ville': 'ville', 'fixe': 'fixe', 'portable': 'portable', 'mail': 'mail', 'Num': 'Num', 'Type': 'Type'}, 5)  # nb=10
         self.assert_count_equal('CSV', 5)
         self.assert_count_equal('#CSV/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal(self.json_actions[0], (six.text_type('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
-        self.assert_action_equal(self.json_actions[1], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
+        self.assert_action_equal(self.json_actions[0], (str('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
+        self.assert_action_equal(self.json_actions[1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
         self.assertEqual(len(self.json_context), 8)
 
         self.factory.xfer = ContactImport()
@@ -1014,7 +1012,7 @@ class ContactsTest(LucteriosTest):
         self.assert_grid_equal('CSV', {"name": "dénomination", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "Informations Juridiques", "custom_3": "ccc"}, 5)
         self.assert_count_equal('#CSV/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal(self.json_actions[2 - 1], (six.text_type('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
+        self.assert_action_equal(self.json_actions[2 - 1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': '', 'delimiter': ';', 'encoding': 'utf-8',

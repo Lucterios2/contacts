@@ -26,7 +26,6 @@ from __future__ import unicode_literals
 from os import unlink
 from os.path import exists
 
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
@@ -115,7 +114,7 @@ parent.get('args_list').setVisible(type==4);
                     args[arg_name] = (args_val != 'False') and (args_val != '0') and (args_val != '') and (args_val != 'n')
                 else:
                     args[arg_name] = float(args_val)
-        self.item.args = six.text_type(args)
+        self.item.args = str(args)
         LucteriosEditor.saving(self, xfer)
         self.item.save()
 
@@ -246,7 +245,7 @@ class AbstractContactEditor(LucteriosEditor):
             mailto_type = Params.getvalue("contacts-mailtoconfig")
             email_list = []
             for item in contacts_list:
-                email_list.append(six.text_type(item.email))
+                email_list.append(str(item.email))
             if len(email_list) > 0:
                 link = XferCompLinkLabel('emailAll')
                 link.set_value_center(_('Write to all'))
@@ -292,7 +291,7 @@ class IndividualEditor(AbstractContactEditor):
             act = ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', xfer)
             act.set_value("", "images/edit.png")
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO,
-                           params={'user_actif': six.text_type(self.item.user.id), 'IDENT_READ': 'YES'})
+                           params={'user_actif': str(self.item.user.id), 'IDENT_READ': 'YES'})
         xfer.add_component(btn)
 
     def saving(self, xfer):

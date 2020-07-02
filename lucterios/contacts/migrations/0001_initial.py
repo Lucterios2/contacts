@@ -31,7 +31,6 @@ import sys
 from django.db import models, migrations, transaction
 from django.db.utils import IntegrityError
 from django.conf import settings
-from django.utils import six
 
 from lucterios.CORE.models import PrintModel
 from lucterios.framework.tools import set_locale_lang
@@ -56,7 +55,7 @@ def save_postalcodes(postalcode, pc_list):
             postalcode.objects.bulk_create(pc_list)
     except IntegrityError as err:
         getLogger(__name__).warning(
-            six.text_type(" --- IntegrityError:") + six.text_type(err))
+            str(" --- IntegrityError:") + str(err))
     return []
 
 
@@ -66,11 +65,11 @@ def import_file_postalcode(postalcode, migrat_file):
     if isfile(migrat_file):
         with codecs.open(migrat_file, 'r', 'utf-8') as flpc:
             for line in flpc.readlines():
-                postal_code, city, country = six.text_type(line).split(';')[:3]
+                postal_code, city, country = str(line).split(';')[:3]
                 newpc = postalcode()
-                newpc.postal_code = six.text_type(postal_code).strip()
-                newpc.city = six.text_type(city).strip()
-                newpc.country = six.text_type(country).strip()
+                newpc.postal_code = str(postal_code).strip()
+                newpc.city = str(city).strip()
+                newpc.country = str(country).strip()
                 pc_list.append(newpc)
                 if len(pc_list) > 900:
                     pc_list = save_postalcodes(postalcode, pc_list)
@@ -108,8 +107,8 @@ def initial_postalcodes(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        (six.text_type("auth"), six.text_type("0001_initial")),
-        (six.text_type("CORE"), six.text_type("0001_initial")),
+        (str("auth"), str("0001_initial")),
+        (str("CORE"), str("0001_initial")),
     ]
 
     operations = [

@@ -34,7 +34,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.apps import apps
 from django_fsm import FSMIntegerField, transition
-from django.utils import six, timezone
+from django.utils import timezone
 
 from lucterios.framework.models import LucteriosModel
 from lucterios.framework.model_fields import LucteriosVirtualField,\
@@ -169,7 +169,7 @@ class Message(LucteriosModel):
 
     def get_contact_noemail(self):
         no_emails = self.get_email_contacts(False)
-        return [six.text_type(no_email) for no_email in no_emails]
+        return [str(no_email) for no_email in no_emails]
 
     def get_contact_nosms(self):
         def show_phones(contact):
@@ -524,7 +524,7 @@ class EmailSent(LucteriosModel):
         if len(self.email.split(':')) == 3:
             modelname, object_id, _printmodel = self.email.split(':')
             model = apps.get_model(modelname)
-            return six.text_type(model.objects.get(id=object_id))
+            return str(model.objects.get(id=object_id))
         else:
             return self.email
 
@@ -580,7 +580,7 @@ class EmailSent(LucteriosModel):
             if hasattr(self.item, 'reference'):
                 doc_reference = self.item.reference
             else:
-                doc_reference = six.text_type(self.item.id)
+                doc_reference = str(self.item.id)
         first_doc_name = ''
         if (first_doc_name == '') and (len(self.get_attach_files()) > 0):
             first_doc_name = self.get_attach_files()[0][0]
@@ -613,12 +613,12 @@ class EmailSent(LucteriosModel):
                 for email_item in split_doubled_email(email_list):
                     if email_item not in no_send_list:
                         no_send_list[email_item] = 'OK'
-                self.error = six.text_type(no_send_list)
+                self.error = str(no_send_list)
         except Exception as error:
             if getLogger('lucterios.mailing').isEnabledFor(DEBUG):
                 getLogger('lucterios.mailing').exception('send_email')
             self.success = False
-            self.error = six.text_type(error)
+            self.error = str(error)
         self.save()
 
     def send_sms(self, provider):
@@ -632,7 +632,7 @@ class EmailSent(LucteriosModel):
             if getLogger('lucterios.mailing').isEnabledFor(DEBUG):
                 getLogger('lucterios.mailing').exception('send_email')
             self.success = False
-            self.error = six.text_type(error)
+            self.error = str(error)
         self.save()
 
     class Meta(object):

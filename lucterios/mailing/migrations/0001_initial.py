@@ -26,14 +26,13 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.db import migrations
-from django.utils import six
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        (six.text_type("CORE"), six.text_type("0001_initial")),
-        (six.text_type("contacts"), six.text_type("0001_initial")),
+        (str("CORE"), str("0001_initial")),
+        (str("contacts"), str("0001_initial")),
     ]
 
     operations = [

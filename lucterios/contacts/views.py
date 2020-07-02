@@ -27,7 +27,6 @@ from os.path import exists
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db import IntegrityError, transaction
@@ -133,13 +132,13 @@ class Account(XferContainerCustom):
             self.item = self.item.get_final_child()
             self.model = Individual
             self.field_id = 'individual'
-            self.params['individual'] = six.text_type(self.item.id)
+            self.params['individual'] = str(self.item.id)
             self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO)
             is_individual = True
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(id=self.request.user.id)
             self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"),
-                            close=CLOSE_NO, params={'user_actif': six.text_type(self.request.user.id)})
+                            close=CLOSE_NO, params={'user_actif': str(self.request.user.id)})
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
@@ -428,7 +427,7 @@ class PostalCodeList(XferListEditor):
         filter_postal_code = self.getparam('filter_postal_code')
         if filter_postal_code is None:
             local_struct = LegalEntity.objects.get(id=1)
-            filter_postal_code = six.text_type(local_struct.postal_code)
+            filter_postal_code = str(local_struct.postal_code)
         comp = XferCompEdit('filter_postal_code')
         comp.set_value(filter_postal_code)
         comp.is_default = True

@@ -26,7 +26,6 @@ from __future__ import unicode_literals
 from os.path import exists, join, dirname
 import logging
 
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
@@ -70,7 +69,7 @@ class CustomField(LucteriosModel):
         return "custom_%d" % self.id
 
     def get_model_title(self):
-        return six.text_type(self.model_associated()._meta.verbose_name)
+        return str(self.model_associated()._meta.verbose_name)
 
     def get_kind_txt(self):
         dep_field = self.get_field_by_name('kind')
@@ -213,7 +212,7 @@ class CustomizeObject(object):
                     cf_value = ""
                 args = {self.FieldName: self, 'field': cf_model}
                 ccf_model = self.CustomFieldClass.objects.get_or_create(**args)
-                ccf_model[0].value = six.text_type(cf_value)
+                ccf_model[0].value = str(cf_value)
                 ccf_model[0].save()
 
     def get_custom_by_name(self, custom_name):
@@ -245,7 +244,7 @@ class CustomizeObject(object):
                 format_num = {}
                 args_list = cf_model.get_args()['list']
                 for list_index in range(len(args_list)):
-                    format_num[six.text_type(list_index)] = args_list[list_index]
+                    format_num[str(list_index)] = args_list[list_index]
         if field_title is not None:
             return LucteriosVirtualField(verbose_name=field_title, name=name, compute_from=name, format_string=lambda: format_num)
         return None
@@ -266,7 +265,7 @@ class CustomizeObject(object):
 
     def __getattr__(self, name):
         if name == "str":
-            return six.text_type(self.get_final_child())
+            return str(self.get_final_child())
         elif name[:7] == "custom_":
             cf_id = int(name[7:])
             cf_model = CustomField.objects.get(id=cf_id)
@@ -275,7 +274,7 @@ class CustomizeObject(object):
             else:
                 ccf_value = self._get_value_for_attr(cf_model)
             if cf_model.kind == 0:
-                ccf_value = six.text_type(ccf_value)
+                ccf_value = str(ccf_value)
             else:
                 ccf_value = self._convert_value_for_attr(cf_model, ccf_value)
             return ccf_value
@@ -350,7 +349,7 @@ class ContactCustomField(LucteriosModel):
     def get_data(self):
         data = None
         if self.field.kind == 0:
-            data = six.text_type(self.value)
+            data = str(self.value)
         else:
             data = self.value
         if data == '':
@@ -391,7 +390,7 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
     def __str__(self):
         if self.get_final_child() != self:
-            return six.text_type(self.get_final_child())
+            return str(self.get_final_child())
         else:
             return "contact#%d" % self.id
 
@@ -617,7 +616,7 @@ class Responsability(LucteriosModel):
     functions__titles = [_("Available functions"), _("Chosen functions")]
 
     def __str__(self):
-        return six.text_type(self.individual)
+        return str(self.individual)
 
     def get_auditlog_object(self):
         return self.legal_entity.get_final_child()

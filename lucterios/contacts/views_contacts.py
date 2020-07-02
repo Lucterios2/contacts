@@ -25,7 +25,6 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils import six
 from django.db.models import Q
 from django.apps.registry import apps
 
@@ -184,7 +183,7 @@ class IndividualShowResp(XferContainerAcknowledge):
 
     def fillresponse(self):
         self.redirect_action(IndividualShow.get_action('', ''),
-                             close=CLOSE_NO, params={'individual': six.text_type(self.item.individual_id)})
+                             close=CLOSE_NO, params={'individual': str(self.item.individual_id)})
 
 
 @ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
@@ -301,7 +300,7 @@ class IndividualUserValid(XferSave):
             obj_indiv.save()
             obj_indiv.editor.saving(self)
             self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
-                                 params={'user_actif': six.text_type(self.item.id), 'IDENT_READ': 'YES'})
+                                 params={'user_actif': str(self.item.id), 'IDENT_READ': 'YES'})
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
@@ -489,7 +488,7 @@ def situation_contacts(xfer):
                 current_individual = Individual.objects.get(user=xfer.request.user)
                 row = xfer.get_max_row() + 1
                 lab = XferCompLabelForm('contactsidentity')
-                lab.set_value_as_header(six.text_type(current_individual))
+                lab.set_value_as_header(str(current_individual))
                 lab.set_location(0, row, 4)
                 xfer.add_component(lab)
                 lab = XferCompLabelForm('contactsend')

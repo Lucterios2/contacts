@@ -30,7 +30,6 @@ from _io import BytesIO
 from io import SEEK_END
 from email.header import decode_header
 
-from django.utils import six
 from django.contrib.auth.models import AnonymousUser
 
 from lucterios.framework.test import LucteriosTest
@@ -136,7 +135,7 @@ class ConfigurationTest(LucteriosTest):
             msg_dkim = decode_header(msg.get('DKIM-Signature'))[0][0]
             self.assertEqual('v=1; a=rsa-sha256; c=relaxed/simple; d=worldcompany.com;', msg_dkim[:56], msg_dkim)
         else:
-            six.print_("-- NO DKIM --")
+            print("-- NO DKIM --")
 
         msg_html, msg_text = self.server.check_first_message('Essai de courriel', 2)
         self.assertEqual('text/html', msg_html.get_content_type())
@@ -240,7 +239,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertEqual(six.text_type(error), 'Courriel non configuré !')
+            self.assertEqual(str(error), 'Courriel non configuré !')
         self.assertEqual(0, self.server.count())
 
     def test_send_bad_config(self):
@@ -251,7 +250,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertEqual(six.text_type(error), '[Errno 111] Connection refused')
+            self.assertEqual(str(error), '[Errno 111] Connection refused')
         self.assertEqual(0, self.server.count())
 
     def test_send_ok(self):
@@ -423,7 +422,7 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
             send_email('toto@machin.com', 'send with starttls', 'failed!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertEqual(six.text_type(error), 'STARTTLS extension not supported by server.')
+            self.assertEqual(str(error), 'STARTTLS extension not supported by server.')
         self.assertEqual(0, self.server.count())
 
     def test_send_with_ssl(self):
@@ -434,7 +433,7 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
             send_email('toto@machin.com', 'send with ssl', 'not success!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertTrue(('unknown protocol' in six.text_type(error)) or ('SSL: WRONG_VERSION_NUMBER' in six.text_type(error)), six.text_type(error))
+            self.assertTrue(('unknown protocol' in str(error)) or ('SSL: WRONG_VERSION_NUMBER' in str(error)), str(error))
         self.assertEqual(0, self.server.count())
 
     def test_send_with_files(self):

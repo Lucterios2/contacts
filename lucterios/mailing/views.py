@@ -25,7 +25,6 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils import six
 
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO, CLOSE_YES, WrapAction
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
@@ -158,7 +157,7 @@ class SendEmailTry(XferContainerAcknowledge):
             address = []
             address.append("")
             address.append("")
-            address.append(six.text_type(legal))
+            address.append(str(legal))
             address.append(legal.address)
             address.append("%s %s" % (legal.postal_code, legal.city))
             message = _('EMail sent to check configuration')

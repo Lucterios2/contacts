@@ -33,7 +33,6 @@ from email.utils import formatdate, make_msgid
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -72,14 +71,14 @@ def get_email_server(smtp_security, smtp_server, smtp_port, smtp_user, smtp_pass
         if (smtp_pass != '') and (smtp_user != ''):
             server.login(smtp_user, smtp_pass)
     except Exception as error:
-        raise EmailException(six.text_type(error))
+        raise EmailException(str(error))
     return server
 
 
 def _create_msg(recipients, subject, cclist, bcclist):
     msg = MIMEMultipart()
     msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = six.text_type(subject)
+    msg['Subject'] = str(subject)
     msg['To'] = ", ".join(recipients)
     if isinstance(cclist, list):
         cclist = split_doubled_email(cclist)
@@ -122,7 +121,7 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
     msg['Return-Path'] = sender_email
     msg['Reply-To'] = sender_email
     msg['Message-ID'] = make_msgid(domain=domain)
-    body = six.text_type(body).strip()
+    body = str(body).strip()
     if body[:6].lower() == '<html>':
         if body_txt is None:
             h2txt = HTML2Text()
@@ -141,7 +140,7 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
     try:
         return email_server.sendmail(msg_from, recipients, msg.as_string())
     except Exception as error:
-        raise EmailException(six.text_type(error))
+        raise EmailException(str(error))
     finally:
         if email_server:
             email_server.quit()
@@ -163,7 +162,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     if recipients is None:
         recipients = sender_email
     if not isinstance(recipients, list):
-        recipients = [six.text_type(recipients)]
+        recipients = [str(recipients)]
     recipients = split_doubled_email(recipients)
     dkim_private_path = Params.getvalue('mailing-dkim-private-path')
     dkim_selector = Params.getvalue('mailing-dkim-selector')
