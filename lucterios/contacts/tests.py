@@ -234,7 +234,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructure()
         self.calljson('/lucterios.contacts/currentStructure', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'currentStructure')
-        self.assert_json_equal('IMAGE', 'logoimg', "data:image/*;base64,/9j/4AAQSkZJRg", True)
+        self.assert_json_equal('IMAGE', 'logoimg', "data:image/jpg;base64,/9j/4AAQSkZJRg", True)
 
         self.factory.xfer = CurrentStructurePrint()
         self.calljson('/lucterios.contacts/currentStructurePrint', {}, False)

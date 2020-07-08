@@ -160,7 +160,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualShow()
         self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
-        self.assert_json_equal('IMAGE', 'logoimg', "data:image/*;base64,", True)
+        self.assert_json_equal('IMAGE', 'logoimg', "data:image/jpg;base64,", True)
 
     def test_individual_user(self):
         self.factory.xfer = IndividualShow()
