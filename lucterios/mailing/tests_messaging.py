@@ -1043,7 +1043,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '1'})
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '3'})
         self.calljson('/lucterios.mailing/messageTransition', {'message': '2', 'TRANSITION': 'valid', 'CONFIRME': 'YES'})
-        self.calljson('/lucterios.mailing/messageShow', {'message': '2'}, True)
+        self.calljson('/lucterios.mailing/messageShow', {'message': '2'}, 'get')
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_json_equal('LABELFORM', "status", 1)
         self.assert_count_equal("recipient_list", 1)

@@ -79,6 +79,8 @@ class CurrentLegalEntityShow(LegalEntityShow):
 class Account(XferContainerCustom):
     caption = _("Your account")
     icon = "account.png"
+    readonly = True
+    methods_allowed = ('GET', )
 
     def add_legalentity(self, legal_entity, tabname=_("Legal entity"), tabnum=-1):
         self.new_tab(tabname, tabnum)
