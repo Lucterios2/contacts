@@ -168,7 +168,7 @@ class MessageShow(XferShowEditor):
 
 
 @ActionsManage.affect_show(_("EMail try"), "email.png", condition=lambda xfer: (xfer.item.message_type == 0) and will_mail_send() and (xfer.item.status == 0))
-@MenuManage.describ('mailing.change_message')
+@MenuManage.describ('mailing.add_message')
 class MessageSendEmailTry(XferContainerAcknowledge):
     icon = "email.png"
     model = Message
@@ -204,7 +204,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
 
 
 @ActionsManage.affect_show(_("SMS try"), "sms.png", condition=lambda xfer: (xfer.item.message_type == 1) and AbstractProvider.is_current_active() and (xfer.item.status == 0))
-@MenuManage.describ('mailing.change_message')
+@MenuManage.describ('mailing.add_message')
 class MessageSendSMSTry(XferContainerAcknowledge):
     icon = "sms.png"
     model = Message
@@ -262,6 +262,7 @@ class MessageSentInfo(XferContainerCustom):
     model = Message
     field_id = 'message'
     caption = _("Transmission report")
+    methods_allowed = ('GET', )
 
     def fillresponse(self, show_only_failed=False):
         img = XferCompImage('img')
@@ -295,12 +296,13 @@ class MessageSentInfo(XferContainerCustom):
 
 
 @ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: (xfer.item.message_type == 0) and (xfer.item.status == 1) and not xfer.item.is_dynamic)
-@MenuManage.describ('mailing.add_message')
+@MenuManage.describ('mailing.change_message')
 class MessageLetter(XferPrintReporting):
     icon = "mailing.png"
     model = Message
     field_id = 'message'
     caption = _("Write message")
+    methods_allowed = ('GET', )
 
     def items_callback(self):
         items = []
@@ -326,6 +328,7 @@ class MessageValidRecipient(XferContainerAcknowledge):
     model = Message
     field_id = 'message'
     caption = _("Add recipient to message")
+    methods_allowed = ('POST', 'PUT')
 
     def fillresponse(self, modelname='', CRITERIA=''):
         self.item.add_recipient(modelname, CRITERIA)
@@ -339,6 +342,7 @@ class MessageAddRecipient(ContactSelection):
     field_id = 'message'
     caption = _("Add recipient to message")
     final_class = MessageValidRecipient
+    methods_allowed = ('POST', 'PUT')
 
 
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_SINGLE, model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
@@ -348,6 +352,7 @@ class MessageDelRecipient(XferContainerAcknowledge):
     model = Message
     field_id = 'message'
     caption = _("Delete recipient")
+    methods_allowed = ('DELETE', )
 
     def fillresponse(self, recipient_list=-1):
         if self.confirme(_("Do you want to delete this recipient?")):
@@ -370,6 +375,7 @@ class MessageInsertDoc(DocumentSearch):
     caption = _("Insert document to message")
     mode_select = SELECT_SINGLE
     select_class = MessageValidInsertDoc
+    methods_allowed = ('POST', 'PUT')
 
 
 @MenuManage.describ('mailing.add_message')
@@ -378,6 +384,7 @@ class MessageRemoveDoc(XferContainerAcknowledge):
     icon = "mailing.png"
     model = Message
     field_id = 'message'
+    methods_allowed = ('DELETE', )
 
     def fillresponse(self, document=[]):
         if self.confirme(_('Do you want to remove those documents ?')):
@@ -391,6 +398,7 @@ class EmailSentAddForStatistic(XferContainerAbstract):
     caption = 'EmailSentAddForStatistic'
     model = EmailSent
     field_id = 'emailsent'
+    methods_allowed = ('GET', )
 
     def fillresponse(self, emailsent=0):
         try:

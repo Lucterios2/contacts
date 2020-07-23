@@ -126,7 +126,7 @@ class Configuration(XferListEditor):
         self.fillreponse_sms()
 
 
-@MenuManage.describ('CORE.change_parameter')
+@MenuManage.describ('CORE.add_parameter')
 class SendEmailTry(XferContainerAcknowledge):
     icon = "config_mail.png"
     caption = _("EMail try")
@@ -168,7 +168,7 @@ class SendEmailTry(XferContainerAcknowledge):
             self.message(_("EMail send, check it."))
 
 
-@MenuManage.describ('CORE.change_parameter')
+@MenuManage.describ('CORE.add_parameter')
 class SendSmsTry(XferContainerAcknowledge):
     icon = "config_mail.png"
     caption = _("SMS try")

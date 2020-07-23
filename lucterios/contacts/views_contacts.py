@@ -180,6 +180,8 @@ class IndividualShowResp(XferContainerAcknowledge):
     icon = "individual.png"
     model = Responsability
     field_id = 'responsability'
+    readonly = True
+    methods_allowed = ('GET', )
 
     def fillresponse(self):
         self.redirect_action(IndividualShow.get_action('', ''),
@@ -304,7 +306,7 @@ class IndividualUserValid(XferSave):
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
-@MenuManage.describ('contacts.change_responsability')
+@MenuManage.describ('contacts.add_responsability')
 class ResponsabilityAdd(XferContainerCustom):
     caption = _("Add responsability")
     icon = "function.png"
@@ -343,7 +345,7 @@ class ResponsabilityAdd(XferContainerCustom):
 
 
 @ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", unique=SELECT_SINGLE)
-@MenuManage.describ('contacts.change_responsability')
+@MenuManage.describ('contacts.add_responsability')
 class ResponsabilityModify(XferAddEditor):
     caption = _("Modify responsability")
     icon = "function.png"
@@ -408,6 +410,8 @@ class AbstractContactFindDouble(XferListEditor):
     icon = "contacts.png"
     model = AbstractContact
     field_id = 'abstractcontact'
+    readonly = True
+    methods_allowed = ('POST', 'PUT')
 
     def fillresponse_header(self):
         self.filter = self.model.get_query_for_duplicate()

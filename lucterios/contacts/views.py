@@ -169,6 +169,8 @@ class CurrentStructure(XferContainerCustom):
     icon = "ourDetails.png"
     model = LegalEntity
     field_id = 1
+    readonly = True
+    methods_allowed = ('GET', )
 
     def fillresponse(self):
         self.params['legal_entity'] = '1'
@@ -450,7 +452,7 @@ class PostalCodeAdd(XferAddEditor):
     field_id = 'postalCode'
 
 
-@MenuManage.describ('contacts.change_postalcode', FORMTYPE_MODAL, 'contact.conf', _('Tool to import contacts from CSV file.'))
+@MenuManage.describ('contacts.add_abstractcontact', FORMTYPE_MODAL, 'contact.conf', _('Tool to import contacts from CSV file.'))
 class ContactImport(ObjectImport):
     caption = _("Contact import")
     icon = "contactsConfig.png"
