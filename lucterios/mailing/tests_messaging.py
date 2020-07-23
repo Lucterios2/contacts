@@ -983,8 +983,8 @@ class SendMessagingTest(AsychronousLucteriosTest):
         self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '2'}, "get")
         self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '2'}, "get")
         self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '20'}, "get")
-        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {}, True)
-        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '3'}, True)
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {}, "get")
+        self.call_ex('/lucterios.mailing/emailSentAddForStatistic', {'emailsent': '3'}, "get")
         self.calljson('/lucterios.mailing/messageSentInfo', {'message': '1', 'show_only_failed': False}, "get")
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
         self.assert_json_equal('', "emailsent/@0/sended_item", "joe@worldcompany.com")
@@ -1094,7 +1094,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
                                       "WoldCompany : +33767892345 => 'Small message to give a big kiss ;)|Bye'\n",
                                       "WoldCompany : +33769874325 => 'Small message to give a big kiss ;)|Bye'\n"])
 
-        self.calljson('/lucterios.mailing/messageSentInfo', {'message': '3', 'show_only_failed': False})
+        self.calljson('/lucterios.mailing/messageSentInfo', {'message': '3', 'show_only_failed': False}, 'get')
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
         self.assert_count_equal('', 7)
         self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoi", "date": "date", "success": "succès"}, 6)
@@ -1122,7 +1122,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
         self.assertNotIn(" message(s) ouvert(s)", val_stat)
         self.assertNotIn(" % d'ouverture.", val_stat)
 
-        self.calljson('/lucterios.mailing/messageSentInfo', {'message': '3', 'show_only_failed': True})
+        self.calljson('/lucterios.mailing/messageSentInfo', {'message': '3', 'show_only_failed': True}, 'get')
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageSentInfo')
         self.assert_count_equal('', 7)
         self.assert_grid_equal('emailsent', {"contact": "contact", "sended_item": "ref. d'envoi", "date": "date", "success": "succès", "error": "erreur"}, 2)
