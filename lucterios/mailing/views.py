@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO, CLOSE_YES, WrapAction
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xfercomponents import XferCompButton, XferCompImage, XferCompLabelForm, XferCompEdit
-from lucterios.framework.xferadvance import TITLE_MODIFY, TITLE_OK, TITLE_CANCEL
+from lucterios.framework.xferadvance import TITLE_MODIFY, TITLE_OK, TITLE_CANCEL, XferListEditor
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework import signal_and_lock
 
@@ -42,7 +42,7 @@ from lucterios.mailing.sms_functions import AbstractProvider
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing and SMS parameters'))
-class Configuration(XferContainerCustom):
+class Configuration(XferListEditor):
     icon = "config_mail.png"
     caption = _("Mailing & SMS parameters")
 
