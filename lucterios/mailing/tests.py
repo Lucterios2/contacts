@@ -578,7 +578,7 @@ class UserTest(LucteriosTest):
                                                                 'lastname': 'DUPONT', 'username': 'admin', 'email': 'pierre@worldcompany.com'}, False)
             self.assert_observer('core.acknowledge', 'lucterios.contacts', 'createAccount')
             self.assertEqual(len(self.json_context), 6)
-            self.assert_action_equal(self.response_json['action'], ('', None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {
+            self.assert_action_equal('POST', self.response_json['action'], ('', None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {
                                      "SAVE": '', "error": "Ce compte existe déjà !"}))
             self.assertEqual(0, server.count())
 
