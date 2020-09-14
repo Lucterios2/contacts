@@ -193,7 +193,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_context['individual'], "2")
         self.assertEqual(self.json_context['username'], "jacko")
         self.assert_action_equal('POST', self.response_json['action'], ('Créer', "images/new.png", "CORE", "usersEdit", 1, 1, 1,
-                                                                {"user_actif": "2", "IDENT_READ": "YES"}))
+                                                                        {"user_actif": "2", "IDENT_READ": "YES"}))
         self.factory.xfer = UsersEdit()
         self.calljson('/CORE/usersEdit', {'individual': '2', 'username':
                                           'jacko', 'user_actif': '2', 'IDENT_READ': 'YES'}, False)
