@@ -42,7 +42,7 @@ from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 
 from lucterios.CORE.models import LucteriosUser
-from lucterios.CORE.views_usergroup import UsersEdit
+from lucterios.CORE.views_usergroup import UsersEdit, UsersPreference
 from lucterios.CORE.views import ParamEdit, ObjectImport
 from lucterios.CORE.xferprint import XferPrintAction
 from lucterios.CORE.parameters import Params, notfree_mode_connect
@@ -135,12 +135,13 @@ class Account(XferContainerCustom):
             self.model = Individual
             self.field_id = 'individual'
             self.params['individual'] = str(self.item.id)
+            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png"), close=CLOSE_NO)
             self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO)
             is_individual = True
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(id=self.request.user.id)
-            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"),
-                            close=CLOSE_NO, params={'user_actif': str(self.request.user.id)})
+            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png"), close=CLOSE_NO)
+            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO, params={'user_actif': str(self.request.user.id)})
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
