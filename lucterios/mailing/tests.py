@@ -38,7 +38,6 @@ from lucterios.framework.tools import get_binay
 from lucterios.CORE.models import Parameter, LucteriosUser, LucteriosGroup
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct, ParamEdit, ParamSave
-from lucterios.CORE.parameters import Params
 
 from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
 from lucterios.contacts.views import CreateAccount
@@ -467,14 +466,14 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
         self.factory.xfer = UsersEdit()
         self.calljson('/CORE/usersEdit', {}, False)
         self.assert_observer('core.custom', 'CORE', 'usersEdit')
-        self.assert_count_equal('', 15)
+        self.assert_count_equal('', 17)
 
     def test_user_withconfig(self):
         configSMTP('localhost', 1025)
         self.factory.xfer = UsersEdit()
         self.calljson('/CORE/usersEdit', {}, False)
         self.assert_observer('core.custom', 'CORE', 'usersEdit')
-        self.assert_count_equal('', 16)
+        self.assert_count_equal('', 18)
         self.assert_attrib_equal("password_generate", "description", "Générer un nouveau mot de passe?")
 
     def test_user_change_password(self):

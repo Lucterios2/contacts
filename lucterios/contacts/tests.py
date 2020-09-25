@@ -29,6 +29,7 @@ from os.path import join, dirname, exists
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
 from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.views_usergroup import UsersPreference
 
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
     CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
@@ -266,8 +267,7 @@ class ConfigurationTest(LucteriosTest):
 
     def test_accountmodify(self):
         self.factory.xfer = AccountAddModify()
-        self.calljson(
-            '/lucterios.contacts/accountAddModify', {'individual': '2'}, False)
+        self.calljson('/lucterios.contacts/accountAddModify', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'accountAddModify')
         self.assertEqual(self.json_meta['title'], str('Mon compte'))
         self.assert_count_equal('', 13)
@@ -275,12 +275,20 @@ class ConfigurationTest(LucteriosTest):
         self.assert_select_equal('genre', {1: 'Homme', 2: 'Femme'})  # nb=2
 
     def test_noaccount(self):
-        self.factory.user = LucteriosUser.objects.get(
-            username='admin')
+        self.factory.user = LucteriosUser.objects.get(username='admin')
         self.factory.xfer = Account()
         self.calljson('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
         self.assertEqual(self.json_meta['title'], str('Votre compte'))
-        self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[1 - 1], (str('Editer'), 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif': '1'}))
-        self.assert_action_equal('POST', self.json_actions[2 - 1], ('Fermer', 'images/close.png'))
+        self.assertEqual(len(self.json_actions), 3)
+        self.assert_action_equal('POST', self.json_actions[0], ('Préférences', 'images/settings.png', 'CORE', 'usersPreference', 0, 1, 1, {}))
+        self.assert_action_equal('POST', self.json_actions[1], ('Editer', 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1, {'user_actif': '1'}))
+        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
+
+    def test_user_preference(self):
+        self.factory.xfer = UsersPreference()
+        self.factory.user = LucteriosUser.objects.get(username='admin')
+        self.calljson('/CORE/usersPreference', {}, False)
+        self.assert_observer('core.custom', 'CORE', 'usersPreference')
+        self.assert_count_equal('', 3)
+
