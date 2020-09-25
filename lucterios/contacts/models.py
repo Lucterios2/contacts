@@ -559,7 +559,13 @@ class LegalEntity(AbstractContact):
 
 
 class Individual(AbstractContact):
-    genre = models.IntegerField(choices=((1, _('Man')), (2, _('Woman'))), default=1, null=False)
+    GENRE_ALL = 0
+    GENRE_MAN = 1
+    GENRE_WOMAN = 2
+    LIST_GENRE = ((GENRE_MAN, _('Man')), (GENRE_WOMAN, _('Woman')))
+    SELECT_GENRE = ((GENRE_ALL, None),) + LIST_GENRE
+
+    genre = models.IntegerField(choices=LIST_GENRE, default=GENRE_MAN, null=False)
     firstname = models.CharField(_('firstname'), max_length=100, blank=False)
     lastname = models.CharField(_('lastname'), max_length=100, blank=False)
     user = models.ForeignKey('CORE.LucteriosUser', verbose_name=_('user'), null=True, on_delete=models.SET_NULL)
