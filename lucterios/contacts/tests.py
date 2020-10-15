@@ -29,7 +29,7 @@ from os.path import join, dirname, exists
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
 from lucterios.CORE.models import LucteriosUser
-from lucterios.CORE.views_usergroup import UsersPreference
+from lucterios.CORE.views_usergroup import UsersPreference, PreferenceEdit
 
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
     CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
@@ -286,9 +286,31 @@ class ConfigurationTest(LucteriosTest):
         self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
 
     def test_user_preference(self):
-        self.factory.xfer = UsersPreference()
         self.factory.user = LucteriosUser.objects.get(username='admin')
+
+        self.factory.xfer = UsersPreference()
         self.calljson('/CORE/usersPreference', {}, False)
         self.assert_observer('core.custom', 'CORE', 'usersPreference')
         self.assert_count_equal('', 3)
+        self.assert_count_equal('preferences', 3)
+        self.assert_json_equal('', 'preferences/@0/id', 'dummy-default-price')
+        self.assert_json_equal('', 'preferences/@0/title', 'dummy-default-price')
+        self.assert_json_equal('', 'preferences/@0/value_txt', '100')
+        self.assert_json_equal('', 'preferences/@1/id', 'dummy-default-valid')
+        self.assert_json_equal('', 'preferences/@1/title', 'dummy-default-valid')
+        self.assert_json_equal('', 'preferences/@1/value_txt', 'Non')
+        self.assert_json_equal('', 'preferences/@2/id', 'dummy-default-value')
+        self.assert_json_equal('', 'preferences/@2/title', 'dummy-default-value')
+        self.assert_json_equal('', 'preferences/@2/value_txt', '0')
+        self.assert_count_equal('#preferences/actions', 1)
+        self.assert_action_equal('POST', '#preferences/actions/@0', ('Modifier', 'images/edit.png', 'CORE', 'preferenceEdit', 0, 1, 0))
 
+        self.factory.xfer = PreferenceEdit()
+        self.calljson('/CORE/preferenceEdit', {'preferences': 'dummy-default-value'}, False)
+        self.assert_observer('core.custom', 'CORE', 'preferenceEdit')
+        self.assert_count_equal('', 5)
+        self.assert_json_equal('LABELFORM', 'title', 'dummy-default-value')
+        self.assert_json_equal('LABELFORM', 'user', 'admin')
+        self.assert_json_equal('FLOAT', 'dummy-default-value', '0')
+        self.assert_json_equal('CHECK', 'setdefault', False)
+        self.assertEqual(self.json_context['user'], self.factory.user.id)
