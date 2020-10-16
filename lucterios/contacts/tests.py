@@ -26,9 +26,11 @@ from __future__ import unicode_literals
 from shutil import rmtree
 from os.path import join, dirname, exists
 
+from django.utils.translation import ugettext_lazy as _
+
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
-from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.models import LucteriosUser, Preference
 from lucterios.CORE.views_usergroup import UsersPreference, PreferenceEdit
 
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
@@ -286,6 +288,9 @@ class ConfigurationTest(LucteriosTest):
         self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
 
     def test_user_preference(self):
+        Preference.check_and_create(name="dummy-default-value", typeparam=Preference.TYPE_INTEGER, title=_("dummy-default-value"), args="{'min':0,'max':10}", value='0')
+        Preference.check_and_create(name="dummy-default-price", typeparam=Preference.TYPE_REAL, title=_("dummy-default-price"), args="{'min':0,'max':1000,'prec':2}", value='100')
+        Preference.check_and_create(name="dummy-default-valid", typeparam=Preference.TYPE_BOOL, title=_("dummy-default-valid"), args="{}", value='False')
         self.factory.user = LucteriosUser.objects.get(username='admin')
 
         self.factory.xfer = UsersPreference()
