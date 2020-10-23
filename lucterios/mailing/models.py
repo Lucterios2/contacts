@@ -46,6 +46,7 @@ from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.framework.filetools import remove_accent
 from lucterios.framework.auditlog import auditlog
+from lucterios.framework.xferprinting import PRINT_EXT_FILE, PRINT_PDF_FILE
 from lucterios.CORE.models import Parameter, PrintModel, LucteriosGroup
 from lucterios.CORE.parameters import Params
 
@@ -544,7 +545,7 @@ class EmailSent(LucteriosModel):
                 gen = ReportingGenerator()
                 gen.items = self.get_send_email_objects()
                 gen.model_text = printmodel_obj.value
-                pdf_file = BytesIO(gen.generate_report(None, False))
+                pdf_file = BytesIO(gen.generate_report(None, PRINT_EXT_FILE[PRINT_PDF_FILE]))
                 self.print_file = [(pdf_name, pdf_file)]
         else:
             self.print_file = None
