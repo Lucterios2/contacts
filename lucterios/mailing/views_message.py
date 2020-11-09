@@ -24,7 +24,7 @@ from lucterios.CORE.xferprint import XferPrintReporting
 from lucterios.contacts.tools import ContactSelection
 from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import DocumentContainer
-from lucterios.documents.views import DocumentSearch
+from lucterios.documents.views import DocumentSearch, DocumentShow
 from lucterios.mailing.models import Message, add_messaging_in_scheduler, EmailSent
 from lucterios.mailing.email_functions import will_mail_send, send_email
 from lucterios.mailing.sms_functions import AbstractProvider
@@ -386,10 +386,22 @@ class MessageRemoveDoc(XferContainerAcknowledge):
     field_id = 'message'
     methods_allowed = ('DELETE', )
 
-    def fillresponse(self, document=[]):
+    def fillresponse(self, attachment=[]):
         if self.confirme(_('Do you want to remove those documents ?')):
-            for doc in DocumentContainer.objects.filter(id__in=document):
+            for doc in DocumentContainer.objects.filter(id__in=attachment):
                 self.item.attachments.remove(doc)
+
+
+@MenuManage.describ('mailing.add_message')
+class MessageShowDoc(XferContainerAcknowledge):
+    caption = _("Remove document to message")
+    icon = "mailing.png"
+    model = Message
+    field_id = 'message'
+    methods_allowed = ('GET', )
+
+    def fillresponse(self, attachment=0):
+        self.redirect_action(DocumentShow.get_action(TITLE_EDIT, "images/show.png"), params={'document': attachment})
 
 
 @MenuManage.describ('')

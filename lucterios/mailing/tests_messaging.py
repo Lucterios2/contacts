@@ -40,7 +40,7 @@ from lucterios.mailing.models import Message
 from lucterios.mailing.email_functions import will_mail_send
 from lucterios.mailing.views_message import MessageAddModify, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
     MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry, MessageEmailList, MessageSMSList,\
-    MessageSendSMSTry
+    MessageSendSMSTry, MessageShowDoc
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver,\
     configSMS, clean_sms_testfile, read_sms
 from lucterios.mailing.sms_functions import AbstractProvider
@@ -117,7 +117,7 @@ class MailingTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', "subject", "new message")
         self.assert_json_equal('LABELFORM', "body", "{[div style='border:1px solid black;background-color:#EEE;padding:5px;']}{[b]}", txtrange=True)
         self.assert_count_equal("recipient_list", 0)
-        self.assert_count_equal("attachments", 0)
+        self.assert_count_equal("attachment", 0)
         self.assert_json_equal('LABELFORM', 'doc_in_link', False)
 
         self.assertEqual(len(self.json_actions), 2)
@@ -302,9 +302,12 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 0)
-        self.assert_grid_equal('attachments', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
+        self.assert_grid_equal('attachment', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
         self.assert_json_equal('LABELFORM', "doc_in_link", False)
-        self.assert_count_equal("#attachments/actions", 3)
+        self.assert_count_equal("#attachment/actions", 3)
+        self.assert_action_equal('GET', "#attachment/actions/@0", ('Editer', 'images/show.png', 'lucterios.mailing', 'messageShowDoc', 0, 1, 0))
+        self.assert_action_equal('DELETE', "#attachment/actions/@1", ('Retirer', 'images/delete.png', 'lucterios.mailing', 'messageRemoveDoc', 0, 1, 2))
+        self.assert_action_equal('POST', "#attachment/actions/@2", ('Insérer', 'images/add.png', 'lucterios.mailing', 'messageInsertDoc', 0, 1, 1))
 
         self.factory.xfer = MessageInsertDoc()
         self.calljson('/lucterios.mailing/messageInsertDoc', {'message': '1'}, False)
@@ -325,13 +328,22 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "status", 0)
-        self.assert_count_equal("attachments", 2)
-        self.assert_count_equal("#attachments/actions", 3)
+        self.assert_count_equal("attachment", 2)
+        self.assert_json_equal('', "attachment/@0/id", 1)
+        self.assert_json_equal('', "attachment/@0/name", 'doc1.png')
+        self.assert_json_equal('', "attachment/@1/id", 3)
+        self.assert_json_equal('', "attachment/@1/name", 'doc3.png')
+        self.assert_count_equal("#attachment/actions", 3)
         self.assertEqual(len(self.json_actions), 2)
+
+        self.factory.xfer = MessageShowDoc()
+        self.calljson('/lucterios.mailing/messageShowDoc', {'message': '1', 'attachment': '3'}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageShowDoc')
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', "images/show.png", "lucterios.documents", "documentShow", 1, 1, 1, {"document": 3}))
 
         self.factory.xfer = MessageRemoveDoc()
         self.calljson('/lucterios.mailing/messageRemoveDoc',
-                      {'message': '1', 'document': '1;2', 'CONFIRME': 'YES'}, False)
+                      {'message': '1', 'attachment': '1;2', 'CONFIRME': 'YES'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageRemoveDoc')
 
         self.factory.xfer = MessageValidRecipient()
@@ -343,8 +355,10 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 0)
-        self.assert_count_equal("attachments", 1)
-        self.assert_count_equal("#attachments/actions", 3)
+        self.assert_count_equal("attachment", 1)
+        self.assert_json_equal('', "attachment/@0/id", 3)
+        self.assert_json_equal('', "attachment/@0/name", 'doc3.png')
+        self.assert_count_equal("#attachment/actions", 3)
         self.assertEqual(len(self.json_actions), 3)
 
         self.factory.xfer = MessageTransition()
@@ -356,8 +370,8 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 13)
         self.assert_json_equal('LABELFORM', "status", 1)
-        self.assert_count_equal("attachments", 1)
-        self.assert_count_equal("#attachments/actions", 1)
+        self.assert_count_equal("attachment", 1)
+        self.assert_count_equal("#attachment/actions", 1)
 
     def test_trysend(self):
         configSMTP('', 25)

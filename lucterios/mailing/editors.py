@@ -29,11 +29,10 @@ from django.utils.translation import ugettext as _
 from lucterios.framework.editors import LucteriosEditor
 from lucterios.framework.xfercomponents import XferCompGrid, XferCompCheckList
 from lucterios.mailing.email_functions import will_mail_send
-from lucterios.documents.views import DocumentShow
-from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE,\
-    SELECT_NONE, SELECT_MULTI
+from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, SELECT_MULTI
 from lucterios.framework.xferadvance import TITLE_EDIT
-from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc
+from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc,\
+    MessageShowDoc
 from lucterios.mailing.sms_functions import AbstractProvider
 
 
@@ -69,11 +68,11 @@ class MessageEditor(LucteriosEditor):
             xfer.remove_component('doc_in_link')
             xfer.remove_component('empty')
         else:
-            new_documents = XferCompGrid('attachments')
+            new_documents = XferCompGrid('attachment')
             new_documents.tab = old_documents.tab
             new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
             new_documents.set_model(self.item.attachments.all(), ["name", "description", "date_modification"], xfer)
-            new_documents.add_action(xfer.request, DocumentShow.get_action(TITLE_EDIT, "images/show.png"),
+            new_documents.add_action(xfer.request, MessageShowDoc.get_action(TITLE_EDIT, "images/show.png"),
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
             if self.item.status == 0:
                 new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png"),
