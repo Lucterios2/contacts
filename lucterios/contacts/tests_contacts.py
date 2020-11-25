@@ -294,9 +294,9 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.response_json['print']['mode'], 4)
         csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 11, str(content_csv))
+        self.assertEqual(len(content_csv), 14, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
-        self.assertEqual(content_csv[4].strip(), '"#";"prénom";"nom";"adresse";"ville";"tel";"courriel";')
+        self.assertEqual(content_csv[6].strip(), '"#";"prénom";"nom";"adresse";"ville";"tel";"courriel";')
 
         self.factory.xfer = IndividualListing()
         self.calljson('/lucterios.contacts/individualListing',
@@ -307,9 +307,9 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.response_json['print']['mode'], 4)
         csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 10, str(content_csv))
+        self.assertEqual(len(content_csv), 13, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
-        self.assertEqual(content_csv[4].strip(), '"#";"prénom";"nom";"adresse";"ville";"tel";"courriel";')
+        self.assertEqual(content_csv[6].strip(), '"#";"prénom";"nom";"adresse";"ville";"tel";"courriel";', str(content_csv))
 
     def test_individual_label(self):
         self.factory.xfer = IndividualLabel()
@@ -553,9 +553,9 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.response_json['print']['mode'], 4)
         csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 11, str(content_csv))
+        self.assertEqual(len(content_csv), 14, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
-        self.assertEqual(content_csv[4].strip(), '"#";"nom";"adresse";"ville";"tel";"courriel";')
+        self.assertEqual(content_csv[6].strip(), '"#";"nom";"adresse";"ville";"tel";"courriel";', str(content_csv))
 
         self.factory.xfer = LegalEntityListing()
         self.calljson('/lucterios.contacts/legalEntityListing',
@@ -566,9 +566,9 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.response_json['print']['mode'], 4)
         csv_value = b64decode(str(self.response_json['print']['content'])).decode("utf-8")
         content_csv = csv_value.split('\n')
-        self.assertEqual(len(content_csv), 10, str(content_csv))
+        self.assertEqual(len(content_csv), 13, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
-        self.assertEqual(content_csv[4].strip(), '"#";"nom";"adresse";"ville";"tel";"courriel";')
+        self.assertEqual(content_csv[6].strip(), '"#";"nom";"adresse";"ville";"tel";"courriel";')
 
     def test_legalentity_label(self):
         self.factory.xfer = LegalEntityLabel()
