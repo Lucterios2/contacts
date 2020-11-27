@@ -311,6 +311,20 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(content_csv[1].strip(), '"Personnes physiques"')
         self.assertEqual(content_csv[6].strip(), '"#";"prénom";"nom";"adresse";"ville";"tel";"courriel";', str(content_csv))
 
+    def test_individual_listing_pdf(self):
+        self.factory.xfer = IndividualListing()
+        self.calljson('/lucterios.contacts/individualListing',
+                      {'PRINT_MODE': '3', 'MODEL': 3, 'WITHNUM': True}, False)
+        self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
+        self.save_pdf()
+
+    def test_individual_listing_ods(self):
+        self.factory.xfer = IndividualListing()
+        self.calljson('/lucterios.contacts/individualListing',
+                      {'PRINT_MODE': '2', 'MODEL': 3, 'WITHNUM': True}, False)
+        self.assert_observer('core.print', 'lucterios.contacts', 'individualListing')
+        self.save_ods()
+
     def test_individual_label(self):
         self.factory.xfer = IndividualLabel()
         self.calljson('/lucterios.contacts/individualLabel', {}, False)
@@ -569,6 +583,20 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(len(content_csv), 13, str(content_csv))
         self.assertEqual(content_csv[1].strip(), '"Personnes morales"')
         self.assertEqual(content_csv[6].strip(), '"#";"nom";"adresse";"ville";"tel";"courriel";')
+
+    def test_legalentity_listing_pdf(self):
+        self.factory.xfer = LegalEntityListing()
+        self.calljson('/lucterios.contacts/legalEntityListing',
+                      {'PRINT_MODE': '3', 'MODEL': 1, 'structure_type': 2, 'WITHNUM': True}, False)
+        self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
+        self.save_pdf()
+
+    def test_legalentity_listing_ods(self):
+        self.factory.xfer = LegalEntityListing()
+        self.calljson('/lucterios.contacts/legalEntityListing',
+                      {'PRINT_MODE': '2', 'MODEL': 1, 'structure_type': 2, 'WITHNUM': True}, False)
+        self.assert_observer('core.print', 'lucterios.contacts', 'legalEntityListing')
+        self.save_ods()
 
     def test_legalentity_label(self):
         self.factory.xfer = LegalEntityLabel()
