@@ -280,7 +280,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], str('Personnes physiques'))
         self.assert_count_equal('', 5)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
-        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV', 2: "Fichier ODS"})  # nb=3
         self.assert_comp_equal(('SELECT', 'MODEL'), "3", (0, 3, 2, 1))
         self.assert_select_equal('MODEL', {3: 'liste'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
@@ -539,7 +539,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], str('Personnes morales'))
         self.assert_count_equal('', 5)
         self.assert_comp_equal(('SELECT', 'PRINT_MODE'), "3", (0, 2, 2, 1))
-        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV'})  # nb=2
+        self.assert_select_equal('PRINT_MODE', {3: 'Fichier PDF', 4: 'Fichier CSV', 2: "Fichier ODS"})  # nb=3
         self.assert_comp_equal(('SELECT', 'MODEL'), "1", (0, 3, 2, 1))
         self.assert_select_equal('MODEL', {1: 'liste'})  # nb=1
         self.assertEqual(len(self.json_actions), 2)
