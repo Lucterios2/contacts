@@ -35,11 +35,13 @@ from email.mime.application import MIMEApplication
 
 from django.utils.translation import ugettext_lazy as _
 
+from lucterios.framework.error import LucteriosException, GRAVE
 
-class EmailException(Exception):
+
+class EmailException(LucteriosException):
 
     def __init__(self, msg):
-        Exception.__init__(self, msg)
+        LucteriosException.__init__(self, GRAVE, msg)
 
 
 def will_mail_send():
