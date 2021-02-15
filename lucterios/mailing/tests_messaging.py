@@ -313,7 +313,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.calljson('/lucterios.mailing/messageInsertDoc', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageInsertDoc')
         self.assert_count_equal("document", 3)
-        self.assert_count_equal("#document/actions", 3)
+        self.assert_count_equal("#document/actions", 2)
         self.assert_action_equal('POST', "#document/actions/@0", ('Sélection', 'images/ok.png', 'lucterios.mailing', 'messageValidInsertDoc', 1, 1, 0))
 
         self.factory.xfer = MessageValidInsertDoc()
