@@ -36,7 +36,6 @@ import email
 from django.test.testcases import TestCase
 
 from lucterios.CORE.parameters import Params
-from lucterios.CORE.models import Parameter
 
 
 def decode_b64(data):
@@ -46,31 +45,14 @@ def decode_b64(data):
 
 
 def configSMTP(server, port, security=0, user='', passwd='', batchtime=0.1, batchsize=20, dkim_private_file=''):
-    param = Parameter.objects.get(name='mailing-smtpserver')
-    param.value = server
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpport')
-    param.value = port
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpsecurity')
-    param.value = security
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtpuser')
-    param.value = user
-    param.save()
-    param = Parameter.objects.get(name='mailing-smtppass')
-    param.value = passwd
-    param.save()
-    param = Parameter.objects.get(name='mailing-dkim-private-path')
-    param.value = dkim_private_file
-    param.save()
-    param = Parameter.objects.get(name='mailing-delay-batch')
-    param.value = "%.1f" % batchtime
-    param.save()
-    param = Parameter.objects.get(name='mailing-nb-by-batch')
-    param.value = "%.d" % batchsize
-    param.save()
-    Params.clear()
+    Params.setvalue(name='mailing-smtpserver', value=server)
+    Params.setvalue(name='mailing-smtpport', value=port)
+    Params.setvalue(name='mailing-smtpsecurity', value=security)
+    Params.setvalue(name='mailing-smtpuser', value=user)
+    Params.setvalue(name='mailing-smtppass', value=passwd)
+    Params.setvalue(name='mailing-dkim-private-path', value=dkim_private_file)
+    Params.setvalue(name='mailing-delay-batch', value="%.1f" % batchtime)
+    Params.setvalue(name='mailing-nb-by-batch', value="%.d" % batchsize)
 
 
 def configSMS(file_name='/tmp/sms.txt', max_sms=3):
