@@ -58,7 +58,6 @@ from lucterios.mailing.sms_functions import AbstractProvider
 
 
 class MessageLine(LucteriosModel):
-    id = models.IntegerField(verbose_name=_('id'), null=False, default=0, db_index=True)
     line = models.TextField(_('line'), null=False, default="")
 
     @classmethod
@@ -66,7 +65,8 @@ class MessageLine(LucteriosModel):
         return ['line']
 
     class Meta(object):
-        abstract = True
+        managed = False
+        default_permissions = []
         verbose_name = _('body')
         verbose_name_plural = _('bodies')
 
