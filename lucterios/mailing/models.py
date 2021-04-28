@@ -65,7 +65,6 @@ class MessageLine(LucteriosModel):
         return ['line']
 
     class Meta(object):
-        managed = False
         default_permissions = []
         verbose_name = _('body')
         verbose_name_plural = _('bodies')
