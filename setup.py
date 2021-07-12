@@ -62,5 +62,5 @@ setup(
         "lucterios.mailing.migrations": ['*'],
         "lucterios.mailing": ['build', 'images/*', 'locale/*/*/*', 'help/*'],
     },
-    install_requires=["lucterios ~=2.5", "lucterios-documents ~=2.5", "dkimpy ~=1.0", "html2text ~=2020.1"],
+    install_requires=["lucterios ~=2.6", "lucterios-documents ~=2.6", "dkimpy ~=1.0", "html2text ~=2020.1"],
 )
