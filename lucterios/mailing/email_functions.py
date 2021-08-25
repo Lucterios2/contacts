@@ -131,8 +131,8 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
             h2txt.wrap_links = False
             body_txt = h2txt.handle(body)
         msg_alternative = MIMEMultipart('alternative')
-        msg_alternative.attach(MIMEText(body, 'html', 'utf-8'))
         msg_alternative.attach(MIMEText(body_txt, 'plain', 'utf-8'))
+        msg_alternative.attach(MIMEText(body, 'html', 'utf-8'))
         msg.attach(msg_alternative)
     else:
         msg.attach(MIMEText(body, 'plain', 'utf-8'))

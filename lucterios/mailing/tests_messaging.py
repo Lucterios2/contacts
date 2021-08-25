@@ -440,7 +440,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
             self.assertEqual(['jack@worldcompany.com'], server.get(1)[2])
 
-            msg, msg_txt, msg_file1 = server.get_msg_index(0, "Sending ''")
+            msg_txt, msg, msg_file1 = server.get_msg_index(0, "Sending ''")
 
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
@@ -548,7 +548,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(3)[1])
             self.assertEqual(['avrel@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(3)[2])
 
-            msg, msg_txt, msg_file1 = server.get_msg_index(2, "Sending '6'")
+            msg_txt, msg, msg_file1 = server.get_msg_index(2, "Sending '6'")
 
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
@@ -931,7 +931,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
             self.assertEqual(0, len(LucteriosScheduler.get_list()))
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
-            msg, msg_txt, msg_file1, msg_file3 = server.check_first_message('new message', 4)
+            msg_txt, msg, msg_file1, msg_file3 = server.check_first_message('new message', 4)
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
             self.assertEqual(
@@ -1075,7 +1075,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
             self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
-            msg, msg_txt = server.check_first_message('new message', 2)
+            msg_txt, msg = server.check_first_message('new message', 2)
             self.assertEqual('text/plain', msg_txt.get_content_type())
             self.assertEqual('text/html', msg.get_content_type())
             self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
