@@ -156,6 +156,9 @@ class TestReceiver(TestCase):
     def get(self, index):
         return self.smtp.emails[index]
 
+    def email_list(self):
+        return [email[2] for email in self.smtp.emails]
+
     def get_first_msg(self):
         data = self.get(0)[3]
         if hasattr(data, 'decode'):

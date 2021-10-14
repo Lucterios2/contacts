@@ -8,60 +8,60 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-15 14:27+0000\n"
-"PO-Revision-Date: 2020-04-27 17:21+0200\n"
+"POT-Creation-Date: 2021-10-14 14:25+0000\n"
+"PO-Revision-Date: 2021-10-14 16:24+0200\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Poedit 2.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: __init__.py:42 views.py:220
+#: __init__.py:42 views.py:219
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
-#: editors.py:54 editors.py:124 views_message.py:84
+#: editors.py:53 editors.py:123 views_message.py:84
 msgid "title"
 msgstr "title"
 
-#: editors.py:57 models.py:114
+#: editors.py:56 models.py:114
 msgid "phone fields"
 msgstr "phone fields"
 
-#: editors.py:79
+#: editors.py:78
 msgid "Remove"
 msgstr "Remove"
 
-#: editors.py:81
+#: editors.py:80
 msgid "Insert"
 msgstr "Insert"
 
-#: editors.py:100
+#: editors.py:99
 msgid "model"
 msgstr "model"
 
-#: editors.py:101
+#: editors.py:100
 msgid "filter"
 msgstr "filter"
 
-#: editors.py:114 views_message.py:277
+#: editors.py:113 views_message.py:278
 msgid "statistic"
 msgstr "statistic"
 
-#: email_functions.py:162 views_message.py:67
+#: email_functions.py:146
+msgid "No valid recipients !"
+msgstr "No valid recipients !"
+
+#: email_functions.py:164 views_message.py:67
 msgid "Email not configure!"
 msgstr "Email not configure!"
 
-#: email_functions.py:181
+#: email_functions.py:183
 msgid "Connection password"
 msgstr "Connection password"
-
-#: models.py:60
-msgid "id"
-msgstr "id"
 
 #: models.py:61
 msgid "line"
@@ -83,7 +83,7 @@ msgstr "subject"
 msgid "type"
 msgstr "type"
 
-#: models.py:99 models.py:508 views.py:153 views_message.py:195
+#: models.py:99 models.py:508 views.py:152 views_message.py:195
 msgid "email"
 msgstr "email"
 
@@ -373,79 +373,79 @@ msgstr "You do not have access to this resource."
 msgid "API token empty"
 msgstr "API token empty"
 
-#: views.py:45
+#: views.py:44
 msgid "Change mailing and SMS parameters"
 msgstr "Change mailing and SMS parameters"
 
-#: views.py:48
+#: views.py:47
 msgid "Mailing & SMS parameters"
 msgstr "Mailing & SMS parameters"
 
-#: views.py:51
+#: views.py:50
 msgid "EMail configuration"
 msgstr "EMail configuration"
 
-#: views.py:64 views.py:82 views.py:96 views.py:109
+#: views.py:63 views.py:81 views.py:95 views.py:108
 msgid "Modify"
 msgstr "Modify"
 
-#: views.py:69 views.py:114
+#: views.py:68 views.py:113
 msgid "Send"
 msgstr "Send"
 
-#: views.py:73
+#: views.py:72
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:86
+#: views.py:85
 msgid "SMS configuration"
 msgstr "SMS configuration"
 
-#: views.py:133 views.py:166 views_message.py:170 views_message.py:177
+#: views.py:132 views.py:165 views_message.py:170 views_message.py:177
 msgid "EMail try"
 msgstr "EMail try"
 
-#: views.py:137
+#: views.py:136
 msgid "Bad email parameter!"
 msgstr "Bad email parameter!"
 
-#: views.py:164
+#: views.py:163
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:169 views_message.py:203
+#: views.py:168 views_message.py:203
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 
-#: views.py:175 views_message.py:206 views_message.py:213
+#: views.py:174 views_message.py:206 views_message.py:213
 msgid "SMS try"
 msgstr "SMS try"
 
-#: views.py:180
+#: views.py:179
 msgid "Bad SMS parameter!"
 msgstr "Bad SMS parameter!"
 
-#: views.py:196 views_message.py:231
+#: views.py:195 views_message.py:231
 msgid "phone"
 msgstr "phone"
 
-#: views.py:201
+#: views.py:200
 msgid "SMS sent to check configuration"
 msgstr "SMS sent to check configuration"
 
-#: views.py:202 views_message.py:238
+#: views.py:201 views_message.py:238
 msgid "SMS send, check it."
 msgstr "SMS send, check it."
 
-#: views.py:220
+#: views.py:219
 msgid "Mailing parameters"
 msgstr "Mailing parameters"
 
-#: views.py:225
+#: views.py:224
 msgid "email properly configured"
 msgstr "email properly configured"
 
-#: views.py:227
+#: views.py:226
 msgid "email not configured"
 msgstr "email not configured"
 
@@ -474,16 +474,13 @@ msgid "Messages SMS"
 msgstr "Messages SMS"
 
 #: views_message.py:88
-#, fuzzy, python-format
-#| msgid "SMS configuration"
+#, python-format
 msgid "SMS bad configured : %s"
-msgstr "SMS configuration"
+msgstr "SMS bad configured : %s"
 
 #: views_message.py:88
-#, fuzzy
-#| msgid "Email not configure!"
 msgid "SMS not configure!"
-msgstr "Email not configure!"
+msgstr "SMS not configure!"
 
 #: views_message.py:103 views_message.py:121
 msgid "Add message"
@@ -520,61 +517,64 @@ msgstr "This message is being transmitted"
 msgid "Info"
 msgstr "Info"
 
-#: views_message.py:264 views_message.py:273
+#: views_message.py:264 views_message.py:274
 msgid "Transmission report"
 msgstr "Transmission report"
 
-#: views_message.py:276
+#: views_message.py:277
 msgid "date begin of send"
 msgstr "date begin of send"
 
-#: views_message.py:276
+#: views_message.py:277
 msgid "date end of send"
 msgstr "date end of send"
 
-#: views_message.py:289
+#: views_message.py:290
 msgid "Show only failed"
 msgstr "Show only failed"
 
-#: views_message.py:294
+#: views_message.py:295
 msgid "Close"
 msgstr "Close"
 
-#: views_message.py:297
+#: views_message.py:298
 msgid "Letters"
 msgstr "Letters"
 
-#: views_message.py:303
+#: views_message.py:304
 msgid "Write message"
 msgstr "Write message"
 
-#: views_message.py:320
+#: views_message.py:322
 msgid "Delete message"
 msgstr "Delete message"
 
-#: views_message.py:328 views_message.py:340
+#: views_message.py:330 views_message.py:343
 msgid "Add recipient to message"
 msgstr "Add recipient to message"
 
-#: views_message.py:350
+#: views_message.py:354
 msgid "Delete recipient"
 msgstr "Delete recipient"
 
-#: views_message.py:353
+#: views_message.py:358
 msgid "Do you want to delete this recipient?"
 msgstr "Do you want to delete this recipient?"
 
-#: views_message.py:362 views_message.py:370
+#: views_message.py:367 views_message.py:375
 msgid "Insert document to message"
 msgstr "Insert document to message"
 
-#: views_message.py:377
+#: views_message.py:383 views_message.py:397
 msgid "Remove document to message"
 msgstr "Remove document to message"
 
-#: views_message.py:383
+#: views_message.py:390
 msgid "Do you want to remove those documents ?"
 msgstr "Do you want to remove those documents ?"
+
+#~ msgid "id"
+#~ msgstr "id"
 
 #~ msgid "sms phone fields"
 #~ msgstr "sms phone fields"

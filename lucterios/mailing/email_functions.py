@@ -28,6 +28,7 @@ from email.mime.text import MIMEText
 from smtplib import SMTP, SMTP_SSL
 from html2text import HTML2Text
 from os.path import isfile
+from re import findall
 
 from email.utils import formatdate, make_msgid
 from email.mime.multipart import MIMEMultipart
@@ -55,7 +56,7 @@ def will_mail_send():
 def split_doubled_email(email_list):
     if isinstance(email_list, list):
         for email_sep in (";", ","):
-            email_list = email_sep.join(email_list).split(email_sep)
+            email_list = findall("([a-zA-Z0-9_%.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)", email_sep.join(email_list))
         return email_list
     else:
         return None
@@ -142,7 +143,7 @@ def sending_email(recipients, sender_name, sender_email, subject, body, body_txt
     try:
         return email_server.sendmail(msg_from, recipients, msg.as_string())
     except Exception as error:
-        raise EmailException(str(error))
+        raise EmailException(str(error) if len(recipients) > 0 else _('No valid recipients !'))
     finally:
         if email_server:
             email_server.quit()
