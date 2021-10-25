@@ -36,6 +36,7 @@ from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.tools import get_format_value
 from lucterios.framework.auditlog import auditlog
 from lucterios.CORE.models import Parameter, LucteriosGroup
+from lucterios.mailing.email_functions import split_doubled_email
 
 
 class CustomField(LucteriosModel):
@@ -530,7 +531,8 @@ class LegalEntity(AbstractContact):
     def get_presentation(self):
         sub_contact = []
         for indiv in Individual.objects.filter(responsability__legal_entity=self):
-            sub_contact.append(indiv.get_presentation())
+            if len(split_doubled_email([indiv.email])) != 0:
+                sub_contact.append(indiv.get_presentation())
         if len(sub_contact) == 0:
             return self.name
         else:

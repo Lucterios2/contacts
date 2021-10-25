@@ -249,7 +249,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertEqual(str(error), '[Errno 111] Connection refused')
+            self.assertEqual(str(error)[:11], '[Errno 111]')
         self.assertEqual(0, self.server.count())
 
     def test_send_ok(self):
