@@ -391,7 +391,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-        msg2, msg1,  = self.server.check_first_message('send html', 2)
+        msg2, msg1, = self.server.check_first_message('send html', 2)
         self.assertEqual('text/html', msg1.get_content_type())
         self.assertEqual('base64', msg1.get('Content-Transfer-Encoding', ''))
         self.assertEqual(html_content, decode_b64(msg1.get_payload()))

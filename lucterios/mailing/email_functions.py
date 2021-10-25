@@ -56,7 +56,7 @@ def will_mail_send():
 def split_doubled_email(email_list):
     if isinstance(email_list, list):
         for email_sep in (";", ","):
-            email_list = findall("([a-zA-Z0-9_%.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)", email_sep.join(email_list))
+            email_list = findall(r"([a-zA-Z0-9_%.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)", email_sep.join(email_list))
         return email_list
     else:
         return None
