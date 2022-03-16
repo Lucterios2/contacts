@@ -93,8 +93,12 @@ class CustomFieldEditor(LucteriosEditor):
             xfer.params['modelname'] = sel_models[0][0]
             model_select.set_value(xfer.params['modelname'])
             xfer.change_to_readonly('modelname')
-        self._edit_add_args(xfer, obj_kind)
-        obj_kind.java_script = """
+        if xfer.getparam('custom_type') is not None:
+            xfer.remove_component('kind')
+            xfer.params['kind'] = xfer.getparam('custom_type')
+        else:
+            self._edit_add_args(xfer, obj_kind)
+            obj_kind.java_script = """
 var type=current.getValue();
 parent.get('args_multi').setVisible(type==0);
 parent.get('args_min').setVisible(type==1 || type==2);
@@ -121,20 +125,20 @@ parent.get('args_list').setVisible(type==4);
     def get_comp(self, value):
         comp = None
         args = self.item.get_args()
-        if self.item.kind == 0:
+        if self.item.kind == CustomField.KIND_STRING:
             if args['multi']:
                 comp = XferCompMemo(self.item.get_fieldname())
             else:
                 comp = XferCompEdit(self.item.get_fieldname())
             comp.set_value(value)
-        elif (self.item.kind == 1) or (self.item.kind == 2):
+        elif (self.item.kind == CustomField.KIND_INTEGER) or (self.item.kind == CustomField.KIND_REAL):
             comp = XferCompFloat(
                 self.item.get_fieldname(), args['min'], args['max'], args['prec'])
             comp.set_value(value)
-        elif self.item.kind == 3:
+        elif self.item.kind == CustomField.KIND_BOOLEAN:
             comp = XferCompCheck(self.item.get_fieldname())
             comp.set_value(value)
-        elif self.item.kind == 4:
+        elif self.item.kind == CustomField.KIND_SELECT:
             val_selected = value
             try:
                 select_id = int(value)

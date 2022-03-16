@@ -392,6 +392,11 @@ class CustomFieldAddModify(XferAddEditor):
     caption_add = _("Add custom field")
     caption_modify = _("Modify custom field")
 
+    def fillresponse(self):
+        XferAddEditor.fillresponse(self)
+        if self.getparam('custom_editor_title') is not None:
+            self.caption = self.getparam('custom_editor_title')
+
 
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')

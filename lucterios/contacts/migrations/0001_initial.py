@@ -233,8 +233,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('abstractcontact_ptr', models.OneToOneField(auto_created=True,
                                                              to='contacts.AbstractContact', serialize=False, parent_link=True, primary_key=True, on_delete=models.CASCADE)),
-                ('name', models.CharField(
-                    max_length=100, verbose_name='name', blank=False)),
+                ('name', models.CharField(max_length=100, verbose_name='denomination')),
                 ('identify_number', models.CharField(
                     max_length=100, blank=True, verbose_name='identify number')),
                 ('structure_type', models.ForeignKey(on_delete=models.deletion.SET_NULL,

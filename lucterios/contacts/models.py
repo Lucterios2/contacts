@@ -40,9 +40,19 @@ from lucterios.mailing.email_functions import split_doubled_email
 
 
 class CustomField(LucteriosModel):
+    KIND_STRING = 0
+    KIND_INTEGER = 1
+    KIND_REAL = 2
+    KIND_BOOLEAN = 3
+    KIND_SELECT = 4
+
     modelname = models.CharField(_('model'), max_length=100)
     name = models.CharField(_('name'), max_length=200, unique=False)
-    kind = models.IntegerField(_('kind'), choices=((0, _('String')), (1, _('Integer')), (2, _('Real')), (3, _('Boolean')), (4, _('Select'))))
+    kind = models.IntegerField(_('kind'), choices=((KIND_STRING, _('String')),
+                                                   (KIND_INTEGER, _('Integer')),
+                                                   (KIND_REAL, _('Real')),
+                                                   (KIND_BOOLEAN, _('Boolean')),
+                                                   (KIND_SELECT, _('Select'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
     model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
     kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
@@ -76,16 +86,16 @@ class CustomField(LucteriosModel):
         dep_field = self.get_field_by_name('kind')
         args = self.get_args()
         params_txt = ""
-        if self.kind == 0:
+        if self.kind == self.KIND_STRING:
             if args['multi']:
                 params_txt = "(%s)" % _('multi-line')
-        elif self.kind == 1:
+        elif self.kind == self.KIND_INTEGER:
             params_txt = "[%d;%d]" % (int(args['min']), int(args['max']))
-        elif self.kind == 2:
+        elif self.kind == self.KIND_REAL:
             prec = ".%df" % int(args['prec'])
             floatformat = "[%" + prec + ";%" + prec + "]"
             params_txt = floatformat % (float(args['min']), float(args['max']))
-        elif self.kind == 4:
+        elif self.kind == self.KIND_SELECT:
             params_txt = "(%s)" % ",".join(args['list'])
         value = "%s %s" % (get_value_if_choices(self.kind, dep_field), params_txt)
         return value.strip()
@@ -106,15 +116,15 @@ class CustomField(LucteriosModel):
         from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField
         from django.core.validators import MaxValueValidator, MinValueValidator
         args = self.get_args()
-        if self.kind == 0:
+        if self.kind == self.KIND_STRING:
             dbfield = TextField(self.name)
-        if self.kind == 1:
+        if self.kind == self.KIND_INTEGER:
             dbfield = IntegerField(self.name, validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
-        if self.kind == 2:
+        if self.kind == self.KIND_REAL:
             dbfield = DecimalField(self.name, decimal_places=int(args['prec']), validators=[MinValueValidator(float(args['min'])), MaxValueValidator(float(args['max']))])
-        if self.kind == 3:
+        if self.kind == self.KIND_BOOLEAN:
             dbfield = BooleanField(self.name)
-        if self.kind == 4:
+        if self.kind == self.KIND_SELECT:
             choices = []
             for item in args['list']:
                 choices.append((len(choices), item))
@@ -141,7 +151,7 @@ class CustomField(LucteriosModel):
         return fields
 
     @classmethod
-    def edit_fields(cls, xfer, init_col):
+    def edit_fields(cls, xfer, init_col, nb_col=2):
         col = init_col
         col_offset = 0
         colspan = 1
@@ -152,7 +162,7 @@ class CustomField(LucteriosModel):
             comp.description = cf_model.name
             xfer.add_component(comp)
             col_offset += 1
-            if col_offset == 2:
+            if col_offset == nb_col:
                 col_offset = 0
                 colspan = 1
                 row += 1
@@ -184,6 +194,9 @@ class CustomizeObject(object):
             if len(cust_item) != 0:
                 fields_desc.append(tuple(cust_item))
         return fields_desc
+
+    def _convert_model_for_attr(self, cf_model, ccf_model):
+        return self._convert_value_for_attr(cf_model, ccf_model.value)
 
     def _convert_value_for_attr(self, cf_model, ccf_value, args_list=[]):
         if ccf_value == '':
@@ -250,7 +263,7 @@ class CustomizeObject(object):
             return LucteriosVirtualField(verbose_name=field_title, name=name, compute_from=name, format_string=lambda: format_num)
         return None
 
-    def _get_value_for_attr(self, cf_model):
+    def _get_custom_for_attr(self, cf_model):
         args = {self.FieldName: self, 'field': cf_model}
         ccf_models = self.CustomFieldClass.objects.filter(**args)
         if len(ccf_models) == 0:
@@ -261,8 +274,7 @@ class CustomizeObject(object):
             ccf_model = ccf_models[0]
             for old_model in ccf_models[1:]:
                 old_model.delete()
-        ccf_value = ccf_model.value
-        return ccf_value
+        return ccf_model
 
     def __getattr__(self, name):
         if name == "str":
@@ -272,12 +284,14 @@ class CustomizeObject(object):
             cf_model = CustomField.objects.get(id=cf_id)
             if self.id is None:
                 ccf_value = ""
+                if cf_model.kind != CustomField.KIND_STRING:
+                    ccf_value = self._convert_value_for_attr(cf_model, ccf_value)
             else:
-                ccf_value = self._get_value_for_attr(cf_model)
-            if cf_model.kind == 0:
-                ccf_value = str(ccf_value)
-            else:
-                ccf_value = self._convert_value_for_attr(cf_model, ccf_value)
+                ccf_model = self._get_custom_for_attr(cf_model)
+                if cf_model.kind == CustomField.KIND_STRING:
+                    ccf_value = str(ccf_model.value)
+                else:
+                    ccf_value = self._convert_model_for_attr(cf_model, ccf_model)
             return ccf_value
         raise AttributeError(name)
 
