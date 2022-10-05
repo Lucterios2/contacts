@@ -30,7 +30,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from lucterios.framework.xfercomponents import XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
-    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel
+    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel,\
+    XferCompDate
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO, CLOSE_YES, get_icon_path, WrapAction
 from lucterios.framework.tools import ActionsManage
 from lucterios.framework.editors import LucteriosEditor
@@ -152,6 +153,9 @@ parent.get('args_list').setVisible(type==4);
             comp = XferCompSelect(self.item.get_fieldname())
             comp.set_select(select_list)
             comp.set_value(select_id)
+        elif self.item.kind == CustomField.KIND_DATE:
+            comp = XferCompDate(self.item.get_fieldname())
+            comp.set_value(value)
         return comp
 
 

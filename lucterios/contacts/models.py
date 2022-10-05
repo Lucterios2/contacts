@@ -24,6 +24,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 from os.path import exists, join, dirname
+from datetime import datetime
 import logging
 
 from django.utils.translation import ugettext_lazy as _
@@ -45,6 +46,7 @@ class CustomField(LucteriosModel):
     KIND_REAL = 2
     KIND_BOOLEAN = 3
     KIND_SELECT = 4
+    KIND_DATE = 5
 
     modelname = models.CharField(_('model'), max_length=100)
     name = models.CharField(_('name'), max_length=200, unique=False)
@@ -52,7 +54,8 @@ class CustomField(LucteriosModel):
                                                    (KIND_INTEGER, _('Integer')),
                                                    (KIND_REAL, _('Real')),
                                                    (KIND_BOOLEAN, _('Boolean')),
-                                                   (KIND_SELECT, _('Select'))))
+                                                   (KIND_SELECT, _('Select')),
+                                                   (KIND_DATE, _('Date'))))
     args = models.CharField(_('arguments'), max_length=200, default="{}")
     model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
     kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
@@ -113,7 +116,7 @@ class CustomField(LucteriosModel):
         return args
 
     def get_field(self):
-        from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField
+        from django.db.models.fields import IntegerField, DecimalField, BooleanField, TextField, DateField
         from django.core.validators import MaxValueValidator, MinValueValidator
         args = self.get_args()
         if self.kind == self.KIND_STRING:
@@ -129,6 +132,8 @@ class CustomField(LucteriosModel):
             for item in args['list']:
                 choices.append((len(choices), item))
             dbfield = IntegerField(self.name, choices=tuple(choices))
+        if self.kind == self.KIND_DATE:
+            dbfield = DateField(self.name)
         return dbfield
 
     @classmethod
@@ -201,17 +206,22 @@ class CustomizeObject(object):
     def _convert_value_for_attr(self, cf_model, ccf_value, args_list=[]):
         if ccf_value == '':
             ccf_value = '0'
-        if cf_model.kind == 1:
+        if cf_model.kind == CustomField.KIND_INTEGER:
             ccf_value = int(ccf_value)
-        if cf_model.kind == 2:
+        elif cf_model.kind == CustomField.KIND_REAL:
             ccf_value = float(ccf_value)
-        if cf_model.kind == 3:
+        elif cf_model.kind == CustomField.KIND_BOOLEAN:
             ccf_value = ccf_value != 'False' and ccf_value != '0' and ccf_value != '' and ccf_value != 'n'
-        if cf_model.kind == 4:
+        elif cf_model.kind == CustomField.KIND_SELECT:
             if args_list.count(ccf_value) > 0:
                 ccf_value = args_list.index(ccf_value)
             else:
                 ccf_value = int(ccf_value)
+        elif cf_model.kind == CustomField.KIND_DATE:
+            try:
+                ccf_value = datetime.strptime(ccf_value, "%Y-%m-%d").date().isoformat()
+            except (TypeError, ValueError):
+                ccf_value = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
         return ccf_value
 
     def set_custom_values(self, params):
@@ -246,19 +256,21 @@ class CustomizeObject(object):
             cf_id = int(name[7:])
             cf_model = CustomField.objects.get(id=cf_id)
             field_title = cf_model.name
-            if cf_model.kind == 0:
+            if cf_model.kind == CustomField.KIND_STRING:
                 format_num = None
-            if cf_model.kind == 1:
+            elif cf_model.kind == CustomField.KIND_INTEGER:
                 format_num = 'N0'
-            if cf_model.kind == 2:
+            elif cf_model.kind == CustomField.KIND_REAL:
                 format_num = 'N%d' % cf_model.get_args()['prec']
-            if cf_model.kind == 3:
+            elif cf_model.kind == CustomField.KIND_BOOLEAN:
                 format_num = 'B'
-            if cf_model.kind == 4:
+            elif cf_model.kind == CustomField.KIND_SELECT:
                 format_num = {}
                 args_list = cf_model.get_args()['list']
                 for list_index in range(len(args_list)):
                     format_num[str(list_index)] = args_list[list_index]
+            elif cf_model.kind == CustomField.KIND_DATE:
+                format_num = 'D'
         if field_title is not None:
             return LucteriosVirtualField(verbose_name=field_title, name=name, compute_from=name, format_string=lambda: format_num)
         return None
