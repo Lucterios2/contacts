@@ -14,7 +14,7 @@ from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
 from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI,\
-    get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO
+    get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO, get_url_from_request
 from lucterios.framework.xferbasic import XferContainerAbstract
 from lucterios.framework.error import LucteriosException, MINOR
 from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom
@@ -45,8 +45,7 @@ class MessageList(XferListEditor):
 
     def fillresponse(self):
         XferListEditor.fillresponse(self)
-        abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
-        root_url = '/'.join(abs_url[:-2])
+        root_url = get_url_from_request(self.request).split('/')
         add_messaging_in_scheduler(check_nb=True, http_root_address=root_url)
 
 
@@ -197,8 +196,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
-            abs_url = self.request.META.get('HTTP_REFERER', self.request.build_absolute_uri()).split('/')
-            self.item.http_root_address = '/'.join(abs_url[:-2])
+            self.item.http_root_address = get_url_from_request(self.request).split('/')
             send_email([self.getparam('recipient')], self.item.subject, self.item.email_content, files=self.item.attach_files)
             self.message(_("EMail send, check it."))
 

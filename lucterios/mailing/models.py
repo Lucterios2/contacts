@@ -41,7 +41,7 @@ from lucterios.framework.model_fields import LucteriosVirtualField,\
     LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.framework.printgenerators import ReportingGenerator
-from lucterios.framework.tools import toHtml, get_date_formating
+from lucterios.framework.tools import toHtml, get_date_formating, get_url_from_request
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.error import LucteriosException, GRAVE
 from lucterios.framework.filetools import remove_accent
@@ -350,8 +350,7 @@ class Message(LucteriosModel):
         if self.can_be_send():
             self.prep_sending()
             if self._last_xfer is not None:
-                abs_url = self._last_xfer.request.META.get('HTTP_REFERER', self._last_xfer.request.build_absolute_uri()).split('/')
-                root_url = '/'.join(abs_url[:-2])
+                root_url = get_url_from_request(self._last_xfer.request)
             else:
                 root_url = ''
             getLogger('lucterios.mailing').debug('Message.sending() -> add_messaging_in_scheduler(http_root_address=%s)', root_url)
