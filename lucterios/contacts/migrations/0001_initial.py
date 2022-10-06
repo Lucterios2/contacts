@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(
                     max_length=100, verbose_name='name')),
                 ('kind', models.IntegerField(choices=[
-                 (0, 'String'), (1, 'Integer'), (2, 'Real'), (3, 'Boolean'), (4, 'Select')], verbose_name='kind')),
+                 (0, 'String'), (1, 'Integer'), (2, 'Real'), (3, 'Boolean'), (4, 'Select'), (5, 'Date')], verbose_name='kind')),
                 ('args', models.CharField(
                     default='{}', max_length=200, verbose_name='arguments')),
             ],

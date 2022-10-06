@@ -39,7 +39,7 @@ from lucterios.CORE.models import Parameter, LucteriosUser, LucteriosGroup
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import AskPassword, AskPasswordAct, ParamEdit, ParamSave
 
-from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
+from lucterios.contacts.test_tools import change_ourdetail, create_jack
 from lucterios.contacts.views import CreateAccount
 from lucterios.contacts.models import Individual, LegalEntity
 
@@ -249,7 +249,7 @@ class ConfigurationTest(LucteriosTest):
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
-            self.assertEqual(str(error)[:11], '[Errno 111]')
+            self.assertEqual(str(error)[:7], '[Errno ')
         self.assertEqual(0, self.server.count())
 
     def test_send_ok(self):

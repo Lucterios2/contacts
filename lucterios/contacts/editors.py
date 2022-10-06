@@ -156,10 +156,67 @@ parent.get('args_list').setVisible(type==4);
         elif self.item.kind == CustomField.KIND_DATE:
             comp = XferCompDate(self.item.get_fieldname())
             comp.set_value(value)
+            comp.set_needed(True)
         return comp
 
 
-class AbstractContactEditor(LucteriosEditor):
+class AbstractEditorCustomizeWithLogo(LucteriosEditor):
+
+    image_prefix = ""
+    component_move = ""
+
+    def edit(self, xfer):
+        obj_cmt = xfer.get_components('comment')
+        xfer.tab = obj_cmt.tab
+        CustomField.edit_fields(xfer, obj_cmt.col)
+        row = xfer.get_max_row()
+        xfer.move_components('comment', 0, row - obj_cmt.row + 1)
+        row = xfer.get_max_row()
+        upload = XferCompUpLoad('uploadlogo')
+        upload.set_value('')
+        upload.description = _('image')
+        upload.add_filter('.jpg')
+        upload.add_filter('.gif')
+        upload.add_filter('.png')
+        upload.add_filter('.bmp')
+        upload.set_location(obj_cmt.col, row + 1, obj_cmt.colspan, 1)
+        xfer.add_component(upload)
+        return
+
+    def show(self, xfer):
+        LucteriosEditor.show(self, xfer)
+        obj_comp = xfer.get_components(self.component_move)
+        xfer.tab = obj_comp.tab
+        xfer.move(obj_comp.tab, 1, 0)
+        img_path = get_user_path("contacts", "%s_%s.jpg" % (self.image_prefix, self.item.id))
+        img = XferCompImage('logoimg')
+        if exists(img_path):
+            img.type = 'jpg'
+            img.set_value(readimage_to_base64(img_path))
+        else:
+            img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
+        img.set_location(obj_comp.col - 1, obj_comp.row, 1, 6)
+        xfer.add_component(img)
+
+    def saving(self, xfer):
+        uploadlogo = xfer.getparam('uploadlogo')
+        if uploadlogo is not None:
+            tmp_file = save_from_base64(uploadlogo)
+            with open(tmp_file, "rb") as image_tmp:
+                image = open_image_resize(image_tmp, 100, 100)
+                image = image.convert("RGB")
+                img_path = get_user_path("contacts", "%s_%s.jpg" % (self.image_prefix, self.item.id))
+                with open(img_path, "wb") as image_file:
+                    image.save(image_file, 'JPEG', quality=90)
+            unlink(tmp_file)
+        LucteriosEditor.saving(self, xfer)
+        self.item.set_custom_values(xfer.params)
+
+
+class AbstractContactEditor(AbstractEditorCustomizeWithLogo):
+
+    image_prefix = "Image"
+    component_move = 'address'
 
     def _change_city_select(self, xfer, list_postalcode, obj_city):
 
@@ -194,58 +251,20 @@ class AbstractContactEditor(LucteriosEditor):
             postal_code=postalcode_current)
         if len(list_postalcode) > 0:
             self._change_city_select(xfer, list_postalcode, obj_city)
-        obj_cmt = xfer.get_components('comment')
-        xfer.tab = obj_cmt.tab
-        CustomField.edit_fields(xfer, obj_cmt.col)
-        row = xfer.get_max_row()
-        upload = XferCompUpLoad('uploadlogo')
-        upload.set_value('')
-        upload.description = _('image')
-        upload.add_filter('.jpg')
-        upload.add_filter('.gif')
-        upload.add_filter('.png')
-        upload.add_filter('.bmp')
-        upload.set_location(obj_cmt.col, row + 10, obj_cmt.colspan, 1)
-        xfer.add_component(upload)
+        AbstractEditorCustomizeWithLogo.edit(self, xfer)
         return
 
     def show(self, xfer):
-        LucteriosEditor.show(self, xfer)
-        obj_addr = xfer.get_components('address')
-        xfer.tab = obj_addr.tab
-        new_col = obj_addr.col
-        xfer.move(obj_addr.tab, 1, 0)
-        img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
-        img = XferCompImage('logoimg')
-        if exists(img_path):
-            img.type = 'jpg'
-            img.set_value(readimage_to_base64(img_path))
-        else:
-            img.set_value(get_icon_path("lucterios.contacts/images/NoImage.png"))
-        img.set_location(new_col, obj_addr.row, 1, 6)
-        xfer.add_component(img)
+        AbstractEditorCustomizeWithLogo.show(self, xfer)
+        obj_addr = xfer.get_components(self.component_move)
         if WrapAction.is_permission(xfer.request, 'contacts.add_abstractcontact'):
             if (len(self.item.__class__.get_select_contact_type(False)) > 0):
                 btn = XferCompButton('btn_promote')
-                btn.set_location(new_col + 1, xfer.get_max_row() + 1, 4)
+                btn.set_location(obj_addr.col + 1, xfer.get_max_row() + 1, 4)
                 btn.set_action(xfer.request, ObjectPromote.get_action(_('Promote'), "images/config.png"), modal=FORMTYPE_MODAL,
                                close=CLOSE_YES, params={'modelname': xfer.model.get_long_name(), 'field_id': xfer.field_id})
                 xfer.add_component(btn)
         signal_and_lock.Signal.call_signal("show_contact", self.item, xfer)
-
-    def saving(self, xfer):
-        uploadlogo = xfer.getparam('uploadlogo')
-        if uploadlogo is not None:
-            tmp_file = save_from_base64(uploadlogo)
-            with open(tmp_file, "rb") as image_tmp:
-                image = open_image_resize(image_tmp, 100, 100)
-                image = image.convert("RGB")
-                img_path = get_user_path("contacts", "Image_%s.jpg" % self.item.abstractcontact_ptr_id)
-                with open(img_path, "wb") as image_file:
-                    image.save(image_file, 'JPEG', quality=90)
-            unlink(tmp_file)
-        LucteriosEditor.saving(self, xfer)
-        self.item.set_custom_values(xfer.params)
 
     def add_email_selector(self, xfer, col, row, colspan):
         contacts_list = xfer.items.exclude(email__isnull=True).exclude(email__exact='')
@@ -316,3 +335,28 @@ class ResponsabilityEditor(LucteriosEditor):
     def edit(self, xfer):
         xfer.change_select_to_label('legal_entity')
         xfer.change_select_to_label('individual')
+
+
+class PossessionEditor(AbstractEditorCustomizeWithLogo):
+
+    image_prefix = "Possession"
+    component_move = 'category_possession'
+
+    def show(self, xfer):
+        AbstractEditorCustomizeWithLogo.show(self, xfer)
+        if xfer.getparam('mng_owner', True):
+            obj_owner = xfer.get_components('owner')
+            xfer.tab = obj_owner.tab
+            btn = XferCompButton('change_owner')
+            btn.set_is_mini(True)
+            btn.set_location(obj_owner.col + obj_owner.colspan, obj_owner.row)
+            btn.set_action(xfer.request, ActionsManage.get_action_url('contacts.Possession', 'Owner', xfer), modal=FORMTYPE_MODAL, close=CLOSE_NO)
+            xfer.add_component(btn)
+            if self.item.owner is not None:
+                owner_up = self.item.owner.get_final_child()
+                btn = XferCompButton('show_owner')
+                btn.set_is_mini(True)
+                btn.set_location(obj_owner.col + obj_owner.colspan + 1, obj_owner.row)
+                btn.set_action(xfer.request, ActionsManage.get_action_url(owner_up.get_long_name(), 'Show', xfer),
+                               modal=FORMTYPE_MODAL, close=CLOSE_NO, params={owner_up.__class__.__name__.lower(): self.item.owner.id})
+                xfer.add_component(btn)

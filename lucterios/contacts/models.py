@@ -174,6 +174,30 @@ class CustomField(LucteriosModel):
             else:
                 colspan = 2
 
+    def convert_data(self, value):
+        data = None
+        if self.kind == CustomField.KIND_STRING:
+            data = str(value)
+        else:
+            data = value
+        if data == '':
+            data = '0'
+        if self.kind == CustomField.KIND_INTEGER:
+            data = int(data)
+        if self.kind == CustomField.KIND_REAL:
+            data = float(data)
+        if self.kind == CustomField.KIND_BOOLEAN:
+            data = (data != 'False') and (data != '0') and (data != '') and (data != 'n')
+        if self.kind == CustomField.KIND_SELECT:
+            data = int(data)
+        if self.kind == CustomField.KIND_DATE:
+            try:
+                data = datetime.strptime(data, "%Y-%m-%d").date().isoformat()
+            except (TypeError, ValueError):
+                data = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
+        dep_field = CustomizeObject.get_virtualfield(self.get_fieldname())
+        return get_format_value(dep_field, data)
+
     class Meta(object):
         verbose_name = _('custom field')
         verbose_name_plural = _('custom fields')
@@ -371,26 +395,7 @@ class ContactCustomField(LucteriosModel):
     field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
     value = models.TextField(_('value'), default="")
 
-    data = LucteriosVirtualField(verbose_name=_('value'), compute_from='get_data')
-
-    def get_data(self):
-        data = None
-        if self.field.kind == 0:
-            data = str(self.value)
-        else:
-            data = self.value
-        if data == '':
-            data = '0'
-        if self.field.kind == 1:
-            data = int(data)
-        if self.field.kind == 2:
-            data = float(data)
-        if self.field.kind == 3:
-            data = (data != 'False') and (data != '0') and (data != '') and (data != 'n')
-        if self.field.kind == 4:
-            data = int(data)
-        dep_field = CustomizeObject.get_virtualfield(self.field.get_fieldname())
-        return get_format_value(dep_field, data)
+    data = LucteriosVirtualField(verbose_name=_('value'), compute_from=lambda item: item.field.convert_data(item.value))
 
     def get_auditlog_object(self):
         return self.contact.get_final_child()
@@ -674,6 +679,121 @@ class Responsability(LucteriosModel):
     class Meta(object):
         verbose_name = _('associate')
         verbose_name_plural = _('associates')
+
+
+class CategoryPossession(LucteriosModel):
+    name = models.CharField(_('name'), max_length=100, blank=False)
+    description = models.TextField(_('description'), blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    @classmethod
+    def get_default_fields(cls):
+        return ["name", "description"]
+
+    class Meta(object):
+        verbose_name = _('category')
+        verbose_name_plural = _('categories')
+        default_permissions = []
+
+
+class PossessionCustomField(LucteriosModel):
+    possession = models.ForeignKey('Possession', verbose_name=_('possession'), null=False, on_delete=models.CASCADE)
+    field = models.ForeignKey('CustomField', verbose_name=_('field'), null=False, on_delete=models.CASCADE)
+    value = models.TextField(_('value'), default="")
+
+    data = LucteriosVirtualField(verbose_name=_('value'), compute_from=lambda item: item.field.convert_data(item.value))
+
+    def get_auditlog_object(self):
+        return self.possession.get_final_child()
+
+    class Meta(object):
+        verbose_name = _('custom field value')
+        verbose_name_plural = _('custom field values')
+        default_permissions = []
+
+
+class Possession(LucteriosModel, CustomizeObject):
+    CustomFieldClass = PossessionCustomField
+    FieldName = 'possession'
+
+    category_possession = models.ForeignKey(CategoryPossession, verbose_name=_('category'), null=False, on_delete=models.PROTECT)
+    name = models.CharField(_('name'), max_length=100, blank=False)
+    owner = models.ForeignKey('AbstractContact', verbose_name=_('owner'), null=True, default=None, on_delete=models.PROTECT)
+    comment = models.TextField(_('comment'), blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    @classmethod
+    def get_field_by_name(cls, fieldname):
+        dep_field = CustomizeObject.get_virtualfield(fieldname)
+        if dep_field is None:
+            dep_field = super(Possession, cls).get_field_by_name(fieldname)
+        return dep_field
+
+    def __getattr__(self, name):
+        if name == "category_possession":
+            if self.category_possession_id is None:
+                return None
+            else:
+                return Possession.objects.get(id=self.category_possession_id)
+        else:
+            return CustomizeObject.__getattr__(self, name)
+
+    @classmethod
+    def get_default_fields(cls):
+        return [("image", "image"), "category_possession", "owner", "name"]
+
+    @classmethod
+    def get_other_fields(cls):
+        return [("image", "image"), "category_possession", "name"]
+
+    @classmethod
+    def get_show_fields(cls):
+        fields_desc = [("category_possession", )]
+        fields_desc.extend(cls.get_fields_to_show())
+        fields_desc.append(("comment",))
+        res_fields = {'': ["name", "owner"], _('001@Description'): fields_desc}
+        return res_fields
+
+    @classmethod
+    def get_edit_fields(cls):
+        return [("name", "category_possession"), ("comment",)]
+
+    @classmethod
+    def get_search_fields(cls, with_addon=True):
+        fieldnames = ["category_possession", "name"]
+        for cf_name, cf_model in CustomField.get_fields(cls):
+            fieldnames.append((cf_name, cf_model.get_field(), 'possessioncustomfield__value', models.Q(possessioncustomfield__field__id=cf_model.id)))
+        fieldnames.extend(["comment"])
+        fieldnames.append(cls.convert_field_for_search('owner', ('name', LegalEntity._meta.get_field('name'), 'legalentity__name', models.Q())))
+        fieldnames.append(cls.convert_field_for_search('owner', ('firstname', Individual._meta.get_field('firstname'), 'individual__firstname', models.Q())))
+        fieldnames.append(cls.convert_field_for_search('owner', ('lastname', Individual._meta.get_field('lastname'), 'individual__lastname', models.Q())))
+        for field_name in AbstractContact.get_search_fields(with_addon=False):
+            fieldnames.append(cls.convert_field_for_search('owner', field_name))
+        if with_addon:
+            Signal.call_signal("addon_search", cls, fieldnames)
+        return fieldnames
+
+    @property
+    def image(self):
+        img_path = get_user_path("contacts", "Possession_%s.jpg" % self.id)
+        if exists(img_path):
+            img = readimage_to_base64(img_path)
+        else:
+            img = readimage_to_base64(join(dirname(__file__), "static", 'lucterios.contacts', "images", "NoImage.png"))
+        return img.decode('ascii')
+
+    def delete(self, using=None):
+        for custom in self.possessioncustomfield_set.all():
+            custom.delete()
+        LucteriosModel.delete(self, using=using)
+
+    class Meta(object):
+        verbose_name = _('possession')
+        verbose_name_plural = _('possessions')
 
 
 class OurDetailPrintPlugin(PrintFieldsPlugIn):

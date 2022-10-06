@@ -36,7 +36,7 @@ from lucterios.CORE.views_usergroup import UsersPreference, PreferenceEdit
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
     CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
 from lucterios.contacts.models import LegalEntity
-from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
+from lucterios.contacts.test_tools import change_ourdetail, create_jack
 
 
 class PostalCodeTest(LucteriosTest):
@@ -185,9 +185,9 @@ class ConfigurationTest(LucteriosTest):
         self.assert_comp_equal(('EDIT', 'tel1'), "01-23-45-67-89", (1, 5, 1, 1))
         self.assert_comp_equal(('EDIT', 'tel2'), '', (2, 5, 1, 1))
         self.assert_comp_equal(('EDIT', 'email'), "mr-sylvestre@worldcompany.com", (1, 6, 2, 1))
-        self.assert_comp_equal(('MEMO', 'comment'), '', (1, 7, 2, 1))
         self.assert_comp_equal(('MEMO', 'identify_number'), '', (1, 8, 2, 1))
-        self.assert_coordcomp_equal('uploadlogo', (1, 18, 2, 1))
+        self.assert_comp_equal(('MEMO', 'comment'), '', (1, 9, 2, 1))
+        self.assert_coordcomp_equal('uploadlogo', (1, 10, 2, 1))
 
         self.factory.xfer = CurrentStructureAddModify()
         self.calljson('/lucterios.contacts/currentStructureAddModify', {"address": 'Rue de la liberté{[newline]}BP 123',

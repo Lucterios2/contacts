@@ -31,7 +31,7 @@ from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
 from lucterios.framework.model_fields import LucteriosScheduler
 from lucterios.CORE.models import LucteriosUser, PrintModel
 
-from lucterios.contacts.tests_contacts import change_ourdetail, create_jack
+from lucterios.contacts.test_tools import change_ourdetail, create_jack
 
 from lucterios.documents.tests import create_doc
 from lucterios.documents.models import DocumentContainer

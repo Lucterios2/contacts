@@ -23,20 +23,19 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from __future__ import unicode_literals
-from shutil import rmtree
 from os.path import join, dirname, exists
 from _io import StringIO
 from base64 import b64decode
 
 from lucterios.framework.test import LucteriosTest
-from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path
+from lucterios.framework.filetools import readimage_to_base64, get_user_path
 from lucterios.framework.xfersearch import get_search_query_from_criteria
 from lucterios.CORE.views_usergroup import UsersEdit
 from lucterios.CORE.views import ObjectMerge
 
 from lucterios.contacts.views import Configuration, CustomFieldAddModify, ContactImport
-from lucterios.contacts.models import LegalEntity, Individual, StructureType, \
-    Function, Responsability, CustomField, ContactCustomField
+from lucterios.contacts.models import LegalEntity, Individual, Function, Responsability, CustomField, ContactCustomField
+from lucterios.contacts.test_tools import initial_contact, create_jack
 from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     LegalEntityAddModify, IndividualAddModify, IndividualShow, IndividualUserAdd, \
     IndividualUserValid, LegalEntityDel, LegalEntityShow, ResponsabilityAdd, \
@@ -45,50 +44,11 @@ from lucterios.contacts.views_contacts import IndividualList, LegalEntityList, \
     AbstractContactFindDouble, AbstractContactShow
 
 
-def change_contact(contact, **field_values):
-    for field_name, field_value in field_values.items():
-        if hasattr(contact, field_name):
-            if field_name[:7] == "custom_":
-                contact.set_custom_values({field_name: field_value})
-            else:
-                setattr(contact, field_name, field_value)
-    contact.save()
-
-
-def change_ourdetail(**field_values):
-    ourdetails = LegalEntity.objects.get(id=1)
-    ourdetails.name = "WoldCompany"
-    change_contact(ourdetails, address="Place des cocotiers", postal_code="97200", city="FORT DE FRANCE",
-                   country="MARTINIQUE", tel1="01-23-45-67-89", email="mr-sylvestre@worldcompany.com", **field_values)
-
-
-def create_jack(empty_user=None, firstname="jack", lastname="MISTER", with_email=True, **field_values):
-    empty_contact = Individual()
-    empty_contact.firstname = firstname
-    empty_contact.lastname = lastname
-    empty_contact.user = empty_user
-    if with_email:
-        empty_contact.email = "%s@worldcompany.com" % firstname
-    empty_contact.save()
-    change_contact(empty_contact, address="rue de la liberté", postal_code="97250", city="LE PRECHEUR",
-                   country="MARTINIQUE", tel2="02-78-45-12-95", **field_values)
-    return empty_contact
-
-
 class ContactsTest(LucteriosTest):
 
     def setUp(self):
         LucteriosTest.setUp(self)
-        change_ourdetail()
-        rmtree(get_user_dir(), True)
-        StructureType.objects.create(name="Type A")
-        StructureType.objects.create(name="Type B")
-        StructureType.objects.create(name="Type C")
-        Function.objects.create(name="President")
-        Function.objects.create(name="Secretaire")
-        Function.objects.create(name="Tresorier")
-        Function.objects.create(name="Troufion")
-        create_jack()
+        initial_contact()
 
     def test_individual(self):
         self.factory.xfer = IndividualList()
