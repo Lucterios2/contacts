@@ -108,12 +108,15 @@ class PossessionSearch(XferSavedCriteriaSearchEditor):
 
 
 def owner_to_possession(request):
-    if "owner" in request.GET:
+    if hasattr(request, "owner_id"):
+        owner = AbstractContact.objects.get(id=getattr(request, "owner_id")).get_final_child()
+        return hasattr(owner, "user") and (owner.user_id == request.user.id)
+    elif "owner" in request.GET:
         owner = AbstractContact.objects.get(id=request.GET["owner"]).get_final_child()
-        return hasattr(owner, "user") and (owner.user == request.user)
+        return hasattr(owner, "user") and (owner.user_id == request.user.id)
     elif "owner" in request.POST:
         owner = AbstractContact.objects.get(id=request.POST["owner"]).get_final_child()
-        return hasattr(owner, "user") and (owner.user == request.user)
+        return hasattr(owner, "user") and (owner.user_id == request.user.id)
     else:
         return False
 
@@ -212,6 +215,7 @@ def show_contact_possession(contact, xfer):
         xfer.new_tab(_("Possessions"))
         xfer.params['mng_owner'] = False
         xfer.params['owner'] = contact.id
+        xfer.request.owner_id = contact.id
         possession_grid = XferCompGrid('possession')
         possession_grid.set_model(Possession.objects.filter(owner=contact).distinct(), Possession.get_other_fields(), xfer)
         possession_grid.add_action_notified(xfer, Possession)

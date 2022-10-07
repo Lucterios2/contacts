@@ -47,6 +47,7 @@ from lucterios.CORE.views import ObjectMerge, ObjectPromote
 from lucterios.contacts.models import LegalEntity, Individual, Responsability, AbstractContact
 from lucterios.CORE.parameters import Params
 
+
 MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
 
 MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/contacts.png",
@@ -489,15 +490,28 @@ def situation_contacts(xfer):
     else:
         if not xfer.request.user.is_anonymous:
             try:
+                from lucterios.contacts.views import AccountAddModify
                 current_individual = Individual.objects.get(user=xfer.request.user)
                 row = xfer.get_max_row() + 1
                 lab = XferCompLabelForm('contactsidentity')
                 lab.set_value_as_header(str(current_individual))
                 lab.set_location(0, row, 4)
                 xfer.add_component(lab)
+                if (current_individual.postal_code == '---'):
+                    row = xfer.get_max_row() + 1
+                    btn = XferCompButton('summarybtn')
+                    btn.set_location(0, row + 1, 4)
+                    btn.set_action(xfer.request, AccountAddModify.get_action(TITLE_EDIT, 'images/edit.png'),
+                                   modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'individual': current_individual.id})
+                    btn.java_script = """if (typeof Singleton().hide_individual === 'undefined') {
+    current.actionPerformed();
+    Singleton().hide_individual = 1;
+}
+"""
+                    xfer.add_component(btn)
                 lab = XferCompLabelForm('contactsend')
                 lab.set_value_center('{[hr/]}')
-                lab.set_location(0, row + 1, 4)
+                lab.set_location(0, row + 2, 4)
                 xfer.add_component(lab)
                 return True
             except Exception:
