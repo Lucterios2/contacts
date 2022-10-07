@@ -56,7 +56,7 @@ class CustomField(LucteriosModel):
                                                    (KIND_BOOLEAN, _('Boolean')),
                                                    (KIND_SELECT, _('Select')),
                                                    (KIND_DATE, _('Date'))))
-    args = models.CharField(_('arguments'), max_length=200, default="{}")
+    args = models.TextField(_('arguments'), default="{}")
     model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
     kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
 
