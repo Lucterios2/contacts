@@ -816,6 +816,19 @@ class OurDetailPrintPlugin(PrintFieldsPlugIn):
 PrintFieldsPlugIn.add_plugin(OurDetailPrintPlugin)
 
 
+@Signal.decorate('addon_search')
+def possession_addon_search(model, search_result):
+    res = False
+    if issubclass(model, AbstractContact) and (CategoryPossession.objects.all().count() > 0):
+        for field_name in ["category_possession", "name", "comment"]:
+            search_result.append(model.convert_field_for_search('possession_set', (field_name, Possession._meta.get_field(field_name), field_name, models.Q())))
+        for cf_name, cf_model in CustomField.get_fields(Possession):
+            field = (cf_name, cf_model.get_field(), 'possessioncustomfield__value', models.Q(possessioncustomfield__field__id=cf_model.id))
+            search_result.append(model.convert_field_for_search('possession_set', field))
+        res = True
+    return res
+
+
 @Signal.decorate('checkparam')
 def contacts_checkparam():
     from django.apps import apps
