@@ -28,6 +28,7 @@ from datetime import datetime
 import logging
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.aggregates import Max
 from django.db import models
 
 from lucterios.framework.models import LucteriosModel
@@ -59,6 +60,7 @@ class CustomField(LucteriosModel):
     args = models.TextField(_('arguments'), default="{}")
     model_title = LucteriosVirtualField(verbose_name=_('model'), compute_from='get_model_title')
     kind_txt = LucteriosVirtualField(verbose_name=_('kind'), compute_from='get_kind_txt')
+    order_key = models.IntegerField(verbose_name=_('order key'), null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -198,10 +200,29 @@ class CustomField(LucteriosModel):
         dep_field = CustomizeObject.get_virtualfield(self.get_fieldname())
         return get_format_value(dep_field, data)
 
+    def up_order(self):
+        prec_custom = CustomField.objects.filter(order_key__lt=self.order_key).order_by('-order_key').first()
+        if prec_custom is not None:
+            order_key = prec_custom.order_key
+            prec_custom.order_key = self.order_key
+            self.order_key = order_key
+            prec_custom.save()
+            self.save()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.order_key is None:
+            val = CustomField.objects.all().aggregate(Max('order_key'))
+            if val['order_key__max'] is None:
+                self.order_key = 1
+            else:
+                self.order_key = val['order_key__max'] + 1
+        return LucteriosModel.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
     class Meta(object):
         verbose_name = _('custom field')
         verbose_name_plural = _('custom fields')
         default_permissions = []
+        ordering = ['order_key']
 
 
 class CustomizeObject(object):
@@ -827,6 +848,12 @@ def possession_addon_search(model, search_result):
             search_result.append(model.convert_field_for_search('possession_set', field))
         res = True
     return res
+
+
+@Signal.decorate('convertdata')
+def contacts_convertdata():
+    for custom in CustomField.objects.filter(order_key__isnull=True).order_by('id'):
+        custom.save()
 
 
 @Signal.decorate('checkparam')

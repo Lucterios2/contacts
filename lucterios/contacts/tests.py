@@ -34,7 +34,8 @@ from lucterios.CORE.models import LucteriosUser, Preference
 from lucterios.CORE.views_usergroup import UsersPreference, PreferenceEdit
 
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint,\
+    CustomFieldAddModify, CustomFieldUp
 from lucterios.contacts.models import LegalEntity
 from lucterios.contacts.test_tools import change_ourdetail, create_jack
 
@@ -319,3 +320,59 @@ class ConfigurationTest(LucteriosTest):
         self.assert_json_equal('FLOAT', 'dummy-default-value', '0')
         self.assert_json_equal('CHECK', 'setdefault', False)
         self.assertEqual(self.json_context['user'], self.factory.user.id)
+
+    def test_configuration_customfield(self):
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('custom_field', 0)
+        self.assert_count_equal('#custom_field/actions', 4)
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'aaa', 'modelname': 'contacts.LegalEntity', 'kind': '0', 'args_multi': 'n', 'args_min': '0', 'args_max': '0', 'args_prec': '0', 'args_list': ''}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = CustomFieldAddModify()
+        self.calljson('/lucterios.contacts/customFieldAddModify', {"SAVE": "YES", 'name': 'bbb', 'modelname': 'contacts.Individual', 'kind': '1', 'args_multi': 'n', 'args_min': '0', 'args_max': '10', 'args_prec': '0', 'args_list': ''}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldAddModify')
+
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('custom_field', 2)
+        self.assert_json_equal('', 'custom_field/@0/id', 1)
+        self.assert_json_equal('', 'custom_field/@0/name', 'aaa')
+        self.assert_json_equal('', 'custom_field/@0/model_title', 'personne morale')
+        self.assert_json_equal('', 'custom_field/@0/kind_txt', 'Chaîne')
+        self.assert_json_equal('', 'custom_field/@1/id', 2)
+        self.assert_json_equal('', 'custom_field/@1/name', 'bbb')
+        self.assert_json_equal('', 'custom_field/@1/model_title', 'personne physique')
+        self.assert_json_equal('', 'custom_field/@1/kind_txt', 'Entier [0;10]')
+
+        self.factory.xfer = CustomFieldUp()
+        self.calljson('/lucterios.contacts/customFieldUp', {"custom_field": 2}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldUp')
+
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('custom_field', 2)
+        self.assert_json_equal('', 'custom_field/@0/id', 2)
+        self.assert_json_equal('', 'custom_field/@0/name', 'bbb')
+        self.assert_json_equal('', 'custom_field/@0/model_title', 'personne physique')
+        self.assert_json_equal('', 'custom_field/@0/kind_txt', 'Entier [0;10]')
+        self.assert_json_equal('', 'custom_field/@1/id', 1)
+        self.assert_json_equal('', 'custom_field/@1/name', 'aaa')
+        self.assert_json_equal('', 'custom_field/@1/model_title', 'personne morale')
+        self.assert_json_equal('', 'custom_field/@1/kind_txt', 'Chaîne')
+
+        self.factory.xfer = CustomFieldUp()
+        self.calljson('/lucterios.contacts/customFieldUp', {"custom_field": 2}, False)
+        self.assert_observer('core.acknowledge', 'lucterios.contacts', 'customFieldUp')
+
+        self.factory.xfer = Configuration()
+        self.calljson('/lucterios.contacts/configuration', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
+        self.assert_count_equal('custom_field', 2)
+        self.assert_json_equal('', 'custom_field/@0/id', 2)
+        self.assert_json_equal('', 'custom_field/@1/id', 1)

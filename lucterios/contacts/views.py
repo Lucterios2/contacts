@@ -407,6 +407,18 @@ class CustomFieldDel(XferDelete):
     field_id = 'custom_field'
 
 
+@ActionsManage.affect_grid(_('Up'), "images/up.png", unique=SELECT_SINGLE)
+@MenuManage.describ('CORE.add_parameter')
+class CustomFieldUp(XferContainerAcknowledge):
+    icon = "up.png"
+    model = CustomField
+    field_id = 'custom_field'
+    caption = _("Up custom field")
+
+    def fillresponse(self):
+        self.item.up_order()
+
+
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeAddModify(XferAddEditor):
