@@ -8,6 +8,7 @@ Aide relative aux fonctionnalités de gestion de contacts moraux ou physiques.
 
    individual.rst
    legal_entity.rst
+   possession.rst
    configuration.rst
 
 
