@@ -314,20 +314,32 @@ class IndividualEditor(AbstractContactEditor):
             act = ActionsManage.get_action_url('CORE.LucteriosUser', 'UserAdd', xfer)
             act.set_value("", "images/add.png")
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO)
+            xfer.add_component(btn)
         else:
+            if not self.item.user.is_active:
+                obj_user.set_color('red')
             act = ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', xfer)
             act.set_value("", "images/edit.png")
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO,
                            params={'user_actif': str(self.item.user.id), 'IDENT_READ': 'YES'})
-        xfer.add_component(btn)
+            xfer.add_component(btn)
+            btn = XferCompButton('userbtnsupp')
+            btn.is_mini = True
+            btn.set_location(obj_user.col + 3, obj_user.row, 1, 1)
+            btn.set_action(xfer.request, ActionsManage.get_action_url('contacts.Individual', 'UserRemove', xfer), modal=FORMTYPE_MODAL, close=CLOSE_NO)
+            xfer.add_component(btn)
 
     def saving(self, xfer):
+        from django.conf import settings
         AbstractContactEditor.saving(self, xfer)
         if self.item.user is not None:
             self.item.user.first_name = self.item.firstname
             self.item.user.last_name = self.item.lastname
-            self.item.user.email = self.item.email
+            self.item.user.email = self.item.email.split(';')[0]
             self.item.user.save()
+            if (settings.LOGIN_FIELD == 'email') and self.item.user.is_email_already_exists:
+                self.item.is_active = False
+                self.item.user.save()
 
 
 class ResponsabilityEditor(LucteriosEditor):

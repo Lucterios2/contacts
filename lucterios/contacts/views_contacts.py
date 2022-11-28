@@ -272,21 +272,49 @@ class IndividualListing(XferPrintListing):
             return XferPrintListing.get_filter(self)
 
 
+@ActionsManage.affect_other("", 'images/delete.png')
+@MenuManage.describ('auth.add_user')
+class IndividualUserRemove(XferContainerAcknowledge):
+    caption = _("Remove as an users")
+    icon = "individual.png"
+    model = Individual
+    field_id = 'individual'
+
+    def fillresponse(self):
+        if self.confirme(_("Do you want to dissociate this user to this contact ?{[br/]}(User will be always active.)")):
+            self.item.user = None
+            self.item.save()
+
+
 @ActionsManage.affect_show("", 'images/add.png')
 @MenuManage.describ('auth.add_user')
-class IndividualUserAdd(XferContainerCustom):
+class IndividualUserAdd(XferContainerAcknowledge):
     caption = _("Add as an users")
     icon = "images/user.png"
     model = LucteriosUser
 
-    def fillresponse(self):
-        img = XferCompImage('img')
-        img.set_value(self.icon_path())
-        img.set_location(0, 0, 1, 3)
-        self.add_component(img)
-        self.fill_from_model(1, 0, False, ['username'])
-        self.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
-        self.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
+    def fillresponse(self, individual):
+        obj_indiv = Individual.objects.get(pk=individual)
+        current_user = LucteriosUser.objects.filter(email=obj_indiv.email.split(';')[0], is_active=True).first()
+        if current_user is not None:
+            if self.confirme(_("An user with same email exists already.{[br/]}Do you want to associate it to this contact?")):
+                for other_contact in Individual.objects.filter(user=current_user):
+                    other_contact.user = None
+                    other_contact.save()
+                obj_indiv.user = current_user
+                obj_indiv.save()
+                self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
+                                     params={'user_actif': str(current_user.id), 'IDENT_READ': 'YES'})
+        else:
+            dlg = self.create_custom(LucteriosUser)
+            img = XferCompImage('img')
+            img.set_value(self.icon_path())
+            img.set_location(0, 0, 1, 3)
+            dlg.add_component(img)
+            dlg.item.username = obj_indiv.create_username()
+            dlg.fill_from_model(1, 0, False, ['username'])
+            dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
+            dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
 
 
 @MenuManage.describ('auth.add_user')
@@ -295,15 +323,27 @@ class IndividualUserValid(XferSave):
     icon = "user.png"
     model = LucteriosUser
 
-    def fillresponse(self, individual):
-        XferSave.fillresponse(self)
-        if self.except_msg == '':
-            obj_indiv = Individual.objects.get(pk=individual)
-            obj_indiv.user = self.item
-            obj_indiv.save()
-            obj_indiv.editor.saving(self)
-            self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
-                                 params={'user_actif': str(self.item.id), 'IDENT_READ': 'YES'})
+    def fillresponse(self, individual, username):
+        current_user = LucteriosUser.objects.filter(username=username).first()
+        if current_user is not None:
+            if self.confirme(_("This user exist already.{[br/]}Do you want to associate it to this contact?")):
+                for other_contact in Individual.objects.filter(user=current_user):
+                    other_contact.user = None
+                    other_contact.save()
+                obj_indiv = Individual.objects.get(pk=individual)
+                obj_indiv.user = current_user
+                obj_indiv.save()
+                self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
+                                     params={'user_actif': str(current_user.id), 'IDENT_READ': 'YES'})
+        else:
+            XferSave.fillresponse(self)
+            if self.except_msg == '':
+                obj_indiv = Individual.objects.get(pk=individual)
+                obj_indiv.user = self.item
+                obj_indiv.save()
+                obj_indiv.editor.saving(self)
+                self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
+                                     params={'user_actif': str(self.item.id), 'IDENT_READ': 'YES'})
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")

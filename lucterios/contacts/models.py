@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from os.path import exists, join, dirname
 from datetime import datetime
+from unicodedata import normalize, category
 import logging
 
 from django.utils.translation import ugettext_lazy as _
@@ -37,7 +38,7 @@ from lucterios.framework.filetools import get_user_path, readimage_to_base64
 from lucterios.framework.signal_and_lock import Signal
 from lucterios.framework.tools import get_format_value
 from lucterios.framework.auditlog import auditlog
-from lucterios.CORE.models import Parameter, LucteriosGroup
+from lucterios.CORE.models import Parameter, LucteriosGroup, LucteriosUser
 from lucterios.mailing.email_functions import split_doubled_email
 
 
@@ -661,6 +662,22 @@ class Individual(AbstractContact):
 
     def get_presentation(self):
         return '%s %s' % (self.firstname, self.lastname)
+
+    def create_username(self, usernamebase=None):
+        username_temp = self.firstname.lower() + self.lastname.upper()[0] if usernamebase is None else usernamebase
+        username_temp = ''.join(letter for letter in normalize('NFD', username_temp) if category(letter) != 'Mn')
+        username = None
+        inc = ""
+        while username is None:
+            username = "%s%s" % (username_temp, inc)
+            users = LucteriosUser.objects.filter(username=username)
+            if users.count() > 0:
+                username = None
+                if inc == "":
+                    inc = 1
+                else:
+                    inc += 1
+        return username
 
     class Meta(object):
         verbose_name = _('individual')

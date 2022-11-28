@@ -140,7 +140,7 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualUserAdd')
         self.assert_count_equal('', 2)
-        self.assert_comp_equal(('EDIT', 'username'), '', (1, 0, 1, 1))
+        self.assert_comp_equal(('EDIT', 'username'), 'jackM', (1, 0, 1, 1))
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal('POST', self.json_actions[1 - 1], ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
         self.assert_action_equal('POST', self.json_actions[2 - 1], ('Annuler', 'images/cancel.png'))

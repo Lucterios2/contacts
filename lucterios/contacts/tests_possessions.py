@@ -275,7 +275,7 @@ class PossessionsTest(LucteriosTest):
         self.factory.xfer = Account()
         self.calljson('/lucterios.contacts/account', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'account')
-        self.assert_count_equal('', 17 + 2)
+        self.assert_count_equal('', 18 + 2)
         self.assert_count_equal('possession', 1)
         self.assert_json_equal('', "possession/@0/id", 1)
         self.assert_json_equal('', "possession/@0/name", "Object")

@@ -1158,7 +1158,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
         # +33698014253
 
     def test(self):
-        self.calljson('/CORE/authentification', {'username': 'admin', 'password': 'admin'})
+        self.calljson('/CORE/authentification', {'login': 'admin', 'password': 'admin'})
         self.assert_observer('core.auth', 'CORE', 'authentification')
         self.assert_json_equal('', '', 'OK')
 

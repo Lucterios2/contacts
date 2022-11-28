@@ -254,7 +254,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal('POST', self.json_actions[1 - 1], (str('Editer'), 'images/edit.png', 'lucterios.contacts', 'accountAddModify', 0, 1, 1))
         self.assert_action_equal('POST', self.json_actions[2 - 1], ('Fermer', 'images/close.png'))
-        self.assert_count_equal('', 17)
+        self.assert_count_equal('', 18)
         self.assert_comp_equal(('LABELFORM', 'genre'), 1, (1, 0, 2, 1, 1))
         self.assert_comp_equal(('LABELFORM', 'firstname'), "jack", (1, 1, 1, 1, 1))
         self.assert_comp_equal(('LABELFORM', 'lastname'), "MISTER", (2, 1, 1, 1, 1))
