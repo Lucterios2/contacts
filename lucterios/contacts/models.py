@@ -461,8 +461,9 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
     @classmethod
     def get_show_fields(cls):
-        fields_desc = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email', 'comment']
+        fields_desc = ['address', ('postal_code', 'city'), 'country', ('tel1', 'tel2'), 'email']
         fields_desc.extend(cls.get_fields_to_show())
+        fields_desc.append('comment')
         return fields_desc
 
     @classmethod
@@ -798,7 +799,7 @@ class Possession(LucteriosModel, CustomizeObject):
 
     @classmethod
     def get_edit_fields(cls):
-        return [("name", "category_possession"), ("comment",)]
+        return [("name", "category_possession"), "comment"]
 
     @classmethod
     def get_search_fields(cls, with_addon=True):
@@ -823,6 +824,18 @@ class Possession(LucteriosModel, CustomizeObject):
         else:
             img = readimage_to_base64(join(dirname(__file__), "static", 'lucterios.contacts', "images", "NoImage.png"))
         return img.decode('ascii')
+
+    @classmethod
+    def import_data(cls, rowdata, dateformat):
+        try:
+            new_item = super(Possession, cls).import_data(rowdata, dateformat)
+            if new_item is not None:
+                new_item.set_custom_values(rowdata)
+            return new_item
+        except Exception as import_error:
+            cls.import_logs.append(str(import_error))
+            logging.getLogger('lucterios.contacts').exception("import_data")
+            return None
 
     def delete(self, using=None):
         for custom in self.possessioncustomfield_set.all():
