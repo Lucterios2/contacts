@@ -150,6 +150,7 @@ parent.get('args_list').setVisible(type==4);
                 if sel_item == val_selected:
                     select_id = len(select_list)
                 select_list.append((len(select_list), sel_item))
+            select_list.sort(key=lambda item: item[1].lower())
             comp = XferCompSelect(self.item.get_fieldname())
             comp.set_select(select_list)
             comp.set_value(select_id)
