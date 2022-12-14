@@ -201,8 +201,6 @@ class CurrentStructurePrint(XferPrintAction):
 def right_create_account(request):
     if not notfree_mode_connect():
         return False
-    if (len(settings.AUTHENTICATION_BACKENDS) != 1) or (settings.AUTHENTICATION_BACKENDS[0] != 'lucterios.framework.backends.EmailModelBackend'):
-        return False
     if (signal_and_lock.Signal.call_signal("send_connection", None, None, None) == 0):
         return False
     if Params.getvalue("contacts-createaccount") == 0:
