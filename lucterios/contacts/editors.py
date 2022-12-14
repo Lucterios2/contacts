@@ -338,7 +338,7 @@ class IndividualEditor(AbstractContactEditor):
             self.item.user.last_name = self.item.lastname
             self.item.user.email = self.item.email.split(';')[0]
             self.item.user.save()
-            if (settings.LOGIN_FIELD == 'email') and self.item.user.is_email_already_exists:
+            if settings.ASK_LOGIN_EMAIL and self.item.user.is_email_already_exists:
                 self.item.is_active = False
                 self.item.user.save()
 
