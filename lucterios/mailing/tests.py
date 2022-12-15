@@ -31,6 +31,7 @@ from io import SEEK_END
 from email.header import decode_header
 
 from django.contrib.auth.models import AnonymousUser
+from django.conf import settings
 
 from lucterios.framework.test import LucteriosTest
 from lucterios.framework.filetools import get_user_dir
@@ -499,6 +500,8 @@ class UserTest(LucteriosTest):
 
     def setUp(self):
         LucteriosTest.setUp(self)
+        settings.ASK_LOGIN_EMAIL = False
+        settings.LOGIN_FIELD = 'username'
         self.factory.user = AnonymousUser()
         change_ourdetail()
         create_jack(LucteriosUser.objects.create(first_name='jack', last_name='MISTER', username='jack', email='jack@worldcompany.com'))
@@ -674,3 +677,75 @@ class UserTest(LucteriosTest):
         self.assertEqual('---', moral[0].postal_code)
         self.assertEqual('---', moral[0].city)
         self.assertEqual(2, len(LegalEntity.objects.all()))
+
+    def test_new_account_by_email(self):
+        settings.ASK_LOGIN_EMAIL = True
+        settings.LOGIN_FIELD = 'email'
+        new_groupe = LucteriosGroup.objects.create(name='new_groupe')
+        param = Parameter.objects.get(name='contacts-defaultgroup')
+        param.value = '%d' % new_groupe.id
+        param.save()
+        param = Parameter.objects.get(name='contacts-createaccount')
+        param.value = '1'
+        param.save()
+        configSMTP('localhost', 1025)
+
+        self.factory.xfer = CreateAccount()
+        self.calljson('/lucterios.contacts/createAccount', {}, False)
+        self.assert_observer('core.custom', 'lucterios.contacts', 'createAccount')
+        self.assertEqual(len(self.json_context), 0)
+        self.assertEqual(len(self.json_actions), 2)
+        self.assert_count_equal('', 7)
+        self.assert_json_equal('SELECT', "genre", '1')
+        self.assert_json_equal('EDIT', "firstname", '')
+        self.assert_json_equal('EDIT', "lastname", '')
+        self.assert_json_equal('EDIT', "email", '')
+        self.assert_json_equal('CAPTCHA', "captcha", '')
+
+        server = TestReceiver()
+        server.start(1025)
+        try:
+            self.factory.xfer = CreateAccount()
+            self.calljson('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
+                                                                'lastname': 'DUPONT', 'email': 'jack@worldcompany.com'}, False)
+            self.assert_observer('core.acknowledge', 'lucterios.contacts', 'createAccount')
+            self.assertEqual(len(self.json_context), 5)
+            self.assert_action_equal('POST', self.response_json['action'], ('', None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {"SAVE": '', "error": "Ce compte existe déjà !"}))
+            self.assertEqual(0, server.count())
+
+            self.factory.xfer = CreateAccount()
+            self.calljson('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
+                                                                'lastname': 'DUPONT', 'email': 'pierre@worldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.contacts', 'createAccount')
+            self.assert_json_equal('', 'text', 'Votre compte est créé{[br/]}Vous allez recevoir un courriel avec votre mot de passe.')
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['pierre@worldcompany.com'], server.get(0)[2])
+            _msg, msg, = server.check_first_message('Mot de passe de connexion', 2)
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg.get_payload())
+            self.assertEqual('<html><p>Bienvenue<br/><br/>Confirmation de connexion à votre application :'
+                             '<br/> - Identifiant : pierre@worldcompany.com<br/> - Mot de passe : ', message[:143])
+            password = message[143:].split('<br/>')[0]
+        finally:
+            server.stop()
+        user = LucteriosUser.objects.get(id=3)
+        self.assertEqual('pierre', user.first_name)
+        self.assertEqual('DUPONT', user.last_name)
+        self.assertEqual('pierreD', user.username)
+        self.assertEqual('pierre@worldcompany.com', user.email)
+        self.assertEqual([new_groupe], list(user.groups.all()))
+        self.assertTrue(user.check_password(password), 'success after change')
+        cont = Individual.objects.filter(user=user)
+        self.assertEqual(1, len(cont))
+        self.assertEqual('pierre', cont[0].firstname)
+        self.assertEqual('DUPONT', cont[0].lastname)
+        self.assertEqual(1, cont[0].genre)
+        self.assertEqual('pierre@worldcompany.com', cont[0].email)
+        self.assertEqual('---', cont[0].address)
+        self.assertEqual('---', cont[0].postal_code)
+        self.assertEqual('---', cont[0].city)
+        moral = LegalEntity.objects.filter(responsability__individual__user=user)
+        self.assertEqual(0, len(moral))
+        self.assertEqual(1, len(LegalEntity.objects.all()))

@@ -223,13 +223,14 @@ class CreateAccount(XferContainerAcknowledge):
         dlg.add_component(img)
         dlg.fill_from_model(1, 0, False, ['genre', 'lastname', 'firstname', 'email'])
         dlg.get_components('email').mask = r'^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-_])+\.)+([a-zA-Z0-9]{2,4})+$'
-        row = dlg.get_max_row() + 1
-        edt = XferCompEdit("username")
-        edt.set_location(1, row)
-        edt.set_needed(True)
-        edt.set_value(username)
-        edt.description = _('username')
-        dlg.add_component(edt)
+        if not settings.ASK_LOGIN_EMAIL:
+            row = dlg.get_max_row() + 1
+            edt = XferCompEdit("username")
+            edt.set_location(1, row)
+            edt.set_needed(True)
+            edt.set_value(username)
+            edt.description = _('username')
+            dlg.add_component(edt)
         if Params.getvalue("contacts-createaccount") == 2:
             row = dlg.get_max_row() + 1
             edt = XferCompEdit("legalentity")
@@ -261,6 +262,8 @@ class CreateAccount(XferContainerAcknowledge):
     @transaction.atomic
     def create_account_atomic(self, username, legalentity):
         defaultgroup = Params.getobject("contacts-defaultgroup")
+        if username == '':
+            username = self.item.create_username()
         user = LucteriosUser()
         user.username = username
         user.first_name = self.item.firstname
@@ -287,6 +290,8 @@ class CreateAccount(XferContainerAcknowledge):
     @transaction.non_atomic_requests
     def create_account(self, username, legalentity):
         try:
+            if LucteriosUser.objects.filter(email=self.item.email, is_active=True).count() > 0:
+                raise IntegrityError()
             self.create_account_atomic(username, legalentity)
             self.item.user.generate_password()
             self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
