@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-28 20:43+0000\n"
-"PO-Revision-Date: 2021-10-14 16:24+0200\n"
+"POT-Creation-Date: 2022-12-15 09:04+0000\n"
+"PO-Revision-Date: 2022-12-15 09:24+0100\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
 "Language: en\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: __init__.py:42 views.py:219
+#: __init__.py:42 views.py:220
 msgid "Lucterios mailing"
 msgstr "Lucterios mailing"
 
@@ -83,7 +83,7 @@ msgstr "subject"
 msgid "type"
 msgstr "type"
 
-#: models.py:99 models.py:507 views.py:152 views_message.py:194
+#: models.py:99 models.py:507 views.py:153 views_message.py:194
 msgid "email"
 msgstr "email"
 
@@ -256,11 +256,11 @@ msgstr "Connection confirmation message"
 #: models.py:674
 #, python-format
 msgid ""
-"Connection confirmation to your application:{[br/]} - User:"
-"%(username)s{[br/]} - Password:%(password)s{[br/]}"
+"Connection confirmation to your application:{[br/]} - Login:%(login)s{[br/]} "
+"- Password:%(password)s{[br/]}"
 msgstr ""
 "Welcome{[br/]}{[br/]}Connection confirmation to your application:{[br/]} - "
-"User:%(username)s{[br/]} - Password:%(password)s{[br/]}{[br/]}Best "
+"Login:%(login)s{[br/]} - Password:%(password)s{[br/]}{[br/]}Best "
 "regards{[br/]}"
 
 #: models.py:675
@@ -373,79 +373,79 @@ msgstr "You do not have access to this resource."
 msgid "API token empty"
 msgstr "API token empty"
 
-#: views.py:44
+#: views.py:45
 msgid "Change mailing and SMS parameters"
 msgstr "Change mailing and SMS parameters"
 
-#: views.py:47
+#: views.py:48
 msgid "Mailing & SMS parameters"
 msgstr "Mailing & SMS parameters"
 
-#: views.py:50
+#: views.py:51
 msgid "EMail configuration"
 msgstr "EMail configuration"
 
-#: views.py:63 views.py:81 views.py:95 views.py:108
+#: views.py:64 views.py:82 views.py:96 views.py:109
 msgid "Modify"
 msgstr "Modify"
 
-#: views.py:68 views.py:113
+#: views.py:69 views.py:114
 msgid "Send"
 msgstr "Send"
 
-#: views.py:72
+#: views.py:73
 msgid "Default message"
 msgstr "Default messages"
 
-#: views.py:85
+#: views.py:86
 msgid "SMS configuration"
 msgstr "SMS configuration"
 
-#: views.py:132 views.py:165 views_message.py:169 views_message.py:176
+#: views.py:133 views.py:166 views_message.py:169 views_message.py:176
 msgid "EMail try"
 msgstr "EMail try"
 
-#: views.py:136
+#: views.py:137
 msgid "Bad email parameter!"
 msgstr "Bad email parameter!"
 
-#: views.py:163
+#: views.py:164
 msgid "EMail sent to check configuration"
 msgstr "EMail sent to check configuration"
 
-#: views.py:168 views_message.py:201
+#: views.py:169 views_message.py:201
 msgid "EMail send, check it."
 msgstr "EMail send, check it."
 
-#: views.py:174 views_message.py:204 views_message.py:211
+#: views.py:175 views_message.py:204 views_message.py:211
 msgid "SMS try"
 msgstr "SMS try"
 
-#: views.py:179
+#: views.py:180
 msgid "Bad SMS parameter!"
 msgstr "Bad SMS parameter!"
 
-#: views.py:195 views_message.py:229
+#: views.py:196 views_message.py:229
 msgid "phone"
 msgstr "phone"
 
-#: views.py:200
+#: views.py:201
 msgid "SMS sent to check configuration"
 msgstr "SMS sent to check configuration"
 
-#: views.py:201 views_message.py:236
+#: views.py:202 views_message.py:236
 msgid "SMS send, check it."
 msgstr "SMS send, check it."
 
-#: views.py:219
+#: views.py:220
 msgid "Mailing parameters"
 msgstr "Mailing parameters"
 
-#: views.py:224
+#: views.py:225
 msgid "email properly configured"
 msgstr "email properly configured"
 
-#: views.py:226
+#: views.py:227
 msgid "email not configured"
 msgstr "email not configured"
 

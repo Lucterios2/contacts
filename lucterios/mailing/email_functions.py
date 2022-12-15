@@ -178,10 +178,10 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     return sending_email(recipients, sender_name, sender_email, subject, body, body_txt, files, cclist, bcclist, email_server, dkim_private_path, dkim_selector)
 
 
-def send_connection_by_email(recipients, alias, passwd):
+def send_connection_by_email(recipients, login, passwd):
     from lucterios.CORE.parameters import Params
     subject = _("Connection password")
-    message = Params.getvalue('mailing-msg-connection') % {'username': alias, 'password': passwd}
+    message = Params.getvalue('mailing-msg-connection') % {'login': login, 'username': login, 'password': passwd}
     msg_connection = "<html>"
     msg_connection += message.replace('{[newline]}', '<br/>').replace('{[', '<').replace(']}', '>')
     msg_connection += "</html>"

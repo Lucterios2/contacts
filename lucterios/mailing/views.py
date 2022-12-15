@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from lucterios.framework.tools import FORMTYPE_MODAL, MenuManage, CLOSE_NO, CLOSE_YES, WrapAction
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
@@ -205,7 +206,7 @@ class SendSmsTry(XferContainerAcknowledge):
 def send_connection_email(email_adress, username, passwd):
     if will_mail_send():
         if email_adress and username and passwd:
-            send_connection_by_email(email_adress, username, passwd)
+            send_connection_by_email(email_adress, email_adress if settings.ASK_LOGIN_EMAIL else username, passwd)
         return True
     else:
         return False
