@@ -5,9 +5,13 @@ Une possession, est une entité qui appartiens à une personne (moral ou physiqu
 Cette possession peut être de nature différente:
 
  - Un animal, comme par exemple un chien, un chat ou un cheval, ...
-Il peut donc être interessant pour une structure lié au monde animal de vouloir cartographié des animaux avec leur maitre et maitresse.
+ 
+ Il peut donc être interessant pour une structure lié au monde animal de vouloir cartographié des animaux avec leur maitre et maitresse.
+ 
  - Un véhicule, comme par exemple une voiture, une moto, un kart, ....
-Ces possessions sont alors interessantes à être identifier afin de connaitre correctement les différents propriétaires.
+ 
+ Ces possessions sont alors interessantes à être identifier afin de connaitre correctement les différents propriétaires.
+
 
 Sur ces possessions, il est possible de faire des recherches et en particulier lié aux propriétaires.
 
