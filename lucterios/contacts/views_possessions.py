@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_MODAL, ActionsManage, SELECT_SINGLE,\
     FORMTYPE_NOMODAL, CLOSE_YES, SELECT_MULTI, CLOSE_NO, WrapAction
@@ -33,7 +34,7 @@ from lucterios.framework.xferadvance import XferListEditor, XferAddEditor, TITLE
 
 
 from lucterios.contacts.models import CustomField, CategoryPossession,\
-    AbstractContact, Possession
+    AbstractContact, Possession, Individual
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 from lucterios.contacts.tools import ContactSelection
 from lucterios.framework.xfergraphic import XferContainerAcknowledge
@@ -177,6 +178,28 @@ class PossessionShow(XferShowEditor):
             if add_action_id != -1:
                 action = self.actions[action_id]
                 self.actions[action_id] = (action[0], action[1], action[2], action[3], {'mng_owner': False, 'owner': self.item.owner_id})
+
+
+def right_to_possession_contact(request):
+    if Individual.objects.filter(user=request.user).first() is not None:
+        return CategoryPossession.objects.all().count() > 0
+    else:
+        return False
+
+
+@MenuManage.describ(right_to_possession_contact, FORMTYPE_MODAL, 'core.general', _('View your possessions.'))
+class PossessionContact(XferListEditor):
+    icon = "possession.png"
+    model = Possession
+    field_id = 'possession'
+    caption = _("Your possessions")
+
+    def fillresponse(self):
+        contact = Individual.objects.filter(user=self.request.user).first()
+        self.filter = Q(owner=contact)
+        self.params['owner'] = contact.id
+        self.request.owner_id = contact.id
+        XferListEditor.fillresponse(self)
 
 
 @ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)

@@ -286,6 +286,7 @@ class CreateAccount(XferContainerAcknowledge):
             entity.email = self.item.email
             entity.save()
             Responsability.objects.create(individual=self.item, legal_entity=entity)
+        signal_and_lock.Signal.call_signal("account_created", self.item)
 
     @transaction.non_atomic_requests
     def create_account(self, username, legalentity):
