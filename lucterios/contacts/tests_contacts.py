@@ -595,7 +595,7 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = Configuration()
         self.calljson('/lucterios.contacts/configuration', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'configuration')
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_grid_equal('custom_field', {"name": "nom", "model_title": "modèle", "kind_txt": "type"}, 0)  # nb=3
 
         self.factory.xfer = CustomFieldAddModify()

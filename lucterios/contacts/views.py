@@ -30,18 +30,20 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db import IntegrityError, transaction
+from django.apps import apps
 
 from lucterios.framework.tools import MenuManage, FORMTYPE_REFRESH, CLOSE_NO, WrapAction, ActionsManage
 from lucterios.framework.tools import FORMTYPE_MODAL, get_icon_path, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor, TEXT_TOTAL_NUMBER
 from lucterios.framework.xferadvance import TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, TITLE_CLOSE, TITLE_EDIT, TITLE_PRINT, TITLE_CANCEL, TITLE_OK
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, XferCompButton, XferCompCaptcha
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, XferCompButton, XferCompCaptcha,\
+    XferCompSelect
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 
-from lucterios.CORE.models import LucteriosUser
+from lucterios.CORE.models import LucteriosUser, PrintModel
 from lucterios.CORE.views_usergroup import UsersEdit, UsersPreference
 from lucterios.CORE.views import ParamEdit, ObjectImport
 from lucterios.CORE.xferprint import XferPrintAction
@@ -360,6 +362,11 @@ class Configuration(XferListEditor):
         self.add_component(img)
         self.fill_grid(0, CustomField, "custom_field", CustomField.get_filter(AbstractContact))
 
+        btn = XferCompButton('add_print_model')
+        btn.set_location(0, 10, 2)
+        btn.set_action(self.request, CustomFieldAppendPrintModel.get_action(), modal=FORMTYPE_MODAL, close=CLOSE_NO)
+        self.add_component(btn)
+
     def fillresponse(self):
         self._fill_functions()
         self._fill_structuretype()
@@ -384,6 +391,35 @@ class FunctionDel(XferDelete):
     icon = "function.png"
     model = Function
     field_id = 'function'
+
+
+@MenuManage.describ('CORE.add_parameter')
+class CustomFieldAppendPrintModel(XferContainerAcknowledge):
+    caption = _("Create print template")
+    icon = "images/add.png"
+    model = CustomField
+    field_id = 'custom_field'
+
+    def fillresponse(self):
+        modelname = self.getparam('modelname')
+        if modelname is None:
+            dlg = self.create_custom(None)
+            img = XferCompLabelForm('title')
+            img.set_value_as_title(_('Do you want to create or modify a print template for this type ?'))
+            img.set_location(0, 0)
+            dlg.add_component(img)
+            sel_models = AbstractContact.get_select_contact_type(with_current=False)
+            model_select = XferCompSelect('modelname')
+            model_select.description = _('model')
+            model_select.set_select(sel_models)
+            model_select.set_location(0, 1)
+            dlg.add_component(model_select)
+            dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'))
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+        else:
+            modelclass = apps.get_model(modelname)
+            template_name = modelclass.create_print_template()
+            self.message("Template '%s' create or modify." % template_name)
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")

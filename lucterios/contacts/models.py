@@ -50,6 +50,8 @@ class CustomField(LucteriosModel):
     KIND_SELECT = 4
     KIND_DATE = 5
 
+    PREFIX_CUSTOM = "custom_"
+
     modelname = models.CharField(_('model'), max_length=100)
     name = models.CharField(_('name'), max_length=200, unique=False)
     kind = models.IntegerField(_('kind'), choices=((KIND_STRING, _('String')),
@@ -83,7 +85,7 @@ class CustomField(LucteriosModel):
         return apps.get_model(self.modelname)
 
     def get_fieldname(self):
-        return "custom_%d" % self.id
+        return self.PREFIX_CUSTOM + "%d" % self.id
 
     def get_model_title(self):
         return str(self.model_associated()._meta.verbose_name)
@@ -274,7 +276,7 @@ class CustomizeObject(object):
         for cf_name, cf_model in CustomField.get_fields(self.__class__):
             if cf_name in params.keys():
                 cf_value = params[cf_name]
-                cf_id = int(cf_name[7:])
+                cf_id = int(cf_name[len(CustomField.PREFIX_CUSTOM):])
                 cf_model = CustomField.objects.get(id=cf_id)
                 try:
                     cf_value = self._convert_value_for_attr(cf_model, cf_value, cf_model.get_args()['list'])
@@ -298,8 +300,8 @@ class CustomizeObject(object):
         field_title = None
         if name == "str":
             field_title = ''
-        elif name[:7] == "custom_":
-            cf_id = int(name[7:])
+        elif name[:len(CustomField.PREFIX_CUSTOM)] == CustomField.PREFIX_CUSTOM:
+            cf_id = int(name[len(CustomField.PREFIX_CUSTOM):])
             cf_model = CustomField.objects.get(id=cf_id)
             field_title = cf_model.name
             if cf_model.kind == CustomField.KIND_STRING:
@@ -337,8 +339,8 @@ class CustomizeObject(object):
     def __getattr__(self, name):
         if name == "str":
             return str(self.get_final_child())
-        elif name[:7] == "custom_":
-            cf_id = int(name[7:])
+        elif name[:len(CustomField.PREFIX_CUSTOM)] == CustomField.PREFIX_CUSTOM:
+            cf_id = int(name[len(CustomField.PREFIX_CUSTOM):])
             cf_model = CustomField.objects.get(id=cf_id)
             if self.id is None:
                 ccf_value = ""
@@ -576,8 +578,11 @@ class LegalEntity(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["image", "name", 'structure_type', 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
-                'email', 'comment', 'identify_number', 'OUR_DETAIL']
+        ident_field = ["image", "name", 'structure_type',
+                       'address', 'postal_code', 'city', 'country',
+                       'tel1', 'tel2', 'email']
+        ident_field.extend(['comment', 'identify_number', 'OUR_DETAIL'])
+        return ident_field
 
     def __str__(self):
         return self.name
@@ -655,8 +660,11 @@ class Individual(AbstractContact):
 
     @classmethod
     def get_print_fields(cls):
-        return ["image", "firstname", "lastname", 'address', 'postal_code', 'city', 'country', 'tel1', 'tel2',
-                'email', 'comment', 'user', 'responsability_set', 'OUR_DETAIL']
+        ident_field = ["image", "firstname", "lastname",
+                       'address', 'postal_code', 'city', 'country',
+                       'tel1', 'tel2', 'email']
+        ident_field.extend(['comment', 'user', 'responsability_set', 'OUR_DETAIL'])
+        return ident_field
 
     def __str__(self):
         return '%s %s' % (self.lastname, self.firstname)

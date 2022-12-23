@@ -140,7 +140,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(len(self.json_context), 0)
         self.assertEqual(len(self.json_actions), 1)
         self.assert_action_equal('POST', self.json_actions[0], ('Fermer', 'images/close.png'))
-        self.assert_count_equal('', 12)
+        self.assert_count_equal('', 13)
         self.assert_coordcomp_equal("function", (0, 1, 2, 1, 1))
         self.assert_grid_equal("function", {"name": "nom"}, 0)
         self.assert_coordcomp_equal("structure_type", (0, 1, 2, 1, 2))
