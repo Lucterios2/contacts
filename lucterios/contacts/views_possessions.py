@@ -181,7 +181,7 @@ class PossessionShow(XferShowEditor):
 
 
 def right_to_possession_contact(request):
-    if Individual.objects.filter(user=request.user).first() is not None:
+    if not request.user.is_anonymous and Individual.objects.filter(user=request.user).first() is not None:
         return CategoryPossession.objects.all().count() > 0
     else:
         return False
