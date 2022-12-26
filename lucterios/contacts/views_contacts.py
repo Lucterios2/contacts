@@ -342,6 +342,9 @@ class IndividualUserValid(XferSave):
                 obj_indiv.user = self.item
                 obj_indiv.save()
                 obj_indiv.editor.saving(self)
+                defaultgroup = Params.getobject("contacts-defaultgroup")
+                if defaultgroup is not None:
+                    obj_indiv.user.groups.add(defaultgroup)
                 self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
                                      params={'user_actif': str(self.item.id), 'IDENT_READ': 'YES'})
 
