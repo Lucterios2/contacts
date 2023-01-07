@@ -606,7 +606,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal('POST', self.json_actions[0], ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
         self.assert_action_equal('POST', self.json_actions[1], ('Annuler', 'images/cancel.png'))
-        self.assert_count_equal('', 9)
+        self.assert_count_equal('', 10)
         self.assert_comp_equal(('SELECT', 'modelname'), 'contacts.AbstractContact', (1, 0, 1, 1))
         self.assert_comp_equal(('EDIT', 'name'), '', (1, 1, 1, 1))
         self.assert_comp_equal(('SELECT', 'kind'), '0', (1, 2, 1, 1))
@@ -615,6 +615,7 @@ class ContactsTest(LucteriosTest):
         self.assert_comp_equal(('FLOAT', 'args_max'), '0', (1, 5, 1, 1))
         self.assert_comp_equal(('FLOAT', 'args_prec'), '0', (1, 6, 1, 1))
         self.assert_comp_equal(('EDIT', 'args_list'), '', (1, 7, 1, 1))
+        self.assert_comp_equal(('CHECK', 'args_today'), '0', (1, 8, 1, 1))
         self.assert_select_equal('kind', {0: "Chaîne", 1: "Entier", 2: "Réel", 3: "Booléen",
                                           4: "Sélection", 5: "Date"})
 

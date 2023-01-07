@@ -71,6 +71,11 @@ class CustomFieldEditor(LucteriosEditor):
         arg.set_location(obj_kind.col, obj_kind.row + 5, obj_kind.colspan, 1)
         arg.description = _('list')
         xfer.add_component(arg)
+        arg = XferCompCheck('args_today')
+        arg.set_value(args['today'])
+        arg.set_location(obj_kind.col, obj_kind.row + 6, obj_kind.colspan, 1)
+        arg.description = _('today by default')
+        xfer.add_component(arg)
 
     def _get_basic_model(self, xfer):
         from django.apps import apps
@@ -106,16 +111,17 @@ parent.get('args_min').setVisible(type==1 || type==2);
 parent.get('args_max').setVisible(type==1 || type==2);
 parent.get('args_prec').setVisible(type==2);
 parent.get('args_list').setVisible(type==4);
+parent.get('args_today').setVisible(type==5);
 """
 
     def saving(self, xfer):
         args = {}
-        for arg_name in ['min', 'max', 'prec', 'list', 'multi']:
+        for arg_name in ['min', 'max', 'prec', 'list', 'multi', 'today']:
             args_val = xfer.getparam('args_' + arg_name)
             if args_val is not None:
                 if arg_name == 'list':
                     args[arg_name] = list(args_val.split(","))
-                elif arg_name == 'multi':
+                elif (arg_name == 'multi') or (arg_name == 'today'):
                     args[arg_name] = (args_val != 'False') and (args_val != '0') and (args_val != '') and (args_val != 'n')
                 else:
                     args[arg_name] = float(args_val)

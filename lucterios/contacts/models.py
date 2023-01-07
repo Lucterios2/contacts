@@ -105,11 +105,14 @@ class CustomField(LucteriosModel):
             params_txt = floatformat % (float(args['min']), float(args['max']))
         elif self.kind == self.KIND_SELECT:
             params_txt = "(%s)" % ",".join(args['list'])
+        elif self.kind == self.KIND_DATE:
+            if args['today']:
+                params_txt = "(%s)" % _('today by default')
         value = "%s %s" % (get_value_if_choices(self.kind, dep_field), params_txt)
         return value.strip()
 
     def get_args(self):
-        default_args = {'min': 0, 'max': 0, 'prec': 0, 'list': [], 'multi': False}
+        default_args = {'min': 0, 'max': 0, 'prec': 0, 'list': [], 'multi': False, 'today': False}
         try:
             args = eval(self.args)
         except Exception:
@@ -199,7 +202,10 @@ class CustomField(LucteriosModel):
             try:
                 data = datetime.strptime(data, "%Y-%m-%d").date().isoformat()
             except (TypeError, ValueError):
-                data = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
+                if self.get_args()['today']:
+                    data = datetime.today().date().isoformat()
+                else:
+                    data = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
         dep_field = CustomizeObject.get_virtualfield(self.get_fieldname())
         return get_format_value(dep_field, data)
 
@@ -269,7 +275,10 @@ class CustomizeObject(object):
             try:
                 ccf_value = datetime.strptime(ccf_value, "%Y-%m-%d").date().isoformat()
             except (TypeError, ValueError):
-                ccf_value = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
+                if cf_model.get_args()['today']:
+                    ccf_value = datetime.today().date().isoformat()
+                else:
+                    ccf_value = datetime.strptime("1900-01-01", "%Y-%m-%d").date().isoformat()
         return ccf_value
 
     def set_custom_values(self, params):
