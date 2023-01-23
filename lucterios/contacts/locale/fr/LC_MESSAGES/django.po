@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 12:43+0000\n"
-"PO-Revision-Date: 2023-01-07 13:43+0100\n"
+"POT-Creation-Date: 2023-01-13 09:30+0000\n"
+"PO-Revision-Date: 2023-01-13 10:29+0100\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
 "Language: fr\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Translated-Using: django-rosetta 0.7.8\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: __init__.py:42 views.py:536 views.py:547 views.py:586
 msgid "Lucterios contacts"
@@ -513,6 +513,11 @@ msgstr "Créer patron d'impression"
 #: views.py:408
 msgid "Do you want to create or modify a print template for this type ?"
 msgstr "Voulez vous créer ou modifier un patron d'impression pour ce type ?"
+
+#: views.py:422
+#, python-format
+msgid "Template '%s' create or modify."
+msgstr "Patron d'impression '%s' créé ou modifié."
 
 #: views.py:432
 msgid "Add custom field"

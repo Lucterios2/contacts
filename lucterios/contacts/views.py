@@ -419,7 +419,7 @@ class CustomFieldAppendPrintModel(XferContainerAcknowledge):
         else:
             modelclass = apps.get_model(modelname)
             template_name = modelclass.create_print_template()
-            self.message("Template '%s' create or modify." % template_name)
+            self.message(_("Template '%s' create or modify.") % template_name)
 
 
 @ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
