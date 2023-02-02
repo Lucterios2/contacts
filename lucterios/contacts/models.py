@@ -942,3 +942,5 @@ def contacts_auditlog_register():
     auditlog.register(StructureType)
     auditlog.register(CustomField, include_fields=['name', 'model_title', 'kind_txt'])
     auditlog.register(ContactCustomField, include_fields=['field', 'data'], mapping_fields=['field'])
+    auditlog.register(Possession)
+    auditlog.register(PossessionCustomField, include_fields=['field', 'data'], mapping_fields=['field'])
