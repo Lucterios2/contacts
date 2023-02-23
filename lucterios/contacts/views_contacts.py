@@ -541,11 +541,16 @@ def situation_contacts(xfer):
                 lab.set_location(0, row, 4)
                 xfer.add_component(lab)
                 if (current_individual.postal_code == '---'):
+                    params = {'individual': current_individual.id, "postal_code": ""}
+                    if (current_individual.address == '---'):
+                        params['address'] = ""
+                    if (current_individual.city == '---'):
+                        params['city'] = ""
                     row = xfer.get_max_row() + 1
                     btn = XferCompButton('summarybtn')
                     btn.set_location(0, row + 1, 4)
                     btn.set_action(xfer.request, AccountAddModify.get_action(TITLE_EDIT, 'images/edit.png'),
-                                   modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'individual': current_individual.id})
+                                   modal=FORMTYPE_MODAL, close=CLOSE_NO, params=params)
                     btn.java_script = """if (typeof Singleton().hide_individual === 'undefined') {
     current.actionPerformed();
     Singleton().hide_individual = 1;
