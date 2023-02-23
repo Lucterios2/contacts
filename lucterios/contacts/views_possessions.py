@@ -234,7 +234,7 @@ class PossessionOwner(ContactSelection):
 
 @signal_and_lock.Signal.decorate('show_contact')
 def show_contact_possession(contact, xfer):
-    if CategoryPossession.objects.all().count() > 0:
+    if (CategoryPossession.objects.all().count() > 0) and (contact.id != 1):  # exclude current structure
         xfer.new_tab(_("Possessions"))
         xfer.params['mng_owner'] = False
         xfer.params['owner'] = contact.id
