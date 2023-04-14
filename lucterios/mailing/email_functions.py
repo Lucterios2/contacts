@@ -38,6 +38,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from lucterios.framework.error import LucteriosException, GRAVE
 
+SMTP_SECURITY_NONE = 0
+SMTP_SECURITY_STARTTLS = 1
+SMTP_SECURITY_SSLTTL = 2
+
 
 class EmailException(LucteriosException):
 
@@ -65,11 +69,11 @@ def split_doubled_email(email_list):
 def get_email_server(smtp_security, smtp_server, smtp_port, smtp_user, smtp_pass):
     server = None
     try:
-        if smtp_security == 2:
+        if smtp_security == SMTP_SECURITY_SSLTTL:
             server = SMTP_SSL(smtp_server, smtp_port)
         else:
             server = SMTP(smtp_server, smtp_port)
-        if smtp_security == 1:
+        if smtp_security == SMTP_SECURITY_STARTTLS:
             server.starttls()
         if (smtp_pass != '') and (smtp_user != ''):
             server.login(smtp_user, smtp_pass)
