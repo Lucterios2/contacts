@@ -139,6 +139,7 @@ class CustomField(LucteriosModel):
             choices = []
             for item in args['list']:
                 choices.append((len(choices), item))
+            choices.sort(key=lambda item: item[1].lower())
             dbfield = IntegerField(self.name, choices=tuple(choices))
         if self.kind == self.KIND_DATE:
             dbfield = DateField(self.name)
