@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-13 09:30+0000\n"
+"POT-Creation-Date: 2023-04-19 14:34+0000\n"
 "PO-Revision-Date: 2022-12-15 10:03+0100\n"
 "Last-Translator: Laurent Gay <l.gay@sd-libre.fr>\n"
 "Language-Team: français <>\n"
@@ -52,15 +52,15 @@ msgstr "filtre"
 msgid "statistic"
 msgstr "statistique"
 
-#: email_functions.py:146
+#: email_functions.py:150
 msgid "No valid recipients !"
 msgstr "Destinataires non valides !"
 
-#: email_functions.py:164 views_message.py:66
+#: email_functions.py:168 views_message.py:66
 msgid "Email not configure!"
 msgstr "Courriel non configuré !"
 
-#: email_functions.py:183
+#: email_functions.py:187
 msgid "Connection password"
 msgstr "Mot de passe de connexion"
 
