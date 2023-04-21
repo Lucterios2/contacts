@@ -228,6 +228,14 @@ class CustomField(LucteriosModel):
                 self.order_key = val['order_key__max'] + 1
         return LucteriosModel.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
+    def check_associated(self):
+        sub_model_class = self.model_associated()
+        customize_field_class = sub_model_class.CustomFieldClass
+        customize_fieldname = "%s__field" % customize_field_class.__name__.lower()
+        fieldname = self.get_fieldname()
+        for sub_model_item in sub_model_class.objects.exclude(**{customize_fieldname: self}):
+            sub_model_item.set_custom_values({fieldname: getattr(sub_model_item, fieldname)})
+
     class Meta(object):
         verbose_name = _('custom field')
         verbose_name_plural = _('custom fields')
@@ -266,7 +274,7 @@ class CustomizeObject(object):
         elif cf_model.kind == CustomField.KIND_REAL:
             ccf_value = float(ccf_value)
         elif cf_model.kind == CustomField.KIND_BOOLEAN:
-            ccf_value = ccf_value != 'False' and ccf_value != '0' and ccf_value != '' and ccf_value != 'n'
+            ccf_value = str(ccf_value) != 'False' and str(ccf_value) != '0' and ccf_value != '' and ccf_value != 'n'
         elif cf_model.kind == CustomField.KIND_SELECT:
             if args_list.count(ccf_value) > 0:
                 ccf_value = args_list.index(ccf_value)
@@ -902,6 +910,9 @@ def possession_addon_search(model, search_result):
 def contacts_convertdata():
     for custom in CustomField.objects.filter(order_key__isnull=True).order_by('id'):
         custom.save()
+    for custom in CustomField.objects.all():
+        print("convert contact customize field", custom)
+        custom.check_associated()
 
 
 @Signal.decorate('checkparam')

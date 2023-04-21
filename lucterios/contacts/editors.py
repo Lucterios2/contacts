@@ -128,6 +128,7 @@ parent.get('args_today').setVisible(type==5);
         self.item.args = str(args)
         LucteriosEditor.saving(self, xfer)
         self.item.save()
+        self.item.check_associated()
 
     def get_comp(self, value):
         comp = None
