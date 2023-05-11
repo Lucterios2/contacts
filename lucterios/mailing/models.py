@@ -253,7 +253,9 @@ class Message(LucteriosModel):
     def get_recipients(self):
         for item in self.recipients.split('\n'):
             if (item != '') and not item.startswith('# '):
-                modelname, criteria = item.split(' ')
+                item_splited = item.split(' ')
+                modelname = item_splited[0]
+                criteria = " ".join(item_splited[1:])
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
     def add_recipient(self, modelname, criteria):
