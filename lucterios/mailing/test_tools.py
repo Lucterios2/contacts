@@ -176,6 +176,11 @@ class TestReceiver(TestCase):
         return msg_result
 
     def get_msg_index(self, index, subject=None, params=None):
+        special_value = {
+            "peer": str(self.get(index)[0]),
+            "mailfrom": str(self.get(index)[1]),
+            "rcpttos": ";".join(self.get(index)[2])
+        }
         data = self.get(index)[3]
         if hasattr(data, 'decode'):
             data = data.decode()
@@ -186,7 +191,10 @@ class TestReceiver(TestCase):
             if subject is not None:
                 params['Subject'] = subject
             for key, val in params.items():
-                self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
+                if key in special_value:
+                    self.assertEqual(val, special_value[key])
+                else:
+                    self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
         return self.convert_message(msg.get_payload())
 
     def check_first_message(self, subject, nb_multi, params=None):

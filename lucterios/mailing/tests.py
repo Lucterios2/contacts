@@ -371,7 +371,8 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com',
                           'tata@machin.com', 'tete@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com, titi@machin.com, tyty@machin.com',
-                                                                          'Cc': 'tutu@machin.com, tata@machin.com'})
+                                                                          'Cc': 'tutu@machin.com, tata@machin.com',
+                                                                          'rcpttos': 'toto@machin.com;titi@machin.com;tyty@machin.com;tutu@machin.com;tata@machin.com;tete@machin.com'})
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
