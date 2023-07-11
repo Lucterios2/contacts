@@ -27,7 +27,7 @@ from os.path import isfile
 from re import compile
 from logging import getLogger
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lucterios.framework.error import LucteriosException, IMPORTANT
 

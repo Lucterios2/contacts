@@ -4,7 +4,7 @@ from django.http.response import HttpResponse
 from base64 import b64decode
 from logging import getLogger
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Q
 

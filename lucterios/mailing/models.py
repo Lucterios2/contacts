@@ -29,7 +29,7 @@ from logging import getLogger, DEBUG
 from _io import BytesIO
 import json
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models.query import QuerySet
 from django.apps import apps

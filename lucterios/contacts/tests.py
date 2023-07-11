@@ -26,7 +26,7 @@ from __future__ import unicode_literals
 from shutil import rmtree
 from os.path import join, dirname, exists
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.framework.filetools import get_user_dir, readimage_to_base64, get_user_path

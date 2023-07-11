@@ -34,7 +34,7 @@ from email.utils import formatdate, make_msgid
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lucterios.framework.error import LucteriosException, GRAVE
 
