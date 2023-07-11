@@ -24,7 +24,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from lucterios.framework.editors import LucteriosEditor
 from lucterios.framework.xfercomponents import XferCompGrid, XferCompCheckList
