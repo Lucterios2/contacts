@@ -70,4 +70,4 @@ def initial_contact(empty_user=None):
     Function.objects.create(name="Secretaire")
     Function.objects.create(name="Tresorier")
     Function.objects.create(name="Troufion")
-    create_jack(empty_user)
+    return create_jack(empty_user)
