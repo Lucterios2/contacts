@@ -27,3 +27,13 @@ Codes postaux/villes
 En saisie, l'outil va automatiquement rechercher la ville (ou les villes) associée(s) au code postal que vous entrerez afin de vous faciliter la saisie de vos contacts. 
 Dans cet écran, vous pouvez ajouter les codes postaux manquants.
 Par défaut, les codes postaux français et suisses sont insérés. 
+
+Import de contacts
+------------------
+
+Depuis le menu *Administration/Modules (conf.)/Importation des contacts*, vous avez la possibilité d'importer des contacts en lot depuis un fichier CSV, ODS ou XLS.
+
+Une fois avoir sélectionné votre fichier, le type de contact et les information de son format,
+vous serez ammené à associer les champs d'un article aux colonnes de votre documents (la première ligne de votre document doit décrire la nature de chaque colonne).
+    
+Vous pouvez alors contrôler vos données avant de les validés.

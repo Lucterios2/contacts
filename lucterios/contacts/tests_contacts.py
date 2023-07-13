@@ -966,13 +966,13 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
-        self.assert_count_equal('', 7)
+        self.assert_count_equal('', 8)
         self.assertEqual(len(self.json_actions), 2)
         self.assert_action_equal('POST', self.json_actions[0], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': "'",
-                                                            'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'csvcontent': StringIO(csv_content)}, False)
+                                                            'delimiter': ';', 'encoding': 'utf-8', 'dateformat': '%d/%m/%Y', 'importcontent': StringIO(csv_content)}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 6 + 16)
         self.assert_attrib_equal("fld_name", 'description', "dénomination")
@@ -1000,9 +1000,9 @@ class ContactsTest(LucteriosTest):
             cases_val.append(str(json_value[1]))
         self.assertEqual("|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type|OtherDate", "|".join(cases_id))
         self.assertEqual("None|value|nom|adresse|codePostal|ville|fixe|portable|mail|Num|Type|OtherDate", "|".join(cases_val))
-        self.assert_grid_equal('CSV', {'value': 'value', 'nom': 'nom', 'adresse': 'adresse', 'codePostal': 'codePostal', 'ville': 'ville', 'fixe': 'fixe', 'portable': 'portable', 'mail': 'mail', 'Num': 'Num', 'Type': 'Type', 'OtherDate': 'OtherDate'}, 5)  # nb=10
-        self.assert_count_equal('CSV', 5)
-        self.assert_count_equal('#CSV/actions', 0)
+        self.assert_grid_equal('Array', {'value': 'value', 'nom': 'nom', 'adresse': 'adresse', 'codePostal': 'codePostal', 'ville': 'ville', 'fixe': 'fixe', 'portable': 'portable', 'mail': 'mail', 'Num': 'Num', 'Type': 'Type', 'OtherDate': 'OtherDate'}, 5)  # nb=10
+        self.assert_count_equal('Array', 5)
+        self.assert_count_equal('#Array/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal('POST', self.json_actions[0], (str('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
         self.assert_action_equal('POST', self.json_actions[1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
@@ -1010,19 +1010,19 @@ class ContactsTest(LucteriosTest):
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 2, 'modelname': 'contacts.LegalEntity', 'quotechar': "'", 'delimiter': ';', 'encoding': 'utf-8',
-                                                            'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                            'dateformat': '%d/%m/%Y', 'importcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
                                                             "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
                                                             "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value", "fld_custom_7": 'OtherDate'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 4)
-        self.assert_grid_equal('CSV', {"name": "dénomination", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "Informations Juridiques", "custom_3": "ccc", "custom_7": 'ggg'}, 5)
-        self.assert_count_equal('#CSV/actions', 0)
+        self.assert_grid_equal('Array', {"name": "dénomination", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "Informations Juridiques", "custom_3": "ccc", "custom_7": 'ggg'}, 5)
+        self.assert_count_equal('#Array/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
         self.assert_action_equal('POST', self.json_actions[2 - 1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': "'", 'delimiter': ';', 'encoding': 'utf-8',
-                                                            'dateformat': '%d/%m/%Y', 'csvcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
+                                                            'dateformat': '%d/%m/%Y', 'importcontent0': csv_content, "fld_name": "nom", "fld_structure_type": "Type",
                                                             "fld_address": "adresse", "fld_postal_code": "codePostal", "fld_city": "ville", "fld_tel1": "fixe",
                                                             "fld_email": "mail", "fld_identify_number": "Num", "fld_custom_3": "value", "fld_custom_7": 'OtherDate'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
