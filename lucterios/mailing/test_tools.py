@@ -176,6 +176,8 @@ class TestReceiver(TestCase):
         return msg_result
 
     def get_msg_index(self, index, subject=None, params=None):
+        def decode_mime_words(text):
+            return ''.join(word.decode(encoding or 'utf8') if isinstance(word, bytes) else word for word, encoding in email.header.decode_header(text))
         special_value = {
             "peer": str(self.get(index)[0]),
             "mailfrom": str(self.get(index)[1]),
@@ -194,7 +196,7 @@ class TestReceiver(TestCase):
                 if key in special_value:
                     self.assertEqual(val, special_value[key])
                 else:
-                    self.assertEqual(val, msg.get(key, ''), msg.get(key, ''))
+                    self.assertEqual(val, decode_mime_words(msg.get(key, '')), msg.get(key, ''))
         return self.convert_message(msg.get_payload())
 
     def check_first_message(self, subject, nb_multi, params=None):
