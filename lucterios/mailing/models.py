@@ -590,6 +590,11 @@ class EmailSent(LucteriosModel):
         text = text.replace('#name', contact.get_final_child().get_presentation() if contact is not None else '???')
         text = text.replace('#doc', first_doc_name)
         text = text.replace('#reference', doc_reference)
+        if "#footer" in text:
+            footer_contain = ""
+            if hasattr(self.item, 'get_email_footer'):
+                footer_contain = self.item.get_email_footer()
+            text = text.replace('#footer', footer_contain)
         return text
 
     def send_email(self, http_root_address):
