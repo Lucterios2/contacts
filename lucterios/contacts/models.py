@@ -296,10 +296,11 @@ class CustomizeObject(object):
                 cf_value = params[cf_name]
                 cf_id = int(cf_name[len(CustomField.PREFIX_CUSTOM):])
                 cf_model = CustomField.objects.get(id=cf_id)
+                args = cf_model.get_args()['list']
                 try:
-                    cf_value = self._convert_value_for_attr(cf_model, cf_value, cf_model.get_args()['list'])
+                    cf_value = self._convert_value_for_attr(cf_model, cf_value, args)
                 except Exception:
-                    cf_value = ""
+                    cf_value = self._convert_value_for_attr(cf_model, '', args)
                 args = {self.FieldName: self, 'field': cf_model}
                 ccf_model = self.CustomFieldClass.objects.get_or_create(**args)
                 ccf_model[0].value = str(cf_value)
