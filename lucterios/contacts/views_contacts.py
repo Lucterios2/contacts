@@ -27,10 +27,11 @@ from __future__ import unicode_literals
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from django.apps.registry import apps
+from django.conf import settings
 
 from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage, SELECT_MULTI
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
-from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
+from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge, XFER_DBOX_WARNING
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
     TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
     TITLE_LISTING, TITLE_CREATE
@@ -305,7 +306,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
                 obj_indiv.save()
                 self.redirect_action(ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', self),
                                      params={'user_actif': str(current_user.id), 'IDENT_READ': 'YES'})
-        else:
+        elif not settings.USER_READONLY:
             dlg = self.create_custom(LucteriosUser)
             img = XferCompImage('img')
             img.set_value(self.icon_path())
@@ -315,6 +316,8 @@ class IndividualUserAdd(XferContainerAcknowledge):
             dlg.fill_from_model(1, 0, False, ['username'])
             dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
             dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
+        else:
+            self.message(_("No user association find for this contact"), XFER_DBOX_WARNING)
 
 
 @MenuManage.describ('auth.add_user')

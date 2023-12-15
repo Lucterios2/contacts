@@ -201,7 +201,7 @@ class CurrentStructurePrint(XferPrintAction):
 
 
 def right_create_account(request):
-    if not notfree_mode_connect():
+    if not notfree_mode_connect() or settings.USER_READONLY:
         return False
     if (signal_and_lock.Signal.call_signal("send_connection", None, None, None) == 0):
         return False

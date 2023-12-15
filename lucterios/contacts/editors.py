@@ -340,7 +340,7 @@ class IndividualEditor(AbstractContactEditor):
     def saving(self, xfer):
         from django.conf import settings
         AbstractContactEditor.saving(self, xfer)
-        if self.item.user is not None:
+        if (self.item.user is not None) and not settings.USER_READONLY:
             self.item.user.first_name = self.item.firstname
             self.item.user.last_name = self.item.lastname
             self.item.user.email = self.item.email.split(';')[0]
