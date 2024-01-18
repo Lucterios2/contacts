@@ -497,6 +497,17 @@ class Message(LucteriosModel):
         else:
             return ""
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.body = self.body.replace('{[/h1]}{[br/]}', '{[/h1]}')
+        self.body = self.body.replace('{[/h2]}{[br/]}', '{[/h2]}')
+        self.body = self.body.replace('{[/h3]}{[br/]}', '{[/h3]}')
+        self.body = self.body.replace('{[/h4]}{[br/]}', '{[/h4]}')
+        self.body = self.body.replace('{[/h5]}{[br/]}', '{[/h5]}')
+        self.body = self.body.replace('{[p]}', '')
+        self.body = self.body.replace('{[/p]}{[br/]}', '{[br]}')
+        self.body = self.body.replace('{[/p]}', '{[br]}')
+        return LucteriosModel.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
     class Meta(object):
         verbose_name = _('message')
         verbose_name_plural = _('messages')

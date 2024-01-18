@@ -196,7 +196,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
-            self.item.http_root_address = get_url_from_request(self.request).split('/')
+            self.item.http_root_address = get_url_from_request(self.request)
             send_email([self.getparam('recipient')], self.item.subject, self.item.email_content, files=self.item.attach_files)
             self.message(_("EMail send, check it."))
 
