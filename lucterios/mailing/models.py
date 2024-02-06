@@ -351,7 +351,7 @@ class Message(LucteriosModel):
     def sending(self):
         if self.can_be_send():
             self.prep_sending()
-            if self._last_xfer is not None:
+            if (self._last_xfer is not None) and hasattr(self._last_xfer, "request"):
                 root_url = get_url_from_request(self._last_xfer.request)
             else:
                 root_url = ''
@@ -611,13 +611,16 @@ class EmailSent(LucteriosModel):
     def send_email(self, http_root_address):
         getLogger('lucterios.mailing').debug('EmailSent.send_email(http_root_address=%s)', http_root_address)
         try:
+            if http_root_address != '':
+                self.message.http_root_address = http_root_address
+                img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (http_root_address, self.id)
+            else:
+                img_html = ""
             body = self.replace_tag(self.message.email_content)
             h2txt = HTML2Text()
             h2txt.ignore_links = False
             body_txt = h2txt.handle(body)
-            if http_root_address != '':
-                self.message.http_root_address = http_root_address
-                img_html = "<img src='%s/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/>" % (http_root_address, self.id)
+            if img_html != "":
                 body = body.replace('</body>', img_html + '</body>')
             email, ccemail = self.get_emails()
             getLogger('lucterios.mailing').debug('send email %s : %s' % (self.message.subject, email))

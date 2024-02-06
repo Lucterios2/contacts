@@ -17,7 +17,7 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManag
     get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO, get_url_from_request
 from lucterios.framework.xferbasic import XferContainerAbstract
 from lucterios.framework.error import LucteriosException, MINOR
-from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom
+from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom, XFER_DBOX_ERROR
 from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompCheck, XferCompEdit
 from lucterios.CORE.xferprint import XferPrintReporting
 
@@ -26,7 +26,7 @@ from lucterios.contacts.models import LegalEntity
 from lucterios.documents.models import DocumentContainer
 from lucterios.documents.views import DocumentSearch, DocumentShow
 from lucterios.mailing.models import Message, add_messaging_in_scheduler, EmailSent
-from lucterios.mailing.email_functions import will_mail_send, send_email
+from lucterios.mailing.email_functions import will_mail_send
 from lucterios.mailing.sms_functions import AbstractProvider
 from lucterios.CORE.parameters import Params
 
@@ -196,9 +196,15 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
-            self.item.http_root_address = get_url_from_request(self.request)
-            send_email([self.getparam('recipient')], self.item.subject, self.item.email_content, files=self.item.attach_files)
-            self.message(_("EMail send, check it."))
+            email_sent = EmailSent.objects.create(message=self.item, contact=None, email=self.getparam('recipient'), date=timezone.now())
+            try:
+                email_sent.send_email(get_url_from_request(self.request))
+                if email_sent.success:
+                    self.message(_("EMail send, check it."))
+                else:
+                    self.message(email_sent.error, XFER_DBOX_ERROR)
+            finally:
+                email_sent.delete()
 
 
 @ActionsManage.affect_show(_("SMS try"), "sms.png", condition=lambda xfer: (xfer.item.message_type == 1) and AbstractProvider.is_current_active() and (xfer.item.status == 0))

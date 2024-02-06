@@ -403,6 +403,13 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             self.calljson('/lucterios.mailing/messageSendEmailTry', {'message': '1', 'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com'}, False)
             self.assert_observer('core.dialogbox', 'lucterios.mailing', 'messageSendEmailTry')
             self.assert_json_equal('', 'text', 'Courriel envoyé, veuillez le vérifier.')
+            self.assert_json_equal('', 'type', 1)
+
+            self.factory.xfer = MessageSendEmailTry()
+            self.calljson('/lucterios.mailing/messageSendEmailTry', {'message': '1', 'CONFIRME': 'YES', "recipient": 'behoaworldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.mailing', 'messageSendEmailTry')
+            self.assert_json_equal('', 'text', 'Destinataires non valides !')
+            self.assert_json_equal('', 'type', 4)
 
             self.assertEqual(1, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
