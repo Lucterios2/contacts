@@ -94,10 +94,19 @@ class MessageLineSet(QuerySet):
 
 
 class Message(LucteriosModel):
+    MESSAGE_TYPE_EMAIL = 0
+    MESSAGE_TYPE_SMS = 1
+    MESSAGE_TYPE_LIST = ((MESSAGE_TYPE_EMAIL, _('email')), (MESSAGE_TYPE_SMS, _('sms')))
+
+    STATUS_OPEN = 0
+    STATUS_VALIDATED = 1
+    STATUS_SENDING = 2
+    STATUS_LIST = ((STATUS_OPEN, _('open')), (STATUS_VALIDATED, _('valided')), (STATUS_SENDING, _('sending')))
+
     subject = models.CharField(_('subject'), max_length=50, blank=False)
     body = models.TextField(_('body'), default="")
-    message_type = FSMIntegerField(verbose_name=_('type'), default=0, choices=((0, _('email')), (1, _('sms'))))
-    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=((0, _('open')), (1, _('valided')), (2, _('sending'))))
+    message_type = FSMIntegerField(verbose_name=_('type'), default=0, choices=MESSAGE_TYPE_LIST)
+    status = FSMIntegerField(verbose_name=_('status'), default=0, choices=STATUS_LIST)
     recipients = models.TextField(_('recipients'), default="", null=False)
     date = models.DateField(verbose_name=_('date'), null=True)
     contact = models.ForeignKey('contacts.AbstractContact', verbose_name=_('contact'), null=True, on_delete=models.SET_NULL)
@@ -154,9 +163,9 @@ class Message(LucteriosModel):
         return ""
 
     def get_contact_nb(self):
-        if self.message_type == 0:
+        if self.message_type == self.MESSAGE_TYPE_EMAIL:
             return len(self.get_email_contacts())
-        elif self.message_type == 1:
+        elif self.message_type == self.MESSAGE_TYPE_SMS:
             return len(self.get_sms_contacts())
         return 0
 
@@ -182,7 +191,7 @@ class Message(LucteriosModel):
             if new_contact not in contact_list:
                 contact_list.append(new_contact)
         contact_list = []
-        if self.message_type == 0:
+        if self.message_type == self.MESSAGE_TYPE_EMAIL:
             for modelname, item in self.get_recipients():
                 model = apps.get_model(modelname)
                 contact_filter = item[0]
@@ -201,7 +210,7 @@ class Message(LucteriosModel):
 
     def get_sms_contacts(self, sms=None):
         contact_list = []
-        if self.message_type == 1:
+        if self.message_type == self.MESSAGE_TYPE_SMS:
             provider = AbstractProvider.get_current_instance()
             if (sms is None) or (provider is not None):
                 field_names = list(self.get_sms_field_names(translate=False))
@@ -259,12 +268,12 @@ class Message(LucteriosModel):
                 yield modelname, get_search_query_from_criteria(criteria, apps.get_model(modelname))
 
     def add_recipient(self, modelname, criteria):
-        if self.status == 0:
+        if self.status == self.STATUS_OPEN:
             self.recipients += modelname + ' ' + criteria + "\n"
             self.save()
 
     def del_recipient(self, recipients):
-        if (self.status == 0) and (recipients >= 0):
+        if (self.status == self.STATUS_OPEN) and (recipients >= 0):
             recipient_list = self.recipients.split('\n')
             self.recipients = ""
             list_idx = 0
@@ -281,7 +290,7 @@ class Message(LucteriosModel):
 
     transitionname__valid = _("Valid")
 
-    @transition(field=status, source=0, target=1, conditions=[lambda item:len(list(item.get_recipients())) > 0])
+    @transition(field=status, source=STATUS_OPEN, target=STATUS_VALIDATED, conditions=[lambda item:len(list(item.get_recipients())) > 0])
     def valid(self):
         self.date = date.today()
 
@@ -301,9 +310,9 @@ class Message(LucteriosModel):
         return len(self.get_printmodel_names()) > 0
 
     def prep_sending(self):
-        if self.message_type == 0:
+        if self.message_type == self.MESSAGE_TYPE_EMAIL:
             item_list = self._prep_sending_email()
-        elif self.message_type == 1:
+        elif self.message_type == self.MESSAGE_TYPE_SMS:
             item_list = self._prep_sending_sms()
         else:
             item_list = []
@@ -345,7 +354,7 @@ class Message(LucteriosModel):
     transitionname__sending = _("Emails")
 
     def can_be_send(self):
-        return ((self.message_type == 0) and will_mail_send()) or ((self.message_type == 1) and AbstractProvider.is_current_active())
+        return ((self.message_type == self.MESSAGE_TYPE_EMAIL) and will_mail_send()) or ((self.message_type == self.MESSAGE_TYPE_SMS) and AbstractProvider.is_current_active())
 
     @transition(field=status, source=1, target=2, conditions=[lambda item: item.can_be_send()])
     def sending(self):
@@ -362,7 +371,7 @@ class Message(LucteriosModel):
     def define_email_message(self):
         self._attache_files = []
         self._email_content = ""
-        if self.message_type == 0:
+        if self.message_type == self.MESSAGE_TYPE_EMAIL:
             if not hasattr(self, 'http_root_address'):
                 raise LucteriosException(GRAVE, "No http_root_address")
             link_html = ""
@@ -396,7 +405,7 @@ class Message(LucteriosModel):
     def sendSMS(self):
         getLogger('lucterios.mailing').debug('Message.sendsms()')
         provider = AbstractProvider.get_current_instance()
-        if (self.message_type == 1) and (provider is not None) and provider.is_active and (self.status == 2):
+        if (self.message_type == self.MESSAGE_TYPE_SMS) and (provider is not None) and provider.is_active and (self.status == self.STATUS_SENDING):
             sms_list = self.email_to_send.split("\n")
             for contact_sms in sms_list:
                 contact_sms_det = contact_sms.split(':')
@@ -409,14 +418,14 @@ class Message(LucteriosModel):
                 email_sent = EmailSent.objects.create(message=self, contact=contact, email=sms, date=timezone.now())
                 email_sent.send_sms(provider)
             self.email_to_send = ""
-            self.status = 1
+            self.status = self.STATUS_VALIDATED
             self.save()
         return
 
     def sendemail(self, nb_to_send, http_root_address):
         getLogger('lucterios.mailing').debug('Message.sendemail(nb_to_send=%s, http_root_address=%s)', nb_to_send, http_root_address)
         self.http_root_address = http_root_address
-        if (self.message_type == 0) and will_mail_send() and (self.status == 2):
+        if (self.message_type == self.MESSAGE_TYPE_EMAIL) and will_mail_send() and (self.status == self.STATUS_SENDING):
             email_list = self.email_to_send.split("\n")
             for contact_email in email_list[:nb_to_send]:
                 contact_email_det = contact_email.split(':')
@@ -443,7 +452,7 @@ class Message(LucteriosModel):
                 email_sent.send_email(http_root_address)
             self.email_to_send = "\n".join(email_list[nb_to_send:])
             if self.email_to_send == '':
-                self.status = 1
+                self.status = self.STATUS_VALIDATED
             self.save()
         return
 
@@ -480,7 +489,7 @@ class Message(LucteriosModel):
 
     @property
     def statistic(self):
-        if self.message_type == 0:
+        if self.message_type == self.MESSAGE_TYPE_EMAIL:
             return _('Send = %(send)d at %(date)s - Error = %(error)d - Open = %(open)d => %(ratio).1f %%') % {
                 'send': self.nb_total,
                 'date': self.date_end,
@@ -488,7 +497,7 @@ class Message(LucteriosModel):
                 'open': self.nb_open,
                 'ratio': (100.0 * self.nb_open) / self.nb_total
             }
-        elif self.message_type == 1:
+        elif self.message_type == self.MESSAGE_TYPE_SMS:
             return _('Send = %(send)d at %(date)s - Error = %(error)d') % {
                 'send': self.nb_total,
                 'date': self.date_end,
@@ -664,19 +673,23 @@ class EmailSent(LucteriosModel):
 
 def send_messaging_in_waiting(http_root_address):
     '''Mailing'''
-    msg_list = Message.objects.filter(status=2)
+    msg_list = Message.objects.filter(status=Message.STATUS_SENDING)
     if len(msg_list) == 0:
         LucteriosScheduler.remove(send_messaging_in_waiting)
     else:
         for msg_item in msg_list:
-            if msg_item.message_type == 0:
+            if msg_item.message_type == Message.MESSAGE_TYPE_EMAIL:
                 msg_item.sendemail(Params.getvalue('mailing-nb-by-batch'), http_root_address)
-            elif msg_item.message_type == 1:
+            elif msg_item.message_type == Message.MESSAGE_TYPE_SMS:
                 msg_item.sendSMS()
 
 
+@Signal.decorate('scheduler_refresh')
 def add_messaging_in_scheduler(check_nb=True, http_root_address=""):
-    if not check_nb or (Message.objects.filter(status=2).count() > 0):
+    from django.conf import settings
+    if http_root_address == "":
+        http_root_address = getattr(settings, 'LUCTERIOS_ROOT_URL', '')
+    if not check_nb or (Message.objects.filter(status=Message.STATUS_SENDING).count() > 0):
         LucteriosScheduler.add_task(send_messaging_in_waiting, minutes=Params.getvalue('mailing-delay-batch'), http_root_address=http_root_address)
 
 
