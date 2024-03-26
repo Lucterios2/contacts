@@ -34,7 +34,7 @@ from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge, XFER_DBOX_WARNING
 from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
     TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
-    TITLE_LISTING, TITLE_CREATE
+    TITLE_LISTING, TITLE_CREATE, TITLE_CANCEL
 from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid,\
     XferCompButton
 from lucterios.framework.xfersearch import XferSearchEditor
@@ -315,7 +315,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
             dlg.item.username = obj_indiv.create_username()
             dlg.fill_from_model(1, 0, False, ['username'])
             dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
-            dlg.add_action(WrapAction(_('Cancel'), 'images/cancel.png'))
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
         else:
             self.message(_("No user association find for this contact"), XFER_DBOX_WARNING)
 

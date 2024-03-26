@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
-    XferTransition, TITLE_OK, TITLE_CANCEL, TITLE_CREATE
+    XferTransition, TITLE_OK, TITLE_CANCEL, TITLE_CREATE, TITLE_CLOSE
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
@@ -296,7 +296,7 @@ class MessageSentInfo(XferContainerCustom):
         check.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(check)
 
-        self.add_action(WrapAction(_('Close'), 'images/close.png'))
+        self.add_action(WrapAction(TITLE_CLOSE, 'images/close.png'))
 
 
 @ActionsManage.affect_show(_("Letters"), "letter.png", condition=lambda xfer: (xfer.item.message_type == 0) and (xfer.item.status == 1) and not xfer.item.is_dynamic)
