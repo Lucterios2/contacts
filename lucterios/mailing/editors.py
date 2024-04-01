@@ -72,7 +72,7 @@ class MessageEditor(LucteriosEditor):
             new_documents.tab = old_documents.tab
             new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
             new_documents.set_model(self.item.attachments.all(), ["name", "description", "date_modification"], xfer)
-            new_documents.add_action(xfer.request, MessageShowDoc.get_action(TITLE_EDIT, "images/show.png"),
+            new_documents.add_action(xfer.request, MessageShowDoc.get_action(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline'),
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
             if self.item.status == 0:
                 new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png"),

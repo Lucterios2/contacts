@@ -49,28 +49,30 @@ from lucterios.contacts.models import LegalEntity, Individual, Responsability, A
 from lucterios.CORE.parameters import Params
 
 
-MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70)
+MenuManage.add_sub("office", None, "lucterios.contacts/images/office.png", _("Office"), _("Office tools"), 70, 'mdi:mdi-monitor')
 
 MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/contacts.png",
-                   _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50)
+                   _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50, 'mdi:mdi-account-outline')
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")
-@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class LegalEntityAddModify(XferAddEditor):
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
     caption_add = _("Add legal entity")
     caption_modify = _("Modify legal entity")
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityShow(XferShowEditor):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -80,21 +82,23 @@ class LegalEntityShow(XferShowEditor):
         XferShowEditor._search_model(self)
 
 
-@ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
+@ActionsManage.affect_show(TITLE_PRINT, "images/print.png", short_icon='mdi:mdi-printer-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityPrint(XferPrintAction):
     caption = _("Show legal entity")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
     action_class = LegalEntityShow
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class LegalEntityDel(XferDelete):
     caption = _("Delete legal entity")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -103,6 +107,7 @@ class LegalEntityDel(XferDelete):
 class LegalEntityList(XferListEditor):
     caption = _("Legal entities")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -123,11 +128,12 @@ class LegalEntityList(XferListEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 2)
 
 
-@ActionsManage.affect_list(TITLE_LISTING, "images/print.png")
+@ActionsManage.affect_list(TITLE_LISTING, "images/print.png", short_icon='mdi:mdi-printer-pos-edit-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityListing(XferPrintListing):
     caption = _("Legal entities")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -139,11 +145,12 @@ class LegalEntityListing(XferPrintListing):
             return XferPrintListing.get_filter(self)
 
 
-@ActionsManage.affect_list(TITLE_LABEL, "images/print.png")
+@ActionsManage.affect_list(TITLE_LABEL, "images/print.png", short_icon='mdi:mdi-printer-pos-star-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class LegalEntityLabel(XferPrintLabel):
     caption = _("Legal entities")
     icon = "legalEntity.png"
+    short_icon = "mdi:mdi-account-multiple-outline"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -155,31 +162,34 @@ class LegalEntityLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png")
-@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", close=CLOSE_YES)
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class IndividualAddModify(XferAddEditor):
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
     caption_add = _("Add individual")
     caption_modify = _("Modify individual")
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualShow(XferShowEditor):
     caption = _("Show individual")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualShowResp(XferContainerAcknowledge):
     caption = _("Show individual")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Responsability
     field_id = 'responsability'
     readonly = True
@@ -190,21 +200,23 @@ class IndividualShowResp(XferContainerAcknowledge):
                              close=CLOSE_NO, params={'individual': str(self.item.individual_id)})
 
 
-@ActionsManage.affect_show(TITLE_PRINT, "images/print.png")
+@ActionsManage.affect_show(TITLE_PRINT, "images/print.png", short_icon='mdi:mdi-printer-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualPrint(XferPrintAction):
     caption = _("Show individual")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
     action_class = IndividualShow
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class IndividualDel(XferDelete):
     caption = _("Delete individual")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
 
@@ -213,6 +225,7 @@ class IndividualDel(XferDelete):
 class IndividualList(XferListEditor):
     caption = _("Individuals")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
 
@@ -240,11 +253,12 @@ class IndividualList(XferListEditor):
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 2)
 
 
-@ActionsManage.affect_list(TITLE_LABEL, "images/print.png")
+@ActionsManage.affect_list(TITLE_LABEL, "images/print.png", short_icon='mdi:mdi-printer-pos-star-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualLabel(XferPrintLabel):
     caption = _("Individuals")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
 
@@ -256,11 +270,12 @@ class IndividualLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect_list(TITLE_LISTING, "images/print.png")
+@ActionsManage.affect_list(TITLE_LISTING, "images/print.png", short_icon='mdi:mdi-printer-pos-edit-outline')
 @MenuManage.describ('contacts.change_abstractcontact')
 class IndividualListing(XferPrintListing):
     caption = _("Individuals")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
     with_text_export = True
@@ -273,11 +288,12 @@ class IndividualListing(XferPrintListing):
             return XferPrintListing.get_filter(self)
 
 
-@ActionsManage.affect_other("", 'images/delete.png')
+@ActionsManage.affect_other("", 'images/delete.png', short_icon='mdi:mdi-delete-outline')
 @MenuManage.describ('auth.add_user')
 class IndividualUserRemove(XferContainerAcknowledge):
     caption = _("Remove as an users")
     icon = "individual.png"
+    short_icon = "mdi:mdi-account-outline"
     model = Individual
     field_id = 'individual'
 
@@ -287,11 +303,12 @@ class IndividualUserRemove(XferContainerAcknowledge):
             self.item.save()
 
 
-@ActionsManage.affect_show("", 'images/add.png')
+@ActionsManage.affect_show("", 'images/add.png', short_icon='mdi mdi-pencil-plus')
 @MenuManage.describ('auth.add_user')
 class IndividualUserAdd(XferContainerAcknowledge):
     caption = _("Add as an users")
     icon = "images/user.png"
+    short_icon = "mdi:mdi-account"
     model = LucteriosUser
 
     def fillresponse(self, individual):
@@ -315,7 +332,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
             dlg.item.username = obj_indiv.create_username()
             dlg.fill_from_model(1, 0, False, ['username'])
             dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             self.message(_("No user association find for this contact"), XFER_DBOX_WARNING)
 
@@ -324,6 +341,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
 class IndividualUserValid(XferSave):
     caption = _("Add as an users")
     icon = "user.png"
+    short_icon = "mdi:mdi-account"
     model = LucteriosUser
 
     def fillresponse(self, individual, username):
@@ -352,11 +370,12 @@ class IndividualUserValid(XferSave):
                                      params={'user_actif': str(self.item.id), 'IDENT_READ': 'YES'})
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
 @MenuManage.describ('contacts.add_responsability')
 class ResponsabilityAdd(XferContainerCustom):
     caption = _("Add responsability")
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = Responsability
     field_id = 'responsability_set'
 
@@ -386,25 +405,27 @@ class ResponsabilityAdd(XferContainerCustom):
                         modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
         grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
-        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png"),
+        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO)
         self.add_component(grid)
 
 
-@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.add_responsability')
 class ResponsabilityModify(XferAddEditor):
     caption = _("Modify responsability")
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = Responsability
     field_id = 'responsability'
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_responsability')
 class ResponsabilityDel(XferDelete):
     caption = _("Delete responsability")
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = Responsability
     field_id = 'responsability'
 
@@ -413,6 +434,7 @@ class ResponsabilityDel(XferDelete):
 class IndividualSearch(XferSavedCriteriaSearchEditor):
     caption = _("Individual search")
     icon = "individualFind.png"
+    short_icon = "mdi mdi-account-search-outline"
     model = Individual
     field_id = 'individual'
 
@@ -424,9 +446,9 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
-        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
+        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                         params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
 
 
@@ -434,6 +456,7 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
 class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     caption = _("Legal entity search")
     icon = "legalEntityFind.png"
+    short_icon = "mdi mdi-account-search"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -445,9 +468,9 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
-        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png"),
+        self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                         params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
 
 
@@ -455,6 +478,7 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
 class AbstractContactFindDouble(XferListEditor):
     caption = _("Contact duplication searching")
     icon = "contacts.png"
+    short_icon = 'mdi:mdi-account-outline'
     model = AbstractContact
     field_id = 'abstractcontact'
     readonly = True
@@ -469,14 +493,15 @@ class AbstractContactFindDouble(XferListEditor):
         self.field_id = field_id
         XferListEditor.fillresponse(self)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png"),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI)
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.change_abstractcontact')
 class AbstractContactShow(XferShowEditor):
     icon = "contacts.png"
+    short_icon = 'mdi:mdi-account-outline'
     model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Show contact")
@@ -502,10 +527,11 @@ class AbstractContactShow(XferShowEditor):
             self.add_component(btn)
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_abstractcontact')
 class AbstractContactDel(XferDelete):
     icon = "contacts.png"
+    short_icon = 'mdi:mdi-account-outline'
     model = AbstractContact
     field_id = 'abstractcontact'
     caption = _("Delete contact")
@@ -552,7 +578,7 @@ def situation_contacts(xfer):
                     row = xfer.get_max_row() + 1
                     btn = XferCompButton('summarybtn')
                     btn.set_location(0, row + 1, 4)
-                    btn.set_action(xfer.request, AccountAddModify.get_action(TITLE_EDIT, 'images/edit.png'),
+                    btn.set_action(xfer.request, AccountAddModify.get_action(TITLE_EDIT, 'images/edit.png', short_icon='mdi:mdi-pencil-outline'),
                                    modal=FORMTYPE_MODAL, close=CLOSE_NO, params=params)
                     btn.java_script = """if (typeof Singleton().hide_individual === 'undefined') {
     current.actionPerformed();

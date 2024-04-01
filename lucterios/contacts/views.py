@@ -43,7 +43,7 @@ from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT
 from lucterios.framework.filetools import get_user_path, readimage_to_base64
 
-from lucterios.CORE.models import LucteriosUser, PrintModel
+from lucterios.CORE.models import LucteriosUser
 from lucterios.CORE.views_usergroup import UsersEdit, UsersPreference
 from lucterios.CORE.views import ParamEdit, ObjectImport
 from lucterios.CORE.xferprint import XferPrintAction
@@ -72,7 +72,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
         try:
             Responsability.objects.get(individual__user=self.request.user, legal_entity=self.item)
             LegalEntityShow.fillresponse(self)
-            self.add_action(CurrentLegalEntityModify.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_YES, pos_act=0)
+            self.add_action(CurrentLegalEntityModify.get_action(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline'), close=CLOSE_YES, pos_act=0)
         except Exception:
             raise LucteriosException(IMPORTANT, _("Bad access!"))
 
@@ -81,6 +81,7 @@ class CurrentLegalEntityShow(LegalEntityShow):
 class Account(XferContainerCustom):
     caption = _("Your account")
     icon = "account.png"
+    short_icon = "mdi:mdi-account"
     readonly = True
     methods_allowed = ('GET', )
 
@@ -116,7 +117,7 @@ class Account(XferContainerCustom):
         self.new_tab(_("Legal entities"))
         grid = XferCompGrid('legal_entity')
         grid.set_model(legal_entities, LegalEntity.get_default_fields())
-        grid.add_action(self.request, CurrentLegalEntityShow.get_action(TITLE_EDIT, "images/show.png"),
+        grid.add_action(self.request, CurrentLegalEntityShow.get_action(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.set_location(1, 1, 2)
         grid.set_size(200, 500)
@@ -153,12 +154,13 @@ class Account(XferContainerCustom):
             elif len(legal_entities) > 1:
                 self.add_legalentities(legal_entities)
             signal_and_lock.Signal.call_signal("add_account", self.item, self)
-        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
+        self.add_action(WrapAction(TITLE_CLOSE, 'images/close.png', 'mdi:mdi-close'))
 
 
 @MenuManage.describ(None)
 class AccountAddModify(XferAddEditor):
     icon = "account.png"
+    short_icon = "mdi:mdi-account"
     model = Individual
     field_id = 'individual'
     caption_add = _("My account")
@@ -170,6 +172,7 @@ class AccountAddModify(XferAddEditor):
 class CurrentStructure(XferContainerCustom):
     caption = _("Our details")
     icon = "ourDetails.png"
+    short_icon = "mdi:mdi-home-account"
     model = LegalEntity
     field_id = 1
     readonly = True
@@ -186,14 +189,15 @@ class CurrentStructure(XferContainerCustom):
         lab.set_location(1, 0, 4)
         self.add_component(lab)
         self.fill_from_model(1, 1, True)
-        self.add_action(CurrentStructureAddModify.get_action(TITLE_EDIT, "images/edit.png"), close=CLOSE_NO)
-        self.add_action(CurrentStructurePrint.get_action(TITLE_PRINT, "images/print.png"), close=CLOSE_NO)
-        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
+        self.add_action(CurrentStructureAddModify.get_action(TITLE_EDIT, "images/edit.png", short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO)
+        self.add_action(CurrentStructurePrint.get_action(TITLE_PRINT, "images/print.png", short_icon='mdi:mdi-printer-outline'), close=CLOSE_NO)
+        self.add_action(WrapAction(TITLE_CLOSE, 'images/close.png', 'mdi:mdi-close'))
 
 
 @MenuManage.describ('')
 class CurrentStructurePrint(XferPrintAction):
     icon = "ourDetails.png"
+    short_icon = "mdi:mdi-home-account"
     model = LegalEntity
     field_id = 1
     caption = _("Our details")
@@ -213,6 +217,7 @@ def right_create_account(request):
 @MenuManage.describ(right_create_account, FORMTYPE_MODAL, 'core.general', _("To ask an account"))
 class CreateAccount(XferContainerAcknowledge):
     icon = "account.png"
+    short_icon = "mdi:mdi-account-plus"
     model = Individual
     field_id = 'individual'
     caption = _("Create account")
@@ -253,7 +258,7 @@ class CreateAccount(XferContainerAcknowledge):
         lbl.set_value(self.getparam('error', ''))
         dlg.add_component(lbl)
         dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'), params={"SAVE": "YES"})
-        dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+        dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
 
     def fillresponse(self, username='', legalentity=''):
         if self.getparam("SAVE") != 'YES':
@@ -310,6 +315,7 @@ def auth_action_contact(actions_basic):
 @MenuManage.describ('CORE.add_parameter')
 class CurrentStructureAddModify(XferAddEditor):
     icon = "ourDetails.png"
+    short_icon = "mdi:mdi-home-account"
     model = LegalEntity
     field_id = 1
     caption_add = _("Our details")
@@ -318,13 +324,14 @@ class CurrentStructureAddModify(XferAddEditor):
     redirect_to_show = False
 
 
-MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1)
+MenuManage.add_sub("contact.conf", "core.extensions", "", _("Contact"), "", 1, 'mdi:mdi-account-cog-outline')
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Management functions of individuals and categories of legal entities.'))
 class Configuration(XferListEditor):
     caption = _("Contacts configuration")
     icon = "contactsConfig.png"
+    short_icon = "mdi:mdi-account-cog"
 
     def _fill_functions(self):
         self.new_tab(_("Functions and responsabilities"))
@@ -371,24 +378,26 @@ class Configuration(XferListEditor):
         self._fill_functions()
         self._fill_structuretype()
         self._fill_customfield()
-        self.add_action(WrapAction(TITLE_CLOSE, "images/close.png"))
+        self.add_action(WrapAction(TITLE_CLOSE, 'images/close.png', 'mdi:mdi-close'))
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
 @MenuManage.describ('CORE.add_parameter')
 class FunctionAddModify(XferAddEditor):
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = Function
     field_id = 'function'
     caption_add = _("Add function")
     caption_modify = _("Modify function")
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class FunctionDel(XferDelete):
     caption = _("Delete function")
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = Function
     field_id = 'function'
 
@@ -397,6 +406,7 @@ class FunctionDel(XferDelete):
 class CustomFieldAppendPrintModel(XferContainerAcknowledge):
     caption = _("Create print template")
     icon = "images/add.png"
+    short_icon = 'mdi:mdi-printer-pos-plus'
     model = CustomField
     field_id = 'custom_field'
 
@@ -415,18 +425,19 @@ class CustomFieldAppendPrintModel(XferContainerAcknowledge):
             model_select.set_location(0, 1)
             dlg.add_component(model_select)
             dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'))
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             modelclass = apps.get_model(modelname)
             template_name = modelclass.create_print_template()
             self.message(_("Template '%s' create or modify.") % template_name)
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
-@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
+@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldAddModify(XferAddEditor):
     icon = "fields.png"
+    short_icon = "mdi:mdi-form-textbox"
     model = CustomField
     field_id = 'custom_field'
     caption_add = _("Add custom field")
@@ -438,19 +449,21 @@ class CustomFieldAddModify(XferAddEditor):
             self.caption = self.getparam('custom_editor_title')
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldDel(XferDelete):
     caption = _("Delete custom field")
     icon = "fields.png"
+    short_icon = "mdi:mdi-form-textbox"
     model = CustomField
     field_id = 'custom_field'
 
 
-@ActionsManage.affect_grid(_('Up'), "images/up.png", unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(_('Up'), "images/up.png", short_icon="mdi:mdi-arrow-up-bold-outline", unique=SELECT_SINGLE)
 @MenuManage.describ('CORE.add_parameter')
 class CustomFieldUp(XferContainerAcknowledge):
     icon = "up.png"
+    short_icon = "mdi:mdi-arrow-up-bold-outline"
     model = CustomField
     field_id = 'custom_field'
     caption = _("Up custom field")
@@ -459,21 +472,23 @@ class CustomFieldUp(XferContainerAcknowledge):
         self.item.up_order()
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeAddModify(XferAddEditor):
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = StructureType
     field_id = 'structure_type'
     caption_add = _("Add structure type")
     caption_modify = _("Modify structure type")
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('CORE.add_parameter')
 class StructureTypeDel(XferDelete):
     caption = _("Delete structure type")
     icon = "function.png"
+    short_icon = "mdi:mdi-account-circle"
     model = StructureType
     field_id = 'structure_type'
 
@@ -482,6 +497,7 @@ class StructureTypeDel(XferDelete):
 class PostalCodeList(XferListEditor):
     caption = _("Postal code")
     icon = "postalCode.png"
+    short_icon = "mdi:mdi-mailbox-outline"
     model = PostalCode
     field_id = 'postalCode'
 
@@ -500,12 +516,13 @@ class PostalCodeList(XferListEditor):
         self.filter = Q(postal_code__startswith=filter_postal_code)
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png")
+@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
 @MenuManage.describ('contacts.add_postalcode')
 class PostalCodeAdd(XferAddEditor):
     caption_add = _("Add function")
     caption_modify = _("Add postal code")
     icon = "postalCode.png"
+    short_icon = "mdi:mdi-mailbox-outline"
     model = PostalCode
     field_id = 'postalCode'
 
@@ -514,6 +531,7 @@ class PostalCodeAdd(XferAddEditor):
 class ContactImport(ObjectImport):
     caption = _("Contact import")
     icon = "contactsConfig.png"
+    short_icon = "mdi:mdi-account-arrow-up"
 
     def get_select_models(self):
         return AbstractContact.get_select_contact_type(False)
@@ -550,7 +568,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         btn = XferCompButton('editparam')
         btn.set_location(4, xfer.get_max_row())
         btn.set_is_mini(True)
-        btn.set_action(xfer.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png'), close=CLOSE_NO,
+        btn.set_action(xfer.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png', short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO,
                        params={'params': param_lists})
         xfer.add_component(btn)
         lbl = XferCompLabelForm("nb_function")
@@ -567,7 +585,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(lbl)
         btn = XferCompButton("btnconf")
         btn.set_location(4, xfer.get_max_row() - 2, 1, 3)
-        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_NO)
+        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO)
         xfer.add_component(btn)
 
         lbl = XferCompLabelForm("nb_legalentity")
@@ -580,7 +598,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(lbl)
         btn = XferCompButton("btnimport")
         btn.set_location(4, xfer.get_max_row() - 1, 1, 2)
-        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png"), close=CLOSE_NO, params={'step': 0})
+        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png", short_icon='mdi mdi-pencil-plus'), close=CLOSE_NO, params={'step': 0})
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
         xfer.add_title(_("Lucterios contacts"), _('associates'), _('configure your association'))

@@ -45,12 +45,14 @@ from lucterios.mailing.sms_functions import AbstractProvider
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Change mailing and SMS parameters'))
 class Configuration(XferListEditor):
     icon = "config_mail.png"
+    short_icon = "mdi:mdi-email-variant"
     caption = _("Mailing & SMS parameters")
 
     def fillreponse_email(self):
         self.new_tab(_('EMail configuration'))
         img = XferCompImage('img_conf')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
         conf_email_params = ['mailing-smtpserver', 'mailing-smtpport',
@@ -61,7 +63,7 @@ class Configuration(XferListEditor):
         btn = XferCompButton('editparam-email')
         btn.set_location(3, 1, 1, 5)
         btn.set_is_mini(True)
-        btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': conf_email_params})
+        btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png'), close=CLOSE_NO, params={'params': conf_email_params})
         self.add_component(btn)
         if will_mail_send():
             btn = XferCompButton('tryemail')
@@ -73,19 +75,21 @@ class Configuration(XferListEditor):
         self.new_tab(_('Default message'))
         img = XferCompImage('img_msg')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
         msg_params = ['mailing-msg-connection']
         Params.fill(self, msg_params, 1, 1)
         btn = XferCompButton('editmsg')
         btn.set_location(1, 10, 2)
-        btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': msg_params})
+        btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png', short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO, params={'params': msg_params})
         self.add_component(btn)
 
     def fillreponse_sms(self):
         self.new_tab(_('SMS configuration'))
         img = XferCompImage('img_sms_conf')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
         conf_sms_params1 = ['mailing-sms-provider']
@@ -93,7 +97,7 @@ class Configuration(XferListEditor):
         btn = XferCompButton('editparam-sms1')
         btn.set_location(1, 3)
         btn.set_is_mini(False)
-        btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': conf_sms_params1})
+        btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png', short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO, params={'params': conf_sms_params1})
         self.add_component(btn)
         provider = AbstractProvider.get_current_instance()
         if provider is not None:
@@ -106,7 +110,7 @@ class Configuration(XferListEditor):
             btn = XferCompButton('editparam-sms2')
             btn.set_location(3, 5, 1, 2)
             btn.set_is_mini(True)
-            btn.set_action(self.request, ParamEdit.get_action(_('Modify'), 'images/edit.png'), close=CLOSE_NO, params={'params': conf_sms_params2})
+            btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png', short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO, params={'params': conf_sms_params2})
             self.add_component(btn)
             if provider.is_active:
                 btn = XferCompButton('trysms')
@@ -130,6 +134,7 @@ class Configuration(XferListEditor):
 @MenuManage.describ('CORE.add_parameter')
 class SendEmailTry(XferContainerAcknowledge):
     icon = "config_mail.png"
+    short_icon = "mdi:mdi-email-variant"
     caption = _("EMail try")
 
     def fillresponse(self):
@@ -140,6 +145,7 @@ class SendEmailTry(XferContainerAcknowledge):
             dlg = self.create_custom()
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -152,8 +158,8 @@ class SendEmailTry(XferContainerAcknowledge):
             email.mask = r"[^@]+@[^@]+\.[^@]+"
             email.description = _("email")
             dlg.add_component(email)
-            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png", short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             address = []
             address.append("")
@@ -172,6 +178,7 @@ class SendEmailTry(XferContainerAcknowledge):
 @MenuManage.describ('CORE.add_parameter')
 class SendSmsTry(XferContainerAcknowledge):
     icon = "config_mail.png"
+    short_icon = "mdi:mdi-email-variant"
     caption = _("SMS try")
 
     def fillresponse(self):
@@ -183,6 +190,7 @@ class SendSmsTry(XferContainerAcknowledge):
             dlg = self.create_custom()
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -195,8 +203,8 @@ class SendSmsTry(XferContainerAcknowledge):
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)
-            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png"), close=CLOSE_YES, params={'CONFIRME': 'YES'})
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png'))
+            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png", short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             provider.send_sms(self.getparam('phone'), _('SMS sent to check configuration'))
             self.message(_("SMS send, check it."))
@@ -227,7 +235,7 @@ def conf_wizard_mailing(wizard_ident, xfer):
             lbl.set_value(_('email not configured'))
         btn = XferCompButton("btnconf")
         btn.set_location(3, xfer.get_max_row())
-        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png"), close=CLOSE_NO)
+        btn.set_action(xfer.request, Configuration.get_action(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline'), close=CLOSE_NO)
         xfer.add_component(btn)
 
 
