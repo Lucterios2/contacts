@@ -477,7 +477,7 @@ class Message(LucteriosModel):
 
     @property
     def nb_total(self):
-        return self.emailsent_set.all().count()
+        return self.emailsent_set.all().count() if self.id is not None else 0
 
     @property
     def nb_errors(self):
