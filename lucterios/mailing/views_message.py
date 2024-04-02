@@ -94,7 +94,7 @@ class MessageSMSList(MessageList):
             self.add_component(lbl_err)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES, condition=lambda xfer: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageAddModify(XferAddEditor):
@@ -187,6 +187,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             dlg = self.create_custom()
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -229,6 +230,7 @@ class MessageSendSMSTry(XferContainerAcknowledge):
             dlg = self.create_custom()
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -267,7 +269,7 @@ class MessageTransition(XferTransition):
             XferTransition.fill_confirm(self, transition, trans)
 
 
-@ActionsManage.affect_show(_("Info"), "images/info.png", short_icon="mdi mdi-information-slab-circle-outline", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.emailsent_set.count() > 0)
+@ActionsManage.affect_show(_("Info"), "images/info.png", short_icon="mdi:mdi-information-slab-circle-outline", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.emailsent_set.count() > 0)
 @MenuManage.describ('mailing.change_message')
 class MessageSentInfo(XferContainerCustom):
     icon = "mailing.png"
@@ -280,6 +282,7 @@ class MessageSentInfo(XferContainerCustom):
     def fillresponse(self, show_only_failed=False):
         img = XferCompImage('img')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
         begin = XferCompLabelForm('title')

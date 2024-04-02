@@ -134,7 +134,7 @@ def right_to_possession_addmodify(request):
         return owner_to_possession(request)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ(right_to_possession_addmodify)
 class PossessionAddModify(XferAddEditor):

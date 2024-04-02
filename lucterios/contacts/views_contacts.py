@@ -55,7 +55,7 @@ MenuManage.add_sub("contact.actions", "office", "lucterios.contacts/images/conta
                    _("Addresses and contacts"), _("Management of men or women and organizations saved."), 50, 'mdi:mdi-account-outline')
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class LegalEntityAddModify(XferAddEditor):
@@ -162,7 +162,7 @@ class LegalEntityLabel(XferPrintLabel):
             return XferPrintLabel.get_filter(self)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
 @ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ('contacts.add_abstractcontact')
 class IndividualAddModify(XferAddEditor):
@@ -303,7 +303,7 @@ class IndividualUserRemove(XferContainerAcknowledge):
             self.item.save()
 
 
-@ActionsManage.affect_show("", 'images/add.png', short_icon='mdi mdi-pencil-plus')
+@ActionsManage.affect_show("", 'images/add.png', short_icon='mdi:mdi-pencil-plus')
 @MenuManage.describ('auth.add_user')
 class IndividualUserAdd(XferContainerAcknowledge):
     caption = _("Add as an users")
@@ -327,6 +327,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
             dlg = self.create_custom(LucteriosUser)
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             dlg.item.username = obj_indiv.create_username()
@@ -383,6 +384,7 @@ class ResponsabilityAdd(XferContainerCustom):
         self.item.legal_entity = LegalEntity.objects.get(id=legal_entity)
         img = XferCompImage('img')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 3)
         self.add_component(img)
         self.fill_from_model(1, 0, True, ['legal_entity'])
@@ -405,7 +407,7 @@ class ResponsabilityAdd(XferContainerCustom):
                         modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
         grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
-        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png", short_icon='mdi mdi-pencil-plus'),
+        grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO)
         self.add_component(grid)
 
@@ -434,7 +436,7 @@ class ResponsabilityDel(XferDelete):
 class IndividualSearch(XferSavedCriteriaSearchEditor):
     caption = _("Individual search")
     icon = "individualFind.png"
-    short_icon = "mdi mdi-account-search-outline"
+    short_icon = "mdi:mdi-account-search-outline"
     model = Individual
     field_id = 'individual'
 
@@ -456,7 +458,7 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
 class LegalEntitySearch(XferSavedCriteriaSearchEditor):
     caption = _("Legal entity search")
     icon = "legalEntityFind.png"
-    short_icon = "mdi mdi-account-search"
+    short_icon = "mdi:mdi-account-search"
     model = LegalEntity
     field_id = 'legal_entity'
 
@@ -514,6 +516,7 @@ class AbstractContactShow(XferShowEditor):
         else:
             img = XferCompImage('img')
             img.set_value(self.icon_path())
+            img.set_short_icon(self.short_icon)
             img.set_location(0, 0, 1, 3)
             self.add_component(img)
             lbl = XferCompLabelForm('title')

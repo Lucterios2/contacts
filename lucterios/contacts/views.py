@@ -226,6 +226,7 @@ class CreateAccount(XferContainerAcknowledge):
         dlg = self.create_custom(self.model)
         img = XferCompImage('img')
         img.set_value(self.icon_path())
+        img.set_short_icon(self.short_icon)
         img.set_location(0, 0, 1, 6)
         dlg.add_component(img)
         dlg.fill_from_model(1, 0, False, ['genre', 'lastname', 'firstname', 'email'])
@@ -598,7 +599,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         xfer.add_component(lbl)
         btn = XferCompButton("btnimport")
         btn.set_location(4, xfer.get_max_row() - 1, 1, 2)
-        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png", short_icon='mdi mdi-pencil-plus'), close=CLOSE_NO, params={'step': 0})
+        btn.set_action(xfer.request, ContactImport.get_action(_("Contact import"), "images/add.png", short_icon='mdi:mdi-pencil-plus'), close=CLOSE_NO, params={'step': 0})
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_responsable"):
         xfer.add_title(_("Lucterios contacts"), _('associates'), _('configure your association'))
