@@ -446,7 +446,7 @@ class IndividualSearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-set-merge'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
         self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                         params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
@@ -468,7 +468,7 @@ class LegalEntitySearch(XferSavedCriteriaSearchEditor):
         XferSearchEditor.fillresponse(self)
         self.item.editor.add_email_selector(self, 0, self.get_max_row() + 1, 5)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-set-merge'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI, params={'modelname': self.model.get_long_name(), 'field_id': self.field_id})
         self.add_action(AbstractContactFindDouble.get_action(_("duplicate"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
                         params={'modelname': self.model.get_long_name(), 'field_id': self.field_id}, pos_act=0)
@@ -493,7 +493,7 @@ class AbstractContactFindDouble(XferListEditor):
         self.field_id = field_id
         XferListEditor.fillresponse(self)
         if WrapAction.is_permission(self.request, 'contacts.add_abstractcontact'):
-            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-content-copy'),
+            self.get_components(self.field_id).add_action(self.request, ObjectMerge.get_action(_("Merge"), "images/clone.png", short_icon='mdi:mdi-set-merge'),
                                                           close=CLOSE_NO, unique=SELECT_MULTI)
 
 
