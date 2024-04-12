@@ -171,7 +171,7 @@ class ContactsTest(LucteriosTest):
 
     def test_individual_search(self):
         fieldnames = Individual.get_search_fields()
-        self.assertEqual(14, len(fieldnames))
+        self.assertEqual(15, len(fieldnames))
 
         self.factory.xfer = IndividualAddModify()
         self.calljson('/lucterios.contacts/individualAddModify', {"address": 'Avenue de la Paix{[newline]}BP 987',
@@ -806,12 +806,12 @@ class ContactsTest(LucteriosTest):
         custom_1[0].save()
 
         fieldnames = Individual.get_search_fields()
-        self.assertEqual(19, len(fieldnames))
-        self.assertEqual('custom_1', fieldnames[-8][0])
-        self.assertEqual('custom_2', fieldnames[-7][0])
-        self.assertEqual('custom_3', fieldnames[-6][0])
-        self.assertEqual('custom_5', fieldnames[-5][0])
-        self.assertEqual('custom_6', fieldnames[-4][0])
+        self.assertEqual(20, len(fieldnames))
+        self.assertEqual('custom_1', fieldnames[-9][0])
+        self.assertEqual('custom_2', fieldnames[-8][0])
+        self.assertEqual('custom_3', fieldnames[-7][0])
+        self.assertEqual('custom_5', fieldnames[-6][0])
+        self.assertEqual('custom_6', fieldnames[-5][0])
 
         filter_result, desc_result = get_search_query_from_criteria(
             "", Individual)

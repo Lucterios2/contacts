@@ -668,7 +668,7 @@ class Individual(AbstractContact):
     def get_search_fields(cls, with_addon=True):
         ident_field = ['lastname', 'firstname', 'genre']
         ident_field.extend(super(Individual, cls).get_search_fields(with_addon=False))
-        ident_field.extend(['user.username', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
+        ident_field.extend(['user.username', 'user.is_active', 'responsability_set.legal_entity.name', 'responsability_set.functions'])
         if with_addon:
             Signal.call_signal("addon_search", cls, ident_field)
         return ident_field
