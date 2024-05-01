@@ -40,6 +40,7 @@ from lucterios.contacts.models import PostalCode, CustomField
 from lucterios.CORE.parameters import Params
 from lucterios.framework import signal_and_lock
 from lucterios.CORE.views import ObjectPromote
+from lucterios.framework.xferadvance import TITLE_MODIFY, TITLE_ADD
 
 
 class CustomFieldEditor(LucteriosEditor):
@@ -269,7 +270,7 @@ class AbstractContactEditor(AbstractEditorCustomizeWithLogo):
             if (len(self.item.__class__.get_select_contact_type(False)) > 0):
                 btn = XferCompButton('btn_promote')
                 btn.set_location(obj_addr.col + 1, xfer.get_max_row() + 1, 4)
-                btn.set_action(xfer.request, ObjectPromote.get_action(_('Promote'), "images/config.png"), modal=FORMTYPE_MODAL,
+                btn.set_action(xfer.request, ObjectPromote.get_action(_('Promote'), "images/config.png", 'mdi:mdi-tune'), modal=FORMTYPE_MODAL,
                                close=CLOSE_YES, params={'modelname': xfer.model.get_long_name(), 'field_id': xfer.field_id})
                 xfer.add_component(btn)
         signal_and_lock.Signal.call_signal("show_contact", self.item, xfer)
@@ -320,14 +321,16 @@ class IndividualEditor(AbstractContactEditor):
         btn.set_location(obj_user.col + 2, obj_user.row, 1, 1)
         if self.item.user is None:
             act = ActionsManage.get_action_url('CORE.LucteriosUser', 'UserAdd', xfer)
-            act.set_value("", "images/add.png")
+            act.set_value(TITLE_ADD, "images/add.png")
+            act.short_icon = 'mdi:mdi-pencil-plus-outline'
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO)
             xfer.add_component(btn)
         else:
             if not self.item.user.is_active:
                 obj_user.set_color('red')
             act = ActionsManage.get_action_url('CORE.LucteriosUser', 'Edit', xfer)
-            act.set_value("", "images/edit.png")
+            act.set_value(TITLE_MODIFY, "images/edit.png")
+            act.short_icon = 'mdi:mdi-pencil-outline'
             btn.set_action(xfer.request, act, modal=FORMTYPE_MODAL, close=CLOSE_NO,
                            params={'user_actif': str(self.item.user.id), 'IDENT_READ': 'YES'})
             xfer.add_component(btn)

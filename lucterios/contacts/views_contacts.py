@@ -332,7 +332,7 @@ class IndividualUserAdd(XferContainerAcknowledge):
             dlg.add_component(img)
             dlg.item.username = obj_indiv.create_username()
             dlg.fill_from_model(1, 0, False, ['username'])
-            dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png'))
+            dlg.add_action(IndividualUserValid.get_action(_('Ok'), 'images/ok.png', 'mdi:mdi-check'))
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             self.message(_("No user association find for this contact"), XFER_DBOX_WARNING)
@@ -403,9 +403,9 @@ class ResponsabilityAdd(XferContainerCustom):
         grid.set_model(items, None, self)
         grid.set_location(1, 3)
         grid.description = _('individual')
-        grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png"),
+        grid.add_action(self.request, ResponsabilityModify.get_action(_("Select"), "images/ok.png", 'mdi:mdi-check'),
                         modal=FORMTYPE_MODAL, close=CLOSE_YES, unique=SELECT_SINGLE, params={"SAVE": "YES"})
-        grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png"),
+        grid.add_action(self.request, IndividualShow.get_action(_("Show"), "images/edit.png", 'mdi:mdi-pencil-outline'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.add_action(self.request, IndividualAddModify.get_action(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO)

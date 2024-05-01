@@ -63,7 +63,7 @@ class Configuration(XferListEditor):
         btn = XferCompButton('editparam-email')
         btn.set_location(3, 1, 1, 5)
         btn.set_is_mini(True)
-        btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png'), close=CLOSE_NO, params={'params': conf_email_params})
+        btn.set_action(self.request, ParamEdit.get_action(TITLE_MODIFY, 'images/edit.png', 'mdi:mdi-pencil-outline'), close=CLOSE_NO, params={'params': conf_email_params})
         self.add_component(btn)
         if will_mail_send():
             btn = XferCompButton('tryemail')

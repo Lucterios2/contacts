@@ -68,5 +68,5 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         self.add_component(selected_model)
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
-            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png"),
+            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png", 'mdi:mdi-check'),
                             close=CLOSE_YES, unique=self.mode_select, params={'pkname': self.field_id}, pos_act=0)

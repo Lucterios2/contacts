@@ -107,7 +107,7 @@ class Account(XferContainerCustom):
             btn = XferCompButton('btn_edit')
             btn.set_is_mini(True)
             btn.set_location(4, 1, 1, 2)
-            btn.set_action(self.request, CurrentLegalEntityModify.get_action(TITLE_EDIT, "images/edit.png"),
+            btn.set_action(self.request, CurrentLegalEntityModify.get_action(TITLE_EDIT, "images/edit.png", 'mdi:mdi-pencil-outline'),
                            modal=FORMTYPE_MODAL, close=CLOSE_NO, params={'legal_entity': legal_entity.id})
             self.add_component(btn)
         finally:
@@ -126,6 +126,7 @@ class Account(XferContainerCustom):
     def fillresponse(self):
         img = XferCompImage('img')
         img.set_value(get_icon_path('lucterios.contacts/images/account.png'))
+        img.set_short_icon("mdi:mdi-account")
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -138,13 +139,13 @@ class Account(XferContainerCustom):
             self.model = Individual
             self.field_id = 'individual'
             self.params['individual'] = str(self.item.id)
-            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png"), close=CLOSE_NO)
-            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO)
+            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png", 'mdi:mdi-account-cog'), close=CLOSE_NO)
+            self.add_action(AccountAddModify.get_action(_("Edit"), "images/edit.png", 'mdi:mdi-pencil-outline'), close=CLOSE_NO)
             is_individual = True
         except ObjectDoesNotExist:
             self.item = LucteriosUser.objects.get(id=self.request.user.id)
-            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png"), close=CLOSE_NO)
-            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png"), close=CLOSE_NO, params={'user_actif': str(self.request.user.id)})
+            self.add_action(UsersPreference.get_action(_("Preferences"), "images/settings.png", "mdi:mdi-account-cog"), close=CLOSE_NO)
+            self.add_action(UsersEdit.get_action(_("Edit"), "images/edit.png", 'mdi:mdi-pencil-outline'), close=CLOSE_NO, params={'user_actif': str(self.request.user.id)})
             is_individual = False
         self.fill_from_model(1, 1, True)
         if is_individual:
@@ -182,6 +183,7 @@ class CurrentStructure(XferContainerCustom):
         self.params['legal_entity'] = '1'
         img = XferCompImage('img')
         img.set_value(get_icon_path('lucterios.contacts/images/fields.png'))
+        img.set_short_icon('mdi:mdi-form-textbox')
         img.set_location(0, 0, 1, 2)
         self.add_component(img)
         lab = XferCompLabelForm("title")
@@ -258,7 +260,7 @@ class CreateAccount(XferContainerAcknowledge):
         lbl.set_color('red')
         lbl.set_value(self.getparam('error', ''))
         dlg.add_component(lbl)
-        dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'), params={"SAVE": "YES"})
+        dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png', 'mdi:mdi-check'), params={"SAVE": "YES"})
         dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
 
     def fillresponse(self, username='', legalentity=''):
@@ -338,6 +340,7 @@ class Configuration(XferListEditor):
         self.new_tab(_("Functions and responsabilities"))
         img = XferCompImage('imgFunction')
         img.set_value(get_icon_path('lucterios.contacts/images/function.png'))
+        img.set_short_icon('mdi:mdi-account-circle')
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleFunction')
@@ -350,6 +353,7 @@ class Configuration(XferListEditor):
         self.new_tab(_("Structure type"))
         img = XferCompImage('imgType')
         img.set_value(get_icon_path('lucterios.contacts/images/category.png'))
+        img.set_short_icon('mdi:mdi-account-box')
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleType')
@@ -362,6 +366,7 @@ class Configuration(XferListEditor):
         self.new_tab(_("Custom field"))
         img = XferCompImage('imgField')
         img.set_value(get_icon_path('lucterios.contacts/images/fields.png'))
+        img.set_short_icon('mdi:mdi-form-textbox')
         img.set_location(0, 0)
         self.add_component(img)
         img = XferCompLabelForm('titleField')
@@ -425,7 +430,7 @@ class CustomFieldAppendPrintModel(XferContainerAcknowledge):
             model_select.set_select(sel_models)
             model_select.set_location(0, 1)
             dlg.add_component(model_select)
-            dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png'))
+            dlg.add_action(self.return_action(TITLE_OK, 'images/ok.png', 'mdi:mdi-check'))
             dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
         else:
             modelclass = apps.get_model(modelname)
@@ -560,7 +565,7 @@ def conf_wizard_contacts(wizard_ident, xfer):
         btn = XferCompButton("btnconf")
         btn.set_location(2, xfer.get_max_row() + 1)
         btn.set_is_mini(True)
-        btn.set_action(xfer.request, CurrentStructureAddModify.get_action('', "images/edit.png"), close=CLOSE_NO)
+        btn.set_action(xfer.request, CurrentStructureAddModify.get_action('', "images/edit.png", 'mdi:mdi-pencil-outline'), close=CLOSE_NO)
         xfer.add_component(btn)
     elif (xfer is not None) and (wizard_ident == "contacts_params"):
         xfer.add_title(_("Lucterios contacts"), _("Contacts configuration"), _('configure your contacts'))

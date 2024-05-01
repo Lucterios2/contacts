@@ -134,7 +134,7 @@ class ContactsTest(LucteriosTest):
 
         self.assert_comp_equal(('LABELFORM', 'user'), None, (1, 8, 2, 1, 1))
         self.assert_coordcomp_equal('userbtn', (3, 8, 1, 1, 1))
-        self.assert_action_equal('POST', '#userbtn/action', ('', 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
+        self.assert_action_equal('POST', '#userbtn/action', ('Ajouter', 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
 
         self.factory.xfer = IndividualUserAdd()
         self.calljson('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
@@ -167,7 +167,7 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
         self.assert_comp_equal(('LABELFORM', 'user'), "jacko", (1, 8, 2, 1, 1))
-        self.assert_action_equal('POST', '#userbtn/action', ('', 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
+        self.assert_action_equal('POST', '#userbtn/action', ('Modifier', 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
 
     def test_individual_search(self):
         fieldnames = Individual.get_search_fields()
