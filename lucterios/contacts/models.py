@@ -464,8 +464,9 @@ class AbstractContact(LucteriosModel, CustomizeObject):
     comment = models.TextField(_('comment'), blank=True)
 
     def __str__(self):
-        if self.get_final_child() != self:
-            return str(self.get_final_child())
+        final_child = self.get_final_child(1)
+        if final_child != self:
+            return str(final_child)
         else:
             return "contact#%d" % self.id
 

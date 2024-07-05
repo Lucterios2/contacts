@@ -277,7 +277,7 @@ class AbstractContactEditor(AbstractEditorCustomizeWithLogo):
 
     def add_email_selector(self, xfer, col, row, colspan):
         contacts_list = xfer.items.exclude(email__isnull=True).exclude(email__exact='')
-        if len(contacts_list) < 100:
+        if contacts_list.count() < 100:
             mailto_type = Params.getvalue("contacts-mailtoconfig")
             email_list = []
             for item in contacts_list:
