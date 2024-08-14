@@ -31,8 +31,7 @@ from lucterios.mailing.sms_functions import AbstractProvider
 from lucterios.CORE.parameters import Params
 
 
-MenuManage.add_sub("mailing.actions", "office", "lucterios.mailing/images/mailing.png",
-                   _("Messaging"), _("Create and send mailing to contacts."), 60, 'mdi:mdi-email-arrow-right-outline')
+MenuManage.add_sub("mailing.actions", "office", short_icon='mdi:mdi-email-arrow-right-outline', caption=_("Messaging"), desc=_("Create and send mailing to contacts."), pos=60)
 
 
 class MessageList(XferListEditor):
@@ -51,7 +50,6 @@ class MessageList(XferListEditor):
 
 @MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for mailing.'))
 class MessageEmailList(MessageList):
-    icon = "email.png"
     short_icon = "mdi:mdi-email-outline"
     caption = _("Messages EMail")
 
@@ -71,7 +69,6 @@ class MessageEmailList(MessageList):
 
 @MenuManage.describ('mailing.change_message', FORMTYPE_NOMODAL, 'mailing.actions', _('Manage list of message for SMS.'))
 class MessageSMSList(MessageList):
-    icon = "sms.png"
     short_icon = "mdi:mdi-message-reply-text-outline"
     caption = _("Messages SMS")
 
@@ -94,30 +91,28 @@ class MessageSMSList(MessageList):
             self.add_component(lbl_err)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
-@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES, condition=lambda xfer: xfer.item.status == 0)
+@ActionsManage.affect_grid(TITLE_CREATE, short_icon='mdi:mdi-pencil-plus')
+@ActionsManage.affect_show(TITLE_MODIFY, short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES, condition=lambda xfer: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageAddModify(XferAddEditor):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
     caption_add = _("Add message")
     caption_modify = _("Modify message")
 
-    def icon_path(self):
+    def fillresponse(self):
+        XferAddEditor.fillresponse(self)
+        img = self.get_components('img')
         if self.getparam('message_type', int(self.item.message_type)) == 0:
-            icon_path = "email.png"
+            img.set_value("mdi:mdi-email-outline", '#')
         else:
-            icon_path = "sms.png"
-        res_icon_path = get_icon_path(icon_path, self.url_text, self.extension)
-        return res_icon_path
+            img.set_value("mdi:mdi-message-outline", '#')
 
 
-@ActionsManage.affect_grid(TITLE_CLONE, "images/clone.png", short_icon='mdi:mdi-content-copy', unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_CLONE, short_icon='mdi:mdi-content-copy', unique=SELECT_SINGLE)
 @MenuManage.describ('mailing.add_message')
 class MessageClone(XferContainerAcknowledge):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -142,39 +137,33 @@ class MessageClone(XferContainerAcknowledge):
         self.redirect_action(MessageShow.get_action('', ''))
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('mailing.change_message')
 class MessageShow(XferShowEditor):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
     caption = _("Show message")
 
-    def icon_path(self):
-        if self.item.message_type == 0:
-            icon_path = "email.png"
-        else:
-            icon_path = "sms.png"
-        res_icon_path = get_icon_path(icon_path, self.url_text, self.extension)
-        return res_icon_path
-
     def fillresponse(self):
         XferShowEditor.fillresponse(self)
+        if self.item.message_type == 0:
+            short_icon = 'mdi:mdi-email-outline'
+            action_caption = _("Emails")
+        else:
+            short_icon = 'mdi:mdi-message-outline'
+            action_caption = _("SMS")
+        img = self.get_components('img')
+        img.set_value(short_icon, '#')
         for action, _modal, _close, _select, params in self.actions:
             if (action.url_text == 'lucterios.mailing/messageTransition') and ('TRANSITION' in params) and (params['TRANSITION'] == 'sending'):
-                if self.item.message_type == 0:
-                    action.icon_path = get_icon_path("email.png", action.url_text)
-                    action.caption = _("Emails")
-                else:
-                    action.icon_path = get_icon_path("sms.png", action.url_text)
-                    action.caption = _("SMS")
+                action.caption = action_caption
+                action.short_icon = short_icon
 
 
-@ActionsManage.affect_show(_("EMail try"), "email.png", short_icon="mdi:mdi-email-outline", condition=lambda xfer: (xfer.item.message_type == 0) and will_mail_send() and (xfer.item.status == 0))
+@ActionsManage.affect_show(_("EMail try"), short_icon="mdi:mdi-email-outline", condition=lambda xfer: (xfer.item.message_type == 0) and will_mail_send() and (xfer.item.status == 0))
 @MenuManage.describ('mailing.add_message')
 class MessageSendEmailTry(XferContainerAcknowledge):
-    icon = "email.png"
     short_icon = "mdi:mdi-email-outline"
     model = Message
     field_id = 'message'
@@ -186,8 +175,7 @@ class MessageSendEmailTry(XferContainerAcknowledge):
         if self.getparam('CONFIRME') is None:
             dlg = self.create_custom()
             img = XferCompImage('img')
-            img.set_value(self.icon_path())
-            img.set_short_icon(self.short_icon)
+            img.set_value(self.short_icon, '#')
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -200,8 +188,8 @@ class MessageSendEmailTry(XferContainerAcknowledge):
             email.mask = r"[^@]+@[^@]+\.[^@]+"
             email.description = _("email")
             dlg.add_component(email)
-            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png", short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
+            dlg.add_action(self.return_action(TITLE_OK, short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, short_icon='mdi:mdi-cancel'))
         else:
             email_sent = EmailSent.objects.create(message=self.item, contact=None, email=self.getparam('recipient'), date=timezone.now())
             try:
@@ -214,10 +202,9 @@ class MessageSendEmailTry(XferContainerAcknowledge):
                 email_sent.delete()
 
 
-@ActionsManage.affect_show(_("SMS try"), "sms.png", short_icon="mdi:mdi-message-reply-text-outline", condition=lambda xfer: (xfer.item.message_type == 1) and AbstractProvider.is_current_active() and (xfer.item.status == 0))
+@ActionsManage.affect_show(_("SMS try"), short_icon="mdi:mdi-message-reply-text-outline", condition=lambda xfer: (xfer.item.message_type == 1) and AbstractProvider.is_current_active() and (xfer.item.status == 0))
 @MenuManage.describ('mailing.add_message')
 class MessageSendSMSTry(XferContainerAcknowledge):
-    icon = "sms.png"
     short_icon = "mdi:mdi-message-reply-text-outline"
     model = Message
     field_id = 'message'
@@ -229,8 +216,7 @@ class MessageSendSMSTry(XferContainerAcknowledge):
         if self.getparam('CONFIRME') is None:
             dlg = self.create_custom()
             img = XferCompImage('img')
-            img.set_value(self.icon_path())
-            img.set_short_icon(self.short_icon)
+            img.set_value(self.short_icon, '#')
             img.set_location(0, 0, 1, 3)
             dlg.add_component(img)
             lbl = XferCompLabelForm('lbl_title')
@@ -243,8 +229,8 @@ class MessageSendSMSTry(XferContainerAcknowledge):
             phone.mask = Params.getvalue('mailing-sms-phone-parse').strip().split('|')[0]
             phone.description = _("phone")
             dlg.add_component(phone)
-            dlg.add_action(self.return_action(TITLE_OK, "images/ok.png", short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
-            dlg.add_action(WrapAction(TITLE_CANCEL, 'images/cancel.png', 'mdi:mdi-cancel'))
+            dlg.add_action(self.return_action(TITLE_OK, short_icon='mdi:mdi-check'), close=CLOSE_YES, params={'CONFIRME': 'YES'})
+            dlg.add_action(WrapAction(TITLE_CANCEL, short_icon='mdi:mdi-cancel'))
         else:
             provider = AbstractProvider.get_current_instance()
             provider.send_sms(self.getparam('phone'), self.item.body.replace('{[br/]}', '\n'))
@@ -254,7 +240,6 @@ class MessageSendSMSTry(XferContainerAcknowledge):
 @ActionsManage.affect_transition("status")
 @MenuManage.describ('mailing.add_message')
 class MessageTransition(XferTransition):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -269,10 +254,9 @@ class MessageTransition(XferTransition):
             XferTransition.fill_confirm(self, transition, trans)
 
 
-@ActionsManage.affect_show(_("Info"), "images/info.png", short_icon="mdi:mdi-information-slab-circle-outline", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.emailsent_set.count() > 0)
+@ActionsManage.affect_show(_("Info"), short_icon="mdi:mdi-information-slab-circle-outline", modal=FORMTYPE_NOMODAL, condition=lambda xfer: xfer.item.emailsent_set.count() > 0)
 @MenuManage.describ('mailing.change_message')
 class MessageSentInfo(XferContainerCustom):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -281,8 +265,7 @@ class MessageSentInfo(XferContainerCustom):
 
     def fillresponse(self, show_only_failed=False):
         img = XferCompImage('img')
-        img.set_value(self.icon_path())
-        img.set_short_icon(self.short_icon)
+        img.set_value(self.short_icon, '#')
         img.set_location(0, 0, 1, 6)
         self.add_component(img)
         begin = XferCompLabelForm('title')
@@ -308,13 +291,12 @@ class MessageSentInfo(XferContainerCustom):
         check.set_action(self.request, self.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         self.add_component(check)
 
-        self.add_action(WrapAction(TITLE_CLOSE, 'images/close.png', 'mdi:mdi-close'))
+        self.add_action(WrapAction(TITLE_CLOSE, short_icon='mdi:mdi-close'))
 
 
-@ActionsManage.affect_show(_("Letters"), "letter.png", short_icon="mdi:mdi-file-sign", condition=lambda xfer: (xfer.item.message_type == 0) and (xfer.item.status == 1) and not xfer.item.is_dynamic)
+@ActionsManage.affect_show(_("Letters"), short_icon="mdi:mdi-file-sign", condition=lambda xfer: (xfer.item.message_type == 0) and (xfer.item.status == 1) and not xfer.item.is_dynamic)
 @MenuManage.describ('mailing.change_message')
 class MessageLetter(XferPrintReporting):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -330,10 +312,9 @@ class MessageLetter(XferPrintReporting):
         return items
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('mailing.delete_message')
 class MessageDel(XferDelete):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -342,7 +323,6 @@ class MessageDel(XferDelete):
 
 @MenuManage.describ('mailing.add_message')
 class MessageValidRecipient(XferContainerAcknowledge):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -353,10 +333,9 @@ class MessageValidRecipient(XferContainerAcknowledge):
         self.item.add_recipient(modelname, CRITERIA)
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline', model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
+@ActionsManage.affect_grid(TITLE_ADD, short_icon='mdi:mdi-pencil-plus-outline', model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageAddRecipient(ContactSelection):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -365,10 +344,9 @@ class MessageAddRecipient(ContactSelection):
     methods_allowed = ('POST', 'PUT')
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_SINGLE, model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
+@ActionsManage.affect_grid(TITLE_DELETE, short_icon='mdi:mdi-delete-outline', unique=SELECT_SINGLE, model_name='recipient_list', condition=lambda xfer, gridname: xfer.item.status == 0)
 @MenuManage.describ('mailing.add_message')
 class MessageDelRecipient(XferContainerAcknowledge):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -382,7 +360,6 @@ class MessageDelRecipient(XferContainerAcknowledge):
 
 @MenuManage.describ('mailing.add_message')
 class MessageValidInsertDoc(XferContainerAcknowledge):
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -403,7 +380,6 @@ class MessageInsertDoc(DocumentSearch):
 @MenuManage.describ('mailing.add_message')
 class MessageRemoveDoc(XferContainerAcknowledge):
     caption = _("Remove document to message")
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
@@ -418,18 +394,18 @@ class MessageRemoveDoc(XferContainerAcknowledge):
 @MenuManage.describ('mailing.add_message')
 class MessageShowDoc(XferContainerAcknowledge):
     caption = _("Remove document to message")
-    icon = "mailing.png"
     short_icon = "mdi:mdi-text-box-edit-outline"
     model = Message
     field_id = 'message'
     methods_allowed = ('GET', )
 
     def fillresponse(self, attachment=0):
-        self.redirect_action(DocumentShow.get_action(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline'), params={'document': attachment})
+        self.redirect_action(DocumentShow.get_action(TITLE_EDIT, short_icon='mdi:mdi-text-box-outline'), params={'document': attachment})
 
 
 @MenuManage.describ('')
 class EmailSentAddForStatistic(XferContainerAbstract):
+    short_icon="mdi:mdi-check"
     observer_name = 'Statistic'
     caption = 'EmailSentAddForStatistic'
     model = EmailSent

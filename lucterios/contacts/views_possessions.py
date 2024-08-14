@@ -42,14 +42,12 @@ from lucterios.framework import signal_and_lock
 from lucterios.framework.xfercomponents import XferCompGrid
 from lucterios.framework.error import LucteriosException, IMPORTANT
 
-MenuManage.add_sub("contact.possessions", "office", "lucterios.contacts/images/contacts.png",
-                   _("Possessions"), _("Management of things, living or inanimate, possessed by contacts."), 51, 'mdi:mdi-car')
+MenuManage.add_sub("contact.possessions", "office", short_icon='mdi:mdi-car', caption=_("Possessions"), desc=_("Management of things, living or inanimate, possessed by contacts."), pos=51)
 
 
 @MenuManage.describ('CORE.change_parameter', FORMTYPE_MODAL, 'contact.conf', _('Configure and manage possessions.'))
 class ConfPossession(XferListEditor):
     caption = _("Possession configuration")
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car-cog'
     model = CategoryPossession
     field_id = 'category_possession'
@@ -66,11 +64,10 @@ class ConfPossession(XferListEditor):
         grid_custom.delete_header('model_title')
 
 
-@ActionsManage.affect_grid(TITLE_ADD, "images/add.png", short_icon='mdi:mdi-pencil-plus-outline')
-@ActionsManage.affect_grid(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_ADD, short_icon='mdi:mdi-pencil-plus-outline')
+@ActionsManage.affect_grid(TITLE_MODIFY, short_icon='mdi:mdi-pencil-outline', unique=SELECT_SINGLE)
 @MenuManage.describ('contacts.add_possession')
 class CategoryAddModify(XferAddEditor):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car-cog'
     model = CategoryPossession
     field_id = 'category_possession'
@@ -78,10 +75,9 @@ class CategoryAddModify(XferAddEditor):
     caption_modify = _("Modify category")
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_possession')
 class CategoryDel(XferDelete):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car-cog'
     model = CategoryPossession
     field_id = 'category_possession'
@@ -89,7 +85,7 @@ class CategoryDel(XferDelete):
 
 
 def right_to_possession_list(request):
-    if WrapAction(caption='', icon_path='', is_view_right='contacts.change_possession').check_permission(request):
+    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.change_possession').check_permission(request):
         return CategoryPossession.objects.all().count() > 0
     else:
         return False
@@ -97,7 +93,6 @@ def right_to_possession_list(request):
 
 @MenuManage.describ(right_to_possession_list, FORMTYPE_NOMODAL, "contact.possessions", _('Management of possession list'))
 class PossessionList(XferListEditor):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -106,7 +101,6 @@ class PossessionList(XferListEditor):
 
 @MenuManage.describ(right_to_possession_list, FORMTYPE_NOMODAL, "contact.possessions", _('To find a possession following a set of criteria.'))
 class PossessionSearch(XferSavedCriteriaSearchEditor):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car-search'
     model = Possession
     field_id = 'possession'
@@ -128,17 +122,16 @@ def owner_to_possession(request):
 
 
 def right_to_possession_addmodify(request):
-    if WrapAction(caption='', icon_path='', is_view_right='contacts.add_possession').check_permission(request):
+    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.add_possession').check_permission(request):
         return True
     else:
         return owner_to_possession(request)
 
 
-@ActionsManage.affect_grid(TITLE_CREATE, "images/new.png", short_icon='mdi:mdi-pencil-plus')
-@ActionsManage.affect_show(TITLE_MODIFY, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
+@ActionsManage.affect_grid(TITLE_CREATE, short_icon='mdi:mdi-pencil-plus')
+@ActionsManage.affect_show(TITLE_MODIFY, short_icon='mdi:mdi-pencil-outline', close=CLOSE_YES)
 @MenuManage.describ(right_to_possession_addmodify)
 class PossessionAddModify(XferAddEditor):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -153,17 +146,16 @@ class PossessionAddModify(XferAddEditor):
 
 
 def right_to_possession_show(request):
-    if WrapAction(caption='', icon_path='', is_view_right='contacts.change_possession').check_permission(request):
+    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.change_possession').check_permission(request):
         return True
     else:
         return owner_to_possession(request)
 
 
-@ActionsManage.affect_grid(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
+@ActionsManage.affect_grid(TITLE_EDIT, short_icon='mdi:mdi-text-box-outline', unique=SELECT_SINGLE)
 @MenuManage.describ(right_to_possession_show)
 class PossessionShow(XferShowEditor):
     caption = _("Show possession")
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -196,7 +188,6 @@ def right_to_possession_contact(request):
 
 @MenuManage.describ(right_to_possession_contact, FORMTYPE_MODAL, 'core.general', _('View your possessions.'))
 class PossessionContact(XferListEditor):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -210,10 +201,9 @@ class PossessionContact(XferListEditor):
         XferListEditor.fillresponse(self)
 
 
-@ActionsManage.affect_grid(TITLE_DELETE, "images/delete.png", short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
+@ActionsManage.affect_grid(TITLE_DELETE, short_icon='mdi:mdi-delete-outline', unique=SELECT_MULTI)
 @MenuManage.describ('contacts.delete_possession')
 class PossessionDel(XferDelete):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -222,7 +212,6 @@ class PossessionDel(XferDelete):
 
 @MenuManage.describ('contacts.add_possession')
 class PossessionOwnerSave(XferContainerAcknowledge):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     field_id = 'possession'
@@ -232,10 +221,9 @@ class PossessionOwnerSave(XferContainerAcknowledge):
         self.item.save()
 
 
-@ActionsManage.affect_other(TITLE_EDIT, "images/edit.png", short_icon='mdi:mdi-pencil-outline', close=CLOSE_NO)
+@ActionsManage.affect_other(TITLE_EDIT, short_icon='mdi:mdi-pencil-outline', close=CLOSE_NO)
 @MenuManage.describ('contacts.add_possession')
 class PossessionOwner(ContactSelection):
-    icon = "possession.png"
     short_icon = 'mdi:mdi-car'
     model = Possession
     select_class = PossessionOwnerSave

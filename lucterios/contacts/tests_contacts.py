@@ -134,7 +134,7 @@ class ContactsTest(LucteriosTest):
 
         self.assert_comp_equal(('LABELFORM', 'user'), None, (1, 8, 2, 1, 1))
         self.assert_coordcomp_equal('userbtn', (3, 8, 1, 1, 1))
-        self.assert_action_equal('POST', '#userbtn/action', ('Ajouter', 'images/add.png', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
+        self.assert_action_equal('POST', '#userbtn/action', ('Ajouter', 'mdi:mdi-pencil-plus-outline', 'lucterios.contacts', 'individualUserAdd', 0, 1, 1))
 
         self.factory.xfer = IndividualUserAdd()
         self.calljson('/lucterios.contacts/individualUserAdd', {'individual': '2'}, False)
@@ -142,8 +142,8 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('', 2)
         self.assert_comp_equal(('EDIT', 'username'), 'jackM', (1, 0, 1, 1))
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[1 - 1], ('Ok', 'images/ok.png', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
-        self.assert_action_equal('POST', self.json_actions[2 - 1], ('Annuler', 'images/cancel.png'))
+        self.assert_action_equal('POST', self.json_actions[1 - 1], ('Ok', 'mdi:mdi-check', 'lucterios.contacts', 'individualUserValid', 1, 1, 1))
+        self.assert_action_equal('POST', self.json_actions[2 - 1], ('Annuler', 'mdi:mdi-cancel'))
 
         self.factory.xfer = IndividualUserValid()
         self.calljson('/lucterios.contacts/individualUserValid',
@@ -152,7 +152,7 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(len(self.json_context), 2)
         self.assertEqual(self.json_context['individual'], "2")
         self.assertEqual(self.json_context['username'], "jacko")
-        self.assert_action_equal('POST', self.response_json['action'], ('Créer', "images/new.png", "CORE", "usersEdit", 1, 1, 1,
+        self.assert_action_equal('POST', self.response_json['action'], ('Créer', "mdi:mdi-pencil-plus", "CORE", "usersEdit", 1, 1, 1,
                                                                         {"user_actif": "2", "IDENT_READ": "YES"}))
         self.factory.xfer = UsersEdit()
         self.calljson('/CORE/usersEdit', {'individual': '2', 'username':
@@ -167,7 +167,7 @@ class ContactsTest(LucteriosTest):
         self.calljson('/lucterios.contacts/individualShow', {'individual': '2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualShow')
         self.assert_comp_equal(('LABELFORM', 'user'), "jacko", (1, 8, 2, 1, 1))
-        self.assert_action_equal('POST', '#userbtn/action', ('Modifier', 'images/edit.png', 'CORE', 'usersEdit', 0, 1, 1))
+        self.assert_action_equal('POST', '#userbtn/action', ('Modifier', 'mdi:mdi-pencil-outline', 'CORE', 'usersEdit', 0, 1, 1))
 
     def test_individual_search(self):
         fieldnames = Individual.get_search_fields()
@@ -604,8 +604,8 @@ class ContactsTest(LucteriosTest):
         self.assertEqual(self.json_meta['title'], 'Ajouter un champ personnalisé')
         self.assertEqual(len(self.json_context), 0)
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[0], ('Ok', 'images/ok.png', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
-        self.assert_action_equal('POST', self.json_actions[1], ('Annuler', 'images/cancel.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Ok', 'mdi:mdi-check', 'lucterios.contacts', 'customFieldAddModify', 1, 1, 1, {"SAVE": "YES"}))
+        self.assert_action_equal('POST', self.json_actions[1], ('Annuler', 'mdi:mdi-cancel'))
         self.assert_count_equal('', 10)
         self.assert_comp_equal(('SELECT', 'modelname'), 'contacts.AbstractContact', (1, 0, 1, 1))
         self.assert_comp_equal(('EDIT', 'name'), '', (1, 1, 1, 1))
@@ -868,7 +868,7 @@ class ContactsTest(LucteriosTest):
         self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'OPEN', 'mrg_object': '3'}, False)
         self.assert_observer('core.acknowledge', 'CORE', 'objectMerge')
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": 3}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": 3}))
 
         self.factory.xfer = ObjectMerge()
         self.calljson('/CORE/objectMerge',
@@ -883,7 +883,7 @@ class ContactsTest(LucteriosTest):
         self.calljson('/CORE/objectMerge',
                       {'modelname': 'contacts.Individual', 'field_id': 'individual', 'individual': '2;3', 'CONFIRME': 'YES'}, False)
         self.assert_observer('core.acknowledge', 'CORE', 'objectMerge')
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.contacts', 'individualShow', 1, 1, 1, {"individual": "2"}))
 
         self.factory.xfer = IndividualList()
         self.calljson('/lucterios.contacts/individualList', {}, False)
@@ -968,7 +968,7 @@ class ContactsTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.contacts', 'contactImport')
         self.assert_count_equal('', 8)
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[0], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
+        self.assert_action_equal('POST', self.json_actions[0], (str('Ok'), 'mdi:mdi-check', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 1}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 1, 'modelname': 'contacts.LegalEntity', 'quotechar': "'",
@@ -1004,8 +1004,8 @@ class ContactsTest(LucteriosTest):
         self.assert_count_equal('Array', 5)
         self.assert_count_equal('#Array/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal('POST', self.json_actions[0], (str('Retour'), 'images/left.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
-        self.assert_action_equal('POST', self.json_actions[1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
+        self.assert_action_equal('POST', self.json_actions[0], (str('Retour'), 'mdi:mdi-page-next-outline', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 0}))
+        self.assert_action_equal('POST', self.json_actions[1], (str('Ok'), 'mdi:mdi-check', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': 2}))
         self.assertEqual(len(self.json_context), 8)
 
         self.factory.xfer = ContactImport()
@@ -1018,7 +1018,7 @@ class ContactsTest(LucteriosTest):
         self.assert_grid_equal('Array', {"name": "dénomination", "structure_type": "type de structure", "address": "adresse", "postal_code": "code postal", "city": "ville", "tel1": "tel1", "email": "courriel", "identify_number": "Informations Juridiques", "custom_3": "ccc", "custom_7": 'ggg'}, 5)
         self.assert_count_equal('#Array/actions', 0)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal('POST', self.json_actions[2 - 1], (str('Ok'), 'images/ok.png', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
+        self.assert_action_equal('POST', self.json_actions[2 - 1], (str('Ok'), 'mdi:mdi-check', 'lucterios.contacts', 'contactImport', 0, 2, 1, {'step': '3'}))
 
         self.factory.xfer = ContactImport()
         self.calljson('/lucterios.contacts/contactImport', {'step': 3, 'modelname': 'contacts.LegalEntity', 'quotechar': "'", 'delimiter': ';', 'encoding': 'utf-8',

@@ -35,7 +35,6 @@ from lucterios.framework.xferadvance import TITLE_OK
 
 
 class ContactSelection(XferSavedCriteriaSearchEditor):
-    icon = "contacts.png"
     model = AbstractContact
     inital_model = AbstractContact
     field_id = 'abstractcontact'
@@ -47,7 +46,7 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
     def fillresponse(self):
         self.action_list = []
         if self.final_class is not None:
-            self.add_action(self.final_class.get_action(TITLE_OK, "images/ok.png", short_icon='mdi:mdi-check'))
+            self.add_action(self.final_class.get_action(TITLE_OK, short_icon='mdi:mdi-check'))
         model_current = self.getparam('modelname')
         if model_current is None:
             self.model = self.inital_model
@@ -68,5 +67,5 @@ class ContactSelection(XferSavedCriteriaSearchEditor):
         self.add_component(selected_model)
         if self.select_class is not None:
             grid = self.get_components(self.field_id)
-            grid.add_action(self.request, self.select_class.get_action(_("Select"), "images/ok.png", 'mdi:mdi-check'),
+            grid.add_action(self.request, self.select_class.get_action(_("Select"), short_icon='mdi:mdi-check'),
                             close=CLOSE_YES, unique=self.mode_select, params={'pkname': self.field_id}, pos_act=0)

@@ -60,8 +60,8 @@ class PossessionsTest(LucteriosTest):
         self.factory.xfer = CategoryAddModify()
         self.calljson('/lucterios.contacts/categoryAddModify', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'categoryAddModify')
-        self.assert_action_equal('POST', self.json_actions[0], ('Ok', 'images/ok.png', 'lucterios.contacts', 'categoryAddModify', 1, 1, 1))
-        self.assert_action_equal('POST', self.json_actions[1], ('Annuler', 'images/cancel.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Ok', 'mdi:mdi-check', 'lucterios.contacts', 'categoryAddModify', 1, 1, 1))
+        self.assert_action_equal('POST', self.json_actions[1], ('Annuler', 'mdi:mdi-cancel'))
         self.assert_count_equal('', 3)
 
         self.factory.xfer = CategoryAddModify()

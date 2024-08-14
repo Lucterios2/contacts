@@ -121,8 +121,8 @@ class MailingTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', 'doc_in_link', False)
 
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[0], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Modifier', 'mdi:mdi-pencil-outline', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'mdi:mdi-close'))
 
         self.factory.xfer = MessageValidRecipient()
         self.calljson('/lucterios.mailing/messageValidRecipient',
@@ -142,9 +142,9 @@ class MailingTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 13)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal('POST', self.json_actions[0], ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
-        self.assert_action_equal('POST', self.json_actions[1], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Valider', 'mdi:mdi-share', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
+        self.assert_action_equal('POST', self.json_actions[1], ('Modifier', 'mdi:mdi-pencil-outline', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'mdi:mdi-close'))
         self.assert_json_equal('LABELFORM', "status", 0)
         self.assert_count_equal("#recipient_list/actions", 2)
         self.assert_count_equal("recipient_list", 3)
@@ -194,8 +194,8 @@ class MailingTest(LucteriosTest):
         self.assert_count_equal("recipient_list", 2)
         self.assert_json_equal('LABELFORM', "contact_nb", '3')
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('GET', self.json_actions[0], ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('GET', self.json_actions[0], ('Lettres', 'mdi:mdi-file-sign', 'lucterios.mailing', 'messageLetter', 0, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'mdi:mdi-close'))
 
         configSMTP('localhost', 1025)
         self.assertTrue(will_mail_send(), 'with email')
@@ -205,9 +205,9 @@ class MailingTest(LucteriosTest):
         self.assert_count_equal('', 14)
         self.assert_json_equal('LABELFORM', "contact_noemail", ['Valjean jean'])
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal('POST', self.json_actions[0], ('Courriels', 'lucterios.mailing/images/email.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
-        self.assert_action_equal('GET', self.json_actions[1], ('Lettres', 'lucterios.mailing/images/letter.png', 'lucterios.mailing', 'messageLetter', 0, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Courriels', 'mdi:mdi-email-outline', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
+        self.assert_action_equal('GET', self.json_actions[1], ('Lettres', 'mdi:mdi-file-sign', 'lucterios.mailing', 'messageLetter', 0, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'mdi:mdi-close'))
 
         self.factory.xfer = MessageTransition()
         self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'sending'}, False)
@@ -305,16 +305,16 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_grid_equal('attachment', {"name": 'nom', "description": 'description', "date_modification": 'date de modification'}, 0)
         self.assert_json_equal('LABELFORM', "doc_in_link", False)
         self.assert_count_equal("#attachment/actions", 3)
-        self.assert_action_equal('GET', "#attachment/actions/@0", ('Editer', 'images/show.png', 'lucterios.mailing', 'messageShowDoc', 0, 1, 0))
-        self.assert_action_equal('DELETE', "#attachment/actions/@1", ('Retirer', 'images/delete.png', 'lucterios.mailing', 'messageRemoveDoc', 0, 1, 2))
-        self.assert_action_equal('POST', "#attachment/actions/@2", ('Insérer', 'images/add.png', 'lucterios.mailing', 'messageInsertDoc', 0, 1, 1))
+        self.assert_action_equal('GET', "#attachment/actions/@0", ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShowDoc', 0, 1, 0))
+        self.assert_action_equal('DELETE', "#attachment/actions/@1", ('Retirer', 'mdi:mdi-delete-outline', 'lucterios.mailing', 'messageRemoveDoc', 0, 1, 2))
+        self.assert_action_equal('POST', "#attachment/actions/@2", ('Insérer', 'mdi:mdi-pencil-plus-outline', 'lucterios.mailing', 'messageInsertDoc', 0, 1, 1))
 
         self.factory.xfer = MessageInsertDoc()
         self.calljson('/lucterios.mailing/messageInsertDoc', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageInsertDoc')
         self.assert_count_equal("document", 3)
         self.assert_count_equal("#document/actions", 2)
-        self.assert_action_equal('POST', "#document/actions/@0", ('Sélection', 'images/ok.png', 'lucterios.mailing', 'messageValidInsertDoc', 1, 1, 0))
+        self.assert_action_equal('POST', "#document/actions/@0", ('Sélection', 'mdi:mdi-check', 'lucterios.mailing', 'messageValidInsertDoc', 1, 1, 0))
 
         self.factory.xfer = MessageValidInsertDoc()
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '1', 'document': '1'}, False)
@@ -339,7 +339,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.factory.xfer = MessageShowDoc()
         self.calljson('/lucterios.mailing/messageShowDoc', {'message': '1', 'attachment': '3'}, False)
         self.assert_observer('core.acknowledge', 'lucterios.mailing', 'messageShowDoc')
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', "images/show.png", "lucterios.documents", "documentShow", 1, 1, 1, {"document": 3}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', "mdi:mdi-text-box-outline", "lucterios.documents", "documentShow", 1, 1, 1, {"document": 3}))
 
         self.factory.xfer = MessageRemoveDoc()
         self.calljson('/lucterios.mailing/messageRemoveDoc',
@@ -710,8 +710,8 @@ class SMSTest(LucteriosTest):
         self.assert_json_equal('LABELFORM', "sms_field_names", ['tel1', 'tel2'])
         self.assert_count_equal("recipient_list", 0)
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[0], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Modifier', 'mdi:mdi-pencil-outline', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'mdi:mdi-close'))
 
         self.factory.xfer = MessageValidRecipient()
         self.calljson('/lucterios.mailing/messageValidRecipient',
@@ -731,9 +731,9 @@ class SMSTest(LucteriosTest):
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assert_count_equal('', 11)
         self.assertEqual(len(self.json_actions), 3)
-        self.assert_action_equal('POST', self.json_actions[0], ('Valider', 'images/transition.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
-        self.assert_action_equal('POST', self.json_actions[1], ('Modifier', 'images/edit.png', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
-        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Valider', 'mdi:mdi-share', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'valid'}))
+        self.assert_action_equal('POST', self.json_actions[1], ('Modifier', 'mdi:mdi-pencil-outline', 'lucterios.mailing', 'messageAddModify', 1, 1, 0))
+        self.assert_action_equal('POST', self.json_actions[2], ('Fermer', 'mdi:mdi-close'))
         self.assert_json_equal('LABELFORM', "status", 0)
         self.assert_count_equal("#recipient_list/actions", 2)
         self.assert_count_equal("recipient_list", 3)
@@ -770,7 +770,7 @@ class SMSTest(LucteriosTest):
         self.assert_count_equal("recipient_list", 2)
         self.assert_json_equal('LABELFORM', "contact_nb", '3')
         self.assertEqual(len(self.json_actions), 1)
-        self.assert_action_equal('POST', self.json_actions[0], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('Fermer', 'mdi:mdi-close'))
 
         clean_sms_testfile(create_new=True)
         self.assertTrue(AbstractProvider.is_current_active(), 'with sms')
@@ -780,8 +780,8 @@ class SMSTest(LucteriosTest):
         self.assert_count_equal('', 12)
         self.assert_json_equal('LABELFORM', "contact_nosms", ['Valjean jean : 02-78-45-12-95'])
         self.assertEqual(len(self.json_actions), 2)
-        self.assert_action_equal('POST', self.json_actions[0], ('SMS', 'lucterios.mailing/images/sms.png', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
-        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'images/close.png'))
+        self.assert_action_equal('POST', self.json_actions[0], ('SMS', 'mdi:mdi-message-outline', 'lucterios.mailing', 'messageTransition', 0, 1, 1, {'TRANSITION': 'sending'}))
+        self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'mdi:mdi-close'))
 
         self.factory.xfer = MessageTransition()
         self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'sending'}, False)
@@ -919,7 +919,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
     def _test_email1(self):
         configSMTP('localhost', 1025, batchtime=0.1, batchsize=4)
         self.calljson('/lucterios.mailing/messageAddModify', {'message_type': 0, 'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body': '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '1'}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '1'}))
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'})
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''})
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '1', 'document': '1'})
@@ -1061,7 +1061,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
 
     def _test_email2(self):
         self.calljson('/lucterios.mailing/messageAddModify', {'message_type': 0, 'SAVE': 'YES', 'doc_in_link': 1, 'subject': 'new message', 'body': '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Other message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '2'}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '2'}))
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '2', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''})
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '1'})
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '2', 'document': '3'})
@@ -1099,7 +1099,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
     def _test_sms1(self):
         self.calljson('/lucterios.mailing/messageAddModify', {'message_type': 1, 'SAVE': 'YES', 'subject': 'test message', 'body': 'Small message to give a big kiss ;){[br/]}Bye',
                                                               "sms_field_names": 'tel1;tel2'})
-        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'images/show.png', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '3'}))
+        self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '3'}))
 
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '3', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'})
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '3', 'modelname': 'contacts.LegalEntity', 'CRITERIA': ''})

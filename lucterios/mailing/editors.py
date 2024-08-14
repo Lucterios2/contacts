@@ -72,12 +72,12 @@ class MessageEditor(LucteriosEditor):
             new_documents.tab = old_documents.tab
             new_documents.set_location(old_documents.col, old_documents.row, old_documents.colspan)
             new_documents.set_model(self.item.attachments.all(), ["name", "description", "date_modification"], xfer)
-            new_documents.add_action(xfer.request, MessageShowDoc.get_action(TITLE_EDIT, "images/show.png", short_icon='mdi:mdi-text-box-outline'),
+            new_documents.add_action(xfer.request, MessageShowDoc.get_action(TITLE_EDIT, short_icon='mdi:mdi-text-box-outline'),
                                      modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
             if self.item.status == 0:
-                new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), "images/delete.png", 'mdi:mdi-delete-outline'),
+                new_documents.add_action(xfer.request, MessageRemoveDoc.get_action(_("Remove"), short_icon='mdi:mdi-delete-outline'),
                                          modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_MULTI)
-                new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), "images/add.png", 'mdi:mdi-pencil-plus-outline'),
+                new_documents.add_action(xfer.request, MessageInsertDoc.get_action(_("Insert"), short_icon='mdi:mdi-pencil-plus-outline'),
                                          modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_NONE)
             xfer.tab = new_documents.tab
             xfer.add_component(new_documents)
