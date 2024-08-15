@@ -34,7 +34,7 @@ from lucterios.CORE.models import LucteriosUser, Preference
 from lucterios.CORE.views_usergroup import UsersPreference, PreferenceEdit
 
 from lucterios.contacts.views import PostalCodeList, PostalCodeAdd, Configuration, CurrentStructure, \
-    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint,\
+    CurrentStructureAddModify, Account, AccountAddModify, CurrentStructurePrint, \
     CustomFieldAddModify, CustomFieldUp
 from lucterios.contacts.models import LegalEntity
 from lucterios.contacts.test_tools import change_ourdetail, create_jack
@@ -225,7 +225,7 @@ class ConfigurationTest(LucteriosTest):
 
     def test_logo(self):
         self.assertFalse(exists(get_user_path('contacts', 'Image_1.jpg')))
-        logo_path = join(dirname(__file__), "static", 'lucterios.contacts', 'images', 'ourDetails.png')
+        logo_path = join(dirname(__file__), 'docs', 'en', 'ResponsabilityLegalEntity.png')
         logo_stream = "image.jpg;" + \
             readimage_to_base64(logo_path, False).decode("utf-8")
 
@@ -238,7 +238,7 @@ class ConfigurationTest(LucteriosTest):
         self.factory.xfer = CurrentStructure()
         self.calljson('/lucterios.contacts/currentStructure', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'currentStructure')
-        self.assert_json_equal('IMAGE', 'logoimg', "data:image/jpg;base64,/9j/4AAQSkZJRg", True)
+        self.assert_json_equal('IMAGE', 'logoimg', "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQ", True)
 
         self.factory.xfer = CurrentStructurePrint()
         self.calljson('/lucterios.contacts/currentStructurePrint', {}, False)

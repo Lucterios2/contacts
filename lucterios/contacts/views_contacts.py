@@ -32,10 +32,10 @@ from django.conf import settings
 from lucterios.framework.tools import MenuManage, WrapAction, ActionsManage, SELECT_MULTI
 from lucterios.framework.tools import FORMTYPE_NOMODAL, FORMTYPE_REFRESH, CLOSE_NO, FORMTYPE_MODAL, CLOSE_YES, SELECT_SINGLE
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge, XFER_DBOX_WARNING
-from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave,\
-    TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL,\
+from lucterios.framework.xferadvance import XferAddEditor, XferDelete, XferShowEditor, XferListEditor, XferSave, \
+    TITLE_ADD, TITLE_MODIFY, TITLE_EDIT, TITLE_PRINT, TITLE_DELETE, TITLE_LABEL, \
     TITLE_LISTING, TITLE_CREATE, TITLE_CANCEL
-from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid,\
+from lucterios.framework.xfercomponents import XferCompLabelForm, XferCompEdit, XferCompImage, XferCompGrid, \
     XferCompButton
 from lucterios.framework.xfersearch import XferSearchEditor
 from lucterios.framework import signal_and_lock

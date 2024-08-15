@@ -37,7 +37,7 @@ from lucterios.framework.tools import FORMTYPE_MODAL, get_icon_path, SELECT_SING
 from lucterios.framework.xfergraphic import XferContainerCustom, XferContainerAcknowledge
 from lucterios.framework.xferadvance import XferDelete, XferAddEditor, XferListEditor, TEXT_TOTAL_NUMBER
 from lucterios.framework.xferadvance import TITLE_DELETE, TITLE_ADD, TITLE_MODIFY, TITLE_CLOSE, TITLE_EDIT, TITLE_PRINT, TITLE_CANCEL, TITLE_OK
-from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, XferCompButton, XferCompCaptcha,\
+from lucterios.framework.xfercomponents import XferCompImage, XferCompLabelForm, XferCompEdit, XferCompGrid, XferCompButton, XferCompCaptcha, \
     XferCompSelect
 from lucterios.framework import signal_and_lock
 from lucterios.framework.error import LucteriosException, IMPORTANT

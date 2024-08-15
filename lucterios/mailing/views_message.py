@@ -8,12 +8,12 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Q
 
-from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE,\
+from lucterios.framework.xferadvance import XferListEditor, TITLE_EDIT, TITLE_ADD, TITLE_MODIFY, TITLE_DELETE, TITLE_CLONE, \
     XferTransition, TITLE_OK, TITLE_CANCEL, TITLE_CREATE, TITLE_CLOSE
 from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
-from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI,\
+from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI, \
     get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO, get_url_from_request
 from lucterios.framework.xferbasic import XferContainerAbstract
 from lucterios.framework.error import LucteriosException, MINOR
@@ -405,7 +405,7 @@ class MessageShowDoc(XferContainerAcknowledge):
 
 @MenuManage.describ('')
 class EmailSentAddForStatistic(XferContainerAbstract):
-    short_icon="mdi:mdi-check"
+    short_icon = "mdi:mdi-check"
     observer_name = 'Statistic'
     caption = 'EmailSentAddForStatistic'
     model = EmailSent

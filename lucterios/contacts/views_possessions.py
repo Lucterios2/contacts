@@ -27,13 +27,13 @@ from __future__ import unicode_literals
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 
-from lucterios.framework.tools import MenuManage, FORMTYPE_MODAL, ActionsManage, SELECT_SINGLE,\
+from lucterios.framework.tools import MenuManage, FORMTYPE_MODAL, ActionsManage, SELECT_SINGLE, \
     FORMTYPE_NOMODAL, CLOSE_YES, SELECT_MULTI, CLOSE_NO, WrapAction
-from lucterios.framework.xferadvance import XferListEditor, XferAddEditor, TITLE_ADD, TITLE_MODIFY,\
+from lucterios.framework.xferadvance import XferListEditor, XferAddEditor, TITLE_ADD, TITLE_MODIFY, \
     TITLE_CREATE, TITLE_EDIT, XferShowEditor, TITLE_DELETE, XferDelete
 
 
-from lucterios.contacts.models import CustomField, CategoryPossession,\
+from lucterios.contacts.models import CustomField, CategoryPossession, \
     AbstractContact, Possession, Individual
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 from lucterios.contacts.tools import ContactSelection

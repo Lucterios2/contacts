@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lucterios.framework.filetools import save_from_base64, get_user_path, open_image_resize, readimage_to_base64
 from lucterios.framework.xfercomponents import XferCompEdit, XferCompFloat, XferCompCheck, XferCompSelect, \
-    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel,\
+    XferCompMemo, XferCompUpLoad, XferCompImage, XferCompButton, XferCompLinkLabel, \
     XferCompDate
 from lucterios.framework.tools import FORMTYPE_REFRESH, FORMTYPE_MODAL, CLOSE_NO, CLOSE_YES, get_icon_path, WrapAction
 from lucterios.framework.tools import ActionsManage

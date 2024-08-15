@@ -31,7 +31,7 @@ from lucterios.framework.xfercomponents import XferCompGrid, XferCompCheckList
 from lucterios.mailing.email_functions import will_mail_send
 from lucterios.framework.tools import FORMTYPE_MODAL, CLOSE_NO, SELECT_SINGLE, SELECT_NONE, SELECT_MULTI
 from lucterios.framework.xferadvance import TITLE_EDIT
-from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc,\
+from lucterios.mailing.views_message import MessageRemoveDoc, MessageInsertDoc, \
     MessageShowDoc
 from lucterios.mailing.sms_functions import AbstractProvider
 

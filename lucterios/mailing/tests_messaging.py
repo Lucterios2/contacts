@@ -38,10 +38,10 @@ from lucterios.documents.models import DocumentContainer
 
 from lucterios.mailing.models import Message
 from lucterios.mailing.email_functions import will_mail_send
-from lucterios.mailing.views_message import MessageAddModify, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc,\
-    MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry, MessageEmailList, MessageSMSList,\
+from lucterios.mailing.views_message import MessageAddModify, MessageDel, MessageShow, MessageValidRecipient, MessageDelRecipient, MessageLetter, MessageTransition, MessageInsertDoc, \
+    MessageValidInsertDoc, MessageRemoveDoc, MessageSendEmailTry, MessageEmailList, MessageSMSList, \
     MessageSendSMSTry, MessageShowDoc
-from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver,\
+from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver, \
     configSMS, clean_sms_testfile, read_sms
 from lucterios.mailing.sms_functions import AbstractProvider
 from lucterios.contacts.models import CustomField
@@ -49,11 +49,14 @@ from lucterios.contacts.models import CustomField
 
 class MailingTest(LucteriosTest):
 
+    smtp_port = 1225
+
     def setUp(self):
         LucteriosTest.setUp(self)
         change_ourdetail()
         self.jack = create_jack(firstname="jack", lastname="MISTER", with_email=True)
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
+        MailingTest.smtp_port += 1
 
     def test_messages(self):
         self.factory.xfer = MessageEmailList()
@@ -197,7 +200,7 @@ class MailingTest(LucteriosTest):
         self.assert_action_equal('GET', self.json_actions[0], ('Lettres', 'mdi:mdi-file-sign', 'lucterios.mailing', 'messageLetter', 0, 1, 0))
         self.assert_action_equal('POST', self.json_actions[1], ('Fermer', 'mdi:mdi-close'))
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         self.assertTrue(will_mail_send(), 'with email')
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
@@ -384,14 +387,14 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assertEqual(len(self.json_actions), 2)
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         self.factory.xfer = MessageShow()
         self.calljson('/lucterios.mailing/messageShow', {'message': '1'}, False)
         self.assert_observer('core.custom', 'lucterios.mailing', 'messageShow')
         self.assertEqual(len(self.json_actions), 3)
 
         server = TestReceiver()
-        server.start(1025)
+        server.start(MailingTest.smtp_port)
         try:
             self.assertEqual(0, server.count())
             self.factory.xfer = MessageSendEmailTry()
@@ -423,9 +426,9 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.factory.user.save()
         create_doc(self.factory.user, with_folder=False)
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         server = TestReceiver()
-        server.start(1025)
+        server.start(MailingTest.smtp_port)
         try:
             email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye", message_type=0)
             email_msg.add_recipient('contacts.Individual', 'genre||8||1')
@@ -470,9 +473,9 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         self.jack.email = self.jack.email + ';titi@machin.com'
         self.jack.save()
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         server = TestReceiver()
-        server.start(1025)
+        server.start(MailingTest.smtp_port)
         server.smtp.wrong_email = 'titi@machin.com'
         try:
             email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye", message_type=0)
@@ -528,9 +531,9 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         create_jack(firstname="wiliam", lastname='Dalton')
         create_jack(firstname="avrel", lastname='Dalton')
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         server = TestReceiver()
-        server.start(1025)
+        server.start(MailingTest.smtp_port)
         try:
             email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye",
                                                email_to_send="contacts.Individual:0:%d" % print_model.id, message_type=0)
@@ -583,9 +586,9 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
         jack.email = self.jack.email + ';titi@machin.com'
         jack.save()
 
-        configSMTP('localhost', 1025)
+        configSMTP('localhost', MailingTest.smtp_port)
         server = TestReceiver()
-        server.start(1025)
+        server.start(MailingTest.smtp_port)
         server.smtp.wrong_email = 'titi@machin.com'
         try:
             email_msg = Message.objects.create(subject="Sending '#reference'", body="{[b]}#name{[/b]}{[br/]}{[br/]}With Document: {[i]}#doc{[/i]}{[br/]}{[br/]}Bye",
@@ -901,6 +904,8 @@ class SMSTest(LucteriosTest):
 
 class SendMessagingTest(AsychronousLucteriosTest):
 
+    smtp_port = 1325
+
     def setUp(self):
         AsychronousLucteriosTest.setUp(self)
         change_ourdetail(tel2="07-45-12-95-78")
@@ -915,9 +920,10 @@ class SendMessagingTest(AsychronousLucteriosTest):
         create_jack(firstname="jean", lastname="Valjean", with_email=False, tel1="04-67-89-23-45")
         create_jack(firstname="joe", lastname='Lindien', tel1="06-98-01-42-53")
         create_doc(LucteriosUser.objects.get(username='admin'), with_folder=False)
+        SendMessagingTest.smtp_port += 1
 
     def _test_email1(self):
-        configSMTP('localhost', 1025, batchtime=0.1, batchsize=4)
+        configSMTP('localhost', SendMessagingTest.smtp_port, batchtime=0.1, batchsize=4)
         self.calljson('/lucterios.mailing/messageAddModify', {'message_type': 0, 'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body': '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
         self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '1'}))
         self.calljson('/lucterios.mailing/messageValidRecipient', {'message': '1', 'modelname': 'contacts.Individual', 'CRITERIA': 'genre||8||1'})
@@ -926,7 +932,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
         self.calljson('/lucterios.mailing/messageValidInsertDoc', {'message': '1', 'document': '3'})
         self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'valid', 'CONFIRME': 'YES'})
         server = TestReceiver()
-        server.start(1025)
+        server.start(SendMessagingTest.smtp_port)
         try:
             self.assertEqual(0, server.count())
             self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'sending', 'CONFIRME': 'YES'})
@@ -1072,7 +1078,7 @@ class SendMessagingTest(AsychronousLucteriosTest):
         self.assert_count_equal("recipient_list", 1)
         self.assert_json_equal('LABELFORM', "contact_nb", '1')
         server = TestReceiver()
-        server.start(1025)
+        server.start(SendMessagingTest.smtp_port)
         try:
             self.assertEqual(0, server.count())
             self.calljson('/lucterios.mailing/messageTransition', {'message': '2', 'TRANSITION': 'sending', 'CONFIRME': 'YES'})

@@ -26,8 +26,8 @@ from __future__ import unicode_literals
 
 from lucterios.framework.test import LucteriosTest, add_empty_user
 from lucterios.contacts.test_tools import initial_contact
-from lucterios.contacts.views_possessions import ConfPossession, CategoryAddModify, CategoryDel,\
-    PossessionShow, PossessionList, PossessionAddModify, PossessionDel,\
+from lucterios.contacts.views_possessions import ConfPossession, CategoryAddModify, CategoryDel, \
+    PossessionShow, PossessionList, PossessionAddModify, PossessionDel, \
     PossessionOwner, PossessionOwnerSave
 from lucterios.contacts.models import CustomField, CategoryPossession, Possession
 from os.path import exists, join, dirname
