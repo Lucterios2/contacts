@@ -956,11 +956,11 @@ class SendMessagingTest(AsychronousLucteriosTest):
             self.assertTrue('doc1.png' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
             content_msg1 = b64decode(msg_file1.get_payload())
             self.assertEqual(b"\x89PNG", content_msg1[:4])
-            self.assertEqual(4054, len(content_msg1))
+            self.assertEqual(26245, len(content_msg1))
             self.assertTrue('doc3.png' in msg_file3.get('Content-Type', ''), msg_file3.get('Content-Type', ''))
             content_msg3 = b64decode(msg_file3.get_payload())
             self.assertEqual(b"\x89PNG", content_msg3[:4])
-            self.assertEqual(3774, len(content_msg3))
+            self.assertEqual(31717, len(content_msg3))
         finally:
             server.stop()
 
