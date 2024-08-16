@@ -85,7 +85,7 @@ class CategoryDel(XferDelete):
 
 
 def right_to_possession_list(request):
-    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.change_possession').check_permission(request):
+    if WrapAction.is_permission(request, is_view_right='contacts.change_possession'):
         return CategoryPossession.objects.all().count() > 0
     else:
         return False
@@ -122,7 +122,7 @@ def owner_to_possession(request):
 
 
 def right_to_possession_addmodify(request):
-    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.add_possession').check_permission(request):
+    if WrapAction.is_permission(request, is_view_right='contacts.add_possession'):
         return True
     else:
         return owner_to_possession(request)
@@ -146,7 +146,7 @@ class PossessionAddModify(XferAddEditor):
 
 
 def right_to_possession_show(request):
-    if WrapAction(caption='', short_icon='mdi:mdi-check', is_view_right='contacts.change_possession').check_permission(request):
+    if WrapAction.is_permission(request, is_view_right='contacts.change_possession'):
         return True
     else:
         return owner_to_possession(request)

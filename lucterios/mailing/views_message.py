@@ -14,7 +14,7 @@ from lucterios.framework.xferadvance import XferAddEditor
 from lucterios.framework.xferadvance import XferShowEditor
 from lucterios.framework.xferadvance import XferDelete
 from lucterios.framework.tools import FORMTYPE_NOMODAL, ActionsManage, MenuManage, SELECT_SINGLE, CLOSE_YES, SELECT_MULTI, \
-    get_icon_path, FORMTYPE_REFRESH, WrapAction, CLOSE_NO, get_url_from_request
+    FORMTYPE_REFRESH, WrapAction, CLOSE_NO, get_url_from_request
 from lucterios.framework.xferbasic import XferContainerAbstract
 from lucterios.framework.error import LucteriosException, MINOR
 from lucterios.framework.xfergraphic import XferContainerAcknowledge, XferContainerCustom, XFER_DBOX_ERROR
