@@ -94,7 +94,6 @@ class CustomFieldEditor(LucteriosEditor):
         model_select.set_value(model_current)
         model_select.set_select(sel_models)
         model_select.set_location(obj_model.col, obj_model.row, obj_model.colspan, obj_model.rowspan)
-        model_select.set_size(obj_model.vmin, obj_model.hmin)
         xfer.add_component(model_select)
         if len(sel_models) == 1:
             xfer.params['modelname'] = sel_models[0][0]
@@ -247,7 +246,6 @@ class AbstractContactEditor(AbstractEditorCustomizeWithLogo):
         city_select.set_select(city_list)
         city_select.set_location(obj_city.col, obj_city.row, obj_city.colspan, obj_city.rowspan)
         city_select.description = obj_city.description
-        city_select.set_size(obj_city.vmin, obj_city.hmin)
         city_select.set_action(xfer.request, xfer.return_action(), modal=FORMTYPE_REFRESH, close=CLOSE_NO)
         xfer.add_component(city_select)
 

@@ -119,7 +119,7 @@ class Account(XferContainerCustom):
         grid.add_action(self.request, CurrentLegalEntityShow.get_action(TITLE_EDIT, short_icon='mdi:mdi-text-box-outline'),
                         modal=FORMTYPE_MODAL, close=CLOSE_NO, unique=SELECT_SINGLE)
         grid.set_location(1, 1, 2)
-        grid.set_size(200, 500)
+        grid.set_height(350)
         self.add_component(grid)
 
     def fillresponse(self):
