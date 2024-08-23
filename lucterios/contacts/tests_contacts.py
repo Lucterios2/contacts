@@ -183,54 +183,48 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[]')
-        self.assert_count_equal('', 17)
+        self.assert_json_equal("SEARCH", "CRITERIA", [])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch',
                       {'CRITERIA': 'genre||8||1;2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["genre", 8, ["1", "2"]]]')
-        self.assert_count_equal('', 20)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["genre", 8, ["1", "2"]]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 2)
 
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch',
                       {'CRITERIA': '[["genre",8,["1"]]]'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["genre", 8, ["1"]]]')
-        self.assert_count_equal('', 20)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["genre", 8, ["1"]]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch',
                       {'CRITERIA': '[["genre",8,"2"]]'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["genre", 8, "2"]]')
-        self.assert_count_equal('', 20)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["genre", 8, "2"]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 1)
 
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch',
                       {'CRITERIA': 'responsability_set.functions||9||1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["responsability_set.functions", 9, "1"]]')
-        self.assert_count_equal('', 19)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["responsability_set.functions", 9, "1"]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 0)
 
         self.factory.xfer = IndividualSearch()
         self.calljson('/lucterios.contacts/individualSearch',
                       {'CRITERIA': '[["user.username",5,"empt"]]'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["user.username", 5, "empt"]]')
-        self.assert_count_equal('', 19)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["user.username", 5, "empt"]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 0)
 
     def test_individual_listing(self):
@@ -465,45 +459,24 @@ class ContactsTest(LucteriosTest):
         self.factory.xfer = LegalEntitySearch()
         self.calljson('/lucterios.contacts/legalEntitySearch', {}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[]')
-        self.assert_count_equal('', 17)
+        self.assert_json_equal("SEARCH", "CRITERIA", [])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('legal_entity', 2)
-
-        self.factory.xfer = LegalEntitySearch()
-        self.calljson('/lucterios.contacts/legalEntitySearch',
-                      {'searchSelector': 'name', 'searchOperator': '5', 'searchValueStr': 'truc', 'ACT': 'ADD'}, False)
-        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["name", 5, "truc"]]')
-        self.assert_count_equal('', 20)
-        self.assert_count_equal('legal_entity', 1)
-
-        self.factory.xfer = LegalEntitySearch()
-        self.calljson('/lucterios.contacts/legalEntitySearch',
-                      {'searchSelector': 'structure_type', 'searchOperator': '8', 'searchValueList': '2', 'ACT': 'ADD'}, False)
-        self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["structure_type", 8, ["2"]]]')
-        self.assert_count_equal('', 20)
-        self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
         self.calljson('/lucterios.contacts/legalEntitySearch',
                       {'CRITERIA': 'name||5||truc//structure_type||8||2'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["name", 5, "truc"], ["structure_type", 8, "2"]]')
-        self.assert_count_equal('', 22)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["name", 5, "truc"], ["structure_type", 8, "2"]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('legal_entity', 1)
 
         self.factory.xfer = LegalEntitySearch()
         self.calljson('/lucterios.contacts/legalEntitySearch',
                       {'CRITERIA': '[["name",5,"truc"],["structure_type",8,["2"]]]', 'ACT': '0'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'legalEntitySearch')
-        self.assertEqual(len(self.json_context), 1)
-        self.assertEqual(self.json_context['CRITERIA'], '[["structure_type", 8, ["2"]]]')
-        self.assert_count_equal('', 20)
+        self.assert_json_equal("SEARCH", "CRITERIA", [["structure_type", 8, ["2"]]])
+        self.assert_count_equal('', 6)
         self.assert_count_equal('legal_entity', 1)
 
     def test_legalentity_listing(self):
