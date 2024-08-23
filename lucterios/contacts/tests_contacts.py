@@ -216,7 +216,7 @@ class ContactsTest(LucteriosTest):
                       {'CRITERIA': 'responsability_set.functions||9||1'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assert_json_equal("SEARCH", "CRITERIA", [["responsability_set.functions", 9, "1"]])
-        self.assert_count_equal('', 7)
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 0)
 
         self.factory.xfer = IndividualSearch()
@@ -224,7 +224,7 @@ class ContactsTest(LucteriosTest):
                       {'CRITERIA': '[["user.username",5,"empt"]]'}, False)
         self.assert_observer('core.custom', 'lucterios.contacts', 'individualSearch')
         self.assert_json_equal("SEARCH", "CRITERIA", [["user.username", 5, "empt"]])
-        self.assert_count_equal('', 7)
+        self.assert_count_equal('', 6)
         self.assert_count_equal('individual', 0)
 
     def test_individual_listing(self):
