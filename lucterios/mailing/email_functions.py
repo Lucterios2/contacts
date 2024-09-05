@@ -37,6 +37,7 @@ from email.mime.application import MIMEApplication
 from django.utils.translation import gettext_lazy as _
 
 from lucterios.framework.error import LucteriosException, GRAVE
+from lucterios.framework.filetools import remove_accent
 
 SMTP_SECURITY_NONE = 0
 SMTP_SECURITY_STARTTLS = 1
@@ -162,7 +163,7 @@ def send_email(recipients, subject, body, files=None, cclist=None, bcclist=None,
     smtp_pass = Params.getvalue('mailing-smtppass')
     smtp_security = Params.getvalue('mailing-smtpsecurity')
     sender_obj = LegalEntity.objects.get(id=1)
-    sender_name = sender_obj.name
+    sender_name = remove_accent(sender_obj.name, replace_slash=False)
     sender_email = sender_obj.email
     if (sender_email == '') or ((smtp_server == '') and (smtp_security != 3)):
         raise EmailException(_('Email not configure!'))
