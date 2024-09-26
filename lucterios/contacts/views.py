@@ -516,7 +516,9 @@ class ContactImport(ObjectImport):
     short_icon = "mdi:mdi-account-arrow-up"
 
     def get_select_models(self):
-        return AbstractContact.get_select_contact_type(False)
+        select_list = AbstractContact.get_select_contact_type(False)
+        select_list.reverse()
+        return select_list
 
 
 @signal_and_lock.Signal.decorate('config')
