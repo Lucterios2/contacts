@@ -20,6 +20,8 @@ Visualisation d'un contact physique
 La liste des personnes physiques étant affichée, le bouton "Editer" ou un double-clic sur la ligne correspondante au contact, permettent de visualiser la fiche du contact.
 
 .. image:: ShowIndividual.png
+   :height: 400px
+   :align: center
 
 La fiche consultée peut être modifiée, bouton "modifier" et imprimée, bouton "Imprimer".
 Si cette personne n'est pas associée à d'autres enregistrements de l'application, vous avez la possibilité de supprimer sa fiche.
@@ -27,6 +29,8 @@ Si cette personne n'est pas associée à d'autres enregistrements de l'applicati
 Vous pouvez également attribuer au contact physique un alias de connexion à l'application, assorti de droits et de permissions (voir Les utilisateurs).
 
 .. image:: PermissionsIndividual.png
+   :height: 400px
+   :align: center
 
 Ajout d'un contact physique
 -----------------------------
@@ -34,6 +38,8 @@ Ajout d'un contact physique
 Depuis la liste précédente, vous avez aussi la possibilité d'ajouter une nouvelle personne à l'aide du bouton "+ Créer".
 
 .. image:: EditIndividual.png
+   :height: 400px
+   :align: center
 
 Recherche d'un contact physique
 -------------------------------
@@ -44,5 +50,7 @@ Définissez les critères de recherche grâce à quoi seront extraites de la bas
 Vous pourrez alors imprimer cette liste ou visualiser/modifier une fiche.
 
 .. image:: FindIndividual.png
+   :height: 400px
+   :align: center
 
 Les critères de filtre peuvent être sauvegardés pour une utilisation ultérieure.
