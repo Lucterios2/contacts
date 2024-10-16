@@ -199,7 +199,7 @@ class TestReceiver(TestCase):
         self.smtp.stop()
 
     def count(self):
-        sleep(0.2)
+        sleep(1.0)
         return len(self.smtp.emails)
 
     def get(self, index):
