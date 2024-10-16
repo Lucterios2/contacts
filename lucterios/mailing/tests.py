@@ -300,7 +300,7 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual({}, ret)
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
-        self.assertEqual(['toto@machin.com'], self.server.get(0)[2])  # TODO no return of BCC
+        self.assertEqual(['toto@machin.com', 'mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1)
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
@@ -373,22 +373,21 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
         self.assertEqual(None, self.server.smtp.auth_params)
 
-    # TODO no return of BCC
-    # def test_send_withbindcopy(self):
-    #     self.server.start(UserTest.smtp_port)
-    #     configSMTP('localhost', UserTest.smtp_port)
-    #     self.assertEqual(0, self.server.count())
-    #     self.assertEqual(True, will_mail_send())
-    #     ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', bcclist=['titi@machin.com', 'tutu@machin.com'])
-    #     self.assertEqual({}, ret)
-    #     self.assertEqual(1, self.server.count())
-    #     self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
-    #     self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
-    #     msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com', 'Cc': ''})
-    #     self.assertEqual('text/plain', msg.get_content_type())
-    #     self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-    #     self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
-    #     self.assertEqual(None, self.server.smtp.auth_params)
+    def test_send_withbindcopy(self):
+        self.server.start(UserTest.smtp_port)
+        configSMTP('localhost', UserTest.smtp_port)
+        self.assertEqual(0, self.server.count())
+        self.assertEqual(True, will_mail_send())
+        ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', bcclist=['titi@machin.com', 'tutu@machin.com'])
+        self.assertEqual({}, ret)
+        self.assertEqual(1, self.server.count())
+        self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
+        self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
+        msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com', 'Cc': ''})
+        self.assertEqual('text/plain', msg.get_content_type())
+        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
+        self.assertEqual(None, self.server.smtp.auth_params)
 
     def test_send_withdouble(self):
         self.server.start(UserTest.smtp_port)
@@ -401,10 +400,10 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual(1, self.server.count())
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com',
-                          'tata@machin.com'], self.server.get(0)[2])  # TODO no return of BCC
+                          'tata@machin.com', 'tete@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com, titi@machin.com, tyty@machin.com',
                                                                           'Cc': 'tutu@machin.com, tata@machin.com',
-                                                                          'rcpttos': 'toto@machin.com;titi@machin.com;tyty@machin.com;tutu@machin.com;tata@machin.com'})
+                                                                          'rcpttos': 'toto@machin.com;titi@machin.com;tyty@machin.com;tutu@machin.com;tata@machin.com;tete@machin.com'})
         self.assertEqual('text/plain', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))

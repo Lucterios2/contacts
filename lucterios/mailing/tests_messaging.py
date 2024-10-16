@@ -57,6 +57,7 @@ class MailingTest(LucteriosTest):
         self.jack = create_jack(firstname="jack", lastname="MISTER", with_email=True)
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
         MailingTest.smtp_port += 1
+        self.maxDiff=None
 
     def test_messages(self):
         self.factory.xfer = MessageEmailList()
@@ -553,15 +554,14 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
 
             email_msg.sendemail(10, "http://testserver")
             self.assertEqual(4, server.count())
-            # TODO no return of BCC
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
-            self.assertEqual(['jack@worldcompany.com'], server.get(0)[2])
+            self.assertEqual(['jack@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
-            self.assertEqual(['joe@worldcompany.com'], server.get(1)[2])
+            self.assertEqual(['joe@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(1)[2])
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(2)[1])
-            self.assertEqual(['wiliam@worldcompany.com'], server.get(2)[2])
+            self.assertEqual(['wiliam@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(2)[2])
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(3)[1])
-            self.assertEqual(['avrel@worldcompany.com'], server.get(3)[2])
+            self.assertEqual(['avrel@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(3)[2])
 
             msg_txt, msg, msg_file1 = server.get_msg_index(2, "Sending '6'")
 
@@ -611,18 +611,17 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.sendemail(10, "http://testserver")
             self.assertEqual(4, server.count())
 
-            # TODO no return of BCC
             # TODO : Manage forbidden email testing
-            self.assertEqual(['jack@worldcompany.com', 'titi@machin.com'], server.get(0)[2])
+            self.assertEqual(['jack@worldcompany.com', 'titi@machin.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
             server.get_msg_index(0, params={'To': 'jack@worldcompany.com, titi@machin.com', 'Cc': ''})
 
-            self.assertEqual(['joe@worldcompany.com'], server.get(1)[2])
+            self.assertEqual(['joe@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(1)[2])
             server.get_msg_index(1, params={'To': 'joe@worldcompany.com', 'Cc': ''})
 
-            self.assertEqual(['wiliam@worldcompany.com'], server.get(2)[2])
+            self.assertEqual(['wiliam@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(2)[2])
             server.get_msg_index(2, params={'To': 'wiliam@worldcompany.com', 'Cc': ''})
 
-            self.assertEqual(['avrel@worldcompany.com'], server.get(3)[2])
+            self.assertEqual(['avrel@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(3)[2])
             server.get_msg_index(3, params={'To': 'avrel@worldcompany.com', 'Cc': ''})
 
             email_sent_list = email_msg.emailsent_set.all()
@@ -947,10 +946,10 @@ class SendMessagingTest(AsychronousLucteriosTest):
             self.assertEqual(0, server.count())
             sleep(10)
             self.assertEqual(1, len(LucteriosScheduler.get_list()))
-            sleep(20)
+            sleep(40)
+            self.assertEqual(8, server.count())
             self.assertEqual([['mr-sylvestre@worldcompany.com'], ['jack@worldcompany.com'], ['joe@worldcompany.com'], ['wiliam@worldcompany.com'], ['avrel@worldcompany.com'],
                               ['lucky@luke.org'], ['lucky@worldcompany.com'], ['luke@usmarchal.gov']], server.email_list())
-            self.assertEqual(8, server.count())
             self.assertEqual(0, len(LucteriosScheduler.get_list()))
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
