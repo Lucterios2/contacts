@@ -18,6 +18,8 @@ Il est également possible de joindre à votre message un ou plusieurs documents
 L'option *document(s) ajouté(s) via liens dans le message* permet d'ajouter un ensemble de liens de partage vers vos documents (et non plus comme pièces jointes). Cela permet la transmission de documents de taille importante ou qui risqueraient d'être supprimés par certains gestionnaires de courriel.
 
 .. image:: mailing.png
+   :height: 400px
+   :align: cente
 
 Validation & transmission
 -------------------------
@@ -32,3 +34,5 @@ Si votre logiciel est accessible depuis internet, vous pouvez également consult
 Ce mécanisme se base sur l'acceptation, par votre destinataire des images distantes présentent dans le message.
 
 .. image:: transmission.png
+   :height: 400px
+   :align: cente
