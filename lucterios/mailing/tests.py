@@ -29,6 +29,7 @@ from os.path import join, dirname
 from _io import BytesIO
 from io import SEEK_END
 from email.header import decode_header
+import logging
 
 from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
@@ -62,8 +63,10 @@ class ConfigurationTest(LucteriosTest):
         rmtree(get_user_dir(), True)
         clean_sms_testfile(create_new=False)
         UserTest.smtp_port += 1
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
 
     def tearDown(self):
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.NOTSET)
         self.server.stop()
         LucteriosTest.tearDown(self)
 
@@ -541,6 +544,11 @@ class UserTest(LucteriosTest):
         change_ourdetail()
         create_jack(LucteriosUser.objects.create(first_name='jack', last_name='MISTER', username='jack', email='jack@worldcompany.com'))
         UserTest.smtp_port += 1
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
+
+    def tearDown(self):
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.NOTSET)
+        LucteriosTest.tearDown(self)
 
     def test_pwd_forget(self):
         configSMTP('localhost', UserTest.smtp_port)

@@ -25,6 +25,7 @@ along with Lucterios.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 from base64 import b64decode
 from time import sleep
+import logging
 
 
 from lucterios.framework.test import LucteriosTest, AsychronousLucteriosTest
@@ -58,6 +59,11 @@ class MailingTest(LucteriosTest):
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
         MailingTest.smtp_port += 1
         self.maxDiff=None
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
+
+    def tearDown(self):
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.NOTSET)
+        LucteriosTest.tearDown(self)
 
     def test_messages(self):
         self.factory.xfer = MessageEmailList()
@@ -653,6 +659,11 @@ class SMSTest(LucteriosTest):
         change_ourdetail(tel2="07-45-12-95-78", custom_1='abcd', custom_2=5, custom_3='0689674523')
         self.jack = create_jack(firstname="jack", lastname="MISTER", with_email=False, tel1="06-89-67-45-23", custom_1='uvw', custom_2=1, custom_4='0345987650', custom_5='blablabla')
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False, tel1="07-67-45-23-01", custom_1='xyz', custom_2=7, custom_4='0795623148', custom_5='blablabla')
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
+
+    def tearDown(self):
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.NOTSET)
+        LucteriosTest.tearDown(self)
 
     def test_messages(self):
         self.factory.xfer = MessageSMSList()
@@ -928,6 +939,11 @@ class SendMessagingTest(AsychronousLucteriosTest):
         create_jack(firstname="joe", lastname='Lindien', tel1="06-98-01-42-53")
         create_doc(LucteriosUser.objects.get(username='admin'), with_folder=False)
         SendMessagingTest.smtp_port += 1
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
+
+    def tearDown(self):
+        logging.getLogger("lucterios.mailing.test").setLevel(logging.NOTSET)
+        LucteriosTest.tearDown(self)
 
     def _test_email1(self):
         configSMTP('localhost', SendMessagingTest.smtp_port, batchtime=0.1, batchsize=4)
