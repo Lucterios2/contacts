@@ -50,6 +50,9 @@ from lucterios.mailing.email_functions import will_mail_send, send_email, EmailE
 from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver, \
     configSMS, clean_sms_testfile, read_sms
 
+if len(logging.getLogger("lucterios.mailing.test").handlers) == 0:
+    logging.getLogger("lucterios.mailing.test").addHandler(logging.StreamHandler())
+
 
 class ConfigurationTest(LucteriosTest):
 
@@ -92,12 +95,12 @@ class ConfigurationTest(LucteriosTest):
     def test_tryemail_noconfig(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('', 25)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.factory.xfer = SendEmailTry()
         self.calljson('/lucterios.mailing/sendEmailTry', {}, False)
         self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
         self.assert_json_equal('', "message", "Mauvais paramètrage du courriel")
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
     def create_dkim_file(self):
         try:
@@ -116,7 +119,7 @@ class ConfigurationTest(LucteriosTest):
         self.server.smtp.wrong_email = 'titi@machin.com'
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port, dkim_private_file=dkim_private_file)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
         self.factory.xfer = SendEmailTry()
         self.calljson('/lucterios.mailing/sendEmailTry', {}, False)
@@ -128,7 +131,7 @@ class ConfigurationTest(LucteriosTest):
         self.assert_observer('core.dialogbox', 'lucterios.mailing', 'sendEmailTry')
         self.assert_json_equal('', 'text', 'Courriel envoyé, veuillez le vérifier.')
 
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['behoa@worldcompany.com'], self.server.get(0)[2])
         msg = self.server.get_first_msg()
@@ -152,7 +155,7 @@ class ConfigurationTest(LucteriosTest):
         # self.factory.xfer = SendEmailTry()
         # self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com;titi@machin.com'}, False)
         # self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
-        # self.assertEqual(2, self.server.count())
+        # self.server.assert_count(2)
 
     def test_sms_config(self):
         from django.conf import settings
@@ -240,35 +243,35 @@ class ConfigurationTest(LucteriosTest):
     def test_send_no_config(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('', 25)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(False, will_mail_send())
         try:
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
             self.assertEqual(str(error), 'Courriel non configuré !')
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
     def test_send_bad_config(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', 1234)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         try:
             send_email('toto@machin.com', 'send without config', 'boom!!!')
             self.assertTrue(False)
         except EmailException as error:
             self.assertEqual(str(error)[:7], '[Errno ')
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
     def test_send_ok(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!')
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, params={'Organization': "WoldCompany"})
@@ -281,11 +284,11 @@ class ConfigurationTest(LucteriosTest):
         self.server.start(UserTest.smtp_port)
         change_ourdetail(name="La Dépêche")
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!')
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, params={'Organization': "La Depeche"})
@@ -297,11 +300,11 @@ class ConfigurationTest(LucteriosTest):
     def test_send_copyhimself(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', withcopy=True)
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'mr-sylvestre@worldcompany.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1)
@@ -313,11 +316,11 @@ class ConfigurationTest(LucteriosTest):
     def test_send_multi_dest(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send correct config', 'Yessss!!!')
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com, titi@machin.com', 'Cc': ''})
@@ -331,11 +334,11 @@ class ConfigurationTest(LucteriosTest):
     #     self.server.smtp.wrong_email = 'titi@machin.com'
     #     self.server.start(UserTest.smtp_port)
     #     configSMTP('localhost', UserTest.smtp_port)
-    #     self.assertEqual(0, self.server.count())
+    #     self.server.assert_count(0)
     #     self.assertEqual(True, will_mail_send())
     #     ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send with refuse', 'Yessss!!!')
     #     self.assertEqual(['titi@machin.com'], list(ret.keys()))
-    #     self.assertEqual(1, self.server.count())
+    #     self.server.assert_count(1)
     #     self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
     #     self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
     #     msg, = self.server.check_first_message('send with refuse', 1, {'To': 'toto@machin.com, titi@machin.com', 'Cc': ''})
@@ -347,11 +350,11 @@ class ConfigurationTest(LucteriosTest):
     def test_send_multi_email(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email(['toto@machin.com;titi@machin.com,tutu@machin.com'], 'send correct config', 'Yessss!!!')
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com, titi@machin.com, tutu@machin.com', 'Cc': ''})
@@ -363,11 +366,11 @@ class ConfigurationTest(LucteriosTest):
     def test_send_withcopy(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', cclist=['titi@machin.com', 'tutu@machin.com'])
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com', 'Cc': 'titi@machin.com, tutu@machin.com'})
@@ -379,11 +382,11 @@ class ConfigurationTest(LucteriosTest):
     def test_send_withbindcopy(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email('toto@machin.com', 'send correct config', 'Yessss!!!', bcclist=['titi@machin.com', 'tutu@machin.com'])
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tutu@machin.com'], self.server.get(0)[2])
         msg, = self.server.check_first_message('send correct config', 1, {'To': 'toto@machin.com', 'Cc': ''})
@@ -395,12 +398,12 @@ class ConfigurationTest(LucteriosTest):
     def test_send_withdouble(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         ret = send_email(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com'], 'send correct config', 'Yessss!!!',
                          cclist=['titi@machin.com', 'tutu@machin.com', 'tata@machin.com'], bcclist=['toto@machin.com', 'tutu@machin.com', 'tete@machin.com'])
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com', 'titi@machin.com', 'tyty@machin.com', 'tutu@machin.com',
                           'tata@machin.com', 'tete@machin.com'], self.server.get(0)[2])
@@ -415,7 +418,7 @@ class ConfigurationTest(LucteriosTest):
     def test_send_html(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         html_content = """<html>
 <body>
@@ -425,7 +428,7 @@ class ConfigurationTest(LucteriosTest):
 </html>"""
         ret = send_email('toto@machin.com', 'send html', html_content)
         self.assertEqual({}, ret)
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
         self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
         msg2, msg1, = self.server.check_first_message('send html', 2)
@@ -442,7 +445,7 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
         self.server.smtp.with_authentificate = True
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port, 0, 'toto', 'abc123')
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         with self.assertRaises(EmailException) as err:
             send_email('toto@machin.com', 'send with auth', 'OK!')
@@ -451,24 +454,24 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
     def test_send_with_starttls(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port, 1)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         with self.assertRaises(EmailException) as err:
             send_email('toto@machin.com', 'send with starttls', 'failed!')
         self.assertEqual(str(err.exception), 'STARTTLS extension not supported by server.')
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
     def test_send_with_ssl(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port, 2)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         try:
             send_email('toto@machin.com', 'send with ssl', 'not success!')
             self.assertTrue(False)
         except EmailException as error:
             self.assertTrue(('unknown protocol' in str(error)) or ('SSL: WRONG_VERSION_NUMBER' in str(error)), str(error))
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
 
     def test_send_with_files(self):
         file1 = BytesIO(get_binay('blablabla\blabla.'))
@@ -476,10 +479,10 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
         try:
             self.server.start(UserTest.smtp_port)
             configSMTP('localhost', UserTest.smtp_port)
-            self.assertEqual(0, self.server.count())
+            self.server.assert_count(0)
             self.assertEqual(True, will_mail_send())
             send_email('toto@machin.com', 'send with files', '2 files sent!', [('filename1.txt', file1), ('filename2.png', file2)])
-            self.assertEqual(1, self.server.count())
+            self.server.assert_count(1)
             self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
             self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
             msg, msg_f1, msg_f2 = self.server.check_first_message('send with files', 3)
@@ -515,12 +518,12 @@ En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb
     def test_user_change_password(self):
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port)
-        self.assertEqual(0, self.server.count())
+        self.server.assert_count(0)
         self.factory.xfer = UsersEdit()
         self.calljson('/CORE/usersEdit', {'SAVE': 'YES', 'user_actif': '1',
                                           "password_generate": 'o', "email": 'admin@super.com'}, False)
         self.assert_observer('core.acknowledge', 'CORE', 'usersEdit')
-        self.assertEqual(1, self.server.count())
+        self.server.assert_count(1)
         _msg, msg = self.server.check_first_message('Mot de passe de connexion', 2)
         self.assertEqual('text/html', msg.get_content_type())
         self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))

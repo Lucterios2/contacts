@@ -47,6 +47,9 @@ from lucterios.mailing.test_tools import configSMTP, decode_b64, TestReceiver, \
 from lucterios.mailing.sms_functions import AbstractProvider
 from lucterios.contacts.models import CustomField
 
+if len(logging.getLogger("lucterios.mailing.test").handlers) == 0:
+    logging.getLogger("lucterios.mailing.test").addHandler(logging.StreamHandler())
+
 
 class MailingTest(LucteriosTest):
 
@@ -58,7 +61,7 @@ class MailingTest(LucteriosTest):
         self.jack = create_jack(firstname="jack", lastname="MISTER", with_email=True)
         self.jean = create_jack(firstname="jean", lastname="Valjean", with_email=False)
         MailingTest.smtp_port += 1
-        self.maxDiff=None
+        self.maxDiff = None
         logging.getLogger("lucterios.mailing.test").setLevel(logging.DEBUG)
 
     def tearDown(self):

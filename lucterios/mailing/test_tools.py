@@ -176,8 +176,8 @@ class SMTPListen(object):
         finally:
             logging.getLogger("lucterios.mailing.test").debug('[email] ANALYSED - PORT=%d - %s\n', self.port, self.err_message.decode())
 
-    def check_is_running(self):
-        sleep(1.0)
+    def check_is_running(self, sleep_time=1.0):
+        sleep(sleep_time)
         logging.getLogger("lucterios.mailing.test").debug('[email] CHECK - PORT=%d - %s - %s', self.port, self.err_message, self.smpt_process.poll())
         if self.smpt_process.poll() is not None:
             raise LucteriosException(GRAVE, self.err_message.decode())
@@ -215,8 +215,11 @@ class TestReceiver(TestCase):
     def stop(self):
         self.smtp.stop()
 
-    def count(self):
-        self.smtp.check_is_running()
+    def assert_count(self, nb_expected):
+        self.assertEqual(nb_expected, self.count(1.0 * (nb_expected + 1)))
+
+    def count(self, sleep_time=1.0):
+        self.smtp.check_is_running(sleep_time)
         return len(self.smtp.emails)
 
     def get(self, index):
