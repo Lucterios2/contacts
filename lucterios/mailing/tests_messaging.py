@@ -500,22 +500,18 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             self.assertEqual(0, server.count())
 
             email_msg.sendemail(10, "http://testserver")
-            # TODO : Manage forbidden email testing
-            self.assertEqual(3, server.count())
+            self.assertEqual(2, server.count())
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(1)[1])
             self.assertEqual(['jack@worldcompany.com'], server.get(1)[2])
-            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(2)[1])
-            self.assertEqual(['titi@machin.com'], server.get(2)[2])
 
             email_sent_list = email_msg.emailsent_set.all()
             self.assertEqual(3, len(email_sent_list))
             self.assertEqual('mr-sylvestre@worldcompany.com', email_sent_list[0].email)
             self.assertEqual('', email_sent_list[0].error)
             self.assertEqual('titi@machin.com', email_sent_list[1].email)
-            # TODO : Manage forbidden email testing
-            # self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com')}", email_sent_list[1].error)
+            self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com')}", email_sent_list[1].error)
             self.assertEqual('jack@worldcompany.com', email_sent_list[2].email)
             self.assertEqual('', email_sent_list[2].error)
         finally:
@@ -620,8 +616,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_msg.sendemail(10, "http://testserver")
             self.assertEqual(4, server.count())
 
-            # TODO : Manage forbidden email testing
-            self.assertEqual(['jack@worldcompany.com', 'titi@machin.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
+            self.assertEqual(['jack@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(0)[2])
             server.get_msg_index(0, params={'To': 'jack@worldcompany.com, titi@machin.com', 'Cc': ''})
 
             self.assertEqual(['joe@worldcompany.com', 'mr-sylvestre@worldcompany.com'], server.get(1)[2])
@@ -636,8 +631,7 @@ Deque his rebus satis multa in nostris de re publica libris sunt dicta a Laelio.
             email_sent_list = email_msg.emailsent_set.all()
             self.assertEqual(4, len(email_sent_list))
             self.assertEqual(['jack@worldcompany.com;titi@machin.com'], email_sent_list[0].get_emails()[0])
-            # TODO : Manage forbidden email testing
-            #self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com'), 'jack@worldcompany.com': 'OK'}", email_sent_list[0].error)
+            self.assertEqual("{'titi@machin.com': (550, b'Bad <address> : titi@machin.com'), 'jack@worldcompany.com': 'OK'}", email_sent_list[0].error)
             self.assertEqual(['joe@worldcompany.com'], email_sent_list[1].get_emails()[0])
             self.assertEqual('', email_sent_list[1].error)
             self.assertEqual(['wiliam@worldcompany.com'], email_sent_list[2].get_emails()[0])

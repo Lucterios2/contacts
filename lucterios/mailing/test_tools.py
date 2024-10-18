@@ -26,19 +26,19 @@ from __future__ import unicode_literals
 from base64 import b64decode
 from os.path import isfile
 from os import remove
-from subprocess import Popen, PIPE
 from threading import Thread, Event
 from time import sleep
+from aiosmtpd.handlers import Message
+from aiosmtpd.controller import Controller
+from aiosmtpd.smtp import SMTP, AuthResult
+import asyncio
+import socket
 import logging
 import email
-import os
-import sys
-import re
 
 from django.test.testcases import TestCase
 
 from lucterios.CORE.parameters import Params
-from lucterios.framework.error import LucteriosException, GRAVE
 
 
 def decode_b64(data):
@@ -80,147 +80,69 @@ def read_sms(file_name='/tmp/sms.txt'):
         return None
 
 
-class SMTPListen(object):
+class RecordingHandler(Message):
+    def __init__(self, controler):
+        super().__init__(message_class=email.message.Message)
+        self.controler = controler
 
-    REGEX_RCPTO = re.compile(r".*', ([0-9]+)\) >> b'rcpt TO:<([^>]+)>'.*")
+    async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
+        if self.controler.wrong_email is not None:
+            addresses = [email.strip() for email in address.replace(',', ';').split(';') if email.strip() != '']
+            if len(addresses) == 0:
+                return '501 Syntax: RCPT TO: <address>'
+            if self.controler.wrong_email in addresses:
+                return '550 Bad <address> : %s' % self.controler.wrong_email
+        envelope.rcpt_tos.append(address)
+        return '250 OK'
 
-    def __init__(self, port=25, with_authentificate=False, auth_params=None, wrong_email=None):
+    def handle_message(self, message):
+        peer = message.get('X-Peer', '')
+        mailfrom = message.get('X-MailFrom', '')
+        rcptTO = [email.strip() for email in message.get('X-RcptTo', '').replace(',', ';').split(';')]
+        self.controler.emails.append((peer, mailfrom, rcptTO, message))
+        logging.getLogger("lucterios.mailing.test").debug('[email] MESSAGE - PORT=%d - %s\n', self.controler.port, message)
+
+
+class SMTPDController(Controller):
+
+    def __init__(self, port=8025, wrong_email=None):
+        Controller.__init__(self,
+                            handler=RecordingHandler(self),
+                            hostname='127.0.0.1',
+                            port=port)
         self.emails = []
-        self.with_authentificate = with_authentificate
-        self.auth_params = auth_params
+        self.auth_params = None
         self.wrong_email = wrong_email
-        self.seen_greeting = None
-        self.port = port
-        self._current_content = None
-        self.smpt_process = None
-        self.err_message = b''
-        self.thread_list = []
-        self.rcptTOList = {}
-        self._startevent = Event()
-
-    def _new_email(self, line):
-        self._current_content = []
-        # self._add_line(line)
-
-    def _add_line(self, line):
-        if self._current_content is not None:
-            logging.getLogger("lucterios.mailing.test").debug('[email] NEW LINE - PORT=%d - %s', self.port, line)
-            self._current_content.append(line)
-        else:
-            self._startevent.set()
-
-    def _end_email(self, line):
-        # self._add_line(line)
-        peer, mailfrom = None, None
-        for line in self._current_content:
-            if line.startswith(b'X-Peer:'):
-                peer = eval(line[7:].decode().strip())
-            if line.startswith(b'From:'):
-                mailfrom = line[5:].decode().strip()
-                if '<' in mailfrom:
-                    mailfrom = mailfrom[mailfrom.index('<') + 1:]
-                if '>' in mailfrom:
-                    mailfrom = mailfrom[:mailfrom.index('>')]
-            if peer and mailfrom:
-                break
-        rcptTO = self.rcptTOList.pop(peer[1], [])
-        logging.getLogger("lucterios.mailing.test").info('[email] NEW EMAIL - PORT=%d - %s/%s - %s - %s', self.port, peer[0], peer[1], mailfrom, rcptTO)
-        self.emails.append((peer, mailfrom, rcptTO, b''.join(self._current_content)))
-        self._current_content = None
-
-    def start(self):
-        logging.getLogger("lucterios.mailing.test").info('[email] STARTING - PORT=%d', self.port)
-        self.smpt_process = Popen("%s -m aiosmtpd -c aiosmtpd.handlers.Debugging -l 127.0.0.1:%d -n -d" % (sys.executable, self.port),
-                                  stdout=PIPE, stderr=PIPE, shell=True)
-        self.thread_list.clear()
-        self.thread_list.append(Thread(target=self.analyse, daemon=True))
-        self.thread_list.append(Thread(target=self.mngerror, daemon=True))
-        for thd in self.thread_list:
-            thd.start()
-        self._startevent.wait()
-        logging.getLogger("lucterios.mailing.test").debug('[email] STARTED - PORT=%d - %s - %s', self.port, self.err_message, self.smpt_process.poll())
-
-    def mngerror(self):
-        with self.smpt_process.stderr:
-            for line in iter(self.smpt_process.stderr.readline, b''):
-                self._startevent.set()
-                self.err_message += line
-                match_rcpto = self.REGEX_RCPTO.match(line.decode())
-                if match_rcpto:
-                    port, rcpt = match_rcpto.groups()
-                    port = int(port)
-                    if port not in self.rcptTOList:
-                        self.rcptTOList[port] = []
-                    self.rcptTOList[port].append(rcpt)
-                if self.smpt_process.poll():
-                    break
-
-    def analyse(self):
-        logging.getLogger("lucterios.mailing.test").debug('[email] ANALYSING - PORT=%d - %s - %s', self.port, self.err_message, self.smpt_process.poll())
-        try:
-            with self.smpt_process.stdout:
-                for line in iter(self.smpt_process.stdout.readline, b''):
-                    if self.smpt_process.poll():
-                        break
-                    if line == b'':
-                        print('[email] blank line')
-                        continue
-                    if b'MESSAGE FOLLOWS' in line:
-                        self._new_email(line)
-                    elif b'END MESSAGE' in line:
-                        self._end_email(line)
-                    else:
-                        self._add_line(line)
-        except Exception:
-            logging.getLogger("lucterios.mailing.test").exception('[email] ERROR ANALYSE')
-        finally:
-            logging.getLogger("lucterios.mailing.test").debug('[email] ANALYSED - PORT=%d - %s\n', self.port, self.err_message.decode())
 
     def check_is_running(self, sleep_time=1.0):
         sleep(sleep_time)
-        logging.getLogger("lucterios.mailing.test").debug('[email] CHECK - PORT=%d - %s - %s', self.port, self.err_message, self.smpt_process.poll())
-        if self.smpt_process.poll() is not None:
-            raise LucteriosException(GRAVE, self.err_message.decode())
-
-    def stop(self):
-        if self.smpt_process is None:
-            logging.getLogger("lucterios.mailing.test").debug('[email] NO STOP - PORT=%d', self.port)
-            return
-        try:
-            logging.getLogger("lucterios.mailing.test").info('[email] STOPING - PORT=%d - %s', self.port, self.smpt_process.pid)
-            os.system('pkill -TERM -P {pid}'.format(pid=self.smpt_process.pid))
-            self.smpt_process.terminate()
-            for thd in self.thread_list:
-                thd.join()
-        except Exception:
-            logging.getLogger("lucterios.mailing.test").exception('[email] ERROR STOP')
-        finally:
-            self.thread_list.clear()
-            self.smpt_process = None
-            logging.getLogger("lucterios.mailing.test").debug('[email] STOPED - PORT=%d - %s', self.port, self.err_message.decode())
 
 
 class TestReceiver(TestCase):
 
     def __init__(self):
         TestCase.__init__(self, methodName='stop')
-        self.smtp = SMTPListen()
+        self.smtp = None
 
     def start(self, port):
-        self.smtp = SMTPListen()
-        self.smtp.port = port
+        self.smtp = SMTPDController(port)
         self.smtp.start()
         logging.getLogger("lucterios.mailing.test").debug('[email] start reseiver')
 
     def stop(self):
-        self.smtp.stop()
+        if self.smtp is not None:
+            self.smtp.stop()
+            self.smtp = None
 
     def assert_count(self, nb_expected):
         self.assertEqual(nb_expected, self.count(1.0 * (nb_expected + 1)))
 
     def count(self, sleep_time=1.0):
-        self.smtp.check_is_running(sleep_time)
-        return len(self.smtp.emails)
+        if self.smtp is not None:
+            self.smtp.check_is_running(sleep_time)
+            return len(self.smtp.emails)
+        else:
+            return -1
 
     def get(self, index):
         return self.smtp.emails[index]
@@ -229,11 +151,7 @@ class TestReceiver(TestCase):
         return [email[2] for email in self.smtp.emails]
 
     def get_first_msg(self):
-        data = self.get(0)[3]
-        if hasattr(data, 'decode'):
-            data = data.decode()
-        msg = email.message_from_string(data)
-        return msg
+        return self.get(0)[3]
 
     def convert_message(self, msg_list):
         msg_result = []
@@ -252,10 +170,7 @@ class TestReceiver(TestCase):
             "mailfrom": str(self.get(index)[1]),
             "rcpttos": ";".join(self.get(index)[2])
         }
-        data = self.get(index)[3]
-        if hasattr(data, 'decode'):
-            data = data.decode()
-        msg = email.message_from_string(data)
+        msg = self.get(index)[3]
         if params is None:
             params = {}
         if isinstance(params, dict):

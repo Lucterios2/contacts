@@ -116,8 +116,8 @@ class ConfigurationTest(LucteriosTest):
 
     def test_tryemail_success(self):
         dkim_private_file = self.create_dkim_file()
-        self.server.smtp.wrong_email = 'titi@machin.com'
         self.server.start(UserTest.smtp_port)
+        self.server.smtp.wrong_email = 'titi@machin.com'
         configSMTP('localhost', UserTest.smtp_port, dkim_private_file=dkim_private_file)
         self.server.assert_count(0)
 
@@ -151,14 +151,12 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('base64', msg_text.get('Content-Transfer-Encoding', ''))
         self.assertEqual('Courriel envoyé pour vérifier la configuration  \n  \nWoldCompany', decode_b64(msg_text.get_payload())[:63])
 
-        # TODO : Manage forbidden email testing
-        # self.factory.xfer = SendEmailTry()
-        # self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com;titi@machin.com'}, False)
-        # self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
-        # self.server.assert_count(2)
+        self.factory.xfer = SendEmailTry()
+        self.calljson('/lucterios.mailing/sendEmailTry', {'CONFIRME': 'YES', "recipient": 'behoa@worldcompany.com;titi@machin.com'}, False)
+        self.assert_observer('core.exception', 'lucterios.mailing', 'sendEmailTry')
+        self.server.assert_count(2)
 
     def test_sms_config(self):
-        from django.conf import settings
         setattr(settings, "MAILING_TESTSMS", True)
 
         self.factory.xfer = Configuration()
@@ -329,23 +327,22 @@ class ConfigurationTest(LucteriosTest):
         self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
         self.assertEqual(None, self.server.smtp.auth_params)
 
-    # TODO : Manage forbidden email testing
-    # def test_send_multi_dest_with_refuse(self):
-    #     self.server.smtp.wrong_email = 'titi@machin.com'
-    #     self.server.start(UserTest.smtp_port)
-    #     configSMTP('localhost', UserTest.smtp_port)
-    #     self.server.assert_count(0)
-    #     self.assertEqual(True, will_mail_send())
-    #     ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send with refuse', 'Yessss!!!')
-    #     self.assertEqual(['titi@machin.com'], list(ret.keys()))
-    #     self.server.assert_count(1)
-    #     self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
-    #     self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
-    #     msg, = self.server.check_first_message('send with refuse', 1, {'To': 'toto@machin.com, titi@machin.com', 'Cc': ''})
-    #     self.assertEqual('text/plain', msg.get_content_type())
-    #     self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-    #     self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
-    #     self.assertEqual(None, self.server.smtp.auth_params)
+    def test_send_multi_dest_with_refuse(self):
+        self.server.start(UserTest.smtp_port)
+        self.server.smtp.wrong_email = 'titi@machin.com'
+        configSMTP('localhost', UserTest.smtp_port)
+        self.server.assert_count(0)
+        self.assertEqual(True, will_mail_send())
+        ret = send_email(['toto@machin.com', 'titi@machin.com'], 'send with refuse', 'Yessss!!!')
+        self.assertEqual(['titi@machin.com'], list(ret.keys()))
+        self.server.assert_count(1)
+        self.assertEqual('mr-sylvestre@worldcompany.com', self.server.get(0)[1])
+        self.assertEqual(['toto@machin.com'], self.server.get(0)[2])
+        msg, = self.server.check_first_message('send with refuse', 1, {'To': 'toto@machin.com, titi@machin.com', 'Cc': ''})
+        self.assertEqual('text/plain', msg.get_content_type())
+        self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+        self.assertEqual('Yessss!!!', decode_b64(msg.get_payload()))
+        self.assertEqual(None, self.server.smtp.auth_params)
 
     def test_send_multi_email(self):
         self.server.start(UserTest.smtp_port)
@@ -442,14 +439,14 @@ class ConfigurationTest(LucteriosTest):
 En here, there are a nice [link](https://truc-muche-machin.zb/aaaa_aaa/bbbb-bbbb/cccc.cccc/dddd%20dddd/bidule.pdf).""", decode_b64(msg2.get_payload()).strip())
 
     def test_send_with_auth(self):
-        self.server.smtp.with_authentificate = True
         self.server.start(UserTest.smtp_port)
         configSMTP('localhost', UserTest.smtp_port, 0, 'toto', 'abc123')
         self.server.assert_count(0)
         self.assertEqual(True, will_mail_send())
         with self.assertRaises(EmailException) as err:
-            send_email('toto@machin.com', 'send with auth', 'OK!')
+            send_email('toto@machin.com', 'send with auth', 'BAD!')
         self.assertEqual(str(err.exception), 'SMTP AUTH extension not supported by server.')
+        self.server.assert_count(0)
 
     def test_send_with_starttls(self):
         self.server.start(UserTest.smtp_port)
