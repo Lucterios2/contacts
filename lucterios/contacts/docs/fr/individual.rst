@@ -13,6 +13,8 @@ La liste des personnes déjà enregistrées s'affiche. Étant donné que celle-c
 Depuis cet écran, vous avez aussi la possibilité d'imprimer la liste des personnes et les étiquettes pour le courrier.
 
 .. image:: ListIndividual.png
+   :height: 400px
+   :align: center
 
 Visualisation d'un contact physique
 -----------------------------------
