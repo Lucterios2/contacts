@@ -28,7 +28,7 @@ from django.apps import apps
 
 from lucterios.contacts.models import AbstractContact
 from lucterios.framework.xfersearch import XferSearchEditor
-from lucterios.framework.xfercomponents import XferCompSelect, XferCompLabelForm
+from lucterios.framework.xfercomponents import XferCompSelect
 from lucterios.framework.tools import FORMTYPE_REFRESH, CLOSE_NO, CLOSE_YES, SELECT_SINGLE
 from lucterios.CORE.editors import XferSavedCriteriaSearchEditor
 from lucterios.framework.xferadvance import TITLE_OK

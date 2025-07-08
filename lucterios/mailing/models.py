@@ -634,6 +634,8 @@ class EmailSent(LucteriosModel):
             email, ccemail = self.get_emails()
             getLogger('lucterios.mailing').debug('send email %s : %s' % (self.message.subject, email))
             no_send_list = send_email(split_doubled_email(email), self.replace_tag(self.message.subject), body, files=self.get_attach_files(), cclist=split_doubled_email(ccemail), withcopy=self.item is not None, body_txt=body_txt)
+            if (self.item is not None) and hasattr(self.item, 'email_sended'):
+                self.item.email_sended()
             self.success = True
             if len(no_send_list) > 0:
                 email_list = email
