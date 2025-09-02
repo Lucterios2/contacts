@@ -28,6 +28,7 @@ from datetime import datetime
 from unicodedata import normalize, category
 import logging
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db.models.aggregates import Max
 from django.db import models
@@ -525,6 +526,17 @@ class AbstractContact(LucteriosModel, CustomizeObject):
             cls.import_logs.append(str(import_error))
             logging.getLogger('lucterios.contacts').exception("import_data")
             return None
+
+    @property
+    def country_id(self):
+        country = self.country[:2].upper().strip()
+        if len(country) != 2:
+            country = settings.LANGUAGE_CODE.upper()
+        return country
+
+    @property
+    def address_list(self):
+        return self.address.replace('{[newline/]}', '\n').replace('{[br/]}', '\n').split('\n')
 
     def get_presentation(self):
         return ""

@@ -26,13 +26,9 @@ from __future__ import unicode_literals
 from base64 import b64decode
 from os.path import isfile
 from os import remove
-from threading import Thread, Event
 from time import sleep
 from aiosmtpd.handlers import Message
 from aiosmtpd.controller import Controller
-from aiosmtpd.smtp import SMTP, AuthResult
-import asyncio
-import socket
 import logging
 import email
 
