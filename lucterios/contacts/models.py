@@ -577,13 +577,17 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 class LegalEntity(AbstractContact):
     name = models.CharField(_('denomination'), max_length=100, blank=False)
     structure_type = models.ForeignKey('StructureType', verbose_name=_('structure type'), null=True, on_delete=models.SET_NULL)
-    identify_number = models.TextField(_('identify number'), blank=True)
+
+    legal_identification = models.CharField(_('legal identification'), max_length=30, blank=True)
+    vat_identification = models.CharField(_('VAT identification number'), max_length=20, blank=True)
+
+    identify_number = models.TextField(_('other identify information'), blank=True)
 
     @classmethod
     def get_show_fields(cls):
         ident_field = ['name', 'structure_type']
         ident_field.extend(super(LegalEntity, cls).get_show_fields())
-        ident_field.append('identify_number')
+        ident_field.extend(['legal_identification', 'vat_identification', 'identify_number'])
         res_fields = {_('001@Identity'): ident_field, _('002@Members'): ['responsability_set']}
         return res_fields
 
@@ -591,15 +595,17 @@ class LegalEntity(AbstractContact):
     def get_edit_fields(cls):
         res_fields = ['name', 'structure_type']
         res_fields.extend(super(LegalEntity, cls).get_edit_fields())
-        res_fields.append('identify_number')
+        res_fields.extend(['legal_identification', 'vat_identification', 'identify_number'])
         return res_fields
 
     @classmethod
     def get_search_fields(cls, with_addon=True):
         res_fields = ['name', 'structure_type']
         res_fields.extend(super(LegalEntity, cls).get_search_fields(with_addon=False))
-        res_fields.extend(['identify_number', 'responsability_set.individual.firstname',
-                           'responsability_set.individual.lastname', 'responsability_set.functions'])
+        res_fields.extend(['legal_identification', 'vat_identification', 'identify_number',
+                           'responsability_set.individual.firstname',
+                           'responsability_set.individual.lastname',
+                           'responsability_set.functions'])
         if with_addon:
             Signal.call_signal("addon_search", cls, res_fields)
         return res_fields
@@ -613,7 +619,7 @@ class LegalEntity(AbstractContact):
         ident_field = ["image", "name", 'structure_type',
                        'address', 'postal_code', 'city', 'country',
                        'tel1', 'tel2', 'email']
-        ident_field.extend(['comment', 'identify_number', 'OUR_DETAIL'])
+        ident_field.extend(['comment', 'legal_identification', 'vat_identification', 'identify_number', 'OUR_DETAIL'])
         return ident_field
 
     def __str__(self):

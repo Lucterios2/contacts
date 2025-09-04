@@ -299,7 +299,9 @@ class LegalEntityEditor(AbstractContactEditor):
     def edit(self, xfer):
         if self.item.id == 1:
             xfer.remove_component('structure_type')
-        return AbstractContactEditor.edit(self, xfer)
+        AbstractContactEditor.edit(self, xfer)
+        obj_user = xfer.get_components('vat_identification')
+        obj_user.mask = '(^$|[A-Z]{2}[0-9A-Za-z\+\*\.]{2,12})'
 
     def show(self, xfer):
         if self.item.id == 1:
