@@ -33,10 +33,10 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models.query import QuerySet
 from django.apps import apps
-from django_fsm import FSMIntegerField, transition
 from django.utils import timezone
 
 from lucterios.framework.models import LucteriosModel
+from lucterios.framework.model_fields import FSMIntegerField, transition
 from lucterios.framework.model_fields import LucteriosVirtualField, \
     LucteriosScheduler
 from lucterios.framework.xfersearch import get_search_query_from_criteria
