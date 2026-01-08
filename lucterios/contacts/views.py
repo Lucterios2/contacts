@@ -264,19 +264,28 @@ class CreateAccount(XferContainerAcknowledge):
     @transaction.atomic
     def create_account_atomic(self, username, legalentity):
         defaultgroup = Params.getobject("contacts-defaultgroup")
-        if username == '':
-            username = self.item.create_username()
-        user = LucteriosUser()
-        user.username = username
+        user = LucteriosUser.objects.filter(email=self.item.email).first()
+        if user is None:
+            user = LucteriosUser()
+            if username == '':
+                username = self.item.create_username()
+            user.username = username
+            user.email = self.item.email
+        user.is_active = True
         user.first_name = self.item.firstname
         user.last_name = self.item.lastname
-        user.email = self.item.email
         user.save()
         if defaultgroup is not None:
             user.groups.add(defaultgroup)
-        self.item.address = '---'
-        self.item.postal_code = '---'
-        self.item.city = '---'
+        if (user.id is not None) and (Individual.objects.filter(user=user).count() > 0):
+            self.item = Individual.objects.filter(user=user).first()
+            self.item.firstname = user.first_name
+            self.item.lastname = user.last_name
+            self.item.email = user.email
+        if self.item.id is None:
+            self.item.address = '---'
+            self.item.postal_code = '---'
+            self.item.city = '---'
         self.item.user = user
         self.item.save()
         if legalentity != '':
@@ -293,11 +302,11 @@ class CreateAccount(XferContainerAcknowledge):
     @transaction.non_atomic_requests
     def create_account(self, username, legalentity):
         try:
-            if LucteriosUser.objects.filter(email=self.item.email, is_active=True).count() > 0:
-                raise IntegrityError()
             self.create_account_atomic(username, legalentity)
             self.item.user.generate_password()
             self.message(_("Your account is created.{[br/]}You will receive an email with your password."))
+        except LucteriosException as err:
+            self.redirect_act = (self.return_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': str(err)})
         except IntegrityError:
             self.redirect_act = (self.return_action('', ''), FORMTYPE_MODAL, CLOSE_YES, {"SAVE": "", 'error': _("This account exists yet!")})
 

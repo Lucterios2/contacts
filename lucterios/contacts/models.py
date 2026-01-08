@@ -635,6 +635,10 @@ class LegalEntity(AbstractContact):
         else:
             return "%s (%s)" % (", ".join(sub_contact), self.name)
 
+    def get_legal_identification(self):
+        import re
+        return re.sub('[^0-9]+', '', self.legal_identification)
+
     def get_email(self, only_main=None):
         email_list = AbstractContact.get_email(self, only_main)
         if only_main is not True:

@@ -751,14 +751,6 @@ class UserTest(LucteriosTest):
         try:
             self.factory.xfer = CreateAccount()
             self.calljson('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
-                                                                'lastname': 'DUPONT', 'email': 'jack@worldcompany.com'}, False)
-            self.assert_observer('core.acknowledge', 'lucterios.contacts', 'createAccount')
-            self.assertEqual(len(self.json_context), 5)
-            self.assert_action_equal('POST', self.response_json['action'], ('', None, 'lucterios.contacts', 'createAccount', 1, 1, 1, {"SAVE": '', "error": "Ce compte existe déjà !"}))
-            self.assertEqual(0, server.count())
-
-            self.factory.xfer = CreateAccount()
-            self.calljson('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
                                                                 'lastname': 'DUPONT', 'email': 'pierre@worldcompany.com'}, False)
             self.assert_observer('core.dialogbox', 'lucterios.contacts', 'createAccount')
             self.assert_json_equal('', 'text', 'Votre compte est créé{[br/]}Vous allez recevoir un courriel avec votre mot de passe.')
@@ -793,3 +785,66 @@ class UserTest(LucteriosTest):
         moral = LegalEntity.objects.filter(responsability__individual__user=user)
         self.assertEqual(0, len(moral))
         self.assertEqual(1, len(LegalEntity.objects.all()))
+
+    def test_failed_account_already_exist(self):
+        settings.ASK_LOGIN_EMAIL = True
+        settings.LOGIN_FIELD = 'email'
+        param = Parameter.objects.get(name='contacts-createaccount')
+        param.value = '1'
+        param.save()
+        configSMTP('localhost', UserTest.smtp_port)
+
+        users = LucteriosUser.objects.all()
+        self.assertEqual(users.count(), 2)
+        self.assertEqual(users[0].id, 1)
+        self.assertEqual(users[0].username, 'admin')
+        self.assertEqual(users[0].email, '')
+        self.assertEqual(users[1].id, 2)
+        self.assertEqual(users[1].username, 'jack')
+        self.assertEqual(users[1].first_name, 'jack')
+        self.assertEqual(users[1].last_name, 'MISTER')
+        self.assertEqual(users[1].email, 'jack@worldcompany.com')
+
+        contacts = Individual.objects.all()
+        self.assertEqual(contacts.count(), 1)
+
+        server = TestReceiver()
+        server.start(UserTest.smtp_port)
+        try:
+            self.factory.xfer = CreateAccount()
+            self.calljson('/lucterios.contacts/createAccount', {'SAVE': 'YES', 'firstname': 'pierre', 'genre': 1,
+                                                                'lastname': 'DUPONT', 'email': 'jack@worldcompany.com'}, False)
+            self.assert_observer('core.dialogbox', 'lucterios.contacts', 'createAccount')
+            self.assert_json_equal('', 'text', 'Votre compte est créé{[br/]}Vous allez recevoir un courriel avec votre mot de passe.')
+            self.assertEqual(1, server.count())
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
+            self.assertEqual(['jack@worldcompany.com'], server.get(0)[2])
+            _msg, msg, = server.check_first_message('Mot de passe de connexion', 2)
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            message = decode_b64(msg.get_payload())
+            self.assertEqual('<html><p>Bienvenue<br/><br/>Confirmation de connexion à votre application :'
+                             '<br/> - Identifiant : jack@worldcompany.com<br/> - Mot de passe : ', message[:141])
+            password = message[141:].split('<br/>')[0]
+        finally:
+            server.stop()
+
+        users = LucteriosUser.objects.all()
+        self.assertEqual(users.count(), 2)
+        self.assertEqual(users[0].id, 1)
+        self.assertEqual(users[0].username, 'admin')
+        self.assertEqual(users[0].email, '')
+        self.assertEqual(users[1].id, 2)
+        self.assertEqual(users[1].username, 'jack')
+        self.assertEqual(users[1].first_name, 'pierre')
+        self.assertEqual(users[1].last_name, 'DUPONT')
+        self.assertEqual(users[1].email, 'jack@worldcompany.com')
+        self.assertTrue(users[1].check_password(password), 'success after change')
+
+        contacts = Individual.objects.all()
+        self.assertEqual(contacts.count(), 1)
+        self.assertEqual(contacts[0].firstname, 'pierre')
+        self.assertEqual(contacts[0].lastname, 'DUPONT')
+        self.assertEqual(contacts[0].email, 'jack@worldcompany.com')
+        self.assertEqual(contacts[0].postal_code, '97250')
+        self.assertEqual(contacts[0].city, "LE PRECHEUR")
