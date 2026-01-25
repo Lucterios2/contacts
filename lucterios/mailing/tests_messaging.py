@@ -225,7 +225,7 @@ class MailingTest(LucteriosTest):
         self.factory.xfer = MessageTransition()
         self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'sending'}, False)
         self.assert_observer('core.dialogbox', 'lucterios.mailing', 'messageTransition')
-        self.assert_json_equal('', 'text', 'Voulez-vous envoyer ce message 2 fois sur 2 contacts ?')
+        self.assert_json_equal('', 'text', 'Voulez-vous envoyer ce message à 2 contacts ?')
 
     def test_letter_message(self):
         self.factory.xfer = MessageAddModify()
@@ -804,7 +804,7 @@ class SMSTest(LucteriosTest):
         self.factory.xfer = MessageTransition()
         self.calljson('/lucterios.mailing/messageTransition', {'message': '1', 'TRANSITION': 'sending'}, False)
         self.assert_observer('core.dialogbox', 'lucterios.mailing', 'messageTransition')
-        self.assert_json_equal('', 'text', 'Voulez-vous envoyer ce message 2 fois sur 2 contacts ?')
+        self.assert_json_equal('', 'text', 'Voulez-vous envoyer ce message à 2 contacts ?')
 
     def test_trysend(self):
         configSMS()
@@ -943,6 +943,21 @@ class SendMessagingTest(AsychronousLucteriosTest):
         LucteriosTest.tearDown(self)
 
     def _test_email1(self):
+        def _check_msg(msg_txt, msg, msg_file1, msg_file3, index):
+            self.assertEqual('text/html', msg.get_content_type())
+            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
+            self.assertEqual("<html><body><b><font color=\"blue\">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye<img src='http://testserver/lucterios.mailing/emailSentAddForStatistic?emailsent=%d' alt=''/></body></html>" % index, decode_b64(msg.get_payload()))
+            self.assertEqual('text/plain', msg_txt.get_content_type())
+            self.assertEqual("**All**  \nSmall message to give a big _kiss_ ;)  \n  \nBye\n\n", decode_b64(msg_txt.get_payload()))
+            self.assertTrue('doc1.png' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
+            content_msg1 = b64decode(msg_file1.get_payload())
+            self.assertEqual(b"\x89PNG", content_msg1[:4])
+            self.assertEqual(42023, len(content_msg1))
+            self.assertTrue('doc3.png' in msg_file3.get('Content-Type', ''), msg_file3.get('Content-Type', ''))
+            content_msg3 = b64decode(msg_file3.get_payload())
+            self.assertEqual(b"\x89PNG", content_msg3[:4])
+            self.assertEqual(51845, len(content_msg3))
+
         configSMTP('localhost', SendMessagingTest.smtp_port, batchtime=0.1, batchsize=4)
         self.calljson('/lucterios.mailing/messageAddModify', {'message_type': 0, 'SAVE': 'YES', 'doc_in_link': 0, 'subject': 'new message', 'body': '{[b]}{[font color="blue"]}All{[/font]}{[/b]}{[newline]}Small message to give a big {[u]}kiss{[/u]} ;){[newline]}{[newline]}Bye'})
         self.assert_action_equal('GET', self.response_json['action'], ('Editer', 'mdi:mdi-text-box-outline', 'lucterios.mailing', 'messageShow', 1, 1, 1, {'message': '1'}))
@@ -967,20 +982,11 @@ class SendMessagingTest(AsychronousLucteriosTest):
             self.assertEqual('mr-sylvestre@worldcompany.com', server.get(0)[1])
             self.assertEqual(['mr-sylvestre@worldcompany.com'], server.get(0)[2])
             msg_txt, msg, msg_file1, msg_file3 = server.check_first_message('new message', 4)
-            self.assertEqual('text/html', msg.get_content_type())
-            self.assertEqual('base64', msg.get('Content-Transfer-Encoding', ''))
-            self.assertEqual(
-                "<html><body><b><font color=\"blue\">All</font></b><br/>Small message to give a big <u>kiss</u> ;)<br/><br/>Bye<img src='http://testserver/lucterios.mailing/emailSentAddForStatistic?emailsent=1' alt=''/></body></html>", decode_b64(msg.get_payload()))
-            self.assertEqual('text/plain', msg_txt.get_content_type())
-            self.assertEqual("**All**  \nSmall message to give a big _kiss_ ;)  \n  \nBye\n\n", decode_b64(msg_txt.get_payload()))
-            self.assertTrue('doc1.png' in msg_file1.get('Content-Type', ''), msg_file1.get('Content-Type', ''))
-            content_msg1 = b64decode(msg_file1.get_payload())
-            self.assertEqual(b"\x89PNG", content_msg1[:4])
-            self.assertEqual(42023, len(content_msg1))
-            self.assertTrue('doc3.png' in msg_file3.get('Content-Type', ''), msg_file3.get('Content-Type', ''))
-            content_msg3 = b64decode(msg_file3.get_payload())
-            self.assertEqual(b"\x89PNG", content_msg3[:4])
-            self.assertEqual(51845, len(content_msg3))
+            _check_msg(msg_txt, msg, msg_file1, msg_file3, 1)
+            self.assertEqual('mr-sylvestre@worldcompany.com', server.get(-1)[1])
+            self.assertEqual(['luke@usmarchal.gov'], server.get(-1)[2])
+            msg_txt, msg, msg_file1, msg_file3 = server.check_last_message('new message', 4)
+            _check_msg(msg_txt, msg, msg_file1, msg_file3, 8)
         finally:
             server.stop()
 

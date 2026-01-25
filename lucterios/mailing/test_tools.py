@@ -183,3 +183,8 @@ class TestReceiver(TestCase):
         msg_result = self.get_msg_index(0, subject, params)
         self.assertEqual(nb_multi, len(msg_result))
         return msg_result
+
+    def check_last_message(self, subject, nb_multi, params=None):
+        msg_result = self.get_msg_index(-1, subject, params)
+        self.assertEqual(nb_multi, len(msg_result))
+        return msg_result
