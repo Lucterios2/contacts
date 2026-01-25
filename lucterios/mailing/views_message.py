@@ -246,8 +246,7 @@ class MessageTransition(XferTransition):
 
     def fill_confirm(self, transition, trans):
         if transition == 'sending':
-            if self.confirme(_("Do you want to sent this message %(nb_msg)d times to %(nb_contact)d contacts?") % {'nb_msg': self.item.prep_sending(),
-                                                                                                                   'nb_contact': self.item.contact_nb - len(self.item.contact_noemail) - len(self.item.contact_nosms)}):
+            if self.confirme(_("Do you want to sent this message to %(nb_contact)d contacts?") % {'nb_contact': self.item.contact_nb - len(self.item.contact_noemail) - len(self.item.contact_nosms)}):
                 self._confirmed(transition)
                 self.message(_("This message is being transmitted"))
         else:

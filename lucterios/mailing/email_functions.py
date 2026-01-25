@@ -117,6 +117,7 @@ def _append_dkim_signature(msg, domain, dkim_private_path, dkim_selector):
 def _append_files(msg, files):
     if (files is not None) and (len(files) > 0):
         for filename, file in files:
+            file.seek(0, 0)
             msg.attach(MIMEApplication(file.read(), Content_Disposition='attachment; filename="%s"' % filename, Name=filename))
 
 

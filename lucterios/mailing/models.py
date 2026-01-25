@@ -117,6 +117,7 @@ class Message(LucteriosModel):
     doc_in_link = models.BooleanField(_('documents in link'), null=False, default=False)
 
     size_sms = LucteriosVirtualField(verbose_name=_('sms size'), compute_from='get_size_sms')
+    sender_nb = LucteriosVirtualField(verbose_name=_('number of sender'), compute_from='get_sender_nb', format_string='N')
     contact_nb = LucteriosVirtualField(verbose_name=_('number of recipients'), compute_from='get_contact_nb', format_string='N')
     contact_noemail = LucteriosVirtualField(verbose_name=_('without email address'), compute_from='get_contact_noemail')
     contact_nosms = LucteriosVirtualField(verbose_name=_('without sms/phone'), compute_from='get_contact_nosms')
@@ -140,7 +141,7 @@ class Message(LucteriosModel):
 
     @classmethod
     def get_default_fields(cls):
-        return ['status', 'date', 'subject', 'contact_nb']
+        return ['status', 'date', 'subject', 'sender_nb']
 
     @classmethod
     def get_show_fields(cls):
@@ -161,6 +162,12 @@ class Message(LucteriosModel):
     @property
     def empty(self):
         return ""
+
+    def get_sender_nb(self):
+        if self.nb_total > 0:
+            return self.nb_total
+        else:
+            return self.get_contact_nb()
 
     def get_contact_nb(self):
         if self.message_type == self.MESSAGE_TYPE_EMAIL:
