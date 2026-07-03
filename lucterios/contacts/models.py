@@ -529,10 +529,21 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
     @property
     def country_id(self):
-        country = self.country[:2].upper().strip()
-        if len(country) != 2:
-            country = settings.LANGUAGE_CODE.upper()
-        return country
+        import pycountry
+        country = pycountry.countries.get(name=self.country)
+        if country is None:
+            return self.country[:2].upper().strip()
+        else:
+            return country.alpha_2
+
+    @country_id.setter
+    def country_id(self, country_id):
+        import pycountry
+        country = pycountry.countries.get(alpha_2=country_id)
+        if country is None:
+            self.country = country_id
+        else:
+            self.country = country.name
 
     @property
     def address_list(self):
@@ -637,7 +648,7 @@ class LegalEntity(AbstractContact):
 
     def get_legal_identification(self):
         import re
-        return re.sub('[^0-9]+', '', self.legal_identification)
+        return re.sub('[^0-9_]+', '', self.legal_identification)
 
     def get_email(self, only_main=None):
         email_list = AbstractContact.get_email(self, only_main)
