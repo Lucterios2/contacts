@@ -547,7 +547,10 @@ class AbstractContact(LucteriosModel, CustomizeObject):
 
     @property
     def address_list(self):
-        return self.address.replace('{[newline/]}', '\n').replace('{[br/]}', '\n').split('\n')
+        ret_address = self.address.replace('{[newline/]}', '\n').replace('{[br/]}', '\n').split('\n')
+        while len(ret_address) < 3:
+            ret_address.append('')
+        return ret_address
 
     def get_presentation(self):
         return ""
@@ -648,7 +651,7 @@ class LegalEntity(AbstractContact):
 
     def get_legal_identification(self):
         import re
-        return re.sub('[^0-9_]+', '', self.legal_identification)
+        return re.sub('[^0-9_:]+', '', self.legal_identification)
 
     def get_email(self, only_main=None):
         email_list = AbstractContact.get_email(self, only_main)
